@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q1 2026 Earnings Commentary from Management — DUMAC Direct Research</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #1a202c;
+    background-color: #f5f7fa;
+  }
+  header {
+    background: linear-gradient(135deg, #0a2540 0%, #1e3a5f 100%);
+    color: #fff;
+    padding: 48px 24px 44px;
+    text-align: center;
+    border-bottom: 4px solid #c5a572;
+  }
+  header .breadcrumb {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.75;
+    margin-bottom: 14px;
+  }
+  header .breadcrumb a {
+    color: #fff;
+    text-decoration: none;
+  }
+  header .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+  header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  header .subtitle {
+    font-size: 0.98rem;
+    opacity: 0.88;
+    font-weight: 300;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+  /* Table of Contents */
+  .toc {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #c5a572;
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .toc-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #4a5568;
+    margin-bottom: 16px;
+  }
+  .toc-list {
+    list-style: none;
+  }
+  .toc-list > li {
+    padding: 12px 0;
+    border-bottom: 1px solid #edf2f7;
+  }
+  .toc-list > li:last-child {
+    border-bottom: none;
+  }
+  .toc-list a.toc-main {
+    color: #0a2540;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05rem;
+    display: inline-block;
+  }
+  .toc-list a.toc-main:hover {
+    color: #c5a572;
+  }
+  .toc-question {
+    color: #4a5568;
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-top: 4px;
+    margin-left: 4px;
+    line-height: 1.45;
+  }
+
+  /* Section styling */
+  .section {
+    scroll-margin-top: 20px;
+    margin-bottom: 56px;
+  }
+  .section-header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+    color: #fff;
+    padding: 28px 32px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 3px solid #c5a572;
+  }
+  .section-header h2 {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+  }
+  .focus-question {
+    font-size: 0.95rem;
+    opacity: 0.92;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .focus-question strong {
+    font-style: normal;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    margin-right: 8px;
+    background: rgba(197, 165, 114, 0.25);
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .section-body {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 8px 0;
+  }
+  .companies-info {
+    padding: 16px 32px;
+    background: #f8fafc;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 0.88rem;
+    color: #4a5568;
+  }
+  .companies-info strong {
+    color: #1e3a5f;
+  }
+
+  /* Company card */
+  .company-card {
+    padding: 24px 32px;
+    border-bottom: 1px solid #edf2f7;
+  }
+  .company-card:last-child {
+    border-bottom: none;
+  }
+  .company-card h3 {
+    font-size: 1.25rem;
+    color: #0a2540;
+    margin-bottom: 4px;
+  }
+  .ticker {
+    color: #2c5282;
+    font-weight: 700;
+  }
+  .call-meta {
+    color: #718096;
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-bottom: 14px;
+  }
+  ul.quotes {
+    list-style: none;
+  }
+  ul.quotes li {
+    position: relative;
+    padding: 9px 0 9px 22px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+  ul.quotes li:last-child {
+    border-bottom: none;
+  }
+  ul.quotes li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    color: #c5a572;
+    font-size: 0.85rem;
+  }
+  ul.quotes blockquote {
+    margin: 0;
+    display: inline;
+  }
+  .speaker {
+    color: #4a5568;
+    font-size: 0.83rem;
+    font-style: italic;
+    display: block;
+    margin-top: 4px;
+  }
+  .note {
+    background: #fffbea;
+    border-left: 3px solid #d69e2e;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 0.88rem;
+    color: #5c4a16;
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* Back to top */
+  .back-to-top {
+    display: block;
+    text-align: right;
+    margin: 16px 32px 0;
+    font-size: 0.82rem;
+    color: #2c5282;
+    text-decoration: none;
+  }
+  .back-to-top:hover {
+    text-decoration: underline;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    color: #718096;
+    font-size: 0.82rem;
+    padding: 24px 16px 40px;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.5rem; }
+    .container { padding: 24px 16px; }
+    .section-header { padding: 22px 20px; }
+    .companies-info, .company-card { padding-left: 20px; padding-right: 20px; }
+    .toc { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="breadcrumb"><a href="index.html">DUMAC Direct Research</a> &nbsp;/&nbsp; Q1 2026 Commentary</p>
+  <h1>Q1 2026 Earnings Commentary from Management</h1>
+  <p class="subtitle">Direct quotes from recent earnings call transcripts</p>
+</header>
+
+<div class="container">
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <div class="toc-label">Table of Contents</div>
+    <ul class="toc-list">
+      <li>
+        <a href="#trucking" class="toc-main">1. Trucking &amp; Logistics</a>
+        <p class="toc-question"><strong>Focus:</strong> What are management teams saying about the current market environment and recent trends?</p>
+      </li>
+      <li>
+        <a href="#advertising" class="toc-main">2. Advertising &amp; Marketing</a>
+        <p class="toc-question"><strong>Focus:</strong> How is AI affecting advertising and marketing trends, and how are these companies dealing with AI?</p>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ============================================================ -->
+  <!-- TRUCKING SECTION                                              -->
+  <!-- ============================================================ -->
+  <section class="section" id="trucking">
+    <div class="section-header">
+      <h2>1. Trucking &amp; Logistics</h2>
+      <p class="focus-question"><strong>Focus Question</strong>What are management teams saying about the current market environment and recent trends?</p>
+    </div>
+
+    <div class="section-body">
+      <div class="companies-info">
+        <strong>Companies covered:</strong> SAIA, KNX, ODFL, JBHT, SNDR, WERN, XPO
+      </div>
+
+      <!-- SAIA -->
+      <div class="company-card">
+        <h3>SAIA <span class="ticker">(SAIA)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 30, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"While 2026 has shown some positive demand signals, the ever-changing macroeconomic environment continues to create uncertainty from a customer perspective."</blockquote>
+            <span class="speaker">— Fritz Holzgrefe, CEO</span>
+          </li>
+          <li>
+            <blockquote>"We have waited for the market to firm so we can show the value of a 214-terminal network. We offered a range this year of 100 to 200 basis points in a choppy market with improving sentiment."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Based on customer feedback, we do not see evidence of broad pull-forward. Sentiment is improving and feels more durable across end markets… what we are seeing today appears to be driven by service performance, footprint expansion, and customers consolidating to reliable partners rather than timing-related pull-forward."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Q1 2026 was no different than history with weather impacting operational results. This year was pronounced as we saw weather patterns impacting our core and profitable Texas and Mid-South regions… we saw seasonality increase in March, particularly the second half of the month, as our customers began to tap our national network."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We noted in Q1 that employee-related costs associated with running the business continued to be inflationary."</blockquote>
+          </li>
+          <li>
+            <blockquote>On end markets: "feedback from customers is consistent across all markets, with no particular sector outpacing another. The sentiment is generally positive."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- KNX -->
+      <div class="company-card">
+        <h3>Knight-Swift <span class="ticker">(KNX)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 22, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"The truckload market continues to tighten, largely due to capacity, though some indications of improving demand are beginning to emerge. Broad truckload market indicators show improving trends for load tenders, tender rejections, and spot pricing."</blockquote>
+            <span class="speaker">— Adam Miller, CEO</span>
+          </li>
+          <li>
+            <blockquote>"The first quarter had its challenges, but these were largely transitory and even bring some upside as the weather disruption exposed market tightness that has served to accelerate the pricing environment, and the spike in fuel prices adds one more headwind to truckload capacity."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Unlike the past few years, shippers are generally not issuing off-cycle bids opportunistically to improve service or drive prices lower; these actions are driven by a need to secure capacity. At the same time, previously deep discounts in the spot market have evaporated, further encouraging shippers to align with quality asset capacity."</blockquote>
+          </li>
+          <li>
+            <blockquote>"This is on top of a trend of shippers favoring asset-based relationships that formed late last year in response to the regulatory enforcement efforts."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Whether for these reasons or because of expectations of improving demand, we have already had a number of shippers initiate discussions about peak-season demand support, which is not typical this early in the year."</blockquote>
+          </li>
+          <li>
+            <blockquote>"As we navigate a busy and rapidly evolving bid environment, we have shifted our bid targets to a range of high single- to low double-digit percentage increases on current pricing activity as compared to our low- to mid single-digit target one quarter ago."</blockquote>
+          </li>
+          <li>
+            <blockquote>"While the pricing environment is improving, we are still seeing carrier failures, as the damage done over a prolonged downcycle is not quickly recovered, especially with the cash flow crunch brought on by the recent fuel spike."</blockquote>
+          </li>
+          <li>
+            <blockquote>"While the LTL sector is not seeing the same sharp tightening as truckload, we are seeing our freight mix improve and rate renewals continue at a mid single digit pace."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- ODFL -->
+      <div class="company-card">
+        <h3>Old Dominion Freight Line <span class="ticker">(ODFL)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 29, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"We are encouraged by trends that we have seen develop in our business. While our LTL tons per day declined on a year-over-year basis for the first two months of the quarter, we remain cautiously optimistic about the direction of the domestic economy."</blockquote>
+            <span class="speaker">— Marty Freeman, CEO</span>
+          </li>
+          <li>
+            <blockquote>"Business levels in the LTL industry can change very quickly, and being able to respond to growth opportunities in an improving demand environment is one of the primary areas that differentiate us from our competition."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Due to our consistent execution and investment, we are uniquely positioned to effectively handle incremental volume opportunities as the demand environment improves."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We have had good acceleration through the month," but management noted volumes remain below normal seasonality and year-over-year trends.</blockquote>
+          </li>
+          <li>
+            <blockquote>"Our revenue results include a 7.7% decrease in LTL tons per day that was partially offset by a 5.7% increase in our LTL revenue per hundredweight. Excluding fuel surcharges, our LTL revenue per hundredweight increased 4.4% compared to the first quarter of 2025, which reflects our long-term disciplined approach to yield management."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Despite a challenging operating environment, we invested nearly $2 billion in capital expenditures over the past three years, while we plan to invest an additional $205 million in 2026."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- JBHT -->
+      <div class="company-card">
+        <h3>J.B. Hunt <span class="ticker">(JBHT)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 15, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"Customer conversations during bid season have become more constructive, though there is still work to do to fully restore pricing and margins to expected levels. We are pushing where appropriate and remain confident in the value we deliver."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We are seeing increased traction in ICS and JBT, consistent with early cycle market shifts, and there remains opportunity in intermodal."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Also, with elevated truckload spot rates and rising fuel prices, the value proposition of our intermodal offering becomes increasingly more attractive for customers."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We continue to see strong rail service from all of our rail providers, a trend we have seen for several years now. During a winter in which we saw several impactful storms across the country, the rail networks were able to quickly recover their service."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We and our rail providers know the true test of network resiliency will come once demand strengthens. As we enter this prove-it time for rail networks, we and the railroads are confident service levels can be maintained even in a period of sustained volume growth."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Given the nature of our bid cycle, we are living with the results of last year's bid season into 2026."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Early in bid season, we saw westbound backhaul freight repriced down year-over-year as the market for this freight was competitive as it is every year."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We still have some pretty meaningful year-over-year headwinds in inflationary costs… insurance premiums, medical costs, we continuously invest in our people… weather being more material in this first quarter than the prior first quarter."</blockquote>
+          </li>
+          <li>
+            <blockquote>On driver markets: "Ongoing driver shortages and more challenging hiring environment as capacity rationalization in the market accelerates, with driver needs climbing to new highs and rising difficulty in certain geographies."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- SNDR -->
+      <div class="company-card">
+        <h3>Schneider National <span class="ticker">(SNDR)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 30, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"The stress in the market over the last several months is a direct reflection of structural supply rationalization, and we believe this upcycle has now gained its foothold."</blockquote>
+            <span class="speaker">— Mark Rourke, CEO</span>
+          </li>
+          <li>
+            <blockquote>"As we look at the freight market, the momentum we saw as we exited 2025 grew in 2026… While weather contributed to initial supply chain disruption, we believe the tighter market conditions that followed are a function of capacity attrition we have seen over the last several quarters."</blockquote>
+            <span class="speaker">— James Filter, EVP &amp; Group President</span>
+          </li>
+          <li>
+            <blockquote>"The attrition is the culmination of the DOT's actions to improve public safety by addressing noncompliant capacity, including curtailing non-domicile CDLs, enforcing English language proficiency, removing CDL mills, and targeting ELDs that enable tampering."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We do not believe we have yet reached a new normal for supply, so we expect additional capacity to leave the market from here. Fuel cost inflation, which is outpacing rate recovery for the long-tail carriers, and the upcoming road check are likely to be catalysts for additional drivers to permanently exit."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We believe that we will see more supply exit than what was removed by the 2017 ELD mandate while also restricting the funnel of new entrants."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Looking at underlying trends, we saw a resilient consumer and signs of life in our industrial end markets, mirrored by what we saw in ISM PMI. However, overall macro uncertainty has also increased amid rising inflation expectations and diminished prospects for additional rate cuts, which adds demand risk for the balance of the year."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Many cycle indicators such as tender rejections, spot/contract spreads, and fleet utilization flashed green in the first quarter, with some of these signals at levels last seen during the pandemic."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Encouraging trends seen in March have persisted into April, with continued strength in the spot market, traction in rate recovery, and volume retention in our allocation events, and indications of moderate customer restocking and seasonal volume activity."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Price renewals are now at the highest level since 2021, and shippers are increasingly recognizing that the tightness is not simply winter weather."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We expect Network 2026 rate renewals to be in the mid- to high-single digits for the full year, and we are acting decisively with the most transactional customers where there is more ground to make up in rate recovery. In these instances, we expect to see double-digit increases."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- WERN -->
+      <div class="company-card">
+        <h3>Werner Enterprises <span class="ticker">(WERN)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 28, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"Market fundamentals are improving, and we are seeing a positive trajectory in our own numbers."</blockquote>
+            <span class="speaker">— Derek Leathers, CEO</span>
+          </li>
+          <li>
+            <blockquote>"If I just start at the macro, we're seeing ongoing largely supply-driven constraints that are continuing to gain momentum as we get deeper into the year. Those capacity exits are only ramping at this point, both through enforcement as well as still some final fallout, if you will, from the freight recession we've lived in, in the last couple of years, all of which sets us up during bid season."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Coming into the early part of the quarter, clearly, it was a bit of a bit abnormal that spot rates held up as well as they did coming out of peak season. They've grown from there. I know there was a lot of noise about what was weather-related versus other. And I think the timing and duration has shown that it was well more than weather."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We believe Werner is better positioned today than we have been in prior cycles. We have used this downturn to make the business more resilient, improve the quality of our portfolio and strengthen our ability to convert an improving market into stronger financial performance."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Availability of quality drivers has been an increasing challenge more recently as a symptom of an improving macro environment. The dedicated pipeline is strong, and we expect TTS truck growth as the year progresses."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We anticipate stable used equipment demand and resale values through 2026, given OEM production constraints and the evolving regulatory backdrop, that will be an incentive towards high-quality used assets."</blockquote>
+          </li>
+          <li>
+            <blockquote>"On the One-Way side, we've talked about mid-single-digit rate increases early in the Q1 bid season."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Through continued cost discipline, and a relentless focus on safety, service and innovation, Werner remains well-positioned to drive better financial results as market conditions tighten throughout the year."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- XPO -->
+      <div class="company-card">
+        <h3>XPO <span class="ticker">(XPO)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 30, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"Looking at the first quarter trends year-over-year by month, January tonnage was flat, February was up 0.1%, and March was down 0.4%. Notably, shipments per day trended up each month."</blockquote>
+            <span class="speaker">— Ali Faghri, Chief Strategy Officer</span>
+          </li>
+          <li>
+            <blockquote>"Shipments per day increased 3% year-over-year, while weight per shipment decreased 2.8%, resulting in tonnage per day turning positive by 0.1%."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We're continuing to drive profitable growth in the business by increasing the number of shipments, improving network density, and prioritizing both freight quality and mix to support yield and margins. Our mix has managed to specific objectives, including share gains with local customers and market penetration with our premium offerings, and we're showing that we can achieve these objectives in any environment."</blockquote>
+          </li>
+          <li>
+            <blockquote>"By the end of the first quarter, first starting with our network capacity, we had more than 30% excess door capacity, which is a sweet spot to be in the LTL carrier in a softer freight environment and expecting demand to inflect at some point and accelerate from here."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We expect our pricing trajectory to accelerate as we move through 2026. At the same time, we're creating structural cost advantages in our network through productivity gains, capacity investments and the ramping of our technology."</blockquote>
+          </li>
+          <li>
+            <blockquote>"In terms of the tonnage outlook, we are just rolling forward normal seasonality. So if you roll forward what we saw here in April into May and June, that would put full quarter tonnage flattish on a year over year basis. Now as you noted, as the demand environment starts to improve and we see this continuation of above seasonal volume performance, there certainly could be upside to that outlook."</blockquote>
+          </li>
+          <li>
+            <blockquote>"For us as an LTL carrier, about two thirds of our business is tied towards industrial customers, which is why we're so highly correlated with what's going on with underlying industrial demand domestically."</blockquote>
+            <span class="speaker">— Ali Faghri</span>
+          </li>
+          <li>
+            <blockquote>"As you've now started to see that industrial demand start to improve after several years at very soft trends, that's leading to better demand for us as well."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We have a clear line of sight to achieving an LTL operating ratio in the 70s."</blockquote>
+            <span class="speaker">— Mario Harik, CEO</span>
+          </li>
+        </ul>
+      </div>
+
+      <a href="#top" class="back-to-top">↑ Back to Top</a>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- ADVERTISING SECTION                                           -->
+  <!-- ============================================================ -->
+  <section class="section" id="advertising">
+    <div class="section-header">
+      <h2>2. Advertising &amp; Marketing</h2>
+      <p class="focus-question"><strong>Focus Question</strong>How is AI affecting advertising and marketing trends, and how are these companies dealing with AI?</p>
+    </div>
+
+    <div class="section-body">
+      <div class="companies-info">
+        <strong>Companies covered:</strong> IBTA, DV, MGNI, TTD, NXST, PSKY, APP, OMC, STGW, TBLA, JMIA, CRTO, QNST, MNTN, EVC, ADV
+      </div>
+
+      <!-- IBTA -->
+      <div class="company-card">
+        <h3>Ibotta <span class="ticker">(IBTA)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 6, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"AI is evolving very rapidly, and so we are investing heavily in AI enablement to take advantage of the efficiencies that are available to us through using tools like Claude Code, but also our ability to create this programmatic API layer."</blockquote>
+            <span class="speaker">— Bryan Leach, CEO</span>
+          </li>
+          <li>
+            <blockquote>"We are absolutely working on that around the clock, getting that to a place where we will be able to automate more of these processes, which will benefit our entire business—not just LiveLift, but also all of our core offers benefit from having it be easier to design, set up, revise, and so forth from beginning to end of a campaign."</blockquote>
+          </li>
+          <li>
+            <blockquote>"The models underlying LiveLift get better with more data, with more refinement of the model, and with more publishers you add. The addition of Uber and Giant Eagle will help us refine those models."</blockquote>
+          </li>
+          <li>
+            <blockquote>"LiveLift scaling is gated by continued AI enablement, automation developments, and ongoing model training sourced from new publisher data and campaign activity."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- DV -->
+      <div class="company-card">
+        <h3>DoubleVerify <span class="ticker">(DV)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 6, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"The solid results this quarter were fueled by our core growth catalysts: social activation and measurement products, streaming TV verification, and our dynamic suite of solutions that empower advertisers to better navigate the evolving ecosystem of AI advertising platforms and GenAI content."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We continue to enhance our market-leading suite of AI tools that combat the increasing challenges of navigating AI slop and avoiding AI cyber fraud. With the launch of DoubleVerify… AI Slop Stopper for social, we have expanded our capability for advertisers to avoid low-quality AI-generated content on YouTube and will broaden our coverage to other walled gardens in the coming quarters."</blockquote>
+          </li>
+          <li>
+            <blockquote>"In Q1 2026, DoubleVerify… fraud lab continued to harness AI to fight fraud as AI-powered fraud schemes proliferated at a record pace and became even more sophisticated. AI-powered bot schemes continue to evolve faster than ever, with 140% more bot scheme variants emerging in Q1 2026 compared to Q1 2025."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Fueled by malicious AI, cyber fraud continues to become more sophisticated, threatening to challenge the ROI and efficiency gains driven by the positive use of AI."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Finally, we are focused on capitalizing on the massive potential ad market that AI chatbot marketing will represent. According to eMarketer, ad spend on LLMs is forecast to grow by over $25 billion by 2029, with ad spend expected to cannibalize over 14% of search spend… OpenAI recently shared that they could generate $100 billion in advertising revenue by 2030."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Shifting focus to the role that AI is playing in the ongoing expansion of our product-led growth cycle, we continue to lean into AI to operate more efficiently, launch products faster, and improve margins."</blockquote>
+          </li>
+          <li>
+            <blockquote>"AI solutions, social activation tools, and streaming TV quality solutions are positively impacting our customers' ad performance and building a foundation for TAM and market share expansion for DoubleVerify."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- MGNI -->
+      <div class="company-card">
+        <h3>Magnite <span class="ticker">(MGNI)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 6, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"There has certainly been an overhang for a lot of software companies about agentic replacing the need for those companies. We feel… that AI is a real tailwind for us. It makes things easier to work with. It lets our publishers go from a dozen dashboards—SpringServe, DV plus—to one, and they can execute more seamlessly."</blockquote>
+            <span class="speaker">— Michael Barrett, CEO</span>
+          </li>
+          <li>
+            <blockquote>"The agent-to-buyer connection makes a ton of sense, but who is to say that the buyer agent is not ours that they are utilizing, just like they utilize ClearLine? I think there is real upside there. But also, if you want to conduct conversations, execute plans, and buy programmatically from tens of thousands of buyer agents, that is where we really shine. We make sure those are the agents you want to talk to, that it is brand-safe inventory, we are collecting payment, and we are policing fraud."</blockquote>
+          </li>
+          <li>
+            <blockquote>"AI is increasing efficiency, expanding working media, and driving more volume through platforms like ours. This is a tailwind for Magnite, Inc."</blockquote>
+          </li>
+          <li>
+            <blockquote>"AI is also becoming foundational in almost every area of our business, from agentic buying, to creative development, to inventory curation, to workflow. It is powering greater productivity throughout our ecosystem and company."</blockquote>
+          </li>
+          <li>
+            <blockquote>On cost savings: cost savings were primarily due to "significant improvements in cloud spend and some early AI-related productivity gains."</blockquote>
+            <span class="speaker">— David Day, CFO</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- TTD -->
+      <div class="company-card">
+        <h3>The Trade Desk <span class="ticker">(TTD)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 7, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"We fundamentally believe that we will lead the agentic revolution in programmatic advertising. I have said on a number of stages in our industry recently that I do not think there is an industry in the world that is better suited to be upgraded from agentic AI than programmatic advertising."</blockquote>
+            <span class="speaker">— Jeff Green, CEO</span>
+          </li>
+          <li>
+            <blockquote>"I do think there is often a mindset of if your company is older than five years old, then you think that you will be, quote, impacted by AI instead of leading it."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Agentic can help that process that has been overwhelming for users since the inception of digital advertising. It represents an opportunity to scale and be more productive and more effective that I am not sure we would have gotten to nearly as fast without the rise of agentic."</blockquote>
+          </li>
+          <li>
+            <blockquote>"The agentic layer can help reason with: if you are expanding the campaign, there is a whole bunch of ways to do it; let us talk about the ways that we can help you do that optimally."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We really do see that the future of the Trade Desk is to be a bit of a hub for all the innovation on the open Internet, including and especially inside of Agentic AI."</blockquote>
+          </li>
+          <li>
+            <blockquote>From the Q1 2026 release: "Koa Agents, agentic AI capabilities for media planning, buying, optimization, and measurement across the open internet, with Stagwell as the first partner."</blockquote>
+          </li>
+          <li>
+            <blockquote>"When I look at things like Audience Unlimited, advancements in measurement, teaching adoption, and the continued expansion of the retail data partnerships, and of course, all the innovations that we have injected into our platform and to our partnerships brought to you via various forms of AI, maybe Agentic being the one I am the most excited about, there is just so much opportunity ahead for us and the open Internet."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- NXST -->
+      <div class="company-card">
+        <h3>Nexstar <span class="ticker">(NXST)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 7, 2026</p>
+        <div class="note">AI was not a primary focus of management's prepared remarks or Q&amp;A on this call. Commentary centered on the TEGNA acquisition, political advertising, and the general advertising environment. Relevant ad-environment quotes are below.</div>
+        <ul class="quotes">
+          <li>
+            <blockquote>"We are seeing a little bit of a weaker advertising environment in the second quarter than we did see in the first quarter."</blockquote>
+            <span class="speaker">— Lee Ann Gliha, CFO</span>
+          </li>
+          <li>
+            <blockquote>"What I tend to look at is I look at our categories and I look at which ones are increasing versus decreasing on a quarter-to-quarter basis. And last quarter, it was about 50-50. And this quarter, it's about 2/3 decreasing and 1/3 increasing. So I think it's just kind of a general overall weakness."</blockquote>
+          </li>
+          <li>
+            <blockquote>CEO Perry Sook framed the TEGNA deal as a counter to "streaming platforms backed by deep-pocketed technology companies [that] continue to siphon off premium TV rights and chip away at advertising dollars."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- PSKY -->
+      <div class="company-card">
+        <h3>Paramount Skydance <span class="ticker">(PSKY)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 4, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"At the same time, we are transforming how we operate, unifying platforms, data, and workflows, and embedding advanced technology to drive efficiency, better serve our partners, and elevate the overall consumer experience across the business."</blockquote>
+            <span class="speaker">— David Ellison, CEO</span>
+          </li>
+          <li>
+            <blockquote>"Around AI transformation, we are spinning up pods to pursue AI-based workflows in the back office—finance, HR, and operational functions. We are enabling these both on the Paramount Skydance Corporation Class B Common Stock side and, we believe, setting ourselves up for the combination, to drive meaningful efficiencies."</blockquote>
+            <span class="speaker">— Dennis Cinelli, CFO</span>
+          </li>
+          <li>
+            <blockquote>"On advertising, particularly ad tech, this is a major focus and opportunity we identified early on."</blockquote>
+            <span class="speaker">— David Ellison</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- APP -->
+      <div class="company-card">
+        <h3>AppLovin <span class="ticker">(APP)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 6, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"We are already seeing advertisers use AI agents to manage their marketing spend, and we are building Axon to be natively accessible to those agents."</blockquote>
+            <span class="speaker">— Adam Foroughi, CEO</span>
+          </li>
+          <li>
+            <blockquote>"The 1.3% comes from advertiser onboarding and model enhancements. This is really a testament to the team. What we're now further evolved at understanding how to improve these models, right? They understand the techniques. They've gotten more sophisticated at what they're doing. The AI research space obviously is seeing fast improvement too. You've seen an insane amount of product releases in the large language model space in short order because of everything that's happening there."</blockquote>
+          </li>
+          <li>
+            <blockquote>"A lot of those same trends apply to us, but I think it starts with our team is just getting much smarter about the tests that they're doing. We have 100% seen faster improvements to the models, both across the consumer business and the gaming business, and we don't really see a reason why that's gonna slow down."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Product enhancements, including advanced AI-based models and creative tools, are accelerating advertiser success and fueling record spend, particularly in the consumer segment."</blockquote>
+          </li>
+          <li>
+            <blockquote>"AI-driven creative generation will soon roll out to all users, which management expects will further lower onboarding friction and increase advertiser success rates."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- OMC -->
+      <div class="company-card">
+        <h3>Omnicom <span class="ticker">(OMC)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 28, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"Especially now with kind of the proliferation of artificial intelligence and more specifically generative AI and how we've incorporated [it] into almost every facet of the marketing life cycle, the ability for us to actually drive value from that data is greater now than it's ever been."</blockquote>
+            <span class="speaker">— Paolo Yuvienco, CTO</span>
+          </li>
+          <li>
+            <blockquote>"As we discussed at our Investor Day last month, Omni, our AI-enabled intelligent sales and marketing platform, is connecting our talent, data and services."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We are leading in agentic media buying, aiming to shorten the media supply chain and drive higher value for clients. Advertising was down, but integrated media, including intelligent content automation, is growing."</blockquote>
+            <span class="speaker">— John Wren, CEO / Paolo Yuvienco, CTO</span>
+          </li>
+          <li>
+            <blockquote>"The key to the portion of the business that's in integrated media is the intelligent content automation business, which is closely integrated with media and our platform."</blockquote>
+          </li>
+          <li>
+            <blockquote>Yuvienco confirmed Omnicom "executed real media buys for several clients using our agent framework."</blockquote>
+          </li>
+          <li>
+            <blockquote>"The Omni platform has been scaled across the entire organization, utilizing Agentic AI to automate manual workflows and improve media ROI through deeper data integration with Acxiom."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- STGW -->
+      <div class="company-card">
+        <h3>Stagwell <span class="ticker">(STGW)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — April 30, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"This is a pivotal moment in the Stagwell story as we continue to achieve our vision of extending in services from global full service to platform self-service AI applications."</blockquote>
+            <span class="speaker">— Mark Penn, CEO</span>
+          </li>
+          <li>
+            <blockquote>"This is a major pivot to the sales of AI application services and software, and we are now on the verge of bringing it all together, going to market with significant sales and installations this year and the ability to hockey stick it in 2027."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Last week, we announced a joint initiative with Adobe called the Creative Intelligence System, which creates agentic personas to surface insights specifically for marketers in the financial sector who use Adobe as their system of record."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Stagwell Search+, our tool to help brands optimize in AI search and beyond was described by senior Google leaders as 'genuinely differentiating,' and we are now working regionally with Google industry heads to support client adoption."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Working together with Palantir, we are adding key features that take users from audience identification through to media placement and assessment on an agentic basis."</blockquote>
+          </li>
+          <li>
+            <blockquote>"This includes OpEx investments into our tech products, including the machine and our Palantir partnership as well as bringing in further experts to strengthen our technical expertise in AI and data."</blockquote>
+          </li>
+          <li>
+            <blockquote>Penn described the shift in client mindset: clients have moved from asking what AI is and what legal teams say about it to a mindset of "I better have AI."</blockquote>
+          </li>
+          <li>
+            <blockquote>The Machine was described as an "agentic marketing operations operating system" that brings together a company's marketing stack.</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- TBLA -->
+      <div class="company-card">
+        <h3>Taboola <span class="ticker">(TBLA)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 6, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"In a world where AI is evolving so quickly, I believe the winners will be those with either unique data that LLMs cannot get or access to unique supply and distribution. Taboola has both."</blockquote>
+            <span class="speaker">— Adam Singolda, CEO</span>
+          </li>
+          <li>
+            <blockquote>"That proprietary intent data and the AI-driven conversion machine we've built, that is Taboola."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Similar to how Google and Meta understand intent within their own platform, Taboola understands intent across billions of consumers who read, watch and engage with trusted OEMs, apps and publishers across the open web."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We then convert these signals into profitable and measurable outcomes for advertisers. That proprietary intent data and the AI driven conversion machine we built that is Taboola."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Our unique data, AI, and distribution continue to deliver real performance outcomes. We remain focused on growing the budgets we manage, returning capital through an aggressive share repurchase program, and strengthening our position as a leader in performance advertising beyond search and social."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- JMIA -->
+      <div class="company-card">
+        <h3>Jumia <span class="ticker">(JMIA)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 7, 2026</p>
+        <div class="note">AI commentary on the call was focused more on operational efficiency than advertising-specific deployment, though marketing &amp; advertising revenue grew 24% in Q1 2026.</div>
+        <ul class="quotes">
+          <li>
+            <blockquote>"AI-driven automation across each of our operations, finance, headcount efficiency, support functions, and technology teams — including in relation to cybersecurity and code quality workflows — enabled a reduction in our headcount and contributed to improved operational leverage in the first quarter of 2026."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Artificial intelligence is also helping us solve operational problems on the ground, including in logistics, customer service, and seller management, improving the quality of the service we offer, while reducing costs."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- CRTO -->
+      <div class="company-card">
+        <h3>Criteo <span class="ticker">(CRTO)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 7, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"We entered 2026 with the ambition to lead in agentic AI, we are already delivering on this ambition with discipline and focus. We became OpenAI's first ad tech partner, integrating our demand into ChatGPT's advertising offering with a focus on experiences that are relevant, additive, and built on user trust."</blockquote>
+            <span class="speaker">— Michael Komasinski, CEO</span>
+          </li>
+          <li>
+            <blockquote>"This positions us at the forefront of a new high-intent discovery channel for our advertiser clients. Momentum is building. We now have over 1,000 brands live with incremental budgets from both existing and new clients."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We are also extending access through Criteo GO, integrating ChatGPT into our self-service cross-channel platform to enable advertisers to easily test and scale AI-native media."</blockquote>
+          </li>
+          <li>
+            <blockquote>"In the first quarter, we have advanced our Agentic AI road map, including our exciting partnership with OpenAI and increasing adoption of MCP with agencies. We also launched Criteo GO as our AI-powered self-service offering and introduced new capabilities like Page Intelligence to help retailers improve product discovery while maximizing monetization."</blockquote>
+          </li>
+          <li>
+            <blockquote>"AI is an important enabler of how we drive performance and monetization. With Page Intelligence, we are introducing an AI optimization layer that helps retailers balance organic and sponsored content while improving the shopper experience and also to unlock additional revenue opportunities while maintaining full control over product selection and rankings."</blockquote>
+          </li>
+          <li>
+            <blockquote>"More broadly, AI is shaping how consumers discover, evaluate and buy, which raises the bar for relevance, trust and high-quality data."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Our focus is clear, building Criteo into the leading commerce intelligence and AI decisioning platform for an increasingly complex and fragmented ecosystem. Our conviction is that the next phase of commerce will be defined by how decisions are made, not just where ads appear."</blockquote>
+          </li>
+          <li>
+            <blockquote>"As AI changes how people discover products and makes the ecosystem more fragmented, the real value will come from turning intent into measurable outcomes at scale."</blockquote>
+          </li>
+          <li>
+            <blockquote>AI platform traffic (e.g., ChatGPT) "converts at about 1.5x other referral channels."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- QNST -->
+      <div class="company-card">
+        <h3>QuinStreet <span class="ticker">(QNST)</span></h3>
+        <p class="call-meta">Fiscal Q3 2026 Earnings Call — May 7, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"Our aggressive deployment of artificial intelligence across business systems is yielding significant productivity improvements and enabling rapid integration of carrier rates."</blockquote>
+            <span class="speaker">— Doug Valenti, CEO</span>
+          </li>
+          <li>
+            <blockquote>"Those initiatives include dozens of active projects applying AI across our business system to our proprietary data, tech stack, integrations and workflows, and to our media campaigns and interactions with consumers."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We're applying AI across the business system, as I indicated, including in media. One of the places in media that we are active is now on OpenAI's advertising platform. As I said, we're active in both insurance and in home services, running advertising campaigns there to both generate revenue, of course, and we have generated our first revenues there. Also to continue to help them pilot that platform and evolve it into a much bigger part of their business and a much bigger part of everybody [of] our business as well."</blockquote>
+          </li>
+          <li>
+            <blockquote>From prior quarter (Q2 FY2026): QuinStreet has used AI as "core technology" since 2008, and management emphasized AI is viewed as an opportunity—not a threat, with "only net positive trends in traffic, especially from AI-driven channels."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- MNTN -->
+      <div class="company-card">
+        <h3>MNTN <span class="ticker">(MNTN)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 6, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"Our results reflect the successful execution of our growth strategy and the increasing adoption of our innovative AI-driven platforms."</blockquote>
+            <span class="speaker">— Mark Douglas, CEO</span>
+          </li>
+          <li>
+            <blockquote>"AI plays an ever-expanding role in that automation, but we're using AI in creative too. QuickFrame AI, our AI-powered creative video platform, was released from beta this morning and has become one of the fastest-growing elements in the MNTN suite."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Our customers benefit from using QuickFrame AI as it combines AI video generation with professional-grade creative controls, so teams can produce polished videos easily, iterate continuously, and go live quickly."</blockquote>
+          </li>
+          <li>
+            <blockquote>On QuickFrame AI 3.0: "It now unifies ideation, storyboarding, editing, and iteration into a single workflow, while expanding support across leading generative AI models, including Seedance 2.0."</blockquote>
+          </li>
+          <li>
+            <blockquote>"For performance marketing to work, you must reach the consumer where they are."</blockquote>
+          </li>
+          <li>
+            <blockquote>On the company's media planning tool: "It is another exciting AI development for MNTN Inc., currently with customers and receiving very positive feedback."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- EVC -->
+      <div class="company-card">
+        <h3>Entravision <span class="ticker">(EVC)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 5, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"We continued to invest in our ATS segment in Q1 2026 to grow revenue and operating profits. We invested in our engineering team to continue to improve our technology and build more powerful AI capabilities into our platform."</blockquote>
+            <span class="speaker">— Michael Christenson, CEO</span>
+          </li>
+          <li>
+            <blockquote>"We have had success executing our strategies in the ATS business, including strengthening the AI capabilities that are part of our technology platform and expanding the ATS sales team and geographic sales coverage."</blockquote>
+          </li>
+          <li>
+            <blockquote>The ATS (Advertising Technology and Services) segment grew 204% year-over-year, with ATS revenue at $155 million driven in part by AI-enabled campaign management on the Smadex programmatic ad platform.</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <!-- ADV -->
+      <div class="company-card">
+        <h3>Advantage Solutions <span class="ticker">(ADV)</span></h3>
+        <p class="call-meta">Q1 2026 Earnings Call — May 6, 2026</p>
+        <ul class="quotes">
+          <li>
+            <blockquote>"Faster insights to action using AI built on top of our data lake will enable us to better meet increasing demand for Experiential and other in-store services and drive demand for clients' brands through a better understanding of product level performance."</blockquote>
+            <span class="speaker">— Dave Peacock, CEO</span>
+          </li>
+          <li>
+            <blockquote>"In Experiential, Retailer Services, we are using AI tools integrated with legacy systems as well as process redesign to increase our hiring speed to better meet in-store labor needs."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Our Branded Services team continues to advance our analytic architecture, driving faster action, increasing the likelihood of accelerating brand performance and driving in-store brand merchandisers dynamically."</blockquote>
+          </li>
+          <li>
+            <blockquote>"We leveraged partnerships like our alliance with Instacart to help drive better retail pricing and assortment decisions on behalf of clients. We're collaborating to leverage proprietary data and an alert-based model to more effectively deploy retail reps to the highest yielding in-store opportunities."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Looking ahead, we believe our growth and productivity initiatives, including our centralized labor model, technology transformation and AI investments position us well to navigate the current environment."</blockquote>
+          </li>
+          <li>
+            <blockquote>"Technology modernization, including SAP and AI integration, began to yield efficiency benefits, particularly in labor allocation and execution speed."</blockquote>
+          </li>
+        </ul>
+      </div>
+
+      <a href="#top" class="back-to-top">↑ Back to Top</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Quotes sourced from Q1 2026 earnings call transcripts. &nbsp;·&nbsp; <a href="index.html" style="color:#2c5282; text-decoration:none;">← Back to Index</a>
+</footer>
+
+</body>
+</html>
