@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Productivity — Names by Theme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1815;
+    --paper: #f4f1ea;
+    --paper-raised: #faf8f2;
+    --rule: #cdc6b5;
+    --rule-soft: #e2dccc;
+    --muted: #6b6457;
+    --tail: #2f5d3f;
+    --tail-soft: #e8efe6;
+    --head: #8a3324;
+    --head-soft: #f1e4df;
+    --gold: #9a7d31;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { background: var(--paper); }
+
+  body {
+    font-family: 'Newsreader', Georgia, serif;
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.012) 2px, rgba(0,0,0,0.012) 3px);
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 36px 90px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    padding: 40px 0 22px;
+    border-bottom: 3px double var(--ink);
+  }
+  .crumb {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .crumb .here { color: var(--ink); font-weight: 600; }
+
+  .home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 12px 6px 9px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--paper-raised);
+    transition: border-color 0.14s ease, color 0.14s ease;
+    margin-bottom: 18px;
+  }
+  .home-link:hover { border-color: var(--ink); color: var(--ink); }
+  .home-link .arrow { font-size: 13px; line-height: 1; }
+  .category-name {
+    font-size: clamp(48px, 8vw, 92px);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 0.96;
+    margin: 18px 0 6px;
+  }
+  .category-sub {
+    font-size: 19px;
+    font-style: italic;
+    color: var(--muted);
+    max-width: 640px;
+  }
+  .meta-strip {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .meta-cell {
+    padding: 9px 20px 9px 0;
+    margin-right: 20px;
+    border-right: 1px solid var(--rule-soft);
+    color: var(--muted);
+  }
+  .meta-cell:last-child { border-right: none; }
+  .meta-cell b {
+    display: block;
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0;
+  }
+
+  /* ---------- Column headers ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 4px;
+  }
+  .col {
+    padding-top: 32px;
+  }
+  .col.survivors { padding-right: 38px; border-right: 1px solid var(--rule); }
+  .col.disruption { padding-left: 38px; }
+
+  .col-flag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+  .col-flag.tail { background: var(--tail-soft); color: var(--tail); }
+  .col-flag.head { background: var(--head-soft); color: var(--head); }
+  .col-flag .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor;
+  }
+  .col-title {
+    font-size: 38px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 14px 0 4px;
+    line-height: 1.02;
+  }
+  .col-desc {
+    font-size: 15.5px;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 6px;
+    min-height: 70px;
+  }
+  .col-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .col-count b { color: var(--ink); font-size: 14px; }
+
+  /* ---------- Sub-theme groups ---------- */
+  .group { margin-top: 26px; }
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 5px;
+    margin-bottom: 4px;
+  }
+  .group-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .group-name .lvl {
+    color: var(--gold);
+    font-size: 10px;
+    margin-right: 6px;
+  }
+  .group-tally {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ---------- Name rows ---------- */
+  ul.names { list-style: none; }
+  ul.names li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 7px 4px 7px 2px;
+    border-bottom: 1px dotted var(--rule-soft);
+    transition: background 0.12s ease;
+  }
+  ul.names li:hover { background: var(--paper-raised); }
+  .tkr {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    flex: 0 0 56px;
+  }
+  .tkr.survivor { color: var(--tail); }
+  .tkr.disruptor { color: var(--head); }
+  .nm {
+    flex: 1;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+  }
+  .tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .tag.flag {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(154,125,49,0.07);
+  }
+  .strength {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .strength.core { background: var(--head); color: var(--paper); }
+  .strength.significant { background: var(--head-soft); color: var(--head); border: 1px solid var(--head); }
+  .strength.peripheral { background: transparent; color: var(--head); border: 1px solid var(--rule); }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    margin-top: 56px;
+    padding-top: 18px;
+    border-top: 3px double var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .footer .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 14px;
+  }
+  .footer .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+  .footer .disc {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 780px;
+  }
+
+  @media (max-width: 760px) {
+    .wrap { padding: 0 20px 70px; }
+    .board { grid-template-columns: 1fr; }
+    .col.survivors { padding-right: 0; border-right: none; padding-bottom: 30px; }
+    .col.disruption { padding-left: 0; border-top: 1px solid var(--rule); }
+    .category-name { font-size: 52px; }
+    .tags { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <a class="home-link" href="index.html"><span class="arrow">&larr;</span>&nbsp;Home &middot; Category Index</a>
+    <div class="crumb">
+      <span>Thematic Research &nbsp;/&nbsp; Names Index &nbsp;/&nbsp; <span class="here">Productivity</span></span>
+      <span>Snapshot &middot; 26 May 2026</span>
+    </div>
+    <h1 class="category-name">Productivity</h1>
+    <p class="category-sub">The productivity-software battleground, mapped from both sides — which franchises the AI shift protects, and which it erodes.</p>
+
+    <div class="meta-strip">
+      <div class="meta-cell">Category<b>Productivity</b></div>
+      <div class="meta-cell">Themes covered<b>2 mirror-image L1</b></div>
+      <div class="meta-cell">Total names<b>52</b></div>
+      <div class="meta-cell">Source<b>Neo4j Aura graph</b></div>
+      <div class="meta-cell">Edge as of<b>17 May 2026</b></div>
+    </div>
+  </header>
+
+  <!-- ============ TWO-COLUMN BOARD ============ -->
+  <div class="board">
+
+    <!-- ---------- SURVIVORS ---------- -->
+    <section class="col survivors">
+      <span class="col-flag tail"><span class="dot"></span>Tailwind</span>
+      <h2 class="col-title">SaaS Survivors</h2>
+      <p class="col-desc">SaaS Durability in the AI Era — franchises structurally protected from AI substitution by moats that live outside the software layer.</p>
+      <div class="col-count"><b>43</b> names &nbsp;&middot;&nbsp; L1 parent + 9 sub-themes</div>
+
+      <!-- L1 direct -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L1</span>SaaS Durability — Parent</span>
+          <span class="group-tally">non-bucketed</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">ANSS</span><span class="nm">Ansys</span><span class="tags"><span class="tag flag">Delisted-Acq</span></span></li>
+          <li><span class="tkr survivor">CFLT</span><span class="nm">Confluent</span><span class="tags"><span class="tag flag">Claude-proposed</span></span></li>
+          <li><span class="tkr survivor">CSU</span><span class="nm">Constellation Software</span><span class="tags"><span class="tag">CN listing</span></span></li>
+          <li><span class="tkr survivor">FISV</span><span class="nm">Fiserv</span><span class="tags"></span></li>
+          <li><span class="tkr survivor">IQV</span><span class="nm">IQVIA Holdings</span><span class="tags"><span class="tag flag">Claude-proposed</span></span></li>
+          <li><span class="tkr survivor">ROP</span><span class="nm">Roper Technologies</span><span class="tags"></span></li>
+        </ul>
+      </div>
+
+      <!-- Proprietary Data -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L2</span>Proprietary Data</span>
+          <span class="group-tally">5</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">CSGP</span><span class="nm">CoStar Group</span></li>
+          <li><span class="tkr survivor">FDS</span><span class="nm">FactSet Research</span></li>
+          <li><span class="tkr survivor">MSCI</span><span class="nm">MSCI Inc</span></li>
+          <li><span class="tkr survivor">SPGI</span><span class="nm">S&amp;P Global</span></li>
+          <li><span class="tkr survivor">VRSK</span><span class="nm">Verisk Analytics</span></li>
+        </ul>
+      </div>
+
+      <!-- Regulated Systems of Record -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L2</span>Regulated Systems of Record</span>
+          <span class="group-tally">5</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">ADP</span><span class="nm">Automatic Data Processing</span></li>
+          <li><span class="tkr survivor">INTU</span><span class="nm">Intuit</span></li>
+          <li><span class="tkr survivor">ORCL</span><span class="nm">Oracle</span></li>
+          <li><span class="tkr survivor">VEEV</span><span class="nm">Veeva Systems</span><span class="tags"><span class="tag">also Phys-World</span></span></li>
+          <li><span class="tkr survivor">WDAY</span><span class="nm">Workday</span></li>
+        </ul>
+      </div>
+
+      <!-- Two-Sided Networks -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L2</span>Two-Sided Networks</span>
+          <span class="group-tally">3</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">SHOP</span><span class="nm">Shopify</span><span class="tags"><span class="tag">CN listing</span></span></li>
+          <li><span class="tkr survivor">TOST</span><span class="nm">Toast</span><span class="tags"><span class="tag">also Phys-World</span></span></li>
+          <li><span class="tkr survivor">TTAN</span><span class="nm">ServiceTitan</span></li>
+        </ul>
+      </div>
+
+      <!-- Physical-World Software -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L2</span>Physical-World Software</span>
+          <span class="group-tally">9</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">DE</span><span class="nm">Deere &amp; Co</span></li>
+          <li><span class="tkr survivor">IOT</span><span class="nm">Samsara</span></li>
+          <li><span class="tkr survivor">PCOR</span><span class="nm">Procore Technologies</span></li>
+          <li><span class="tkr survivor">PTC</span><span class="nm">PTC Inc</span></li>
+          <li><span class="tkr survivor">ROK</span><span class="nm">Rockwell Automation</span></li>
+          <li><span class="tkr survivor">SYM</span><span class="nm">Symbotic</span></li>
+          <li><span class="tkr survivor">TOST</span><span class="nm">Toast</span><span class="tags"><span class="tag">also Two-Sided</span></span></li>
+          <li><span class="tkr survivor">TRMB</span><span class="nm">Trimble</span></li>
+          <li><span class="tkr survivor">VEEV</span><span class="nm">Veeva Systems</span><span class="tags"><span class="tag">also Reg. SoR</span></span></li>
+        </ul>
+      </div>
+
+      <!-- Cybersecurity Tailwind -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L2</span>Cybersecurity Tailwind</span>
+          <span class="group-tally">5</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">CRWD</span><span class="nm">CrowdStrike</span><span class="tags"><span class="tag">also Existential</span></span></li>
+          <li><span class="tkr survivor">FTNT</span><span class="nm">Fortinet</span><span class="tags"><span class="tag">also Existential</span></span></li>
+          <li><span class="tkr survivor">NET</span><span class="nm">Cloudflare</span><span class="tags"><span class="tag">also Existential</span></span></li>
+          <li><span class="tkr survivor">PANW</span><span class="nm">Palo Alto Networks</span><span class="tags"><span class="tag">also Existential</span></span></li>
+          <li><span class="tkr survivor">ZS</span><span class="nm">Zscaler</span><span class="tags"><span class="tag">also Existential</span></span></li>
+        </ul>
+      </div>
+
+      <!-- Existential Infrastructure -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L3</span>Mission-Critical &middot; Existential</span>
+          <span class="group-tally">8</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">BR</span><span class="nm">Broadridge Financial</span></li>
+          <li><span class="tkr survivor">CRWD</span><span class="nm">CrowdStrike</span></li>
+          <li><span class="tkr survivor">FTNT</span><span class="nm">Fortinet</span></li>
+          <li><span class="tkr survivor">MA</span><span class="nm">Mastercard</span></li>
+          <li><span class="tkr survivor">NET</span><span class="nm">Cloudflare</span></li>
+          <li><span class="tkr survivor">PANW</span><span class="nm">Palo Alto Networks</span></li>
+          <li><span class="tkr survivor">V</span><span class="nm">Visa</span></li>
+          <li><span class="tkr survivor">ZS</span><span class="nm">Zscaler</span></li>
+        </ul>
+      </div>
+
+      <!-- Operational Infrastructure -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L3</span>Mission-Critical &middot; Operational</span>
+          <span class="group-tally">5</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">CRM</span><span class="nm">Salesforce</span></li>
+          <li><span class="tkr survivor">DDOG</span><span class="nm">Datadog</span></li>
+          <li><span class="tkr survivor">MDB</span><span class="nm">MongoDB</span></li>
+          <li><span class="tkr survivor">NOW</span><span class="nm">ServiceNow</span></li>
+          <li><span class="tkr survivor">SNOW</span><span class="nm">Snowflake</span></li>
+        </ul>
+      </div>
+
+      <!-- Engineering-Critical Infrastructure -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L3</span>Mission-Critical &middot; Engineering</span>
+          <span class="group-tally">4</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr survivor">ADSK</span><span class="nm">Autodesk</span></li>
+          <li><span class="tkr survivor">BSY</span><span class="nm">Bentley Systems</span></li>
+          <li><span class="tkr survivor">CDNS</span><span class="nm">Cadence Design</span></li>
+          <li><span class="tkr survivor">SNPS</span><span class="nm">Synopsys</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ---------- DISRUPTION ---------- -->
+    <section class="col disruption">
+      <span class="col-flag head"><span class="dot"></span>Headwind</span>
+      <h2 class="col-title">AI Disruption</h2>
+      <p class="col-desc">AI Disruption of Horizontal SaaS — thin-moat franchises most exposed to LLM-generated substitutes. The inverse of the Survivors cohort, by design.</p>
+      <div class="col-count"><b>9</b> names &nbsp;&middot;&nbsp; single L1 theme</div>
+
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L1</span>AI Disruption of Horizontal SaaS</span>
+          <span class="group-tally">9</span>
+        </div>
+        <ul class="names">
+          <li>
+            <span class="tkr disruptor">ASAN</span><span class="nm">Asana</span>
+            <span class="tags"><span class="strength core">Core</span></span>
+          </li>
+          <li>
+            <span class="tkr disruptor">FRSH</span><span class="nm">Freshworks</span>
+            <span class="tags"><span class="strength core">Core</span></span>
+          </li>
+          <li>
+            <span class="tkr disruptor">HUBS</span><span class="nm">HubSpot</span>
+            <span class="tags"><span class="strength core">Core</span></span>
+          </li>
+          <li>
+            <span class="tkr disruptor">PD</span><span class="nm">PagerDuty</span>
+            <span class="tags"><span class="strength core">Core</span></span>
+          </li>
+          <li>
+            <span class="tkr disruptor">TWLO</span><span class="nm">Twilio</span>
+            <span class="tags"><span class="strength significant">Significant</span></span>
+          </li>
+          <li>
+            <span class="tkr disruptor">DBX</span><span class="nm">Dropbox</span>
+            <span class="tags"><span class="strength significant">Significant</span></span>
+          </li>
+          <li>
+            <span class="tkr disruptor">BOX</span><span class="nm">Box Inc</span>
+            <span class="tags"><span class="strength significant">Significant</span></span>
+          </li>
+          <li>
+            <span class="tkr disruptor">ZM</span><span class="nm">Zoom Communications</span>
+            <span class="tags"><span class="strength significant">Significant</span></span>
+          </li>
+          <li>
+            <span class="tkr disruptor">DOCU</span><span class="nm">DocuSign</span>
+            <span class="tags"><span class="strength peripheral">Peripheral</span></span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="group" style="margin-top:38px;">
+        <div class="group-head">
+          <span class="group-name">Reading the column</span>
+        </div>
+        <p style="font-family:'Newsreader',serif; font-style:italic; font-size:14.5px; color:var(--muted); padding-top:8px;">
+          Strength chips show how central the disruption thesis is to each name's story.
+          Core names are direct thin-moat targets — workflow UI over a database.
+          Significant and Peripheral names carry partial offsets (storage compliance,
+          AI Companion, e-signature's regulated-systems edge). The disruption list is built
+          to <em>not</em> overlap the Survivors cohort — the two themes are mirror images
+          linked by an inverse RELATES_TO edge in the graph.
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--tail);"></span>Tailwind — protected</span>
+      <span><span class="swatch" style="background:var(--head);"></span>Headwind — exposed</span>
+      <span><span class="swatch" style="background:rgba(154,125,49,0.4);border:1px solid var(--gold);"></span>Lifecycle flag — needs review</span>
+    </div>
+    <p>NEO4J AURA &mdash; THEMATIC INVESTMENT GRAPH &nbsp;|&nbsp; CATEGORY: PRODUCTIVITY &nbsp;|&nbsp; SNAPSHOT GENERATED 26 MAY 2026</p>
+    <p>Names appear in multiple sub-themes by design — additive edges, distinct mechanisms. Tickers shown in short form; canonical Bloomberg format in the graph (e.g. SHOP CN Equity).</p>
+    <p class="disc" style="margin-top:10px;">
+      This is a static snapshot of the Neo4j graph and will drift — the graph is the canonical source. Framework-driven analysis of structural exposure, not investment advice; valuation, growth, and management quality are layered on separately.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

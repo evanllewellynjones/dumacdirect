@@ -206,6 +206,29 @@
     margin-top: 7px;
   }
 
+  /* ---------- Clickable category banner (names index link) ---------- */
+  a.umbrella {
+    display: block;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+  a.umbrella:hover { background: var(--accent-soft); }
+  a.umbrella .u-sub {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(6,15,34,0.78);
+    transition: gap 0.2s ease;
+  }
+  a.umbrella .u-sub::after {
+    content: "\203A";
+    font-size: 1rem;
+    line-height: 1;
+    font-weight: 600;
+    color: var(--ink-deep);
+  }
+  a.umbrella:hover .u-sub { gap: 11px; }
+
   /* ---------- TIER 2 — Theme ---------- */
   .theme {
     display: block;
@@ -361,10 +384,10 @@
 
     <!-- ===== PRODUCTIVITY ===== -->
     <section class="cluster">
-      <div class="umbrella">
+      <a class="umbrella" href="Productivity_Names.html">
         <div class="u-title">Productivity</div>
-        <div class="u-sub">Category 01</div>
-      </div>
+        <div class="u-sub">Click for all Thematic Names in this category</div>
+      </a>
 
       <div class="theme t2">
         <span class="name">SaaS</span>
