@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS Durability in the Age of AI — DUMAC Direct</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     THEME WRITE-UP TEMPLATE  —  DUMAC Direct
+     Reusable for all theme tear-sheets. Section order locked:
+     Header / Thesis / Catalysts / Market Dynamic /
+     Key Leaders / Sub-theme structure / DB Structure / Caveats
+     Palette: white bg, black type, blue + yellow accents.
+     Font floor: 13px (~10pt) everywhere.
+     ========================================================= */
+  :root {
+    --bg:          #ffffff;
+    --bg-tint:     #f5f7fb;   /* faint blue panel */
+    --bg-yellow:   #fdf6e0;   /* faint yellow panel */
+    --ink:         #14181f;   /* near-black body */
+    --ink-soft:    #565d6b;   /* muted text */
+    --blue:        #1b3a8f;   /* primary accent */
+    --blue-deep:   #122a66;
+    --blue-soft:   #e4e9f6;
+    --yellow:      #f2b705;   /* secondary accent */
+    --yellow-deep: #b8860b;
+    --line:        #d9dde6;
+    --tail:        #1f7a4d;   /* tailwind green */
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 40px 110px;
+  }
+
+  /* ---------- Breadcrumb ---------- */
+  .crumb {
+    padding: 28px 0 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .crumb a {
+    color: var(--blue);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .crumb a:hover { color: var(--yellow-deep); }
+  .crumb .sep { margin: 0 10px; color: var(--line); }
+
+  /* ---------- SECTION 1 — Header line ---------- */
+  .masthead {
+    margin-top: 24px;
+    padding-bottom: 26px;
+    border-bottom: 3px solid var(--yellow);
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.6vw, 3.15rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--blue-deep);
+    max-width: 16ch;
+  }
+  .updated {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    padding-bottom: 6px;
+  }
+  .updated b { color: var(--yellow-deep); font-weight: 500; }
+
+  /* ---------- Section scaffold ---------- */
+  section { margin-top: 50px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .sec-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--yellow-deep);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    letter-spacing: -0.012em;
+    color: var(--blue);
+  }
+  .sec-head::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: var(--line);
+    align-self: center;
+  }
+
+  /* ---------- Bullet list (thesis / catalysts) ---------- */
+  .points { list-style: none; }
+  .points > li {
+    position: relative;
+    padding: 0 0 20px 30px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .points > li:last-child { border-bottom: none; margin-bottom: 0; }
+  .points > li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 9px;
+    width: 9px; height: 9px;
+    background: var(--yellow);
+    border: 1px solid var(--yellow-deep);
+    transform: rotate(45deg);
+  }
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.16rem;
+    color: var(--blue);
+    letter-spacing: -0.005em;
+  }
+  .points p {
+    font-size: 1.08rem;
+    line-height: 1.62;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+
+  /* ---------- Market dynamic block ---------- */
+  .dynamic {
+    background: var(--bg-tint);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--blue);
+    padding: 26px 30px;
+  }
+  .dynamic p {
+    font-size: 1.1rem;
+    line-height: 1.66;
+    color: var(--ink);
+  }
+  .dynamic .pill {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 2px 9px;
+    border-radius: 2px;
+    color: var(--ink);
+    background: var(--yellow);
+  }
+  .dynamic .pill.tail { background: var(--tail); color: #ffffff; }
+
+  /* ---------- Leaders ---------- */
+  .leaders { display: grid; gap: 0; }
+  .lgroup {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .lgroup:last-child { border-bottom: none; }
+  .lgroup .gname {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 3px solid var(--yellow);
+  }
+  .lgroup p {
+    font-size: 1.06rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .tk {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--blue-deep);
+    background: var(--blue-soft);
+    padding: 1px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* ---------- Table (sub-theme structure) ---------- */
+  .tbl-scroll { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.02rem;
+    min-width: 560px;
+    border: 1px solid var(--line);
+  }
+  thead th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--blue);
+    text-align: left;
+    padding: 11px 16px;
+  }
+  tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) td { background: var(--bg-tint); }
+  tbody td:first-child {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+
+  /* ---------- DB structure meta table ---------- */
+  .meta {
+    border: 1px solid var(--line);
+  }
+  .meta-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+  .meta-row:last-child { border-bottom: none; }
+  .meta-row .k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    padding: 13px 16px;
+    background: var(--bg-tint);
+    border-right: 1px solid var(--line);
+  }
+  .meta-row .v {
+    padding: 13px 16px;
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  /* ---------- Caveats ---------- */
+  .caveats { list-style: none; }
+  .caveats li {
+    position: relative;
+    padding: 0 0 14px 26px;
+    margin-bottom: 14px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--ink);
+    border-bottom: 1px dotted var(--line);
+  }
+  .caveats li:last-child { border-bottom: none; margin-bottom: 0; }
+  .caveats li::before {
+    content: "\2014";
+    position: absolute;
+    left: 0; top: 0;
+    color: var(--yellow-deep);
+    font-weight: 600;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 3px solid var(--yellow);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { color: var(--yellow-deep); }
+
+  .disclaimer {
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  strong { color: var(--blue); font-weight: 600; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 0 22px 80px; }
+    .meta-row { grid-template-columns: 1fr; }
+    .meta-row .k { border-right: none; border-bottom: 1px solid var(--line); }
+    .title-row { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="crumb">
+    <a href="../index.html">Theme Knowledge Base</a>
+    <span class="sep">/</span> Productivity
+    <span class="sep">/</span> SaaS
+  </nav>
+
+  <!-- ============ 1 · HEADER LINE ============ -->
+  <header class="masthead">
+    <div class="eyebrow">Theme Tear-Sheet</div>
+    <div class="title-row">
+      <h1>SaaS Durability in the Age of AI</h1>
+      <div class="updated">Last updated <b>May 16, 2026</b></div>
+    </div>
+  </header>
+
+  <!-- ============ 2 · THESIS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Thesis</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">LLMs make custom software trivial to generate; the moat must live outside the software layer.</span>
+        <p>Workflow logic, form-based data entry, and being a thin UI over a database are no longer defensible &mdash; these are the categories AI agents synthesize fastest. Durable SaaS franchises are protected by something that is not code: proprietary data, regulatory and compliance entrenchment, two-sided network effects, hardware and calibration loops, or mission-critical blast radius. The framework deliberately ignores valuation and management quality. The question is which businesses are structurally protected, not which are cheap.</p>
+      </li>
+      <li>
+        <span class="lead">Five moat categories with different decay curves.</span>
+        <p>(1) Proprietary Data &mdash; decades of curated datasets AI cannot regenerate without the underlying observations. (2) Regulated Systems of Record &mdash; compliance, audit trail, and regulatory relationships create switching costs unrelated to software quality. (3) Two-Sided Networks &mdash; ecosystem value lives beyond the UI. (4) Physical-World Integration &mdash; hardware, sensors, and calibration loops code alone cannot replicate. (5) Mission-Critical Infrastructure &mdash; tiered by severity of failure.</p>
+      </li>
+      <li>
+        <span class="lead">Mission-Critical Infrastructure is the largest and deepest bucket &mdash; sub-tiered by blast radius.</span>
+        <p>Existential failure threatens the existence of customer operations; switching is essentially unthinkable. Operational failure severely disrupts daily operations but is recoverable. Engineering-Critical switching costs are measured in years because the tools sit inside multi-year product development cycles. The CIO test applies cleanly: if the board would ask follow-up questions about risk and continuity before approving a vendor change, the name is durable.</p>
+      </li>
+      <li>
+        <span class="lead">Cybersecurity is the underrated tailwind &mdash; AI raises both attack sophistication and attack surface.</span>
+        <p>Defenders gain because attackers gain. The Cybersecurity Tailwind sub-theme is cross-cutting under SaaS Durability rather than under Mission-Critical because the driver is demand-side, not moat-side &mdash; and the same names also carry distinct edges to PQC Migration (deadline-driven) and Existential Infrastructure (blast-radius driven). Same companies, three distinct economic forces.</p>
+      </li>
+      <li>
+        <span class="lead">Contrarian take &mdash; the biggest winners may be incumbents that reposition as the AI agent orchestration layer.</span>
+        <p>Agentforce and ServiceNow's AI platform are early bets that customers will bring any LLM as the interface while incumbents own the data, permissions, audit trail, and integrations beneath it. This is the AI Orchestration Layer Incumbents thesis as a separate theme, but the names live first under SaaS Durability. If the orchestration thesis plays out, these go from Significant to Core strength on the durability framework.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ 3 · CATALYSTS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Catalysts to Watch</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">Hyperscaler-led customer migration off a thin-moat horizontal SaaS vendor.</span>
+        <p>First well-documented case of a Fortune 500 customer cancelling a thin-moat horizontal vendor in favor of an internal LLM-built equivalent would be the inflection point. Watch press releases, cloud-provider customer case studies, and earnings-call commentary on churn. Would validate the durability thesis (winners stay) and the disruption thesis (losers get hit) simultaneously.</p>
+      </li>
+      <li>
+        <span class="lead">AI orchestration layer revenue disclosure from CRM or NOW.</span>
+        <p>Both have launched AI platform products; neither has broken out attributable revenue. The first quarter either reports a material attributable line item confirms the contrarian take. Conversely, repeated guidance disappointment would undermine the orchestration thesis.</p>
+      </li>
+      <li>
+        <span class="lead">Multiple compression in horizontal SaaS opens a relative-value gap.</span>
+        <p>If the AI Disruption headwind theme plays out, thin-moat names should de-rate relative to the durable cohort. A wider multiple gap creates the conditions for premium durable names to look expensive vs. peers &mdash; which is the point. The framework predicts the dispersion.</p>
+      </li>
+      <li>
+        <span class="lead">Major SaaS M&amp;A by a Mission-Critical or Proprietary Data incumbent.</span>
+        <p>Roper is the canonical compounder buying niche mission-critical software at scale; S&amp;P Global's IHS Markit deal demonstrated the Proprietary Data play. The next $5B+ deal where a durable incumbent acquires a vertical software company at a premium signals the moat-by-acquisition strategy is accelerating.</p>
+      </li>
+      <li>
+        <span class="lead">Cyber breach attributed to AI-generated attack tooling.</span>
+        <p>First major breach explicitly tied to LLM-assisted attack development accelerates the Cybersecurity Tailwind sub-theme materially, driving security spend and board-level demand for defender names across the existential tier.</p>
+      </li>
+      <li>
+        <span class="lead">Engineering-Critical incumbents ship credible AI copilots without revenue cannibalization.</span>
+        <p>These businesses have the deepest moats but the most to lose if a price-disrupting AI workflow emerges in chip design or CAD. Quiet integration of AI features inside existing seat-based pricing &mdash; without seat reductions &mdash; validates the engineering-critical thesis and could re-rate the cohort higher.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ 4 · MARKET DYNAMIC ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Market Dynamic, Direction, Horizon &amp; Conviction</h2></div>
+    <div class="dynamic">
+      <p>A recognized but actively debated theme. The dynamic is a structural <span class="pill tail">Tailwind</span> for the durable cohort and a structural headwind for thin-moat horizontal SaaS &mdash; the two sides of the same AI hyperscaler force, captured here and in the inverse RELATES_TO link to AI Disruption of Horizontal SaaS. The dispersion plays out over a <span class="pill">3&ndash;5 year</span> horizon as customer behavior catches up with the technology &mdash; most enterprise software contracts run 3+ years, so AI substitution shows up at renewal cycles, not on announcement. Theme conviction is <span class="pill">High</span> &mdash; the technology shift is verified, the moat categories are well-defined, and the failure modes for non-durable SaaS are increasingly visible in customer behavior. The honest caveat: many durable names already trade at premium multiples that price in some of the moat. The framework identifies what is structurally protected, not what is cheap.</p>
+    </div>
+  </section>
+
+  <!-- ============ 5 · KEY LEADERS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Key Leaders to Watch</h2></div>
+    <div class="leaders">
+      <div class="lgroup">
+        <div class="gname">Proprietary Data</div>
+        <p>S&amp;P Global <span class="tk">SPGI</span>, MSCI <span class="tk">MSCI</span>, Verisk <span class="tk">VRSK</span>, FactSet <span class="tk">FDS</span>, CoStar <span class="tk">CSGP</span>, IQVIA <span class="tk">IQV</span> (Claude-proposed, pending next universe CSV refresh). All carry High edge confidence; the data moat is the most tested category.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Regulated Systems of Record</div>
+        <p>Intuit <span class="tk">INTU</span>, ADP <span class="tk">ADP</span>, Veeva <span class="tk">VEEV</span>, Workday <span class="tk">WDAY</span>, Oracle <span class="tk">ORCL</span>. Veeva spans this bucket and Physical-World Software &mdash; clinical-trial workflows are both compliance- and lab-integrated.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Two-Sided Networks</div>
+        <p>Shopify <span class="tk">SHOP CN</span>, Toast <span class="tk">TOST</span>, ServiceTitan <span class="tk">TTAN</span>. All three reinforced by physical-world hardware (POS terminals, vertical-specific devices).</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Physical-World Software</div>
+        <p>Samsara <span class="tk">IOT</span>, Procore <span class="tk">PCOR</span>, Trimble <span class="tk">TRMB</span>, PTC <span class="tk">PTC</span>, Rockwell <span class="tk">ROK</span>, Symbotic <span class="tk">SYM</span> at Core strength. Deere <span class="tk">DE</span>, Toast, Veeva at Significant &mdash; each has a partial physical-world tie reinforcing a primary moat elsewhere.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Mission-Critical &mdash; Existential Tier</div>
+        <p>CrowdStrike <span class="tk">CRWD</span>, Palo Alto <span class="tk">PANW</span>, Fortinet <span class="tk">FTNT</span>, Zscaler <span class="tk">ZS</span>, Cloudflare <span class="tk">NET</span>, Visa <span class="tk">V</span>, Mastercard <span class="tk">MA</span>, Broadridge <span class="tk">BR</span>, Fiserv <span class="tk">FISV</span> (migrated from framework alias 'FI').</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Mission-Critical &mdash; Operational Tier</div>
+        <p>Datadog <span class="tk">DDOG</span>, Snowflake <span class="tk">SNOW</span>, MongoDB <span class="tk">MDB</span>, ServiceNow <span class="tk">NOW</span> at Core; Confluent <span class="tk">CFLT</span> (Claude-proposed) and Salesforce <span class="tk">CRM</span> at Significant.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Mission-Critical &mdash; Engineering-Critical Tier</div>
+        <p>Synopsys <span class="tk">SNPS</span>, Cadence <span class="tk">CDNS</span>, Autodesk <span class="tk">ADSK</span>, Bentley <span class="tk">BSY</span>. Ansys <span class="tk">ANSS</span> is preserved as a Delisted-Acquired node (absorbed by SNPS, July 17 2025); live exposure now travels through SNPS.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Cybersecurity Tailwind (cross-cutting)</div>
+        <p>CRWD, PANW, FTNT, NET, ZS &mdash; same names that appear in the Existential tier, linked via a separate edge because the driver is demand-side, not blast-radius. Each carries three distinct, intentionally additive edges across the tree.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Capital-Allocator Angle (outside the L1 tree)</div>
+        <p>Roper <span class="tk">ROP</span> and Constellation Software <span class="tk">CSU CN</span> (migrated from alias 'CSU.TO') carry Significant edges to SaaS Durability directly for disciplined M&amp;A of niche mission-critical software. The standalone Capital Allocator Compounders theme was retired as redundant.</p>
+      </div>
+    </div>
+    <p class="disclaimer">Not exhaustive &mdash; see Neo4j for the full edge list.</p>
+  </section>
+
+  <!-- ============ 6 · SUB-THEME STRUCTURE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Sub-Theme Structure</h2></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr><th>Sub-theme</th><th>Driver</th><th>Public-equity surface</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Proprietary Data</td>
+            <td>Decades of curated, hard-to-replicate data create moats AI cannot regenerate without the underlying observations.</td>
+            <td>Concentrated and high-quality. Premium multiples but defensible.</td>
+          </tr>
+          <tr>
+            <td>Regulated Systems of Record</td>
+            <td>Compliance, audit trail, and regulatory relationships create switching costs independent of software quality.</td>
+            <td>Large-cap, slow-moving. Boring is the point; switching is structurally hard.</td>
+          </tr>
+          <tr>
+            <td>Two-Sided Networks</td>
+            <td>Ecosystem value lives beyond the UI &mdash; network effects between buyers and sellers, or merchants and consumers.</td>
+            <td>Narrow but high-quality; all reinforced by physical-world integration.</td>
+          </tr>
+          <tr>
+            <td>Physical-World Software</td>
+            <td>Hardware, sensors, and calibration loops cannot be replicated by code alone &mdash; protection is materials and devices, not algorithms.</td>
+            <td>Broadest mid-cap surface across Core and Significant strength.</td>
+          </tr>
+          <tr>
+            <td>Mission-Critical Infrastructure</td>
+            <td>High blast radius of failure protects incumbents &mdash; customers will not switch vendors for systems they cannot afford to have fail.</td>
+            <td>Deepest bucket, sub-tiered three ways: Existential, Operational, Engineering-Critical.</td>
+          </tr>
+          <tr>
+            <td>Cybersecurity Tailwind</td>
+            <td>AI raises both attack sophistication and attack surface, driving structural demand for cyber defenders. Demand-side force, distinct from blast-radius moat.</td>
+            <td>Cross-cutting; same names appear in the Existential tier via a separate edge. Linked to PQC Migration via RELATES_TO.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 7 · DB STRUCTURE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Theme Database Structure</h2></div>
+    <div class="meta">
+      <div class="meta-row"><div class="k">Topic</div><div class="v">None &mdash; SaaS Durability is a standalone editorial cluster (no Topic tag).</div></div>
+      <div class="meta-row"><div class="k">Theme level</div><div class="v">Level 1 (parent), with 6 Level 2 sub-themes and 3 Level 3 sub-themes nested under Mission-Critical Infrastructure.</div></div>
+      <div class="meta-row"><div class="k">Status</div><div class="v">Active</div></div>
+      <div class="meta-row"><div class="k">Conviction</div><div class="v">High (Physical-World Software is Medium-High; all other sub-themes High).</div></div>
+      <div class="meta-row"><div class="k">Time horizon</div><div class="v">3&ndash;5 years for the parent thesis; 5+ years for most sub-themes; 10+ years for Engineering-Critical Infrastructure.</div></div>
+      <div class="meta-row"><div class="k">Companies</div><div class="v">43 direct EXPOSED_TO edges at the L1 parent (35 Core + 8 Significant) after orphan migration; re-edged at sub-theme level via additive edges.</div></div>
+      <div class="meta-row"><div class="k">Related themes</div><div class="v">Inverse RELATES_TO link to AI Disruption of Horizontal SaaS. Cybersecurity Tailwind carries a separate RELATES_TO link to PQC Migration (overlapping-but-distinct).</div></div>
+      <div class="meta-row"><div class="k">Lifecycle conventions</div><div class="v">All 5 legacy Security orphans (ANSS, CFLT, FI, IQV, CSU.TO) migrated May 17, 2026. ANSS preserved as Delisted-Acquired (acquired by SNPS); FI &rarr; FISV and CSU.TO &rarr; CSU CN reused canonical nodes; CFLT and IQV created as Claude-proposed pending next CSV refresh.</div></div>
+      <div class="meta-row"><div class="k">Why separate from AI Disruption</div><div class="v">Mirror-image themes kept distinct: SaaS Durability is which companies are protected; AI Disruption is which are vulnerable. Lists do not overlap by design; direction differs (Tailwind vs. Headwind). Inverse RELATES_TO documents the relationship without merging.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 8 · CAVEATS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Caveats &amp; Discipline Notes</h2></div>
+    <ul class="caveats">
+      <li>Framework, not investment advice. This identifies what is structurally protected from AI substitution, not what is attractively valued. Many durable names trade at premium multiples that already price in some of the moat.</li>
+      <li>Same names appear in multiple sub-themes &mdash; intentionally additive, not duplicative. VEEV carries three distinct-mechanism edges; the cyber names carry four. Multi-theme exposure inflates apparent overlap in slicing queries.</li>
+      <li>The framework is theme-driven, not sector-driven. GICS edges still classify these companies, but theme exposure is a separate analytical layer. Don't infer durability from sector.</li>
+      <li>Mechanism is required on every edge. The graph currently has Mechanism populated at the L1 parent but missing on several L2 child edges &mdash; pending a backfill pass.</li>
+      <li>The AI Orchestration Layer Incumbents thesis lives as a separate L1 theme, not a sub-theme here. Revisit promotion to a Level 2 child only if revenue disclosure validates the orchestration take.</li>
+      <li>Engineering-Critical names are the deepest moat but the highest risk if AI changes the workflow primitive. Watch for early signals of seat reductions on AI feature ship.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div><a href="../index.html">&larr; Back to Knowledge Base</a></div>
+    <div>DUMAC Direct &middot; Framework-driven analysis, not investment advice</div>
+  </footer>
+
+</div>
+</body>
+</html>
