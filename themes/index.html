@@ -53,6 +53,39 @@
     padding: 0 48px 96px;
   }
 
+  /* ---------- Return to DUMAC Direct button ---------- */
+  .return-btn {
+    position: absolute;
+    top: 26px;
+    left: 26px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 9px 16px 8px;
+    border: 1px solid var(--navy-line);
+    background: rgba(11,29,58,0.6);
+    transition: all 0.2s ease;
+  }
+  .return-btn:hover {
+    color: var(--ink-deep);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .return-btn .ar {
+    font-size: 1rem;
+    line-height: 1;
+    transform: translateX(0);
+    transition: transform 0.2s ease;
+  }
+  .return-btn:hover .ar { transform: translateX(-3px); }
+
   /* ---------- Masthead ---------- */
   header {
     padding: 64px 0 40px;
@@ -300,6 +333,10 @@
 </head>
 <body>
 <div class="wrap">
+
+  <a class="return-btn" href="../index.html">
+    <span class="ar">&larr;</span> Return to DUMAC Direct
+  </a>
 
   <header>
     <div class="kicker">Thematic Investment Research</div>

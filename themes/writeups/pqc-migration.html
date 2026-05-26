@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post-Quantum Cryptography Migration — DUMAC Direct</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     THEME WRITE-UP TEMPLATE  —  DUMAC Direct
+     Section order locked: Header / Thesis / Catalysts /
+     Market Dynamic / Key Leaders / Sub-theme structure /
+     DB Structure / Caveats
+     Palette: white bg, black type, blue + yellow accents.
+     Font floor: 13px (~10pt) everywhere.
+     ========================================================= */
+  :root {
+    --bg:          #ffffff;
+    --bg-tint:     #f5f7fb;
+    --bg-yellow:   #fdf6e0;
+    --ink:         #14181f;
+    --ink-soft:    #565d6b;
+    --blue:        #1b3a8f;
+    --blue-deep:   #122a66;
+    --blue-soft:   #e4e9f6;
+    --yellow:      #f2b705;
+    --yellow-deep: #b8860b;
+    --line:        #d9dde6;
+    --tail:        #1f7a4d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 40px 110px;
+  }
+
+  /* ---------- Breadcrumb ---------- */
+  .crumb {
+    padding: 28px 0 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .crumb a {
+    color: var(--blue);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .crumb a:hover { color: var(--yellow-deep); }
+  .crumb .sep { margin: 0 10px; color: var(--line); }
+
+  /* ---------- SECTION 1 — Header line ---------- */
+  .masthead {
+    margin-top: 24px;
+    padding-bottom: 26px;
+    border-bottom: 3px solid var(--yellow);
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.6vw, 3.15rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--blue-deep);
+    max-width: 18ch;
+  }
+  .updated {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    padding-bottom: 6px;
+  }
+  .updated b { color: var(--yellow-deep); font-weight: 500; }
+
+  /* ---------- Section scaffold ---------- */
+  section { margin-top: 50px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .sec-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--yellow-deep);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    letter-spacing: -0.012em;
+    color: var(--blue);
+  }
+  .sec-head::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: var(--line);
+    align-self: center;
+  }
+
+  /* ---------- Bullet list (thesis / catalysts) ---------- */
+  .points { list-style: none; }
+  .points > li {
+    position: relative;
+    padding: 0 0 20px 30px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .points > li:last-child { border-bottom: none; margin-bottom: 0; }
+  .points > li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 9px;
+    width: 9px; height: 9px;
+    background: var(--yellow);
+    border: 1px solid var(--yellow-deep);
+    transform: rotate(45deg);
+  }
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.16rem;
+    color: var(--blue);
+    letter-spacing: -0.005em;
+  }
+  .points p {
+    font-size: 1.08rem;
+    line-height: 1.62;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+
+  /* ---------- Market dynamic block ---------- */
+  .dynamic {
+    background: var(--bg-tint);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--blue);
+    padding: 26px 30px;
+  }
+  .dynamic p {
+    font-size: 1.1rem;
+    line-height: 1.66;
+    color: var(--ink);
+  }
+  .dynamic .pill {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 2px 9px;
+    border-radius: 2px;
+    color: var(--ink);
+    background: var(--yellow);
+  }
+  .dynamic .pill.tail { background: var(--tail); color: #ffffff; }
+
+  /* ---------- Leaders ---------- */
+  .leaders { display: grid; gap: 0; }
+  .lgroup {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .lgroup:last-child { border-bottom: none; }
+  .lgroup .gname {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 3px solid var(--yellow);
+  }
+  .lgroup p {
+    font-size: 1.06rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .tk {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--blue-deep);
+    background: var(--blue-soft);
+    padding: 1px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* ---------- Table (sub-theme structure) ---------- */
+  .tbl-scroll { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.02rem;
+    min-width: 560px;
+    border: 1px solid var(--line);
+  }
+  thead th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--blue);
+    text-align: left;
+    padding: 11px 16px;
+  }
+  tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) td { background: var(--bg-tint); }
+  tbody td:first-child {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+
+  /* ---------- DB structure meta table ---------- */
+  .meta {
+    border: 1px solid var(--line);
+  }
+  .meta-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+  .meta-row:last-child { border-bottom: none; }
+  .meta-row .k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    padding: 13px 16px;
+    background: var(--bg-tint);
+    border-right: 1px solid var(--line);
+  }
+  .meta-row .v {
+    padding: 13px 16px;
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  /* ---------- Caveats ---------- */
+  .caveats { list-style: none; }
+  .caveats li {
+    position: relative;
+    padding: 0 0 14px 26px;
+    margin-bottom: 14px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--ink);
+    border-bottom: 1px dotted var(--line);
+  }
+  .caveats li:last-child { border-bottom: none; margin-bottom: 0; }
+  .caveats li::before {
+    content: "\2014";
+    position: absolute;
+    left: 0; top: 0;
+    color: var(--yellow-deep);
+    font-weight: 600;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 3px solid var(--yellow);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { color: var(--yellow-deep); }
+
+  .disclaimer {
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  strong { color: var(--blue); font-weight: 600; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 0 22px 80px; }
+    .meta-row { grid-template-columns: 1fr; }
+    .meta-row .k { border-right: none; border-bottom: 1px solid var(--line); }
+    .title-row { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="crumb">
+    <a href="../index.html">Theme Knowledge Base</a>
+    <span class="sep">/</span> Future
+    <span class="sep">/</span> Quantum
+    <span class="sep">/</span> Cryptography
+  </nav>
+
+  <!-- ============ 1 · HEADER LINE ============ -->
+  <header class="masthead">
+    <div class="eyebrow">Theme Tear-Sheet</div>
+    <div class="title-row">
+      <h1>Post-Quantum Cryptography Migration</h1>
+      <div class="updated">Last updated <b>May 16, 2026</b></div>
+    </div>
+  </header>
+
+  <!-- ============ 2 · THESIS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Thesis</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">Largest mandated cryptographic refresh cycle since Y2K.</span>
+        <p>NIST finalized the first three PQC standards (FIPS 203, 204, 205) in August 2024. NSA CNSA 2.0 requires quantum-safe algorithms for new national-security systems by Jan 2027, full application migration by 2030, and complete infrastructure migration by 2035. NIST historically estimates 10&ndash;20 years for a cryptographic transition of this scale.</p>
+      </li>
+      <li>
+        <span class="lead">"Harvest now, decrypt later" pulls demand forward of CRQC arrival.</span>
+        <p>Adversaries are already capturing encrypted traffic and archived data at scale, betting that a cryptographically relevant quantum computer will eventually decrypt it. Protection requires migrating today, not when a CRQC arrives &mdash; making the spend cycle independent of when quantum advantage is actually demonstrated.</p>
+      </li>
+      <li>
+        <span class="lead">Spend is non-discretionary for regulated entities.</span>
+        <p>Federal agencies, defense contractors and the Defense Industrial Base, financial institutions, healthcare, and critical infrastructure all face cascading compliance requirements. The EU's coordinated PQC roadmap targets critical-infrastructure protection by end of 2030, mirroring the US framework.</p>
+      </li>
+      <li>
+        <span class="lead">Market scale is large and already visible.</span>
+        <p>Industry analysts size the PQC market at $15B+ by 2030. Organizations are expected to budget 2&ndash;5% of annual IT-security spend over a roughly 4-year migration window. Cloudflare already protects over 65% of human-initiated TLS traffic on its network with hybrid post-quantum key agreement (Apr 2026) and is targeting full-stack PQC by 2029 &mdash; a concrete demand-pull signal across the broader internet stack.</p>
+      </li>
+      <li>
+        <span class="lead">Private-market validation is well ahead of public-equity flows.</span>
+        <p>SandboxAQ raised $450M+ in its April 2025 Series E at a $5.75B valuation (investors include Google, NVIDIA, BNP Paribas, Ray Dalio) and won a 5-year Department of War CIO contract in Dec 2025 to deploy AQtive Guard for cryptographic discovery and PQC migration. PQShield (Oxford-based, $65M+ raised) and QuSecure are similarly funded. The capital is recognizing the theme; public markets have not yet repriced incumbents for it.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ 3 · CATALYSTS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Catalysts to Watch</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">First major breach attributed to harvest-now-decrypt-later.</span>
+        <p>Would compress timelines, surface board-level urgency, and likely trigger an SEC disclosure thread for affected enterprises.</p>
+      </li>
+      <li>
+        <span class="lead">CRQC milestone announcement &mdash; verified Shor's algorithm at scale.</span>
+        <p>Would shift this theme from tailwind-only to a mixed picture: explicitly creates a Quantum Disruption of Encryption headwind theme for incumbents slow to migrate, while accelerating the tailwind for vendors and integrators.</p>
+      </li>
+      <li>
+        <span class="lead">CNSA 2.0 enforcement event &mdash; a contract disqualification or compliance audit failure.</span>
+        <p>Would validate the integrator sub-theme thesis. Treat 2027 as the practical hard deadline for DIB organizations, not 2035 &mdash; contract officers will increasingly use CNSA 2.0 as an evaluation criterion.</p>
+      </li>
+      <li>
+        <span class="lead">Pure-play PQC IPO &mdash; PQShield, SandboxAQ, or QuSecure.</span>
+        <p>Would justify carving out a third sub-theme (PQC Pure-Plays) and create the first clean public-equity proxy for the theme. Watch SandboxAQ in particular given valuation and DoW contract pipeline.</p>
+      </li>
+      <li>
+        <span class="lead">Quantum-safe SKU adoption metrics from major incumbents.</span>
+        <p>Cloudflare and Apple have already shipped PQC to consumers; the next read is whether IBM, Cisco, Microsoft, and Oracle start disclosing PQC-attributable bookings in earnings calls. First disclosure that breaks PQC out as a line item is the inflection point.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ 4 · MARKET DYNAMIC ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Market Dynamic, Direction, Horizon &amp; Conviction</h2></div>
+    <div class="dynamic">
+      <p>Not a material market factor today; the future trend is largely unanticipated by public-equity flows as of May 2026. This would be a <span class="pill tail">Tailwind</span> and is currently expected to play out over a <span class="pill">3&ndash;5 year</span> horizon, with deadlines bracketing 2027&ndash;2035. Theme conviction is <span class="pill">High</span> &mdash; the spend is deadline-driven, not speculation-driven. Federal, DIB, financial, and critical-infrastructure migration is mandated regardless of when quantum advantage is actually demonstrated, which is what separates this from a threat-volume-driven cyber theme.</p>
+    </div>
+  </section>
+
+  <!-- ============ 5 · KEY LEADERS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Key Leaders to Watch</h2></div>
+    <div class="leaders">
+      <div class="lgroup">
+        <div class="gname">Public Incumbents</div>
+        <p>IBM <span class="tk">IBM</span> &mdash; co-developer of the NIST-winning ML-KEM and ML-DSA algorithms, with the deepest enterprise PQC pipeline. Cloudflare <span class="tk">NET</span> &mdash; the largest live PQC deployment, with over 65% of human TLS traffic protected. CrowdStrike <span class="tk">CRWD</span>, Palo Alto <span class="tk">PANW</span>, and Fortinet <span class="tk">FTNT</span> have PQC roadmaps building, mostly customer-pull rather than mandate-driven.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Public Integrators</div>
+        <p>Booz Allen <span class="tk">BAH</span>, Leidos <span class="tk">LDOS</span>, and CACI <span class="tk">CACI</span> &mdash; large DIB footprints with direct CNSA 2.0 migration mandates. Accenture <span class="tk">ACN</span> for enterprise PQC consulting.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Important Private Companies to Monitor</div>
+        <p>SandboxAQ (Alphabet spinout, $5.75B valuation, 5-year DoW CIO contract, FedRAMP Ready) is the most material private name. PQShield (Oxford, $65M+, hardware-and-software PQC IP, automotive and IoT focus) and QuSecure (San Mateo, crypto-agility platform) round out the leadership group. ID Quantique, Qrypt, and CryptoNext Security operate in adjacent quantum-safe networking niches.</p>
+      </div>
+    </div>
+    <p class="disclaimer">Not exhaustive &mdash; see Neo4j for the full edge list.</p>
+  </section>
+
+  <!-- ============ 6 · SUB-THEME STRUCTURE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Sub-Theme Structure</h2></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr><th>Sub-theme</th><th>Driver</th><th>Initial public-equity surface</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Identity and Encryption Incumbents</td>
+            <td>Vendors whose existing products embed quantum-vulnerable cryptography and must ship PQC upgrades to retain customer base and federal eligibility.</td>
+            <td>Modest &mdash; mostly multi-theme names where PQC is an additive driver, not the primary one.</td>
+          </tr>
+          <tr>
+            <td>Compliance and Migration Services</td>
+            <td>Defense IT integrators and consultancies executing federal, DIB, and critical-infrastructure migration contracts.</td>
+            <td>Cleaner &mdash; federal integrators have direct PQC contract pipelines forming.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 7 · DB STRUCTURE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Theme Database Structure</h2></div>
+    <div class="meta">
+      <div class="meta-row"><div class="k">Topic</div><div class="v">Quantum &mdash; tagged via TAGGED_AS to the umbrella QUANTUM Topic node.</div></div>
+      <div class="meta-row"><div class="k">Theme level</div><div class="v">Level 1 (parent), with 2 Level 2 sub-themes.</div></div>
+      <div class="meta-row"><div class="k">Status</div><div class="v">Active</div></div>
+      <div class="meta-row"><div class="k">Conviction</div><div class="v">High &mdash; deadline-driven, not speculation-driven.</div></div>
+      <div class="meta-row"><div class="k">Time horizon</div><div class="v">3&ndash;5 years; deadlines bracket 2027 / 2030 / 2035.</div></div>
+      <div class="meta-row"><div class="k">Companies</div><div class="v">9 Tailwind EXPOSED_TO edges aggregated via children: 5 Identity and Encryption Incumbents, 4 Compliance and Migration Services.</div></div>
+      <div class="meta-row"><div class="k">Relates to</div><div class="v">Cybersecurity Tailwind (via RELATES_TO, kind "overlapping-but-distinct"); Quantum Computing Beneficiaries (inverse-risk linkage via the shared QUANTUM Topic).</div></div>
+      <div class="meta-row"><div class="k">Why separate from Cybersecurity Tailwind</div><div class="v">Deadline-driven (2027 / 2030 / 2035), not threat-driven &mdash; spend happens regardless of attack frequency. Touches identity, encryption, PKI, code signing, VPN, HSM, and embedded cryptography &mdash; broader than the firewall/EDR core of Cybersecurity Tailwind. Drives defense-IT-integrator revenue the cyber-pure-play theme misses. Linked via RELATES_TO, not CHILD_OF &mdash; the two themes overlap on some names (PANW, CRWD, NET, FTNT) but the economic driver is different.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 8 · CAVEATS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Caveats &amp; Discipline Notes</h2></div>
+    <ul class="caveats">
+      <li>Most candidate names are multi-theme. Layering PQC edges on top of existing Cybersecurity Tailwind edges is additive, not duplicative, but inflates apparent overlap in slicing queries &mdash; keep this in mind when running cross-theme analytics.</li>
+      <li>The theme is currently best expressed via incumbents adding PQC SKUs, not via standalone PQC vendors. Pure-play PQC public-equity coverage will improve as IPOs land.</li>
+      <li>Theme membership will grow over time. Initial edge count is intentionally modest; the value of recognizing the theme today is having a place to wire new names as the market structure clarifies (pure-play IPOs, M&amp;A consolidation, defense-prime PQC contract awards).</li>
+      <li>Mechanism on every edge must specify whether the company sells PQC capability or is buying it &mdash; the former is the tailwind; the latter is an offsetting capex line.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div><a href="../index.html">&larr; Back to Knowledge Base</a></div>
+    <div>DUMAC Direct &middot; Framework-driven analysis, not investment advice</div>
+  </footer>
+
+</div>
+</body>
+</html>
