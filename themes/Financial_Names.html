@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial — Names by Theme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1815;
+    --paper: #f4f1ea;
+    --paper-raised: #faf8f2;
+    --rule: #cdc6b5;
+    --rule-soft: #e2dccc;
+    --muted: #6b6457;
+    --tail: #2f5d3f;
+    --tail-soft: #e8efe6;
+    --head: #8a3324;
+    --head-soft: #f1e4df;
+    --gold: #9a7d31;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--paper); }
+
+  body {
+    font-family: 'Newsreader', Georgia, serif;
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.012) 2px, rgba(0,0,0,0.012) 3px);
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 36px 90px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    padding: 40px 0 22px;
+    border-bottom: 3px double var(--ink);
+  }
+  .crumb {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .crumb .here { color: var(--ink); font-weight: 600; }
+
+  .home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 12px 6px 9px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--paper-raised);
+    transition: border-color 0.14s ease, color 0.14s ease;
+    margin-bottom: 18px;
+  }
+  .home-link:hover { border-color: var(--ink); color: var(--ink); }
+  .home-link .arrow { font-size: 13px; line-height: 1; }
+  .category-name {
+    font-size: clamp(48px, 8vw, 92px);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 0.96;
+    margin: 18px 0 6px;
+  }
+  .category-sub {
+    font-size: 19px;
+    font-style: italic;
+    color: var(--muted);
+    max-width: 680px;
+  }
+  .meta-strip {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .meta-cell {
+    padding: 9px 20px 9px 0;
+    margin-right: 20px;
+    border-right: 1px solid var(--rule-soft);
+    color: var(--muted);
+  }
+  .meta-cell:last-child { border-right: none; }
+  .meta-cell b {
+    display: block;
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0;
+  }
+
+  /* ---------- Two-theme board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 4px;
+  }
+  .col { padding-top: 32px; }
+  .col.tokenization { padding-right: 38px; border-right: 1px solid var(--rule); }
+  .col.crypto { padding-left: 38px; }
+
+  .col-flag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    background: var(--tail-soft); color: var(--tail);
+  }
+  .col-flag .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .col-title {
+    font-size: 38px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 14px 0 4px;
+    line-height: 1.02;
+  }
+  .col-title a { color: inherit; text-decoration: none; border-bottom: 2px solid var(--gold); transition: color 0.14s ease; }
+  .col-title a:hover { color: var(--gold); }
+  .col-desc {
+    font-size: 15.5px;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 6px;
+    min-height: 70px;
+  }
+  .col-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .col-count b { color: var(--ink); font-size: 14px; }
+
+  /* ---------- Sub-theme groups ---------- */
+  .group { margin-top: 26px; }
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 5px;
+    margin-bottom: 4px;
+  }
+  .group-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .group-name .lvl { color: var(--gold); font-size: 10px; margin-right: 6px; }
+  .group-tally { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  /* ---------- Name rows ---------- */
+  ul.names { list-style: none; }
+  ul.names li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 7px 4px 7px 2px;
+    border-bottom: 1px dotted var(--rule-soft);
+    transition: background 0.12s ease;
+  }
+  ul.names li:hover { background: var(--paper-raised); }
+  .tkr {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    flex: 0 0 52px;
+    color: var(--tail);
+  }
+  .nm { flex: 1; font-size: 16px; letter-spacing: 0.01em; }
+  .tags { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .tag.flag { border-color: var(--gold); color: var(--gold); background: rgba(154,125,49,0.07); }
+  .strength {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .strength.high { background: var(--tail); color: var(--paper); }
+  .strength.medium { background: var(--tail-soft); color: var(--tail); border: 1px solid var(--tail); }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    margin-top: 56px;
+    padding-top: 18px;
+    border-top: 3px double var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .footer .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 14px; }
+  .footer .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+  .footer .disc {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 780px;
+  }
+
+  @media (max-width: 760px) {
+    .wrap { padding: 0 20px 70px; }
+    .board { grid-template-columns: 1fr; }
+    .col.tokenization { padding-right: 0; border-right: none; padding-bottom: 30px; }
+    .col.crypto { padding-left: 0; border-top: 1px solid var(--rule); }
+    .category-name { font-size: 52px; }
+    .tags { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <a class="home-link" href="index.html"><span class="arrow">&larr;</span>&nbsp;Home &middot; Category Index</a>
+    <div class="crumb">
+      <span>Thematic Research &nbsp;/&nbsp; Names Index &nbsp;/&nbsp; <span class="here">Financial</span></span>
+      <span>Snapshot &middot; 27 May 2026</span>
+    </div>
+    <h1 class="category-name">Financial</h1>
+    <p class="category-sub">The on-chain finance map &mdash; the assets migrating onto blockchains, and the crypto-cycle beta that rides alongside. Two distinct mechanisms, kept deliberately apart.</p>
+
+    <div class="meta-strip">
+      <div class="meta-cell">Category<b>Financial</b></div>
+      <div class="meta-cell">Themes covered<b>2 L1 themes</b></div>
+      <div class="meta-cell">Total names<b>25</b></div>
+      <div class="meta-cell">Source<b>Neo4j Aura graph</b></div>
+      <div class="meta-cell">Edge as of<b>27 May 2026</b></div>
+    </div>
+  </header>
+
+  <!-- ============ TWO-THEME BOARD ============ -->
+  <div class="board">
+
+    <!-- ---------- TOKENIZATION ---------- -->
+    <section class="col tokenization">
+      <span class="col-flag"><span class="dot"></span>Tailwind</span>
+      <h2 class="col-title"><a href="writeups/tokenization.html">Asset Tokenization</a></h2>
+      <p class="col-desc">Real-world assets migrating on-chain &mdash; value accruing to compliant issuance, regulated record-keeping, and the stablecoin settlement layer. Mechanism-clean only; crypto-price beta deliberately excluded.</p>
+      <div class="col-count"><b>8</b> names &nbsp;&middot;&nbsp; single L1 theme (flat)</div>
+
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L1</span>Asset Tokenization</span>
+          <span class="group-tally">8</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr">CRCL</span><span class="nm">Circle Internet</span><span class="tags"><span class="strength high">High</span></span></li>
+          <li><span class="tkr">FIGR</span><span class="nm">Figure Technologies</span><span class="tags"><span class="strength high">High</span></span></li>
+          <li><span class="tkr">COIN</span><span class="nm">Coinbase</span><span class="tags"><span class="tag">also Crypto</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">BR</span><span class="nm">Broadridge Financial</span><span class="tags"><span class="strength medium">Med</span></span></li>
+          <li><span class="tkr">SSNC</span><span class="nm">SS&amp;C Technologies</span><span class="tags"><span class="strength medium">Med</span></span></li>
+          <li><span class="tkr">BLSH</span><span class="nm">Bullish</span><span class="tags"><span class="tag flag">Claude-added</span><span class="strength medium">Med</span></span></li>
+          <li><span class="tkr">XYZ</span><span class="nm">Block</span><span class="tags"><span class="strength medium">Med</span></span></li>
+          <li><span class="tkr">HOOD</span><span class="nm">Robinhood</span><span class="tags"><span class="strength medium">Med</span></span></li>
+        </ul>
+      </div>
+
+      <div class="group" style="margin-top:34px;">
+        <div class="group-head"><span class="group-name">Private pure-plays to watch</span></div>
+        <p style="font-family:'Newsreader',serif; font-style:italic; font-size:14.5px; color:var(--muted); padding-top:8px;">
+          The most material issuance names are still private &mdash; Securitize (BlackRock&rsquo;s BUIDL partner, &gt;$4.6B tokenized AUM), Ondo Finance, Superstate, Dinari, Centrifuge, and Tokeny. An IPO or incumbent acquisition of any would reshape the public surface.
+        </p>
+      </div>
+    </section>
+
+    <!-- ---------- CRYPTO ---------- -->
+    <section class="col crypto">
+      <span class="col-flag"><span class="dot"></span>Tailwind</span>
+      <h2 class="col-title"><a href="writeups/crypto-beneficiaries.html">Crypto Asset Beneficiaries</a></h2>
+      <p class="col-desc">Public-equity proxies for crypto-price and on-chain-activity beta &mdash; split between Bitcoin miners (increasingly pivoting to AI/HPC) and the non-miner exchanges and treasury vehicles. Cycle exposure, not a moat thesis.</p>
+      <div class="col-count"><b>17</b> names &nbsp;&middot;&nbsp; L1 parent + 2 sub-themes</div>
+
+      <!-- Miners -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L2</span>Crypto Miners (Pure-Play)</span>
+          <span class="group-tally">12</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr">MARA</span><span class="nm">MARA Holdings</span><span class="tags"><span class="strength high">High</span></span></li>
+          <li><span class="tkr">RIOT</span><span class="nm">Riot Platforms</span><span class="tags"><span class="strength high">High</span></span></li>
+          <li><span class="tkr">CLSK</span><span class="nm">CleanSpark</span><span class="tags"><span class="strength high">High</span></span></li>
+          <li><span class="tkr">CORZ</span><span class="nm">Core Scientific</span><span class="tags"><span class="tag">AI pivot</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">IREN</span><span class="nm">IREN Ltd</span><span class="tags"><span class="tag">AI pivot</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">HUT</span><span class="nm">Hut 8</span><span class="tags"><span class="tag">CN listing</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">WULF</span><span class="nm">TeraWulf</span><span class="tags"><span class="tag">AI pivot</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">CIFR</span><span class="nm">Cipher Mining</span><span class="tags"><span class="strength high">High</span></span></li>
+          <li><span class="tkr">BTDR</span><span class="nm">Bitdeer Technologies</span><span class="tags"><span class="strength high">High</span></span></li>
+          <li><span class="tkr">BTBT</span><span class="nm">Bit Digital</span><span class="tags"><span class="strength medium">Med</span></span></li>
+          <li><span class="tkr">HIVE</span><span class="nm">HIVE Digital</span><span class="tags"><span class="tag">CN listing</span><span class="strength medium">Med</span></span></li>
+          <li><span class="tkr">CAN</span><span class="nm">Canaan</span><span class="tags"><span class="tag">ASIC maker</span><span class="strength medium">Med</span></span></li>
+        </ul>
+      </div>
+
+      <!-- Non-miners -->
+      <div class="group">
+        <div class="group-head">
+          <span class="group-name"><span class="lvl">L2</span>Crypto Beneficiaries, Non-Miners</span>
+          <span class="group-tally">5</span>
+        </div>
+        <ul class="names">
+          <li><span class="tkr">COIN</span><span class="nm">Coinbase</span><span class="tags"><span class="tag">also Token.</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">MSTR</span><span class="nm">Strategy</span><span class="tags"><span class="tag">BTC treasury</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">SBET</span><span class="nm">SharpLink</span><span class="tags"><span class="tag">ETH treasury</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">BMNR</span><span class="nm">BitMine Immersion</span><span class="tags"><span class="tag">treasury/mining</span><span class="strength high">High</span></span></li>
+          <li><span class="tkr">GLXY</span><span class="nm">Galaxy Digital</span><span class="tags"><span class="tag flag">Claude-added</span><span class="strength high">High</span></span></li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--tail);"></span>Tailwind &mdash; beneficiary</span>
+      <span><span class="swatch" style="background:rgba(154,125,49,0.4);border:1px solid var(--gold);"></span>Lifecycle flag &mdash; AI-added / needs review</span>
+    </div>
+    <p>NEO4J AURA &mdash; THEMATIC INVESTMENT GRAPH &nbsp;|&nbsp; CATEGORY: FINANCIAL &nbsp;|&nbsp; SNAPSHOT GENERATED 27 MAY 2026</p>
+    <p>COIN carries edges to both themes by design &mdash; additive edges, distinct mechanisms (tokenization venue vs. exchange-volume beta). Tickers shown in short form; canonical Bloomberg format in the graph (e.g. HUT CN Equity).</p>
+    <p class="disc" style="margin-top:10px;">
+      Static snapshot of the Neo4j graph and will drift &mdash; the graph is canonical. All edges are Claude-inferred and reviewed = false pending confirmation. Framework-driven analysis of structural exposure, not investment advice; valuation, growth, and management quality are layered on separately.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>
