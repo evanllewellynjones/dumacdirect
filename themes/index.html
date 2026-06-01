@@ -129,58 +129,69 @@
 
   /* ---------- Masthead ---------- */
   header {
-    padding: 64px 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 72px 0 24px;
     border-bottom: 1px solid var(--navy-line);
-    text-align: center;
+    text-align: left;
   }
-
-  .kicker {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 22px;
-  }
+  .head-left { flex: 1; min-width: 0; }
 
   h1 {
     font-family: 'Fraunces', serif;
     font-weight: 500;
-    font-size: clamp(2.4rem, 5.4vw, 4.1rem);
-    line-height: 1.04;
-    letter-spacing: -0.018em;
+    font-size: clamp(1.5rem, 2.8vw, 2.3rem);
+    line-height: 1.08;
+    letter-spacing: -0.012em;
     color: var(--paper);
   }
   h1 .light { color: var(--accent-soft); font-style: italic; font-weight: 400; }
 
   .standfirst {
-    margin: 24px auto 0;
-    max-width: 640px;
-    font-size: 1.08rem;
-    line-height: 1.6;
+    margin: 12px 0 0;
+    max-width: 760px;
+    font-size: 1rem;
+    line-height: 1.5;
     color: #c2cadd;
   }
 
-  .meta-rule {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    margin-top: 30px;
+  /* ---------- Meta box (upper right) ---------- */
+  .meta-box {
+    flex: 0 0 auto;
+    min-width: 220px;
+    margin-top: 4px;
+    border: 1px solid var(--navy-line);
+    background: rgba(11,29,58,0.5);
+    padding: 12px 16px 13px;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    letter-spacing: 0.1em;
+    font-size: 12px;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--ink-soft);
+    color: #8b94ad;
   }
-  .meta-rule span { color: #8b94ad; }
-  .meta-rule b { color: var(--accent); font-weight: 500; }
+  .meta-box .updated {
+    color: var(--accent);
+    font-size: 11px;
+    padding-bottom: 9px;
+    margin-bottom: 9px;
+    border-bottom: 1px solid var(--navy-line);
+  }
+  .meta-box .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 3px 0;
+  }
+  .meta-box .row b { color: var(--paper); font-weight: 500; }
 
   /* ---------- Tier legend ---------- */
   .tier-key {
     display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin: 30px 0 4px;
+    justify-content: flex-start;
+    gap: 26px;
+    margin: 18px 0 0;
     flex-wrap: wrap;
   }
   .tier-key .tk {
@@ -228,7 +239,7 @@
   .umbrella {
     background: var(--accent);
     margin: 0 0 18px;
-    padding: 16px 18px 14px;
+    padding: 14px 16px 12px;
   }
   .umbrella .u-title {
     font-family: 'Fraunces', serif;
@@ -239,13 +250,14 @@
     color: var(--ink-deep);
     text-transform: uppercase;
   }
+  .umbrella .u-title.compact { font-size: 0.85rem; letter-spacing: -0.01em; }
   .umbrella .u-sub {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    letter-spacing: 0.14em;
+    font-size: 11px;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     color: rgba(6,15,34,0.62);
-    margin-top: 7px;
+    margin-top: 6px;
   }
 
   /* ---------- Clickable category banner (names index link) ---------- */
@@ -363,6 +375,10 @@
   .theme.soon .name { color: #707b96; }
   .theme.soon .tag { color: #5b6680; }
 
+  /* parent groupings that won't get their own write-up — yellow */
+  .theme.group { cursor: default; }
+  .theme.group .name { color: var(--accent-soft); font-weight: 600; }
+
   /* ---------- Footer ---------- */
   footer {
     margin-top: 64px;
@@ -398,6 +414,8 @@
   }
   @media (max-width: 760px) {
     .wrap { padding: 0 24px 64px; }
+    header { flex-direction: column; padding-top: 56px; }
+    .meta-box { width: 100%; }
     .clusters { grid-template-columns: repeat(2, 1fr); }
     .cluster:nth-child(3n) { border-right: 1px solid var(--navy-line); }
     .cluster:nth-child(2n) { border-right: none; }
@@ -405,7 +423,7 @@
   @media (max-width: 520px) {
     .clusters { grid-template-columns: 1fr; }
     .cluster { border-right: none !important; }
-    .meta-rule, .tier-key { gap: 16px; flex-wrap: wrap; }
+    .tier-key { gap: 16px; flex-wrap: wrap; }
   }
 </style>
 </head>
@@ -417,8 +435,8 @@
   </a>
 
   <div class="top-actions">
-    <a class="act-btn" href="export_names.cypher" target="_blank" rel="noopener">
-      <span class="num">1</span><span class="ic">&#8635;</span> Refresh query (.cypher)
+    <a class="act-btn" href="export_names.txt" target="_blank" rel="noopener">
+      <span class="num">1</span><span class="ic">&#8635;</span> Refresh query
     </a>
     <a class="act-btn" href="Theme_names.xlsx" download>
       <span class="num">2</span><span class="ic">&darr;</span> Download names (.xlsx)
@@ -426,21 +444,20 @@
   </div>
 
   <header>
-    <div class="kicker">Thematic Investment Research</div>
-    <h1>DUMAC Direct<br><span class="light">Theme Knowledge Base</span></h1>
-    <p class="standfirst">
-      A traversable map of macro forces and the securities they touch &mdash; winners,
-      losers, and the mechanisms in between. Each theme links to a structured write-up.
-    </p>
-    <div class="meta-rule">
-      <span>Universe <b>~9,900</b></span>
-      <span>Themes <b>19</b> live</span>
-      <span>Backed by <b>Neo4j Aura</b></span>
+    <div class="head-left">
+      <h1>DUMAC Direct&nbsp;<span class="light">&mdash; Theme Knowledge Base</span></h1>
+      <p class="standfirst">A traversable map of macro forces and the securities they touch &mdash; winners, losers</p>
+      <div class="tier-key">
+        <span class="tk"><span class="marker m1"></span>Category</span>
+        <span class="tk"><span class="marker m2"></span>Theme</span>
+        <span class="tk"><span class="marker m3"></span>Sub-theme</span>
+      </div>
     </div>
-    <div class="tier-key">
-      <span class="tk"><span class="marker m1"></span>Category</span>
-      <span class="tk"><span class="marker m2"></span>Theme</span>
-      <span class="tk"><span class="marker m3"></span>Sub-theme</span>
+    <div class="meta-box">
+      <div class="updated">Last updated May 31, 2026 &middot; EST</div>
+      <div class="row"><span>Universe</span><b>~9,900</b></div>
+      <div class="row"><span>Themes</span><b>19 live</b></div>
+      <div class="row"><span>Backed by</span><b>Neo4j Aura</b></div>
     </div>
   </header>
 
@@ -453,24 +470,24 @@
         <div class="u-sub">Category Names</div>
       </a>
 
-      <div class="theme t2">
+      <div class="theme t2 group">
         <span class="name">SaaS</span>
       </div>
       <a class="theme t3 live" href="writeups/saas-durability.html">
         <span class="name">SaaS Survivors</span>
-        <span class="tag">Write-up &middot; SaaS Durability</span>
+        <span class="tag">SaaS Durability</span>
       </a>
       <a class="theme t3 live" href="writeups/ai-disruption-horizontal-saas.html">
         <span class="name">AI Disruption</span>
-        <span class="tag">Write-up &middot; Horizontal SaaS</span>
+        <span class="tag">Horizontal SaaS</span>
       </a>
 
-      <div class="theme t2">
+      <div class="theme t2 group">
         <span class="name">Data Centers</span>
       </div>
       <a class="theme t3 live" href="writeups/800v-hvdc-power.html">
         <span class="name">800V HVDC Power</span>
-        <span class="tag">Write-up &middot; Data Center Power</span>
+        <span class="tag">Data Center Power</span>
       </a>
     </section>
 
@@ -504,18 +521,18 @@
 
       <a class="theme t2 live" href="writeups/crypto-beneficiaries.html">
         <span class="name">Crypto</span>
-        <span class="tag">Write-up &middot; Crypto Asset Beneficiaries</span>
+        <span class="tag">Crypto Asset Beneficiaries</span>
       </a>
       <a class="theme t2 live" href="writeups/tokenization.html">
         <span class="name">Tokenization</span>
-        <span class="tag">Write-up &middot; Asset Tokenization</span>
+        <span class="tag">Asset Tokenization</span>
       </a>
     </section>
 
     <!-- ===== ENERGY TRANSITION ===== -->
     <section class="cluster">
       <div class="umbrella">
-        <div class="u-title">Energy Transition</div>
+        <div class="u-title compact">Energy Transition</div>
         <div class="u-sub">Category 04</div>
       </div>
 
@@ -537,17 +554,16 @@
         <span class="tag">Write-up pending</span>
       </div>
 
-      <div class="theme t2 soon">
+      <div class="theme t2 group">
         <span class="name">Quantum</span>
-        <span class="tag">Write-up pending</span>
       </div>
       <a class="theme t3 live" href="writeups/quantum-beneficiaries.html">
         <span class="name">Beneficiaries</span>
-        <span class="tag">Write-up &middot; Quantum</span>
+        <span class="tag">Quantum</span>
       </a>
       <a class="theme t3 live" href="writeups/pqc-migration.html">
         <span class="name">Cryptography</span>
-        <span class="tag">Write-up &middot; PQC Migration</span>
+        <span class="tag">PQC Migration</span>
       </a>
     </section>
 
@@ -575,7 +591,7 @@
       <span><span class="dot g"></span>Write-up linked</span>
       <span><span class="dot p"></span>Pending</span>
     </div>
-    <div>DUMAC Direct &middot; Internal Research &middot; Updated May 2026</div>
+    <div>DUMAC Direct &middot; Internal Research</div>
   </footer>
 
 </div>
