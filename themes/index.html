@@ -218,9 +218,10 @@
   }
 
   .cluster {
-    padding: 0 18px 36px;
+    padding: 0 12px 36px;
     border-right: 1px solid var(--navy-line);
     position: relative;
+    min-width: 0;
     opacity: 0;
     transform: translateY(18px);
     animation: rise 0.7s cubic-bezier(0.22,0.61,0.36,1) forwards;
@@ -239,18 +240,19 @@
   .umbrella {
     background: var(--accent);
     margin: 0 0 18px;
-    padding: 14px 16px 12px;
+    padding: 14px 12px 12px;
   }
   .umbrella .u-title {
     font-family: 'Fraunces', serif;
     font-weight: 700;
-    font-size: 1.28rem;
+    font-size: 0.82rem;
     line-height: 1.06;
-    letter-spacing: -0.008em;
+    letter-spacing: -0.02em;
     color: var(--ink-deep);
     text-transform: uppercase;
+    white-space: nowrap;
   }
-  .umbrella .u-title.compact { font-size: 0.85rem; letter-spacing: -0.01em; }
+  .umbrella .u-title.compact { font-size: 0.82rem; letter-spacing: -0.02em; }
   .umbrella .u-sub {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
