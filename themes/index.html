@@ -212,7 +212,7 @@
   /* ---------- Cluster grid ---------- */
   .clusters {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0;
     margin-top: 14px;
   }
@@ -233,8 +233,17 @@
   .cluster:nth-child(4) { animation-delay: 0.32s; }
   .cluster:nth-child(5) { animation-delay: 0.40s; }
   .cluster:nth-child(6) { animation-delay: 0.48s; }
+  .cluster:nth-child(7) { animation-delay: 0.56s; }
+  .cluster:nth-child(8) { animation-delay: 0.64s; }
 
   @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+  /* Desktop 4-col grid: divider between the two rows of categories */
+  @media (min-width: 1181px) {
+    .cluster:nth-child(4n) { border-right: none; }
+    .cluster:nth-child(-n+4) { border-bottom: 1px solid var(--navy-line); padding-bottom: 30px; }
+    .cluster:nth-child(n+5) { padding-top: 26px; }
+  }
 
   /* ---------- TIER 1 — Category banner ---------- */
   .umbrella {
@@ -381,6 +390,12 @@
   .theme.group { cursor: default; }
   .theme.group .name { color: var(--accent-soft); font-weight: 600; }
 
+  /* in Neo4j, write-up not yet linked: solid white, not clickable.
+     Placed last so it wins over .t3 italic-grey at equal specificity. */
+  .theme.node { cursor: default; }
+  .theme.node .name { color: var(--paper); font-weight: 600; font-style: normal; }
+  .theme.node .tag { color: #5b6680; }
+
   /* ---------- Footer ---------- */
   footer {
     margin-top: 64px;
@@ -403,6 +418,7 @@
     margin-right: 8px; vertical-align: middle;
   }
   footer .dot.g { background: var(--accent); }
+  footer .dot.w { background: var(--paper); }
   footer .dot.p { background: #5b6680; }
 
   /* ---------- Responsive ---------- */
@@ -456,9 +472,9 @@
       </div>
     </div>
     <div class="meta-box">
-      <div class="updated">Last updated May 31, 2026 &middot; EST</div>
+      <div class="updated">Last updated June 26, 2026 &middot; EST</div>
       <div class="row"><span>Universe</span><b>~9,900</b></div>
-      <div class="row"><span>Themes</span><b>19 live</b></div>
+      <div class="row"><span>Themes</span><b>22 mapped</b></div>
       <div class="row"><span>Backed by</span><b>Neo4j Aura</b></div>
     </div>
   </header>
@@ -484,31 +500,36 @@
         <span class="tag">Horizontal SaaS</span>
       </a>
 
-      <div class="theme t2 group">
-        <span class="name">Data Centers</span>
+      <div class="theme t2 node">
+        <span class="name">Edge AI</span>
+        <span class="tag">Write-up pending</span>
       </div>
-      <a class="theme t3 live" href="writeups/800v-hvdc-power.html">
-        <span class="name">800V HVDC Power</span>
-        <span class="tag">Data Center Power</span>
-      </a>
+
+      <div class="theme t2 group">
+        <span class="name">Voice</span>
+      </div>
+      <div class="theme t3 node">
+        <span class="name">AI Orchestration</span>
+        <span class="tag">Write-up pending</span>
+      </div>
+      <div class="theme t3 node">
+        <span class="name">Voice Agents &mdash; CX</span>
+        <span class="tag">Write-up pending</span>
+      </div>
+      <div class="theme t3 node">
+        <span class="name">Ambient Voice</span>
+        <span class="tag">Write-up pending</span>
+      </div>
     </section>
 
     <!-- ===== PHYSICAL AI ===== -->
     <section class="cluster">
-      <div class="umbrella">
+      <a class="umbrella" href="PhysicalAI_Names.html">
         <div class="u-title">Physical AI</div>
-        <div class="u-sub">Category 02</div>
-      </div>
+        <div class="u-sub">Category Names</div>
+      </a>
 
-      <div class="theme t2 soon">
-        <span class="name">Autonomous Driving</span>
-        <span class="tag">Write-up pending</span>
-      </div>
-      <div class="theme t2 soon">
-        <span class="name">Drones</span>
-        <span class="tag">Write-up pending</span>
-      </div>
-      <div class="theme t2 soon">
+      <div class="theme t2 node">
         <span class="name">Robotics</span>
         <span class="tag">Write-up pending</span>
       </div>
@@ -533,13 +554,30 @@
 
     <!-- ===== ENERGY TRANSITION ===== -->
     <section class="cluster">
-      <div class="umbrella">
+      <a class="umbrella" href="EnergyTransition_Names.html">
         <div class="u-title compact">Energy Transition</div>
-        <div class="u-sub">Category 04</div>
+        <div class="u-sub">Category Names</div>
+      </a>
+
+      <div class="theme t2 node">
+        <span class="name">AI Power</span>
+        <span class="tag">Write-up pending</span>
+      </div>
+      <div class="theme t2 node">
+        <span class="name">AI Hardware</span>
+        <span class="tag">Write-up pending</span>
       </div>
 
-      <div class="theme t2 soon">
-        <span class="name">Nuclear</span>
+      <div class="theme t2 group">
+        <span class="name">Data Centers</span>
+      </div>
+      <a class="theme t3 live" href="writeups/800v-hvdc-power.html">
+        <span class="name">800V HVDC Power</span>
+        <span class="tag">Data Center Power</span>
+      </a>
+
+      <div class="theme t2 node">
+        <span class="name">Uranium SMR</span>
         <span class="tag">Write-up pending</span>
       </div>
     </section>
@@ -550,11 +588,6 @@
         <div class="u-title">Future</div>
         <div class="u-sub">Category Names</div>
       </a>
-
-      <div class="theme t2 soon">
-        <span class="name">Space</span>
-        <span class="tag">Write-up pending</span>
-      </div>
 
       <div class="theme t2 group">
         <span class="name">Quantum</span>
@@ -569,19 +602,58 @@
       </a>
     </section>
 
-    <!-- ===== GEOPOLITICS ===== -->
+    <!-- ===== DEFENSE ===== -->
     <section class="cluster">
-      <div class="umbrella">
-        <div class="u-title">Geopolitics</div>
-        <div class="u-sub">Category 06</div>
-      </div>
+      <a class="umbrella" href="Defense_Names.html">
+        <div class="u-title">Defense</div>
+        <div class="u-sub">Category Names</div>
+      </a>
 
-      <div class="theme t2 soon">
+      <div class="theme t2 node">
         <span class="name">National Security</span>
         <span class="tag">Write-up pending</span>
       </div>
-      <div class="theme t2 soon">
-        <span class="name">Defense Disruptors</span>
+      <div class="theme t2 node">
+        <span class="name">Drones</span>
+        <span class="tag">Write-up pending</span>
+      </div>
+    </section>
+
+    <!-- ===== CYCLICALS ===== -->
+    <section class="cluster">
+      <a class="umbrella" href="Cyclicals_Names.html">
+        <div class="u-title">Cyclicals</div>
+        <div class="u-sub">Category Names</div>
+      </a>
+
+      <div class="theme t2 node">
+        <span class="name">Housing</span>
+        <span class="tag">Write-up pending</span>
+      </div>
+      <div class="theme t3 node">
+        <span class="name">New Build</span>
+        <span class="tag">Write-up pending</span>
+      </div>
+      <div class="theme t3 node">
+        <span class="name">R&amp;R</span>
+        <span class="tag">Write-up pending</span>
+      </div>
+
+      <div class="theme t2 node">
+        <span class="name">Low Income</span>
+        <span class="tag">Write-up pending</span>
+      </div>
+    </section>
+
+    <!-- ===== LIFE SCIENCES ===== -->
+    <section class="cluster">
+      <a class="umbrella" href="LifeSciences_Names.html">
+        <div class="u-title compact">Life Sciences</div>
+        <div class="u-sub">Category Names</div>
+      </a>
+
+      <div class="theme t2 node">
+        <span class="name">Biotech</span>
         <span class="tag">Write-up pending</span>
       </div>
     </section>
@@ -591,7 +663,7 @@
   <footer>
     <div class="legend">
       <span><span class="dot g"></span>Write-up linked</span>
-      <span><span class="dot p"></span>Pending</span>
+      <span><span class="dot w"></span>In Neo4j</span>
     </div>
     <div>DUMAC Direct &middot; Internal Research</div>
   </footer>

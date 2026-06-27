@@ -293,7 +293,24 @@
     .col.disruption { padding-left: 0; border-top: 1px solid var(--rule); }
     .category-name { font-size: 52px; }
     .tags { display: none; }
+    .groups-grid, ul.names.flow { columns: 1; }
   }
+
+  /* ---- appended theme sections (Edge AI, Voice) ---- */
+  .more-themes { margin-top: 36px; padding-top: 26px; border-top: 3px double var(--ink); }
+  .more-themes .intro { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .theme-block { margin-top: 40px; }
+  .theme-block:first-of-type { margin-top: 18px; }
+  .theme-flag { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:2px; background:var(--tail-soft); color:var(--tail); }
+  .theme-flag .dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .theme-block .tkr { flex: 0 0 78px; }
+  .groups-grid { columns:2; column-gap:46px; margin-top:6px; }
+  .groups-grid .group { break-inside:avoid; margin-top:22px; }
+  .groups-grid .group:first-child { margin-top:4px; }
+  ul.names.flow { columns:2; column-gap:46px; }
+  ul.names.flow li { break-inside:avoid; }
+  .nm.pending { color:var(--rule); font-style:italic; }
+  .skeleton-note { font-family:'Newsreader',serif; font-style:italic; font-size:14px; color:var(--muted); padding-top:8px; }
 </style>
 </head>
 <body>
@@ -304,15 +321,15 @@
     <a class="home-link" href="index.html"><span class="arrow">&larr;</span>&nbsp;Home &middot; Category Index</a>
     <div class="crumb">
       <span>Thematic Research &nbsp;/&nbsp; Names Index &nbsp;/&nbsp; <span class="here">Productivity</span></span>
-      <span>Snapshot &middot; 26 May 2026</span>
+      <span>Snapshot &middot; 26 Jun 2026</span>
     </div>
     <h1 class="category-name">Productivity</h1>
     <p class="category-sub">The productivity-software battleground, mapped from both sides — which franchises the AI shift protects, and which it erodes.</p>
 
     <div class="meta-strip">
       <div class="meta-cell">Category<b>Productivity</b></div>
-      <div class="meta-cell">Themes covered<b>2 mirror-image L1</b></div>
-      <div class="meta-cell">Total names<b>52</b></div>
+      <div class="meta-cell">Themes covered<b>6 L1</b></div>
+      <div class="meta-cell">Total names<b>63</b></div>
       <div class="meta-cell">Source<b>Neo4j Aura graph</b></div>
       <div class="meta-cell">Edge as of<b>17 May 2026</b></div>
     </div>
@@ -538,60 +555,65 @@
 
   </div>
 
+  <!-- ============ ADDED THEMES (AI & Software shelf) ============ -->
+  <div class="more-themes">
+    <div class="intro">Also in this category · beyond the SaaS mirror</div>
 
-  <!-- ============ DATA CENTER POWER (separate L1 family) ============ -->
-  <section class="dc-section" style="margin-top:48px; padding-top:34px; border-top:3px solid var(--gold);">
-    <span class="col-flag tail"><span class="dot"></span>Tailwind</span>
-    <h2 class="col-title">Data Center Power</h2>
-    <p class="col-desc">800V HVDC Data Center Power &mdash; the power-delivery re-architecture as AI racks scale toward 1MW. A distinct Level&nbsp;1 family in the graph (not a child of Productivity); shown here while the index still shelves it under this category.</p>
-    <div class="col-count"><b>17</b> names &nbsp;&middot;&nbsp; L1 Data Center Power &rarr; L2 800V HVDC &rarr; 3 L3 sub-themes</div>
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:0 38px;">
+    <section class="theme-block">
+      <span class="theme-flag"><span class="dot"></span>Tailwind</span>
+      <h2 class="col-title">Edge AI</h2>
+      <p class="col-desc">On-device and edge AI inference — silicon, IP, and handset/PC OEMs levered to local model execution moving off the data center.</p>
+      <div class="col-count"><b>11</b> names &nbsp;&middot;&nbsp; single L1 theme &middot; all Peripheral</div>
       <div class="group">
-        <div class="group-head">
-          <span class="group-name"><span class="lvl">L3</span>Power Semiconductors (GaN / SiC)</span>
-          <span class="group-tally">11</span>
-        </div>
-        <ul class="names">
-          <li><span class="tkr survivor">NVTS</span><span class="nm">Navitas</span><span class="tags"><span class="strength core">Core</span></span></li>
-          <li><span class="tkr survivor">IFX</span><span class="nm">Infineon</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">STM</span><span class="nm">STMicroelectronics</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">ON</span><span class="nm">onsemi</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">MPWR</span><span class="nm">Monolithic Power</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">POWI</span><span class="nm">Power Integrations</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">WOLF</span><span class="nm">Wolfspeed</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">6723</span><span class="nm">Renesas</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">TXN</span><span class="nm">Texas Instruments</span><span class="tags"><span class="strength peripheral">Peripheral</span></span></li>
-          <li><span class="tkr survivor">ADI</span><span class="nm">Analog Devices</span><span class="tags"><span class="strength peripheral">Peripheral</span></span></li>
-          <li><span class="tkr survivor">6963</span><span class="nm">ROHM</span><span class="tags"><span class="strength peripheral">Peripheral</span></span></li>
+        <ul class="names flow">
+          <li><span class="tkr survivor">2454 TT</span><span class="nm">MediaTek</span></li>
+          <li><span class="tkr survivor">3661 TT</span><span class="nm">Alchip Technologies</span></li>
+          <li><span class="tkr survivor">6857 JP</span><span class="nm">Advantest</span></li>
+          <li><span class="tkr survivor">AAPL</span><span class="nm">Apple</span></li>
+          <li><span class="tkr survivor">ARM</span><span class="nm">Arm Holdings</span></li>
+          <li><span class="tkr survivor">DELL</span><span class="nm">Dell Technologies</span></li>
+          <li><span class="tkr survivor">HPQ</span><span class="nm">HP Inc</span></li>
+          <li><span class="tkr survivor">QCOM</span><span class="nm">Qualcomm</span></li>
+          <li><span class="tkr survivor">STMPA FP</span><span class="nm">STMicroelectronics</span></li>
+          <li><span class="tkr survivor">1810 HK</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">992 HK</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
         </ul>
       </div>
-      <div class="group">
-        <div class="group-head">
-          <span class="group-name"><span class="lvl">L3</span>Data Center Power Systems &amp; Infrastructure</span>
-          <span class="group-tally">4</span>
+    </section>
+
+    <section class="theme-block">
+      <span class="theme-flag"><span class="dot"></span>Tailwind</span>
+      <h2 class="col-title">Voice</h2>
+      <p class="col-desc">Voice-AI grouping — orchestration-layer incumbents today, plus two early skeleton themes for conversational-CX and ambient voice interfaces.</p>
+      <div class="col-count"><b>2</b> mapped names &nbsp;&middot;&nbsp; 3 L1 themes &middot; 2 skeleton</div>
+      <div class="groups-grid">
+        <div class="group">
+          <div class="group-head">
+            <span class="group-name"><span class="lvl">L1</span>AI Orchestration Layer Incumbents</span>
+            <span class="group-tally">2 &middot; Core</span>
+          </div>
+          <ul class="names">
+            <li><span class="tkr survivor">CRM</span><span class="nm">Salesforce</span></li>
+            <li><span class="tkr survivor">NOW</span><span class="nm">ServiceNow</span></li>
+          </ul>
         </div>
-        <ul class="names">
-          <li><span class="tkr survivor">VRT</span><span class="nm">Vertiv</span><span class="tags"><span class="strength core">Core</span></span></li>
-          <li><span class="tkr survivor">ETN</span><span class="nm">Eaton</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">SU</span><span class="nm">Schneider Electric</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-          <li><span class="tkr survivor">ABBN</span><span class="nm">ABB</span><span class="tags"><span class="strength significant">Significant</span></span></li>
-        </ul>
-      </div>
-      <div class="group">
-        <div class="group-head">
-          <span class="group-name"><span class="lvl">L3</span>Power Conversion &amp; Delivery Components</span>
-          <span class="group-tally">2</span>
+        <div class="group">
+          <div class="group-head">
+            <span class="group-name"><span class="lvl">L1</span>AI Voice Agents in CX</span>
+            <span class="group-tally">skeleton</span>
+          </div>
+          <p class="skeleton-note">No mapped names yet — NICE and Verint flagged as universe gaps to add.</p>
         </div>
-        <ul class="names">
-          <li><span class="tkr survivor">FLEX</span><span class="nm">Flex</span><span class="tags"><span class="strength peripheral">Peripheral</span></span></li>
-          <li><span class="tkr survivor">2301</span><span class="nm">Lite-On</span><span class="tags"><span class="strength peripheral">Peripheral</span></span></li>
-        </ul>
+        <div class="group">
+          <div class="group-head">
+            <span class="group-name"><span class="lvl">L1</span>Ambient Voice Computing Interface</span>
+            <span class="group-tally">skeleton</span>
+          </div>
+          <p class="skeleton-note">Theme skeleton in graph; EXPOSED_TO edges still pending.</p>
+        </div>
       </div>
-    </div>
-    <p style="font-family:'Newsreader',serif; font-style:italic; font-size:14.5px; color:var(--muted); padding-top:14px;">
-      All edges Tailwind, strength reflects revenue attributability (NVTS and VRT most levered; TXN / ADI / ROHM peripheral). Conviction and every edge are <em>Claude-inferred, reviewed = false</em> pending sign-off. In the graph this sits under its own <strong>Data Center Power</strong> L1 parent, not Productivity.
-    </p>
-  </section>
+    </section>
+  </div>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer">
