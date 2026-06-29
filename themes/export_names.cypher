@@ -22,12 +22,12 @@
 //  Notes
 //    - Deeper (L3) exposures roll up to their L2 parent group by design.
 //    - CATEGORY is not stored in the graph; it is mapped here from the
-//      L1 root theme. The CASE block below covers all 19 current L1 themes
+//      L1 root theme. The CASE block below covers all 20 current L1 themes
 //      and uses the same eight buckets as the [Category]_Names.html pages.
 //      Add a WHEN line whenever a new L1 theme is created, or it lands in
 //      ELSE 'Uncategorized'.
 //    - No status/reviewed filter: Proposed themes (e.g. Space Economy,
-//      Voice AI) and Claude-inferred / unreviewed edges ARE included.
+//      Voice AI, Cannabis) and Claude-inferred / unreviewed edges ARE included.
 //    - Returns scalar column aliases for clean CSV export.
 // ============================================================
 
@@ -63,6 +63,7 @@ RETURN
     // --- Cyclicals ---
     WHEN 'Housing'                             THEN 'Cyclicals'
     WHEN 'Low Income'                          THEN 'Cyclicals'
+    WHEN 'Cannabis'                            THEN 'Cyclicals'
     // --- Life Sciences ---
     WHEN 'HC_BioTech'                          THEN 'Life Sciences'
     ELSE 'Uncategorized'
