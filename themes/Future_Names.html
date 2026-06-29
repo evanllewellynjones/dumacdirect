@@ -260,6 +260,9 @@
   .strength.significant { background: var(--head-soft); color: var(--head); border: 1px solid var(--head); }
   .strength.peripheral { background: transparent; color: var(--head); border: 1px solid var(--rule); }
 
+  /* ---------- Space Economy full-width section ---------- */
+  .space-section { margin-top: 44px; padding-top: 30px; border-top: 3px double var(--ink); }
+
   /* ---------- Footer ---------- */
   .footer {
     margin-top: 56px;
@@ -304,17 +307,17 @@
     <a class="home-link" href="index.html"><span class="arrow">&larr;</span>&nbsp;Home &middot; Category Index</a>
     <div class="crumb">
       <span>Thematic Research &nbsp;/&nbsp; Names Index &nbsp;/&nbsp; <span class="here">Future</span></span>
-      <span>Snapshot &middot; 31 May 2026</span>
+      <span>Snapshot &middot; 28 Jun 2026</span>
     </div>
     <h1 class="category-name">Future</h1>
-    <p class="category-sub">Frontier theses where the technology is real but the revenue timing is uneven &mdash; quantum computing and the cryptographic migration it forces. Both families are tailwinds; the question is which sub-bucket compounds first.</p>
+    <p class="category-sub">Frontier theses where the technology is real but the revenue timing is uneven &mdash; quantum computing and the cryptographic migration it forces, and the commercial space economy now reaching public markets. All three families are tailwinds; the question is which sub-bucket compounds first.</p>
 
     <div class="meta-strip">
       <div class="meta-cell">Category<b>Future</b></div>
-      <div class="meta-cell">Themes covered<b>2 L1 (+ Space pending)</b></div>
-      <div class="meta-cell">Total names<b>26</b></div>
+      <div class="meta-cell">Themes covered<b>3 L1</b></div>
+      <div class="meta-cell">Total names<b>37</b></div>
       <div class="meta-cell">Source<b>Neo4j Aura graph</b></div>
-      <div class="meta-cell">Edge as of<b>31 May 2026</b></div>
+      <div class="meta-cell">Edge as of<b>28 Jun 2026</b></div>
     </div>
   </header>
 
@@ -366,7 +369,7 @@
         <ul class="names">
           <li><span class="tkr survivor">IONQ</span><span class="nm">IonQ</span><span class="tags"><span class="strength core">Core</span></span></li>
           <li><span class="tkr survivor">QBTS</span><span class="nm">D-Wave Quantum</span><span class="tags"><span class="strength core">Core</span></span></li>
-          <li><span class="tkr survivor">QNT</span><span class="nm">Quantinuum</span><span class="tags"><span class="strength core">Core</span><span class="tag">IPO pending</span></span></li>
+          <li><span class="tkr survivor">QNT</span><span class="nm">Quantinuum</span><span class="tags"><span class="strength core">Core</span><span class="tag">IPO&rsquo;d Jun &rsquo;26</span></span></li>
           <li><span class="tkr survivor">RGTI</span><span class="nm">Rigetti Computing</span><span class="tags"><span class="strength core">Core</span></span></li>
           <li><span class="tkr survivor">QUBT</span><span class="nm">Quantum Computing Inc</span><span class="tags"><span class="strength core">Core</span></span></li>
         </ul>
@@ -407,16 +410,6 @@
         </ul>
       </div>
 
-      <div class="group" style="margin-top:38px;">
-        <div class="group-head">
-          <span class="group-name"><span class="lvl">&nbsp;</span>Space</span>
-          <span class="group-tally">pending</span>
-        </div>
-        <p style="font-family:'Newsreader',serif; font-style:italic; font-size:14.5px; color:var(--muted); padding-top:8px;">
-          Listed in the Future cluster on the index but not yet a theme in the graph &mdash; no names wired. Write-up and edges pending.
-        </p>
-      </div>
-
       <div class="group" style="margin-top:24px;">
         <div class="group-head">
           <span class="group-name">Reading the columns</span>
@@ -429,14 +422,60 @@
 
   </div>
 
+  <!-- ============ SPACE ECONOMY ============ -->
+  <section class="space-section">
+    <span class="col-flag tail"><span class="dot"></span>Tailwind</span>
+    <h2 class="col-title">Space Economy</h2>
+    <p class="col-desc" style="max-width:840px;min-height:0;">The commercial space build-out &mdash; launch, Earth observation, satellite broadband and lunar infrastructure &mdash; plus the photonics and specialty materials that enable it. A newly added L1 theme: sub-structure is not yet laid out and every edge is Claude-inferred, pending review.</p>
+    <div class="col-count" style="border-bottom:2px solid var(--ink);"><b>11</b> names &nbsp;&middot;&nbsp; L1 theme &middot; structure pending</div>
+
+    <div class="board" style="margin-top:18px;">
+      <section class="col survivors">
+        <div class="group" style="margin-top:8px;">
+          <div class="group-head">
+            <span class="group-name">Pure-Play Operators</span>
+            <span class="group-tally">8</span>
+          </div>
+          <ul class="names">
+            <li><span class="tkr survivor">SPCX</span><span class="nm">SpaceX</span><span class="tags"><span class="strength core">Core</span><span class="tag">IPO Jun &rsquo;26</span></span></li>
+            <li><span class="tkr survivor">RKLB</span><span class="nm">Rocket Lab</span><span class="tags"><span class="strength core">Core</span></span></li>
+            <li><span class="tkr survivor">ASTS</span><span class="nm">AST SpaceMobile</span><span class="tags"><span class="strength core">Core</span></span></li>
+            <li><span class="tkr survivor">PL</span><span class="nm">Planet Labs</span><span class="tags"><span class="strength core">Core</span></span></li>
+            <li><span class="tkr survivor">BKSY</span><span class="nm">BlackSky</span><span class="tags"><span class="strength core">Core</span></span></li>
+            <li><span class="tkr survivor">IRDM</span><span class="nm">Iridium</span><span class="tags"><span class="strength core">Core</span></span></li>
+            <li><span class="tkr survivor">LUNR</span><span class="nm">Intuitive Machines</span><span class="tags"><span class="strength core">Core</span></span></li>
+            <li><span class="tkr survivor">FLY</span><span class="nm">Firefly Aerospace</span><span class="tags"><span class="strength core">Core</span></span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="col disruption">
+        <div class="group" style="margin-top:8px;">
+          <div class="group-head">
+            <span class="group-name">Components &amp; Materials</span>
+            <span class="group-tally">3</span>
+          </div>
+          <ul class="names">
+            <li><span class="tkr survivor">LITE</span><span class="nm">Lumentum</span><span class="tags"><span class="strength peripheral">Peripheral</span><span class="tag">photonics</span></span></li>
+            <li><span class="tkr survivor">CRS</span><span class="nm">Carpenter Technology</span><span class="tags"><span class="strength peripheral">Peripheral</span><span class="tag">alloys</span></span></li>
+            <li><span class="tkr survivor">MTRN</span><span class="nm">Materion</span><span class="tags"><span class="strength peripheral">Peripheral</span><span class="tag">adv. materials</span></span></li>
+          </ul>
+        </div>
+        <p style="font-family:'Newsreader',serif; font-style:italic; font-size:14.5px; color:var(--muted); padding-top:18px;">
+          Pure-plays carry Space as <em>Core</em> &mdash; the thesis is the whole equity. The components &amp; materials names hold it as a <em>Peripheral</em> slice of a diversified business. No L2 sub-themes yet; launch / Earth-obs / satellite-broadband / lunar structure to follow.
+        </p>
+      </section>
+    </div>
+  </section>
+
   <!-- ============ FOOTER ============ -->
   <footer class="footer">
     <div class="legend">
       <span><span class="swatch" style="background:var(--tail);"></span>Tailwind — exposed to the upside</span>
       <span><span class="swatch" style="background:rgba(154,125,49,0.4);border:1px solid var(--gold);"></span>Lifecycle / cross-theme flag</span>
     </div>
-    <p>NEO4J AURA &mdash; THEMATIC INVESTMENT GRAPH &nbsp;|&nbsp; CATEGORY: FUTURE &nbsp;|&nbsp; SNAPSHOT GENERATED 31 MAY 2026</p>
-    <p>Names appear in multiple themes by design — additive edges, distinct mechanisms. Tickers shown in short form; canonical Bloomberg format in the graph (e.g. IONQ US Equity). QNT (Quantinuum) is pre-IPO and held as a watch entry.</p>
+    <p>NEO4J AURA &mdash; THEMATIC INVESTMENT GRAPH &nbsp;|&nbsp; CATEGORY: FUTURE &nbsp;|&nbsp; SNAPSHOT GENERATED 28 JUN 2026</p>
+    <p>Names appear in multiple themes by design — additive edges, distinct mechanisms. Tickers shown in short form; canonical Bloomberg format in the graph (e.g. IONQ US Equity). QNT (Quantinuum) IPO&rsquo;d on Nasdaq 4 Jun 2026 and SPCX (SpaceX) on 12 Jun 2026; both are now Listed. Space Economy edges are Claude-inferred and unreviewed.</p>
     <p class="disc" style="margin-top:10px;">
       This is a static snapshot of the Neo4j graph and will drift — the graph is the canonical source. Framework-driven analysis of structural exposure, not investment advice; valuation, growth, and management quality are layered on separately.
     </p>
