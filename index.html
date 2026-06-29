@@ -136,9 +136,117 @@
     .container { padding: 32px 16px; }
     .research-card { padding: 22px; }
   }
+
+  /* ===== Login gate ===== */
+  /* While gated, hide everything except the login overlay (no content flash). */
+  body.gated > *:not(#login-overlay) { display: none !important; }
+
+  #login-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: linear-gradient(135deg, #0a2540 0%, #1e3a5f 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  body:not(.gated) #login-overlay { display: none; }
+
+  #login-overlay .login-card {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    border-radius: 10px;
+    border-top: 4px solid #c5a572;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    padding: 40px 34px 32px;
+    text-align: center;
+  }
+  #login-overlay .login-mark {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #0a2540;
+    margin-bottom: 6px;
+  }
+  #login-overlay .login-sub {
+    font-size: 0.78rem;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 28px;
+  }
+  #login-overlay label {
+    display: block;
+    text-align: left;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #4a5568;
+    margin-bottom: 8px;
+  }
+  #login-overlay input[type=password] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    color: #1a202c;
+    transition: border-color 0.15s;
+  }
+  #login-overlay input[type=password]:focus {
+    outline: none;
+    border-color: #c5a572;
+    box-shadow: 0 0 0 3px rgba(197,165,114,0.18);
+  }
+  #login-overlay button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: #1e3a5f;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #login-overlay button:hover { background: #0a2540; }
+  #login-overlay .login-error {
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: #c0392b;
+    min-height: 1.1em;
+    visibility: hidden;
+  }
+  #login-overlay .login-error.show { visibility: visible; }
+  #login-overlay .login-note {
+    margin-top: 22px;
+    font-size: 0.72rem;
+    color: #a0aec0;
+    letter-spacing: 0.5px;
+  }
 </style>
 </head>
-<body>
+<body class="gated">
+
+<!-- ===== Login overlay ===== -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-mark">DUMAC Direct Research</div>
+    <div class="login-sub">Internal Use Only</div>
+    <label for="login-pass">Access Password</label>
+    <input type="password" id="login-pass" autocomplete="off" autofocus>
+    <button id="login-btn">Enter</button>
+    <div class="login-error" id="login-error">Incorrect password. Try again.</div>
+    <div class="login-note">Authorized personnel only</div>
+  </div>
+</div>
 
 <header>
   <h1>DUMAC DIRECT RESEARCH</h1>
@@ -185,6 +293,63 @@
 <footer>
   DUMAC Direct Research &nbsp;·&nbsp; Internal Use Only
 </footer>
+
+<script>
+  // ===== Simple client-side password gate =====
+  // NOTE: This is light-touch protection only. The page source is visible to
+  // anyone who downloads it. It stops casual/accidental access, not a determined user.
+  //
+  // The stored value below is the SHA-256 hash of the password (NOT the password
+  // itself). Default password is:  dumac2026
+  //
+  // ---- TO CHANGE THE PASSWORD ----
+  // 1. Open this page, then open your browser console (F12 / right-click > Inspect > Console).
+  // 2. Paste this, replacing YOUR_NEW_PASSWORD, and press Enter:
+  //
+  //      crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_NEW_PASSWORD'))
+  //        .then(b => console.log([...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join('')));
+  //
+  // 3. Copy the printed hash and paste it as PASSWORD_HASH below. Commit the change.
+  var PASSWORD_HASH = '6769d3fb66c2a39bb9dd2af19267e1ee3d7ca37e255b1e35d82a6b063dfb4f39';
+
+  var SESSION_KEY = 'dumac_authed';
+
+  // If already authenticated this session, unlock immediately (avoids re-prompting on navigation).
+  try {
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+      document.body.classList.remove('gated');
+    }
+  } catch (e) {}
+
+  function sha256Hex(text) {
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buf) {
+      return [].slice.call(new Uint8Array(buf))
+        .map(function (b) { return b.toString(16).padStart(2, '0'); })
+        .join('');
+    });
+  }
+
+  function attempt() {
+    var input = document.getElementById('login-pass');
+    var errEl = document.getElementById('login-error');
+    sha256Hex(input.value).then(function (hash) {
+      if (hash === PASSWORD_HASH) {
+        try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) {}
+        document.body.classList.remove('gated');
+      } else {
+        errEl.classList.add('show');
+        input.value = '';
+        input.focus();
+      }
+    });
+  }
+
+  document.getElementById('login-btn').addEventListener('click', attempt);
+  document.getElementById('login-pass').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') attempt();
+    else document.getElementById('login-error').classList.remove('show');
+  });
+</script>
 
 </body>
 </html>
