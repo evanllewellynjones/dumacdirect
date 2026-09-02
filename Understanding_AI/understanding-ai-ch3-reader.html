@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Chapter 3 reader</title>
+<style>
+  :root{
+    --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+    --blue:#156082; --orange:#E97132; --wash:#f2f2f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .shell{max-width:820px;margin:0 auto;padding:28px 28px 140px}
+
+  header.top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
+  header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
+  header.top .ch a.backlink:hover{text-decoration:underline}
+  header.top .ch .sep{color:var(--muted);font-weight:normal}
+  header.top .meta{color:var(--muted);font-size:13px}
+
+  h1.cardtitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.25;margin:0 0 4px}
+  .cardid{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .body p{margin:0 0 14px;max-width:70ch}
+  .body ul{margin:0 0 16px;padding-left:20px;max-width:70ch}
+  .body li{margin:0 0 7px}
+  .body strong{color:#000}
+  .figure{margin:22px 0 24px}
+  .figure svg{width:100%;height:auto;display:block}
+
+  table.grid{border-collapse:collapse;font-size:15px;margin:4px 0 18px;width:100%;max-width:560px}
+  table.grid th{text-align:left;font-weight:bold;border-bottom:1px solid var(--ink);padding:5px 12px 5px 0}
+  table.grid td{border-bottom:1px solid var(--rule);padding:5px 12px 5px 0;vertical-align:top}
+
+  .stats{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 20px}
+  .stat{flex:1 1 150px;border-top:2px solid var(--navy);padding-top:8px}
+  .stat b{display:block;color:var(--navy);font-size:26px;line-height:1.1}
+  .stat span{display:block;color:var(--muted);font-size:13px;margin-top:5px}
+
+  .band{background:var(--wash);padding:12px 16px;margin:20px 0;font-size:15px;max-width:70ch}
+
+  .twocol{display:flex;gap:22px;flex-wrap:wrap;margin:4px 0 6px}
+  .twocol .col{flex:1 1 260px;padding-top:9px}
+  .twocol .col.blue{border-top:2px solid var(--blue)}
+  .twocol .col.orange{border-top:2px solid var(--orange)}
+  .twocol h3{font-size:14px;margin:0 0 10px;font-weight:bold}
+  .twocol .blue h3{color:var(--blue)}
+  .twocol .orange h3{color:var(--orange)}
+  .twocol p{font-size:14px;margin:0 0 10px;color:#2a2a2a}
+  .twocol b{display:inline-block;min-width:96px;font-size:16px;color:var(--ink)}
+
+  table.grid.wide{max-width:100%}
+  table.grid.wide td:last-child{width:auto}
+  h4.grouplabel{font-size:14px;margin:18px 0 6px;color:var(--navy)}
+  p.disclaim{font-size:13px;font-style:italic;color:var(--muted)}
+  p.warn{background:var(--wash);padding:11px 14px;font-size:15px;max-width:70ch}
+  p.hint2{font-size:13px;color:var(--muted);margin-top:14px;max-width:70ch}
+  code{font-family:Consolas,monospace;font-size:13px;background:var(--wash);padding:1px 4px}
+  .dots button.app i{border-radius:0;width:8px;height:8px;margin:3px 2px}
+  p.nextlink{margin:20px 0 6px}
+  p.nextlink a{color:var(--blue);font-size:19px;font-weight:bold;text-decoration:none}
+  p.nextlink a:hover{text-decoration:underline}
+
+  details.deeper{border-top:1px solid var(--rule);margin-top:26px;padding-top:12px}
+  details.deeper summary{cursor:pointer;color:var(--blue);font-size:15px;list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:"▸ ";}
+  details.deeper[open] summary::before{content:"▾ ";}
+  details.deeper .inner{padding-top:12px}
+  details.deeper p{font-size:16px;color:#2a2a2a}
+
+  .sources{color:var(--muted);font-size:13px;font-style:italic;margin-top:22px;max-width:70ch}
+
+  .ask{border-top:1px solid var(--rule);margin-top:26px;padding-top:16px}
+  .ask h2{font-size:15px;color:var(--navy);margin:0 0 8px;font-weight:bold}
+  .ask p.hint{font-size:13px;color:var(--muted);margin:0 0 10px;max-width:70ch}
+  .ask textarea{width:100%;max-width:70ch;min-height:62px;font-family:inherit;font-size:15px;
+    padding:8px 10px;border:1px solid var(--rule);border-radius:3px;resize:vertical}
+  .ask textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--navy);
+    background:#fff;color:var(--navy);border-radius:3px;cursor:pointer}
+  button:hover{background:var(--navy);color:#fff}
+  button:disabled{opacity:.4;cursor:default}
+  button.ghost{border-color:var(--rule);color:var(--muted)}
+  button.ghost:hover{background:var(--wash);color:var(--ink)}
+  .said{font-size:13px;color:var(--blue)}
+  .err{font-size:13px;color:#a32d2d}
+
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--rule)}
+  nav.bar .inner{max-width:820px;margin:0 auto;padding:12px 28px;
+    display:flex;align-items:center;gap:16px}
+  .dots{display:flex;gap:7px;flex:1}
+  .dots button{padding:0;border:none;background:none;width:14px;height:14px;cursor:pointer}
+  .dots i{display:block;width:9px;height:9px;border-radius:50%;background:#fff;
+    border:1px solid var(--muted);margin:2px}
+  .dots button[aria-current="true"] i{background:var(--navy);border-color:var(--navy)}
+  .dots button.seen i{background:var(--rule);border-color:var(--rule)}
+  .pos{font-size:13px;color:var(--muted);white-space:nowrap}
+
+  .logbox{border:1px solid var(--rule);padding:14px 16px;margin-top:18px;font-size:14px;display:none}
+  .logbox.on{display:block}
+  .logbox h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .logbox ol{margin:0;padding-left:20px}
+  .logbox li{margin-bottom:6px;color:#2a2a2a}
+
+  @media (max-width:640px){
+    .shell{padding:20px 18px 150px}
+    nav.bar .inner{padding:10px 18px;gap:10px}
+    h1.cardtitle{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 3 — The hardware and the supply chain</div>
+    <div class="meta">v2.1 · 30 Aug 2026</div>
+  </header>
+
+  <main id="stage" tabindex="-1"></main>
+
+  <section class="ask">
+    <h2>Ask about this slide</h2>
+    <p class="hint">This reader has the slides but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the slide ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this slide?"></textarea>
+    <div class="btnrow">
+      <button id="copyq">Copy question for Claude</button>
+      <button id="copyall" class="ghost">Copy all questions from this session</button>
+      <span id="say" class="said"></span>
+    </div>
+    <div class="logbox" id="logbox">
+      <h3>Questions saved this session</h3>
+      <ol id="loglist"></ol>
+    </div>
+  </section>
+</div>
+
+<nav class="bar">
+  <div class="inner">
+    <button id="prev">← Back</button>
+    <div class="dots" id="dots"></div>
+    <span class="pos" id="pos"></span>
+    <button id="next">Next →</button>
+  </div>
+</nav>
+
+<script>
+function waferSVG(){
+  function grid(cx, cy, r, cell, gap, fill){
+    let s = '', step = cell + gap, n = 0;
+    for (let x = cx - r + 4; x < cx + r - cell; x += step){
+      for (let y = cy - r + 4; y < cy + r - cell; y += step){
+        const dx = x + cell/2 - cx, dy = y + cell/2 - cy;
+        if (Math.sqrt(dx*dx + dy*dy) < r - cell/1.4){
+          s += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + cell +
+               '" height="' + cell + '" fill="' + fill + '" stroke="#1a1a1a" stroke-width="0.4"/>';
+          n++;
+        }
+      }
+    }
+    return {svg:s, n:n};
+  }
+  const a = grid(180, 118, 72, 9, 3, '#ffffff');
+  const b = grid(500, 118, 72, 22, 4, '#f2f2f2');
+  return '<svg viewBox="0 0 680 250" role="img" aria-label="Two wafers of identical size: one yielding many commodity DRAM dies, the other far fewer usable HBM stacks, because HBM consumes far more wafer area per usable bit.">' +
+  '<g font-family="Calibri, sans-serif" text-anchor="middle" fill="#1a1a1a">' +
+  '<circle cx="180" cy="118" r="72" fill="#fff" stroke="#1a1a1a" stroke-width="1"/>' + a.svg +
+  '<circle cx="500" cy="118" r="72" fill="#fff" stroke="#1a1a1a" stroke-width="1"/>' + b.svg +
+  '<text x="180" y="212" font-size="14" font-weight="bold">Commodity DRAM</text>' +
+  '<text x="180" y="230" font-size="13" fill="#595959">many usable dies per wafer</text>' +
+  '<text x="500" y="212" font-size="14" font-weight="bold">HBM</text>' +
+  '<text x="500" y="230" font-size="13" fill="#595959">far more area per usable bit</text>' +
+  '<text x="340" y="118" font-size="20">→</text>' +
+  '<text x="340" y="28" font-size="13" fill="#595959">The same wafer. Every one moved to HBM is a wafer taken out of DDR5 and GDDR.</text>' +
+  '</g></svg>';
+}
+
+const SVG_PHYS = `
+<svg viewBox="0 0 680 350" role="img" aria-label="Side by side schematic: the inside of a desktop machine, and a data-centre rack, with the same six jobs labelled in each.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="170" y="30" font-size="14" font-weight="bold" text-anchor="middle">One desktop machine</text>
+<text x="170" y="47" font-size="12" text-anchor="middle" fill="#595959">one box, one user</text>
+<rect x="45" y="58" width="250" height="232" fill="#fff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="62" y="76" width="216" height="46" fill="#f2f2f2" stroke="#156082" stroke-width="1.75"/>
+<text x="170" y="96" font-size="12" font-weight="bold" text-anchor="middle" fill="#156082">Graphics card</text>
+<text x="170" y="113" font-size="11" text-anchor="middle" fill="#156082">GPU + VRAM — compute and model memory</text>
+<rect x="62" y="132" width="103" height="44" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="113" y="152" font-size="12" font-weight="bold" text-anchor="middle">CPU + RAM</text>
+<text x="113" y="168" font-size="11" text-anchor="middle" fill="#595959">orchestration</text>
+<rect x="175" y="132" width="103" height="44" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="226" y="152" font-size="12" font-weight="bold" text-anchor="middle">NVMe SSD</text>
+<text x="226" y="168" font-size="11" text-anchor="middle" fill="#595959">the weight file</text>
+<rect x="62" y="186" width="216" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="170" y="207" font-size="11" text-anchor="middle">Motherboard — PCIe link between them</text>
+<rect x="62" y="230" width="216" height="42" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="170" y="248" font-size="12" font-weight="bold" text-anchor="middle">Power supply + fans</text>
+<text x="170" y="264" font-size="11" text-anchor="middle" fill="#595959">around 575 W for the card alone</text>
+<text x="170" y="310" font-size="12" text-anchor="middle" fill="#595959">Nothing is pooled. What fits in VRAM is</text>
+<text x="170" y="326" font-size="12" text-anchor="middle" fill="#595959">what you can run.</text>
+<text x="510" y="30" font-size="14" font-weight="bold" text-anchor="middle">One data-centre rack</text>
+<text x="510" y="47" font-size="12" text-anchor="middle" fill="#595959">72 accelerators, many users at once</text>
+<rect x="385" y="58" width="250" height="232" fill="#fff" stroke="#1a1a1a" stroke-width="1.5"/>
+<rect x="400" y="70" width="192" height="26" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="496" y="87" font-size="11" text-anchor="middle">Switch — InfiniBand to other racks</text>
+<rect x="400" y="104" width="192" height="30" fill="#f2f2f2" stroke="#156082" stroke-width="1.75"/>
+<text x="496" y="123" font-size="11" font-weight="bold" text-anchor="middle" fill="#156082">Node — accelerators + HBM on package</text>
+<rect x="400" y="138" width="192" height="30" fill="#f2f2f2" stroke="#156082" stroke-width="1.75"/>
+<text x="496" y="157" font-size="11" text-anchor="middle" fill="#156082">Node</text>
+<rect x="400" y="172" width="192" height="30" fill="#f2f2f2" stroke="#156082" stroke-width="1.75"/>
+<text x="496" y="191" font-size="11" text-anchor="middle" fill="#156082">Node</text>
+<rect x="400" y="206" width="192" height="30" fill="#f2f2f2" stroke="#156082" stroke-width="1.75"/>
+<text x="496" y="225" font-size="11" text-anchor="middle" fill="#156082">Node</text>
+<rect x="598" y="104" width="24" height="132" fill="#fff" stroke="#E97132" stroke-width="1.75"/>
+<text x="610" y="150" font-size="10" text-anchor="middle" fill="#E97132">N</text>
+<text x="610" y="163" font-size="10" text-anchor="middle" fill="#E97132">V</text>
+<text x="610" y="176" font-size="10" text-anchor="middle" fill="#E97132">L</text>
+<text x="610" y="189" font-size="10" text-anchor="middle" fill="#E97132">i</text>
+<text x="610" y="202" font-size="10" text-anchor="middle" fill="#E97132">n</text>
+<text x="610" y="215" font-size="10" text-anchor="middle" fill="#E97132">k</text>
+<rect x="400" y="244" width="222" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="511" y="259" font-size="12" font-weight="bold" text-anchor="middle">Power + liquid cooling</text>
+<text x="511" y="273" font-size="11" text-anchor="middle" fill="#595959">tens of kilowatts per rack</text>
+<text x="510" y="310" font-size="12" text-anchor="middle" fill="#595959">Orange — the NVLink spine. It is the</text>
+<text x="510" y="326" font-size="12" text-anchor="middle" fill="#595959">part a desktop has no equivalent of.</text>
+</g></svg>`;
+
+const SVG_LITHO = `
+<svg viewBox="0 0 680 250" role="img" aria-label="The constraint moving upstream: accelerators, then memory, then packaging, then lithography, with the number of suppliers falling at each step.">
+<defs><marker id="u1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="340" y="26" font-size="13" fill="#595959">Each time one constraint eased, the binding one moved further upstream — and thinned.</text>
+<rect x="38" y="48" width="134" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="105" y="72" font-size="13" font-weight="bold">Accelerators</text>
+<text x="105" y="90" font-size="12" fill="#595959">2023–24</text>
+<text x="105" y="126" font-size="14" font-weight="bold">several</text>
+<text x="105" y="143" font-size="11" fill="#595959">designers</text>
+<line x1="174" y1="76" x2="190" y2="76" stroke="#1a1a1a" stroke-width="1" marker-end="url(#u1)"/>
+<rect x="194" y="48" width="134" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="261" y="72" font-size="13" font-weight="bold">HBM</text>
+<text x="261" y="90" font-size="12" fill="#595959">2024–25</text>
+<text x="261" y="126" font-size="14" font-weight="bold">3</text>
+<text x="261" y="143" font-size="11" fill="#595959">makers</text>
+<line x1="330" y1="76" x2="346" y2="76" stroke="#1a1a1a" stroke-width="1" marker-end="url(#u1)"/>
+<rect x="350" y="48" width="134" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="417" y="72" font-size="13" font-weight="bold">Packaging</text>
+<text x="417" y="90" font-size="12" fill="#595959">2025–26</text>
+<text x="417" y="126" font-size="14" font-weight="bold">1</text>
+<text x="417" y="143" font-size="11" fill="#595959">leader (TSMC)</text>
+<line x1="486" y1="76" x2="502" y2="76" stroke="#1a1a1a" stroke-width="1" marker-end="url(#u1)"/>
+<rect x="506" y="48" width="134" height="56" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="573" y="72" font-size="13" font-weight="bold" fill="#E97132">EUV lithography</text>
+<text x="573" y="90" font-size="12" fill="#E97132">2026–</text>
+<text x="573" y="126" font-size="14" font-weight="bold" fill="#E97132">1</text>
+<text x="573" y="143" font-size="11" fill="#E97132">supplier (ASML)</text>
+<text x="340" y="182" font-size="13" fill="#595959">ASML builds roughly 50–60 standard EUV machines a year. That rate is the physical</text>
+<text x="340" y="200" font-size="13" fill="#595959">upper bound on how fast the world can add leading-edge fab capacity.</text>
+<text x="340" y="228" font-size="12" fill="#595959">Orange — the step with the fewest suppliers of all.</text>
+</g></svg>`;
+
+const SVG_CUDASTACK = `
+<svg viewBox="0 0 680 300" role="img" aria-label="A seven-layer stack from your application down to the tensor cores, with the CUDA software layers and NVIDIA silicon layers marked.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="120" y="20" width="440" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="42" font-size="13" text-anchor="middle">Your prompt or application</text>
+<rect x="120" y="56" width="440" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="78" font-size="13" text-anchor="middle">Framework — PyTorch, vLLM, TensorRT-LLM</text>
+<rect x="120" y="92" width="440" height="34" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="340" y="114" font-size="13" text-anchor="middle" fill="#156082">CUDA libraries — cuBLAS, cuDNN, CUTLASS, NCCL</text>
+<rect x="120" y="128" width="440" height="34" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="340" y="150" font-size="13" text-anchor="middle" fill="#156082">CUDA C++ and the nvcc compiler → PTX</text>
+<rect x="120" y="164" width="440" height="34" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="340" y="186" font-size="13" text-anchor="middle" fill="#156082">GPU driver → SASS machine code</text>
+<rect x="120" y="200" width="440" height="34" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="340" y="222" font-size="13" text-anchor="middle" fill="#E97132">Streaming multiprocessors — warps of 32 threads</text>
+<rect x="120" y="236" width="440" height="34" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="340" y="258" font-size="13" text-anchor="middle" fill="#E97132">Tensor cores — the multiply-accumulate itself</text>
+<text x="340" y="288" font-size="13" text-anchor="middle" fill="#595959">Blue — NVIDIA CUDA software. Orange — NVIDIA silicon. White — not NVIDIA. Each layer compiles into the one beneath.</text>
+</g></svg>`;
+
+const SVG_HBMSTACK = `
+<svg viewBox="0 0 680 250" role="img" aria-label="An HBM stack of DRAM dies wired with through-silicon vias, sitting on a shared substrate beside the GPU die.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="90" y="186" width="480" height="20" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="330" y="222" font-size="13" text-anchor="middle" fill="#595959">Shared substrate — bonded by TSMC CoWoS (see 3.8)</text>
+<rect x="110" y="104" width="190" height="82" fill="#fff" stroke="#1a1a1a" stroke-width="1"/>
+<text x="205" y="140" font-size="14" font-weight="bold" text-anchor="middle">GPU die</text>
+<text x="205" y="160" font-size="12" text-anchor="middle" fill="#595959">the arithmetic</text>
+<rect x="360" y="170" width="180" height="16" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="450" y="182" font-size="11" text-anchor="middle">base logic die</text>
+<rect x="360" y="152" width="180" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<rect x="360" y="134" width="180" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<rect x="360" y="116" width="180" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<rect x="360" y="98" width="180" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<rect x="360" y="80" width="180" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<rect x="360" y="62" width="180" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<line x1="390" y1="62" x2="390" y2="186" stroke="#156082" stroke-width="1.5"/>
+<line x1="420" y1="62" x2="420" y2="186" stroke="#156082" stroke-width="1.5"/>
+<line x1="450" y1="62" x2="450" y2="186" stroke="#156082" stroke-width="1.5"/>
+<line x1="480" y1="62" x2="480" y2="186" stroke="#156082" stroke-width="1.5"/>
+<line x1="510" y1="62" x2="510" y2="186" stroke="#156082" stroke-width="1.5"/>
+<text x="450" y="50" font-size="14" font-weight="bold" text-anchor="middle">HBM stack</text>
+<text x="596" y="100" font-size="12" fill="#156082">8–16 DRAM dies</text>
+<text x="596" y="118" font-size="12" fill="#156082">thousands of TSVs</text>
+<text x="596" y="136" font-size="12" fill="#595959">every die tested</text>
+<text x="596" y="154" font-size="12" fill="#595959">before and after</text>
+<text x="340" y="26" font-size="13" text-anchor="middle" fill="#595959">Blue — the through-silicon vias. One bad die kills the whole stack.</text>
+</g></svg>`;
+
+const SVG_SHAREBAR = `
+<svg viewBox="0 0 680 250" role="img" aria-label="Two stacked share bars: HBM revenue share for Q1 2026 and the broader DRAM market for Q2 2026, showing different rankings.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="60" y="34" font-size="14" font-weight="bold">HBM revenue share — Q1 2026</text>
+<rect x="60" y="46" width="325" height="46" fill="#156082" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="222" y="68" font-size="14" font-weight="bold" text-anchor="middle" fill="#fff">SK Hynix</text>
+<text x="222" y="85" font-size="13" text-anchor="middle" fill="#fff">58%</text>
+<rect x="385" y="46" width="117" height="46" fill="#A6A6A6" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="443" y="68" font-size="14" font-weight="bold" text-anchor="middle">Samsung</text>
+<text x="443" y="85" font-size="13" text-anchor="middle">21%</text>
+<rect x="502" y="46" width="117" height="46" fill="#D9D9D9" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="560" y="68" font-size="14" font-weight="bold" text-anchor="middle">Micron</text>
+<text x="560" y="85" font-size="13" text-anchor="middle">21%</text>
+<text x="60" y="112" font-size="12" fill="#595959">Down from 69% a year earlier. Samsung and Micron are level, not ranked.</text>
+<text x="60" y="152" font-size="14" font-weight="bold">All DRAM — Q2 2026, a different market and a different ranking</text>
+<rect x="60" y="164" width="218" height="34" fill="#D9D9D9" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="169" y="186" font-size="13" text-anchor="middle">Samsung 39%</text>
+<rect x="278" y="164" width="146" height="34" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="351" y="186" font-size="13" text-anchor="middle">SK Hynix 26%</text>
+<rect x="424" y="164" width="140" height="34" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="494" y="186" font-size="13" text-anchor="middle">Micron 25%</text>
+<rect x="564" y="164" width="55" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="591" y="186" font-size="12" text-anchor="middle">others</text>
+<text x="60" y="220" font-size="12" fill="#595959">Both are quoted as "memory market share" in coverage. They are not the same thing.</text>
+<text x="60" y="240" font-size="12" fill="#595959">Revenue basis. HBM data is one quarter further in arrears than the DRAM data beside it.</text>
+</g></svg>`;
+
+const SVG_SERIES = `
+<svg viewBox="0 0 680 200" role="img" aria-label="Four steps in series from DRAM wafer capacity through HBM stacking and CoWoS packaging to a finished accelerator, with two steps marked capacity-limited.">
+<defs><marker id="s1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="38" y="50" width="134" height="60" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="105" y="76" font-size="13" font-weight="bold">DRAM wafer</text>
+<text x="105" y="93" font-size="13" font-weight="bold">capacity</text>
+<line x1="174" y1="80" x2="190" y2="80" stroke="#1a1a1a" stroke-width="1" marker-end="url(#s1)"/>
+<rect x="194" y="50" width="134" height="60" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="261" y="76" font-size="13" font-weight="bold" fill="#E97132">HBM stacking</text>
+<text x="261" y="93" font-size="13" font-weight="bold" fill="#E97132">and test</text>
+<line x1="330" y1="80" x2="346" y2="80" stroke="#1a1a1a" stroke-width="1" marker-end="url(#s1)"/>
+<rect x="350" y="50" width="134" height="60" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="417" y="76" font-size="13" font-weight="bold" fill="#E97132">TSMC CoWoS</text>
+<text x="417" y="93" font-size="13" font-weight="bold" fill="#E97132">packaging</text>
+<line x1="486" y1="80" x2="502" y2="80" stroke="#1a1a1a" stroke-width="1" marker-end="url(#s1)"/>
+<rect x="506" y="50" width="134" height="60" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="573" y="84" font-size="13" font-weight="bold">Finished accelerator</text>
+<text x="340" y="30" font-size="13" fill="#595959">Orange — the two capacity-limited steps. They sit in series.</text>
+<text x="340" y="140" font-size="13" fill="#595959">Output is set by whichever is tighter. Relieving only one of them adds nothing.</text>
+<text x="340" y="168" font-size="13" fill="#595959">NVIDIA is estimated to hold about 60% of 2026 CoWoS capacity; the top three, above 85%.</text>
+</g></svg>`;
+
+const SVG_GATES = `
+<svg viewBox="0 0 680 250" role="img" aria-label="Four narrowing barriers to entering HBM manufacture: a leading-edge DRAM fab, the stacking process, HBM4's logic-die requirement, and export controls.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="340" y="26" font-size="13" fill="#595959">Each gate narrows the field. Nobody has passed all four since the incumbents.</text>
+<rect x="60" y="42" width="560" height="42" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="60" font-size="13" font-weight="bold">You already run a leading-edge DRAM fab</text>
+<text x="340" y="77" font-size="12" fill="#595959">tens of billions of dollars and several years — three companies qualify</text>
+<rect x="120" y="92" width="440" height="42" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="110" font-size="13" font-weight="bold">You survive the stacking process</text>
+<text x="340" y="127" font-size="12" fill="#595959">12–16 dies thinned to 30–50 µm, thousands of TSVs, yield loss compounding per layer</text>
+<rect x="180" y="142" width="320" height="42" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="160" font-size="13" font-weight="bold">You secure a 3nm logic foundry</text>
+<text x="340" y="177" font-size="12" fill="#595959">HBM4's base die can no longer be built on a DRAM process</text>
+<rect x="240" y="192" width="200" height="42" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="210" font-size="13" font-weight="bold">You can buy the tools</text>
+<text x="340" y="227" font-size="12" fill="#595959">export controls bind here</text>
+</g></svg>`;
+
+const SVG_CHAIN = `
+<svg viewBox="0 0 680 210" role="img" aria-label="A causal chain from AI accelerator demand through wafer reallocation and falling commodity supply to rising consumer prices.">
+<defs><marker id="c1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="38" y="44" width="134" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="105" y="66" font-size="13" font-weight="bold">Accelerator</text>
+<text x="105" y="83" font-size="13" font-weight="bold">demand</text>
+<text x="105" y="118" font-size="12" fill="#595959">up to 70% of world</text>
+<text x="105" y="134" font-size="12" fill="#595959">memory output, 2026</text>
+<line x1="174" y1="70" x2="190" y2="70" stroke="#1a1a1a" stroke-width="1" marker-end="url(#c1)"/>
+<rect x="194" y="44" width="134" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="261" y="66" font-size="13" font-weight="bold">Wafers move</text>
+<text x="261" y="83" font-size="13" font-weight="bold">to HBM</text>
+<text x="261" y="118" font-size="12" fill="#595959">far more profitable</text>
+<text x="261" y="134" font-size="12" fill="#595959">per wafer</text>
+<line x1="330" y1="70" x2="346" y2="70" stroke="#1a1a1a" stroke-width="1" marker-end="url(#c1)"/>
+<rect x="350" y="44" width="134" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="417" y="66" font-size="13" font-weight="bold">DDR5 and GDDR</text>
+<text x="417" y="83" font-size="13" font-weight="bold">supply falls</text>
+<text x="417" y="118" font-size="12" fill="#595959">contract prices +80–90%</text>
+<text x="417" y="134" font-size="12" fill="#595959">QoQ, Q1 2026</text>
+<line x1="486" y1="70" x2="502" y2="70" stroke="#1a1a1a" stroke-width="1" marker-end="url(#c1)"/>
+<rect x="506" y="44" width="134" height="52" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="573" y="66" font-size="13" font-weight="bold">Your hardware</text>
+<text x="573" y="83" font-size="13" font-weight="bold">costs more</text>
+<text x="573" y="118" font-size="12" fill="#595959">RAM, GPUs, consoles,</text>
+<text x="573" y="134" font-size="12" fill="#595959">SSDs — all of it</text>
+<text x="340" y="24" font-size="13" fill="#595959">One supply chain, observed at two ends.</text>
+<text x="340" y="180" font-size="13" fill="#595959">No factory burned down. This is a reallocation, working exactly as the price signal intends.</text>
+</g></svg>`;
+
+const CARDS = [
+{
+ id:"S-009a", num:"3.1", title:"Your PC: what runs a model locally, and what stops it",
+ figure:`<div class="twocol"><div class="col blue"><h3>The parts, and what each one decides</h3>
+ <p><b>GPU</b> the parallel matrix arithmetic of 2.5 — NVIDIA GeForce RTX (5090 = 32 GB, top consumer part), AMD Radeon, Apple Silicon</p>
+ <p><b>VRAM</b> the hard limit on what you can run — roughly 0.6 GB per billion parameters at 4-bit, plus the KV cache (2.7)</p>
+ <p><b>CPU + RAM</b> tokenization and orchestration; runs offloaded layers very slowly. Does not decide what fits on the GPU</p>
+ <p><b>NVMe SSD</b> holds the multi-gigabyte weight file, governs load time</p>
+ <p><b>Power</b> a top consumer GPU draws around 575 W</p>
+ <p><b>Quantization</b> software, not hardware — about 90–95% of quality at roughly a quarter of the memory</p>
+ </div><div class="col orange"><h3>Worked example — why it won't load</h3>
+ <p><b>4.7 GB</b> an 8-billion-parameter model at 4-bit</p>
+ <p><b>+ 4 GB</b> KV cache for a 32,000-token context</p>
+ <p><b>= 8.7 GB</b> which overflows an 8 GB card</p>
+ <p>The single most common reason a local model refuses to run.</p>
+ </div></div>`,
+ body:`<p>Running a model on your own machine, one user at a time. Blue — the components. Orange — what they add up to in practice.</p>`,
+ depth:`<p>The thing to internalise is that VRAM is a wall, not a slope. Fit the model and it runs at full speed; miss by a gigabyte and layers spill to system RAM and throughput collapses by an order of magnitude. There is no graceful degradation.</p>
+ <p>Note what is absent from that list: any mention of how <em>fast</em> the GPU computes. For inference the binding constraint is almost never arithmetic throughput — it is how quickly weights can be moved out of memory, which is slide 2.6's autoregressive loop showing up in hardware. That is why memory capacity and bandwidth, rather than headline compute figures, decide what a card can do.</p>
+ <p>Quantization is the one free lunch here, and it is not entirely free. Dropping from 16-bit to 4-bit shrinks the model roughly fourfold for a modest quality cost on most tasks — but the loss falls unevenly, hitting reasoning and long-context work harder than casual conversation, which is exactly where a benchmark is least likely to catch it.</p>`,
+ sources:"Consumer GPU configurations as of Aug 2026. Pricing deliberately omitted here and handled on 3.12 — it has moved too far to state in passing."
+},
+{
+ id:"S-034", num:"3.2", title:"Where these parts physically sit",
+ figure:SVG_PHYS,
+ body:`<p>Same six jobs in both machines. The difference is scale, and one component the desktop has no version of.</p>
+ <table class="grid wide"><thead><tr><th>The job</th><th>In your machine</th><th>In the rack</th></tr></thead><tbody>
+ <tr><td>Do the arithmetic</td><td>One GPU on a graphics card</td><td>72 accelerators across several nodes</td></tr>
+ <tr><td>Hold the model</td><td>VRAM on that same card — the wall</td><td>HBM on each accelerator's own package</td></tr>
+ <tr><td>Orchestrate</td><td>CPU and system RAM</td><td>Host CPUs, one set per node</td></tr>
+ <tr><td>Store the weight file</td><td>NVMe SSD</td><td>Parallel NVMe file systems, shared</td></tr>
+ <tr><td>Connect the parts</td><td>PCIe, inside one box</td><td><strong>NVLink</strong> between GPUs, InfiniBand between racks</td></tr>
+ <tr><td>Power and cool it</td><td>A power supply and fans, ~575 W</td><td>Liquid cooling, tens of kilowatts per rack</td></tr>
+ </tbody></table>
+ <p>The row with no desktop equivalent is the fifth. A PC has one GPU and no way to add a second that behaves as part of the first. NVLink is what lets 72 chips act as one machine with one pooled memory space — which is the whole reason a data centre can hold a model that no single chip could.</p>`,
+ depth:`<p>Physical placement matters more than it sounds, because distance costs bandwidth. Note what sits where in the two diagrams: in your machine the VRAM is on the graphics card itself, inches from the GPU, while system RAM is on the motherboard — and that gap is exactly why spilling out of VRAM into system RAM is catastrophic rather than gradual.</p>
+ <p>The same principle explains HBM's shape. It is not on a separate module like the RAM in your machine; it is stacked on the same package as the GPU die, millimetres away (3.6). Every step further from the compute costs bandwidth, and 2.6 says bandwidth is the thing you run out of.</p>
+ <p>One thing the diagram flattens: a real rack is one of many. The Vera Rubin NVL72 is 72 GPUs pooled by NVLink, and a large training or serving cluster is hundreds of those racks connected by the scale-out network. The pooling gets weaker at each level outward — very fast inside the rack, slower between racks — which is why how a model is split across hardware is a genuine engineering discipline.</p>`,
+ sources:"Schematic, not to scale — component placement is representative of a typical desktop and a typical liquid-cooled AI rack, not any specific product."
+},
+{
+ id:"S-009b", num:"3.3", title:"The data centre: many accelerators behaving as one",
+ figure:`<table class="grid wide"><thead><tr><th>Component</th><th>Its job (and the 3.1 equivalent)</th><th>Who supplies it</th></tr></thead><tbody>
+ <tr><td><b>Accelerator</b></td><td><em>= your GPU.</em> NVIDIA Rubin — 288 GB HBM4 at 22 TB/s, dual-die on TSMC 3nm, 336B transistors. Blackwell B200 (192 GB HBM3e, 8 TB/s) and B300 Ultra are the installed base</td><td>NVIDIA; AMD MI355X and MI450, Google TPU, AWS Trainium, Groq, Cerebras</td></tr>
+ <tr><td><b>HBM</b></td><td><em>= your VRAM.</em> On-package memory. Capacity sets model-per-chip; bandwidth sets tokens per second</td><td>SK Hynix, Samsung, Micron</td></tr>
+ <tr><td><b>Advanced packaging</b></td><td><em>no desktop equivalent.</em> Bonds the HBM stacks and GPU dies onto one substrate. A capacity gate in its own right (3.8)</td><td>TSMC CoWoS</td></tr>
+ <tr><td><b>NVLink</b></td><td><em>no desktop equivalent.</em> GPU-to-GPU fabric at 1.8 TB/s, so a rack behaves as one machine. Vera Rubin NVL72 = 72 GPUs, 36 Vera CPUs, liquid-cooled</td><td>NVIDIA</td></tr>
+ <tr><td><b>Scale-out network</b></td><td><em>= your PCIe bus, between buildings.</em> 400–800 Gb/s InfiniBand or Ethernet across racks</td><td>NVIDIA, Broadcom, Arista, Marvell</td></tr>
+ <tr><td><b>Host CPU</b></td><td><em>= your CPU.</em> NVIDIA Vera, 88-core Arm, fused with the GPUs as a superchip. Grace filled this role for Blackwell</td><td>NVIDIA; otherwise Intel Xeon, AMD EPYC</td></tr>
+ <tr><td><b>Power, cooling, storage</b></td><td><em>= your power supply, fans and SSD.</em> Racks at tens of kilowatts, liquid-cooled; parallel NVMe file systems</td><td>Vertiv, Schneider Electric, Supermicro, DDN, VAST, WEKA</td></tr>
+ </tbody></table>`,
+ body:`<p>Serving a full-size model to many users at once. The middle column names the 3.1 equivalent for each part, so the two machines can be read against each other directly.</p>`,
+ band:`A PC pools nothing — one GPU, VRAM-limited, quantized, one user. A data centre pools many accelerators over NVLink and InfiniBand to hold a full-size model in HBM and batch many users onto it. Both are gated by the same thing: memory bandwidth. Moving the weights, not multiplying them.`,
+ depth:`<p>Rubin's status as of 30 August 2026 is worth stating precisely, because it is being reported loosely. NVIDIA announced full production at CES in January, said at GTC Taipei at the end of May that production shipments would begin in the autumn, and its head of data centre confirmed in July that chips were shipping to major AI customers. Trade press has first deliveries to North American hyperscalers from July, with an initial constrained run estimated at 200,000–300,000 units, and rack-rail suppliers began shipping Vera Rubin rack products in August. Full hyperscaler integration is expected across Q4 2026 into Q1 2027.</p>
+ <p>So: Rubin is real, shipping, and scarce. Blackwell remains what almost everything actually runs on today. Both statements are true and they are routinely conflated.</p>
+ <p>The initial shipping configuration is the <strong>NVL72</strong>, not the NVL144 announced at GTC — reported as a deliberate choice to hold chip count down and control thermal draw while the supply chain adjusts. Treat NVL144 as announced, not deployed.</p>`,
+ sources:"NVIDIA newsroom, \u201CVera Rubin Ramps Into Full Production\u201D, GTC Taipei, 31 May 2026 \u2014 primary, states autumn availability. Rubin specifications from NVIDIA CES and GTC 2026 disclosures. Shipment timing and the 200,000\u2013300,000 unit estimate: Next Waves Insight (Jun 2026), StartupHub (Jul 2026), DigiTimes (28 Aug 2026), Wccftech (Mar and May 2026) \u2014 all secondary trade press, and they do not agree precisely on dates. The NVL72-first detail is trade-press sourced, not NVIDIA guidance."
+},
+{
+ id:"S-009c", num:"3.4", title:"Where CUDA fits: the layer that turns code into silicon",
+ figure:SVG_CUDASTACK,
+ body:`<ul>
+ <li><strong>What it is</strong> — NVIDIA's programming platform for its own GPUs: a C++ language extension, the nvcc compiler, a driver runtime and a large library set. Launched 2007; toolkit 13.x as of 2026.</li>
+ <li><strong>Where it enters</strong> — the step where slide 2.5's matrix multiplication becomes real instructions. A <code>torch.matmul</code> call dispatches to a cuBLAS or CUTLASS kernel, compiled to PTX, translated by the driver into SASS for that exact chip, then issued to tensor cores. Nothing runs on the GPU that did not pass through this path.</li>
+ <li><strong>It owns the data movement</strong> — allocating HBM, tiling weights into shared memory and registers, overlapping copies with compute, pooling GPUs through NCCL over NVLink. The memory-bandwidth problem from 3.1 and 3.3 is managed here, not in the silicon.</li>
+ <li><strong>A kernel</strong> is the unit it all runs as: a small program that performs one operation — a matrix multiply, an attention step — launched across thousands of GPU threads at once. A model's forward pass is a long sequence of kernel launches. "Hand-tuned kernels" means someone wrote a faster version of one of those small programs for one specific chip.</li>
+ </ul>
+ <p><strong>What CUDA is actually operating on:</strong> the numbers, not the model. It has no representation of your model as a thing, and no notion of what any weight means. PyTorch turns the model into an ordered list of operations; CUDA supplies a kernel for each one and runs it over the arrays of numbers from 2.4. Below CUDA the driver has translated those kernels into machine code, and below that it is binary — so the ones and zeros are downstream of CUDA, not what CUDA works with directly. The algorithm lives in the framework; CUDA does the arithmetic it is told to do, very fast.</p>`,
+ depth:`<p>The reason this card exists is that "NVIDIA makes the chips" is only half the position, and the weaker half. The layer diagram is the other half: five of the seven rows are NVIDIA's, and three of those five are software.</p>
+ <p>For anyone trying to place where value accrues: the silicon rows are replicable — TSMC will fabricate a competitor's accelerator on the same node. The software rows are the accumulated output of nineteen years of kernel engineering, and they are not.</p>
+ <p>The framework-versus-CUDA split is also why porting a model to other hardware is easier than it sounds and harder than it looks. Easier, because the model is defined in portable PyTorch and never mentions CUDA. Harder, because the kernels underneath it were tuned for one vendor's chips, and a correct-but-untuned kernel can be several times slower. Nothing needs rewriting; everything needs re-optimising. That distinction is the whole of 3.5.</p>`,
+ sources:"NVIDIA CUDA Toolkit release notes 13.3 (Jun 2026) and CUDA Toolkit Archive."
+},
+{
+ id:"S-009d", num:"3.5", title:"Why CUDA is the moat, and what could neutralise it",
+ figure:`<div class="twocol"><div class="col blue"><h3>What holds it</h3>
+ <p><b>19 years</b> of hand-tuned kernels (3.4) — FlashAttention, quantization libraries, TensorRT-LLM — all written CUDA-first</p>
+ <p><b>Tooling</b> Nsight, CUDA-GDB, and the largest body of worked examples and answers of any platform</p>
+ <p><b>Training</b> CUDA retains an estimated 20–30% advantage on large transformer runs</p>
+ </div><div class="col orange"><h3>What is eroding it</h3>
+ <p><b>90–95%</b> ROCm's share of H100 throughput on standard PyTorch, vLLM and SGLang <em>inference</em>, on MI300X and MI355X</p>
+ <p><b>Single digits</b> the MI355X's gap to the B200 at MLPerf Inference 6.0, published 1 Apr 2026</p>
+ <p><b>Triton</b> hardware-agnostic kernel language targeting both vendors — one kernel, either chip</p>
+ </div></div>`,
+ body:`<p>Google's <strong>XLA</strong> belongs on the right-hand side too: mature, and a first-class path for JAX on both TPUs and AMD hardware.</p>
+ <p>Where the gap persists is anything depending on CUDA-only libraries. TensorRT-LLM and FlashAttention 3 have no full ROCm equivalent, and custom PTX kernels need manual porting.</p>`,
+ band:`What to watch: NVIDIA's pricing power rests on CUDA at least as much as on the chip. Adoption of Triton and ROCm inside production serving stacks is the leading indicator of margin pressure — and note that serving is precisely where the gap has already closed most.`,
+ depth:`<p>The distinction the headline numbers obscure: the gap is nearly closed for inference and materially open for training. That is not a small asymmetry, because inference is the larger and faster-growing share of total compute spend, and it is the workload most sensitive to cost per token. A challenger does not need to win training to take revenue.</p>
+ <p>Two 2026 developments to keep in view. AMD announced ROCm.AI at its Advancing AI event, pairing a kernel-writing AI agent with an orchestrator and claiming a verified 21.8% throughput gain on shipping silicon, with availability from August 2026 — automating exactly the hand-tuning that constitutes the moat. Against that, one analyst house documented AMD's own internal cluster shortage causing regressions in its vLLM work: the company is compute-constrained in closing a software gap, which is a genuinely awkward position.</p>
+ <p>Treat every throughput figure on this card as benchmark- and vendor-dependent. The 90–95% range recurs across many independent write-ups, which is reassuring, but they may share sources.</p>`,
+ sources:"Thunder Compute ROCm vs CUDA (Jul 2026, updated within the last week); Spheron (Apr 2026); Convly (Jul 2026); GPUAdvisor (Apr 2026) \u2014 all secondary, though all cite MLPerf Inference 6.0, a standardised primary benchmark. ROCm.AI and the cluster shortage: TechTimes summary of SemiAnalysis, Jul 2026 \u2014 secondary reporting a paywalled primary."
+},
+{
+ id:"S-010a", num:"3.6", title:"HBM: why only three companies make it",
+ figure:SVG_HBMSTACK,
+ body:`<p>Ordinary DRAM and GDDR are commodities. <strong>HBM is not</strong> — three companies on earth make it, and all three sell their capacity forward.</p>
+ <ul>
+ <li><strong>What it is</strong> — 8 to 16 DRAM dies stacked vertically and wired with thousands of <strong>through-silicon vias</strong>, mounted on the same package as the GPU. Short wires, enormous parallel width; hence the bandwidth.</li>
+ <li><strong>Why it is hard</strong> — every die is tested before and after bonding, because one bad die kills the whole stack. Yield loss compounds per layer. It consumes far more wafer area per usable bit than standard DRAM, competing for the same fab lines.</li>
+ <li><strong>Why it decides everything</strong> — capacity sets how much model fits on a chip; bandwidth sets tokens per second. Slide 2.6 is the reason: every token reads every weight.</li>
+ </ul>
+ <p>Who those three companies are, and how the ranking between them moved in 2026, is next (3.7).</p>`,
+ depth:`<p>The inversion is the point. Memory used to be the cheap, swappable part of a computer — the thing you added more of when the machine felt slow. It now gates the entire AI buildout, which puts SK Hynix, Samsung and Micron in as strategic a position as NVIDIA and TSMC, and makes them the part of the chain most people underweight.</p>
+ <p>HBM4 raises the difficulty again in a way that matters structurally: the base logic die can no longer be built on a DRAM process. It needs an advanced logic foundry at the 3nm class — which ties the memory makers to TSMC and favours whichever of them can secure that allocation.</p>
+ <p><strong>The way out that some designers have taken:</strong> do not use HBM at all. Cerebras builds a single chip the size of a whole wafer and keeps the weights in SRAM on that wafer — memory on the same silicon as the compute, so bandwidth is enormous and no stacking, no TSVs and no CoWoS are involved. Groq takes a related approach with SRAM-based parts. The trade is capacity: SRAM gives up perhaps two orders of magnitude of density against DRAM, so a single wafer holds a small fraction of what an HBM stack does, and a large model must be split across many units. These architectures sidestep the triopoly this chapter describes, and they inherit a different constraint instead — which is why they compete at the edges of the market rather than at its centre.</p>`,
+ sources:"HBM manufacturing process \u2014 established engineering, uncontested."
+},
+{
+ id:"S-010b", num:"3.7", title:"Who makes it, and how the ranking moved",
+ figure:SVG_SHAREBAR,
+ body:`<ul>
+ <li>SK Hynix still leads but has shed eleven points in a year, from 69%, as the other two qualified parts with NVIDIA.</li>
+ <li>Samsung is the <strong>first HBM4 supplier to NVIDIA</strong>. Samsung and Micron are now level, not ranked.</li>
+ <li>Most 2026 HBM revenue is still HBM3E; HBM4 shipments were expected to materialise in the second half of the year.</li>
+ </ul>`,
+ depth:`<p>The share numbers move faster than any deck can track, and the direction has been consistent for two years: away from SK Hynix's near-monopoly and toward a three-way split. What does <em>not</em> move is the number three. No fourth supplier is arriving — slide 3.9.</p>
+ <p>A caution about which figure you are reading. HBM share and DRAM share are separate rankings over separate products, and both get quoted as "memory market share" in coverage. The Q1 2026 HBM split is the most recent published on a revenue basis specifically for HBM. Counterpoint's Q2 2026 release covers DRAM and does not restate the HBM split, so the HBM figures are one further quarter in arrears than the DRAM ones beside them.</p>`,
+ sources:"Counterpoint Research, \u201CGlobal DRAM and HBM Market Share\u201D, published 8 Jun 2026 \u2014 Q1 2026 data, revenue basis, primary. DRAM Q2 2026 figures: Counterpoint Research, \u201CAI Demand Reshapes DRAM Rankings in Q2 2026\u201D, 4 Aug 2026 \u2014 primary. Share data is revenue-based and at least one quarter in arrears. Supersedes the pre-Aug-2025 figures (SK Hynix ~62%, Micron ahead of Samsung), which were Q2 2025."
+},
+{
+ id:"S-010c", num:"3.8", title:"The second chokepoint: CoWoS packaging",
+ figure:SVG_SERIES,
+ body:`<p>Finished HBM stacks are useless until they are co-packaged onto the GPU, and that step is its own bottleneck.</p>
+ <ul>
+ <li>TSMC's CoWoS capacity has gone from roughly <strong>35,000 wafers per month at end-2024</strong> to about <strong>75,000 at end-2025</strong>, targeting <strong>120,000–140,000 by end-2026</strong>. Close to a fourfold expansion in two years.</li>
+ <li>It is still sold out. TSMC's CEO told shareholders on 4 June 2026 that CoWoS capacity remains extremely tight and <strong>sold out through 2026</strong>.</li>
+ <li>The supply-demand gap is estimated to narrow from around <strong>20% now to about 10% by end-2026</strong>.</li>
+ <li><strong>NVIDIA alone is estimated to hold about 60% of 2026 CoWoS capacity</strong> — roughly 595,000 wafers — with the top three customers together above 85%.</li>
+ </ul>`,
+ band:`Capacity announcements from any single link only matter when both links move together. A doubling of HBM output against flat CoWoS capacity ships no additional accelerators.`,
+ depth:`<p>This is the card that explains why "the memory makers are adding capacity" is not by itself good news for accelerator supply. Two constrained steps in series means output is set by whichever is tighter, and adding to the other one changes nothing.</p>
+ <p>The 60% allocation figure is the more strategically interesting number. One customer holding that share of a chokepoint is not a market — it is a queue with a preferred customer at the front, and it goes some way to explaining why competing accelerators can be competitive on paper and still scarce in practice.</p>
+ <p>Watch also for the successor. TSMC is developing CoPoS, a panel-level packaging platform, with pilot production targeted for mid-2027 — the constraint moving rather than disappearing.</p>`,
+ sources:"TSMC CEO C.C. Wei, annual shareholders' meeting, 4 Jun 2026 (sold out through 2026) \u2014 primary, via trade press. Capacity trajectory and the 20%\u219210% gap estimate: TrendForce, 15 Jun 2026, citing Economic Daily News and institutional investors \u2014 secondary, and an estimate. The 60% NVIDIA allocation and the 595,000-wafer figure trace to sell-side analysis reproduced across outlets, not to TSMC or NVIDIA \u2014 treat as indicative. Capacity targets vary by source between 120,000 and 140,000 wafers per month."
+},
+{
+ id:"S-011a", num:"3.9", title:"Why there is no fourth maker",
+ figure:SVG_GATES,
+ body:`<ul>
+ <li><strong>You need a leading-edge DRAM fab already.</strong> Only SK Hynix, Samsung and Micron have one. DRAM has been off Moore's law for two decades — the 6F² cell dates to 2004, capacitor aspect ratios run 50:1 — so catching up is years and tens of billions of dollars.</li>
+ <li><strong>The stacking process is punishing.</strong> Thin 12–16 dies to 30–50 micrometres, wire them with thousands of TSVs, stack under roughly 775 micrometres with near-perfect alignment, bond, and test every die before and after. One bad die kills the stack.</li>
+ <li><strong>HBM4 raised the wall.</strong> The base logic die now requires an advanced logic foundry at the 3nm class, tying any entrant to TSMC as well.</li>
+ <li><strong>China's CXMT is climbing, but not here.</strong> It went from 3% to 8% of commodity DRAM between Q1 2025 and Q1 2026 while remaining generations behind on HBM and constrained by export controls on tools.</li>
+ </ul>`,
+ depth:`<p>The CXMT trajectory is the one to watch, and the reason to be careful with the word "impossible." Nothing on this list is a law of physics. Every barrier is capital, time and tool access — and two of those three are things a state can supply. What the barriers buy is <em>years</em>, not permanence, and export controls on tools are the load-bearing part of the third. Which tools, and who controls them, is 3.11.</p>
+ <p>Worth noting the shape of the risk if it changes: an entrant does not need HBM4 parity to matter. Taking the commodity DRAM business would free the incumbents' wafer capacity for HBM, which would loosen the constraint this whole chapter describes from an unexpected direction.</p>`,
+ sources:"CXMT share: Counterpoint Research DRAM data, Q1 2025 to Q1 2026. Process detail: established semiconductor engineering, uncontested."
+},
+{
+ id:"S-011b", num:"3.10", title:"Why the three cannot simply make more",
+ figure:waferSVG(),
+ body:`<ul>
+ <li><strong>The wafer trade-off is the core constraint.</strong> HBM consumes far more wafer area per usable bit, so every wafer moved into HBM comes out of commodity DDR5 and GDDR. The 2026 DRAM shortage is not a separate event — it is this, directly.</li>
+ <li><strong>Capacity takes years.</strong> New cleanrooms are two-to-three-year builds, and the specialised gear — TSV etch, thin-wafer bonders, stack testers — carries long lead times of its own. Analysts do not expect meaningful new capacity in volume before late 2027 or 2028.</li>
+ <li><strong>Packaging is the second gate</strong> (3.8), and it is not under the memory makers' control at all.</li>
+ </ul>`,
+ band:`A structural triopoly feeding a serial chokepoint — not a temporary shortage that a new supplier arrives to relieve.`,
+ depth:`<p>The economics here are not a failure of foresight; they are working exactly as designed. HBM out-earns commodity DRAM by a wide margin per wafer. A manufacturer that allocated capacity to consumer memory instead would be destroying value on purpose. So the shortage is not something the three are failing to fix — it is the rational consequence of the price signal they face, and it persists until either the price gap closes or new capacity lands.</p>
+ <p>That framing tells you what would actually change it, and neither is quick: a demand shock that collapses HBM pricing, or the 2027–2028 fab wave arriving. Announcements of the latter are frequent; the years between announcement and volume are the part to hold onto.</p>`,
+ sources:"Wafer trade-off and cleanroom lead times: established industry economics, corroborated across 2026 trade coverage. Timing of new capacity (late 2027\u20132028): multiple secondary sources in broad agreement, no single primary."
+},
+{
+ id:"S-035", num:"3.11", title:"Upstream of all of it: one lithography supplier",
+ figure:SVG_LITHO,
+ body:`<p>Behind the three memory makers and the one packaging leader sits something narrower still.</p>
+ <ul>
+ <li><strong>Every patterned layer of every chip begins with a lithography step</strong> — light projected through a mask onto the wafer. A leading-edge logic chip runs roughly 90 mask layers, so 90 lithography cycles. DRAM uses fewer, but lithography is still the most expensive and capacity-constrained operation in the fab.</li>
+ <li><strong>ASML is the sole global supplier of EUV scanners</strong>, the tool required at 3nm and below. Nikon and Canon exited advanced lithography years ago; China's SMEE is estimated to be more than a decade behind.</li>
+ <li><strong>Output is roughly 50–60 standard EUV machines a year.</strong> High-NA EUV, at around $380–400 million per tool, is smaller still — it moved from pilot to commercial production in February 2026.</li>
+ <li><strong>Memory is now pulling the demand.</strong> HBM3E, HBM4 and HBM4E need EUV layers, and ASML reported memory orders exceeding logic for the first time in Q1 2026. It raised its 2026 revenue outlook from €36–40bn to €43–45bn.</li>
+ <li><strong>And below ASML, narrower again.</strong> Carl Zeiss SMT makes the optics — the most sensitive sub-supplier in the chain — and Trumpf and Cymer supply the lasers driving the EUV plasma source.</li>
+ </ul>`,
+ band:`The pattern of this chapter is a constraint that keeps moving upstream: accelerators, then HBM, then packaging, now EUV capacity. At each step the number of suppliers falls — several, then three, then one, then one.`,
+ depth:`<p>This answers a question 3.9 leaves open. TSMC is not only constrained by its own packaging lines; it is constrained by how fast it can be sold the machines that make leading-edge wafers possible at all. TSMC's 2nm capacity is reported booked into 2028 on top of CoWoS being sold out — two separate queues, one company.</p>
+ <p>The geopolitics concentrate here more sharply than anywhere else in the chapter. EUV exports to China are barred under Dutch licensing coordinated with US policy, and advanced DUV is restricted with US lawmakers pressing to go further. ASML's China revenue is reported falling from roughly a third of sales to about a fifth. That is the mechanism behind 3.9's note that CXMT is limited by tool access — this is the tool, and this is the access.</p>
+ <p>Worth being precise about what kind of bottleneck this is, because it differs from the others. HBM and CoWoS are output constraints: the supplier could make more if it had capacity. ASML's is a throughput constraint on capital equipment with multi-year lead times — every EUV machine sold this year sets fab capacity for the decade. It moves slower than the rest of the chain in both directions, which makes it the least likely of these constraints to resolve quickly and the least likely to whipsaw.</p>`,
+ sources:"ASML 2026 outlook raise (\u20AC36\u201340bn to \u20AC43\u201345bn) and memory-orders-exceed-logic: TSPA Semiconductor (Jul 2026) and Wccftech (Apr 2026) summarising ASML results \u2014 secondary, reporting a primary earnings release. EUV unit output (50\u201360/yr), tool pricing, Zeiss/Trumpf/Cymer roles and export-control status: SemiconductorX and TechMarketBriefs (2026) \u2014 secondary reference material. High-NA commercial production from Feb 2026: FinancialContent/TokenRing (2 Feb 2026) \u2014 secondary. Verify the financial figures against ASML's own results before external use."
+},
+{
+ id:"S-011c", num:"3.12", title:"The spillover: why your own hardware got expensive",
+ figure:SVG_CHAIN,
+ body:`<p>The cleanest evidence that this chapter is not abstract is that it reached your own desk.</p>
+ <ul>
+ <li>AI data centres are forecast to consume as much as <strong>70% of world memory output in 2026</strong>, up from roughly 20–30% in 2022.</li>
+ <li>Blended DRAM contract prices rose roughly <strong>80–90% quarter-on-quarter in Q1 2026</strong> alone.</li>
+ <li>Retail followed: one German retail index for DDR5 stood at <strong>486% of its July 2025 baseline in August 2026</strong>. A 64 GB DDR5 kit reported at <strong>$1,118</strong>.</li>
+ <li>Graphics cards followed the memory. The RTX 5090, at a $1,999 list price, has traded at <strong>$5,000–6,000</strong>. AMD raised Radeon prices twice inside six months; MSI guided to 15–30% increases across 2026.</li>
+ <li>It reached consoles and handhelds too — Nintendo, Sony, Microsoft and Valve all raised prices and all cited memory and storage costs.</li>
+ <li>Nobody credible expects relief before <strong>late 2027, and several say 2028</strong>.</li>
+ </ul>`,
+ band:`The bottleneck in the data centre and the price of a graphics card are the same fact observed at two ends of one supply chain.`,
+ depth:`<p>For a general audience this is the most persuasive card in the chapter, because it converts an abstract supply-chain argument into something already visible in a household budget.</p>
+ <p>Two things worth drawing out. First, this is a <em>reallocation</em>, not a shortage in the usual sense — no factory burned down. The wafers exist and are being pointed at the more profitable product, exactly as slide 3.10 describes. Second, note who absorbs it. The consumer market has no bargaining power against hyperscaler demand, so it functions as the residual claimant on whatever capacity is left. That is a durable structural position, not a temporary squeeze.</p>
+ <p>The related detail on slide 3.1: this is why local inference on consumer hardware got harder rather than easier through 2026, despite better small models. The models improved and the cards to run them on got scarcer.</p>`,
+ sources:"All figures on this card are secondary. IDC's 70%-of-memory-output figure and its 2026 supply-growth forecasts come via IDC's own blog (Aug 2026) and trade summaries \u2014 the closest to primary here. DRAM contract price moves: TrendForce data via multiple outlets. Retail prices, the 3D Center index, GPU street prices and console pricing: Tech Insider (Aug 2026), Aliteq (Aug 2026), Barrack AI (Mar 2026), Compute Market (Apr 2026) \u2014 trade and enthusiast press, directionally consistent but individually unverified. Verify anything quoted externally against IDC or TrendForce directly."
+},
+{
+ apparatus:true, label:"Glossary", title:"Chapter 3 — Glossary",
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Card</th></tr></thead><tbody>
+ <tr><td>VRAM</td><td>Memory on a graphics card. The hard limit on what model you can run locally</td><td>3.1</td></tr>
+ <tr><td>quantization</td><td>Compressing weights to lower precision so a bigger model fits in less memory</td><td>3.1</td></tr>
+ <tr><td>accelerator</td><td>The data-centre GPU or equivalent chip that does the model arithmetic</td><td>3.3</td></tr>
+ <tr><td>HBM</td><td>High-bandwidth memory: DRAM dies stacked on the GPU's own package</td><td>3.3</td></tr>
+ <tr><td>NVLink</td><td>GPU-to-GPU fabric at 1.8 TB/s, so a whole rack behaves as one machine</td><td>3.3</td></tr>
+ <tr><td>InfiniBand</td><td>400–800 Gb/s scale-out network connecting racks to each other</td><td>3.3</td></tr>
+ <tr><td>superchip</td><td>A CPU and GPUs fused in one package — NVIDIA Vera with Rubin, Grace with Blackwell</td><td>3.3</td></tr>
+ <tr><td>PTX</td><td>CUDA's virtual instruction set, produced by the compiler before the driver translates it</td><td>3.4</td></tr>
+ <tr><td>SASS</td><td>The actual machine code for one specific NVIDIA chip</td><td>3.4</td></tr>
+ <tr><td>tensor core</td><td>The silicon unit performing the multiply-accumulate itself</td><td>3.4</td></tr>
+ <tr><td>streaming multiprocessor</td><td>The GPU's scheduling unit, running threads in warps of 32</td><td>3.4</td></tr>
+ <tr><td>kernel</td><td>A small program performing one GPU operation, launched across thousands of threads</td><td>3.4</td></tr>
+ <tr><td>ROCm</td><td>AMD's open-source answer to CUDA. At inference parity is close; at training it is not</td><td>3.5</td></tr>
+ <tr><td>XLA</td><td>Google's compiler backend for JAX, mature on both TPUs and AMD hardware</td><td>3.5</td></tr>
+ <tr><td>MLPerf</td><td>Standardised industry benchmark suite with controlled submission rules</td><td>3.5</td></tr>
+ <tr><td>through-silicon via</td><td>A vertical wire running through stacked dies to connect them</td><td>3.6</td></tr>
+ <tr><td>HBM4</td><td>Current HBM generation. Its base logic die requires a 3nm-class logic foundry</td><td>3.6</td></tr>
+ <tr><td>CoWoS</td><td>TSMC's advanced packaging process bonding HBM stacks and GPU dies to one substrate</td><td>3.8</td></tr>
+ <tr><td>wafer</td><td>The silicon disc chips are made from. The unit capacity is measured in</td><td>3.8</td></tr>
+ <tr><td>DRAM</td><td>Ordinary computer memory. A commodity, unlike HBM</td><td>3.10</td></tr>
+ <tr><td>GDDR</td><td>The commodity memory on consumer graphics cards. Competes with HBM for wafers</td><td>3.10</td></tr>
+ <tr><td>lithography</td><td>Projecting a circuit pattern onto the wafer. Every patterned layer starts here</td><td>3.11</td></tr>
+ <tr><td>EUV</td><td>Extreme ultraviolet lithography, required at 3nm and below. One supplier</td><td>3.11</td></tr>
+ <tr><td>High-NA EUV</td><td>Next-generation EUV for sub-2nm nodes; roughly $380–400M per machine</td><td>3.11</td></tr>
+ <tr><td>wafer-scale</td><td>Building one chip the size of a wafer, holding weights in on-chip SRAM instead of HBM</td><td>3.6</td></tr>
+ <tr><td>contract vs spot price</td><td>Negotiated bulk pricing versus the open market. Spot moves first and further</td><td>3.12</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Carried forward from earlier chapters</h4>
+ <table class="grid wide"><thead><tr><th>Term</th><th>Reminder</th><th>Owned by</th></tr></thead><tbody>
+ <tr><td>KV cache</td><td>Cached attention results for the conversation so far; competes with weights for memory</td><td>2.7</td></tr>
+ <tr><td>inference</td><td>Running a trained model. Weights are read, never written</td><td>2.8</td></tr>
+ <tr><td>matrix multiplication</td><td>Rows against columns. The operation the whole stack exists to perform</td><td>2.5</td></tr>
+ <tr><td>autoregressive loop</td><td>One full pass over every weight, per token. The reason bandwidth binds</td><td>2.6</td></tr>
+ <tr><td>CUDA</td><td>NVIDIA's GPU programming platform, launched 2007</td><td>2.10</td></tr>
+ <tr><td>Triton</td><td>Hardware-agnostic kernel language targeting both vendors</td><td>2.10</td></tr>
+ </tbody></table>`,
+ body:`<p>Terms this chapter owns, in order of first appearance.</p>`
+},
+{
+ apparatus:true, label:"Companies", title:"Chapter 3 — Companies and organisations",
+ figure:`<h4 class="grouplabel">Silicon</h4>
+ <table class="grid wide"><thead><tr><th>Organisation</th><th>Listing</th><th>Role in this chapter</th></tr></thead><tbody>
+ <tr><td>NVIDIA</td><td>Nasdaq: NVDA</td><td>Rubin and Blackwell accelerators, NVLink, Vera CPU, and CUDA — the software layer that is the harder half of the position <em>(also 1.3, 2.10)</em></td></tr>
+ <tr><td>AMD</td><td>Nasdaq: AMD</td><td>Instinct MI355X and MI450, and ROCm — the only challenger at inference parity</td></tr>
+ <tr><td>TSMC</td><td>NYSE: TSM · 2330.TW</td><td>Fabricates the accelerators at 3nm and owns CoWoS packaging. Sits in the chain twice</td></tr>
+ <tr><td>Intel</td><td>Nasdaq: INTC</td><td>Host CPUs; EMIB and Foveros packaging, behind TSMC in volume</td></tr>
+ <tr><td>Google</td><td>Nasdaq: GOOGL</td><td>TPU as an in-house alternative to buying accelerators; XLA <em>(also 1.4, 2.10)</em></td></tr>
+ <tr><td>AWS</td><td>Nasdaq: AMZN</td><td>Trainium and Inferentia — the same in-house substitution</td></tr>
+ <tr><td>Groq, Cerebras</td><td>Private</td><td>Alternative inference architectures outside the GPU model</td></tr>
+ <tr><td>Apple</td><td>Nasdaq: AAPL</td><td>Apple Silicon — unified memory makes consumer local inference unusually viable</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Memory</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>SK Hynix</td><td>000660.KS</td><td>58% of HBM revenue, Q1 2026. Down from a near-monopoly</td></tr>
+ <tr><td>Samsung</td><td>005930.KS</td><td>21% of HBM; first HBM4 supplier to NVIDIA; 39% of all DRAM in Q2 2026</td></tr>
+ <tr><td>Micron</td><td>Nasdaq: MU</td><td>21% of HBM. The only US-domiciled maker of the three</td></tr>
+ <tr><td>CXMT</td><td>Private (China)</td><td>3% → 8% of commodity DRAM in a year; generations behind on HBM</td></tr>
+ <tr><td>Solidigm, Western Digital</td><td>SK Hynix subsidiary · Nasdaq: WDC</td><td>NVMe storage for weight files, local and data centre</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Packaging, networking and systems</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>ASE, Amkor</td><td>NYSE: ASX · Nasdaq: AMKR</td><td>OSAT partners TSMC now subcontracts packaging to</td></tr>
+ <tr><td>Broadcom, Arista, Marvell</td><td>Nasdaq: AVGO, ANET · Nasdaq: MRVL</td><td>Scale-out networking between racks</td></tr>
+ <tr><td>Foxconn, Quanta, Wistron</td><td>2317.TW · 2382.TW · 3231.TW</td><td>Build the Vera Rubin racks; their shipment timing is the public signal on Rubin availability</td></tr>
+ <tr><td>Dell, HPE, Lenovo, Supermicro</td><td>NYSE: DELL, HPE · 0992.HK · Nasdaq: SMCI</td><td>System integration and AI-factory buildout</td></tr>
+ <tr><td>Vertiv, Schneider Electric</td><td>NYSE: VRT · SU.PA</td><td>Power and liquid cooling at tens of kilowatts per rack</td></tr>
+ <tr><td>DDN, VAST, WEKA</td><td>Private</td><td>Parallel file systems feeding the accelerators</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Lithography — the narrowest layer</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>ASML</td><td>Nasdaq: ASML · ASML.AS</td><td>Sole supplier of EUV scanners; roughly 50–60 standard machines a year sets the ceiling on leading-edge capacity</td></tr>
+ <tr><td>Carl Zeiss SMT</td><td>Division of Zeiss (private foundation)</td><td>The EUV optics. The most sensitive single sub-supplier in the chain</td></tr>
+ <tr><td>Trumpf</td><td>Private</td><td>High-power CO₂ lasers driving the EUV plasma source</td></tr>
+ <tr><td>Cymer</td><td>ASML subsidiary</td><td>Light sources for the scanners</td></tr>
+ <tr><td>Nikon, Canon</td><td>7731.T · 7751.T</td><td>Legacy lithography only; both exited advanced development years ago</td></tr>
+ <tr><td>SMEE</td><td>State-backed (China)</td><td>Domestic lithography effort, estimated over a decade behind</td></tr>
+ <tr><td>Cerebras, Groq</td><td>Private</td><td>Wafer-scale and SRAM-based designs that avoid HBM entirely, trading capacity for bandwidth <em>(also 3.3)</em></td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Analysts and standards bodies</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>Counterpoint Research</td><td>Private</td><td>The HBM and DRAM share data on 3.7 and 3.9</td></tr>
+ <tr><td>TrendForce</td><td>Private</td><td>CoWoS capacity and DRAM pricing series</td></tr>
+ <tr><td>IDC</td><td>Private</td><td>The memory-consumption forecast on 3.12</td></tr>
+ <tr><td>MLCommons</td><td>Non-commercial</td><td>Runs MLPerf, the standardised benchmark behind the ROCm comparison</td></tr>
+ </tbody></table>`,
+ body:`<p class="disclaim">Descriptive map of the industry structure described in this chapter. Not investment advice and not a view on any security. Listing statuses as of Aug 2026; verify tickers before external use.</p>`
+},
+{
+ apparatus:true, label:"What's next", title:"End of Chapter 3",
+ figure:null,
+ body:`<p>Twelve slides. The argument, in one line: inference is a memory problem, memory is made by three companies, packaging is dominated by one, the machines that make any of it possible come from one supplier — and those constraints sit in series, which is why the buildout is gated and why your own hardware got expensive.</p>
+ <p>This is the chapter that decays fastest. Every figure carries a date and a sourcing note for that reason. Before quoting anything here outside the firm, check it.</p>
+ <p><strong>Chapter 4 — Building reliably with an unreliable model.</strong> If the model samples from a distribution and cannot tell a right answer from a wrong one (2.5), how does anyone build something dependable on top of it? The model steers and deterministic code executes; you move the error rather than deleting it; and the clarification gap.</p>
+ <p class="warn">Chapter 4 is not built in this format yet. The button below copies a prompt that starts the work in Claude — drafted in markdown for your approval first, then built as a reader like this one.</p>
+ <div class="btnrow">
+   <button id="ch2btn">Copy prompt to start Chapter 4</button>
+   <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
+   <span id="say2" class="said"></span>
+ </div>
+ <p class="hint2">Send back only the questions tagged <code>[gap]</code> or <code>[correction]</code>. A gap two readers hit independently is a defect in the material, not in the reader.</p>`
+}
+];
+
+let i = 0;
+const seen = new Set([0]);
+const asked = [];
+
+const stage = document.getElementById('stage');
+const dotsEl = document.getElementById('dots');
+const posEl = document.getElementById('pos');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+const qEl = document.getElementById('q');
+const sayEl = document.getElementById('say');
+const logbox = document.getElementById('logbox');
+const loglist = document.getElementById('loglist');
+
+const CONTENT = CARDS.filter(function(c){ return !c.apparatus; }).length;
+
+function render(){
+  const c = CARDS[i];
+  seen.add(i);
+  stage.innerHTML =
+    '<h1 class="cardtitle">' + c.title + '</h1>' +
+    (c.apparatus ? '' :
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — slide ' + (i+1) + ' of ' + CONTENT + '</p>') +
+    (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
+    '<div class="body">' + c.body + '</div>' +
+    (c.band ? '<div class="band">' + c.band + '</div>' : '') +
+    (c.depth ? '<details class="deeper"><summary>Go deeper</summary><div class="inner">' + c.depth + '</div></details>' : '') +
+    (c.sources ? '<p class="sources">' + c.sources + '</p>' : '');
+
+  document.querySelector('.ask').style.display = c.apparatus ? 'none' : '';
+
+  const ch2 = document.getElementById('ch2btn');
+  const allb = document.getElementById('allbtn');
+  const say2 = document.getElementById('say2');
+  if (ch2) {
+    ch2.onclick = function(){
+      copyText(CH2_PROMPT, function(){
+        say2.className = 'said';
+        say2.textContent = 'Copied. Paste it into Claude.';
+      }, say2);
+    };
+  }
+  if (allb) { allb.onclick = function(){ copyAll(say2); }; }
+
+  posEl.textContent = c.apparatus ? c.label : (i+1) + ' / ' + CONTENT;
+  prevB.disabled = (i === 0);
+  nextB.disabled = (i === CARDS.length - 1);
+  qEl.value = '';
+  sayEl.textContent = '';
+  dotsEl.innerHTML = '';
+  CARDS.forEach(function(c2, n){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    if (n === i) b.setAttribute('aria-current','true');
+    let cls = c2.apparatus ? 'app' : '';
+    if (seen.has(n) && n !== i) cls += ' seen';
+    b.className = cls.trim();
+    b.innerHTML = '<i></i>';
+    b.onclick = function(){ i = n; render(); };
+    dotsEl.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+
+function go(d){
+  const n = i + d;
+  if (n < 0 || n >= CARDS.length) return;
+  i = n; render();
+}
+
+prevB.onclick = function(){ go(-1); };
+nextB.onclick = function(){ go(1); };
+
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { i = 0; render(); }
+  if (e.key === 'End')  { i = CARDS.length - 1; render(); }
+});
+
+function promptFor(card, q){
+  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
+    card.title + '".\n\nMy question: ' + q;
+}
+
+const CH2_PROMPT =
+'Understanding AI \u2014 I have finished Chapter 3 in the card reader.\n\n' +
+'Let\'s develop Chapter 4, "Building reliably with an unreliable model", the same way. ' +
+'Per the \u00A711 inventory it covers outline slides 13, 14, 15 and 16 \u2014 the LLM steers ' +
+'while deterministic code executes, how that moves the error rather than deleting it, the ' +
+'clarification gap, and how to close it.\n\n' +
+'Search for anything dated \u2014 the clarification-gap research in particular. Draft the ' +
+'cards in markdown first for my approval, one idea per card, with graphic specs and dated ' +
+'sources. Then build the HTML reader once I have signed off the wording.';
+
+function copyText(text, ok, target){
+  const el = target || sayEl;
+  function fallback(){
+    const t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); ok(); }
+    catch(e){ el.className = 'err'; el.textContent = 'Copy failed — select the text manually.'; }
+    document.body.removeChild(t);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else { fallback(); }
+}
+
+function copyAll(target){
+  const el = target || sayEl;
+  if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
+  let out = '# Understanding AI — questions from Chapter 3\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  asked.forEach(function(a){
+    out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
+  });
+  copyText(out, function(){
+    el.className = 'said';
+    el.textContent = 'Copied ' + asked.length + ' question(s) in notes-block format.';
+  }, el);
+}
+
+document.getElementById('copyq').onclick = function(){
+  const q = qEl.value.trim();
+  if (!q) { sayEl.className = 'err'; sayEl.textContent = 'Type a question first.'; qEl.focus(); return; }
+  const card = CARDS[i];
+  copyText(promptFor(card, q), function(){
+    asked.push({ card: card, q: q });
+    const li = document.createElement('li');
+    li.textContent = card.num + ' · ' + card.id + ' — ' + q;
+    loglist.appendChild(li);
+    logbox.classList.add('on');
+    sayEl.className = 'said';
+    sayEl.textContent = 'Copied. Paste it into Claude.';
+    qEl.value = '';
+  });
+};
+
+document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Chapter 4 reader</title>
+<style>
+  :root{
+    --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+    --blue:#156082; --orange:#E97132; --wash:#f2f2f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .shell{max-width:820px;margin:0 auto;padding:28px 28px 140px}
+
+  header.top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
+  header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
+  header.top .ch a.backlink:hover{text-decoration:underline}
+  header.top .ch .sep{color:var(--muted);font-weight:normal}
+  header.top .meta{color:var(--muted);font-size:13px}
+
+  h1.cardtitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.25;margin:0 0 4px}
+  .cardid{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .body p{margin:0 0 14px;max-width:70ch}
+  .body ul{margin:0 0 16px;padding-left:20px;max-width:70ch}
+  .body li{margin:0 0 7px}
+  .body strong{color:#000}
+  .figure{margin:22px 0 24px}
+  .figure svg{width:100%;height:auto;display:block}
+
+  table.grid{border-collapse:collapse;font-size:15px;margin:4px 0 18px;width:100%;max-width:560px}
+  table.grid th{text-align:left;font-weight:bold;border-bottom:1px solid var(--ink);padding:5px 12px 5px 0}
+  table.grid td{border-bottom:1px solid var(--rule);padding:5px 12px 5px 0;vertical-align:top}
+
+  .stats{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 20px}
+  .stat{flex:1 1 150px;border-top:2px solid var(--navy);padding-top:8px}
+  .stat b{display:block;color:var(--navy);font-size:26px;line-height:1.1}
+  .stat span{display:block;color:var(--muted);font-size:13px;margin-top:5px}
+
+  .band{background:var(--wash);padding:12px 16px;margin:20px 0;font-size:15px;max-width:70ch}
+
+  .twocol{display:flex;gap:22px;flex-wrap:wrap;margin:4px 0 6px}
+  .twocol .col{flex:1 1 260px;padding-top:9px}
+  .twocol .col.blue{border-top:2px solid var(--blue)}
+  .twocol .col.orange{border-top:2px solid var(--orange)}
+  .twocol h3{font-size:14px;margin:0 0 10px;font-weight:bold}
+  .twocol .blue h3{color:var(--blue)}
+  .twocol .orange h3{color:var(--orange)}
+  .twocol p{font-size:14px;margin:0 0 10px;color:#2a2a2a}
+  .twocol b{display:inline-block;min-width:96px;font-size:16px;color:var(--ink)}
+
+  table.grid.wide{max-width:100%}
+  table.grid.wide td:last-child{width:auto}
+  h4.grouplabel{font-size:14px;margin:18px 0 6px;color:var(--navy)}
+  p.disclaim{font-size:13px;font-style:italic;color:var(--muted)}
+  p.warn{background:var(--wash);padding:11px 14px;font-size:15px;max-width:70ch}
+  p.hint2{font-size:13px;color:var(--muted);margin-top:14px;max-width:70ch}
+  code{font-family:Consolas,monospace;font-size:13px;background:var(--wash);padding:1px 4px}
+  .dots button.app i{border-radius:0;width:8px;height:8px;margin:3px 2px}
+  p.nextlink{margin:20px 0 6px}
+  p.nextlink a{color:var(--blue);font-size:19px;font-weight:bold;text-decoration:none}
+  p.nextlink a:hover{text-decoration:underline}
+
+  details.deeper{border-top:1px solid var(--rule);margin-top:26px;padding-top:12px}
+  details.deeper summary{cursor:pointer;color:var(--blue);font-size:15px;list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:"▸ ";}
+  details.deeper[open] summary::before{content:"▾ ";}
+  details.deeper .inner{padding-top:12px}
+  details.deeper p{font-size:16px;color:#2a2a2a}
+
+  .sources{color:var(--muted);font-size:13px;font-style:italic;margin-top:22px;max-width:70ch}
+
+  .ask{border-top:1px solid var(--rule);margin-top:26px;padding-top:16px}
+  .ask h2{font-size:15px;color:var(--navy);margin:0 0 8px;font-weight:bold}
+  .ask p.hint{font-size:13px;color:var(--muted);margin:0 0 10px;max-width:70ch}
+  .ask textarea{width:100%;max-width:70ch;min-height:62px;font-family:inherit;font-size:15px;
+    padding:8px 10px;border:1px solid var(--rule);border-radius:3px;resize:vertical}
+  .ask textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--navy);
+    background:#fff;color:var(--navy);border-radius:3px;cursor:pointer}
+  button:hover{background:var(--navy);color:#fff}
+  button:disabled{opacity:.4;cursor:default}
+  button.ghost{border-color:var(--rule);color:var(--muted)}
+  button.ghost:hover{background:var(--wash);color:var(--ink)}
+  .said{font-size:13px;color:var(--blue)}
+  .err{font-size:13px;color:#a32d2d}
+
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--rule)}
+  nav.bar .inner{max-width:820px;margin:0 auto;padding:12px 28px;
+    display:flex;align-items:center;gap:16px}
+  .dots{display:flex;gap:7px;flex:1}
+  .dots button{padding:0;border:none;background:none;width:14px;height:14px;cursor:pointer}
+  .dots i{display:block;width:9px;height:9px;border-radius:50%;background:#fff;
+    border:1px solid var(--muted);margin:2px}
+  .dots button[aria-current="true"] i{background:var(--navy);border-color:var(--navy)}
+  .dots button.seen i{background:var(--rule);border-color:var(--rule)}
+  .pos{font-size:13px;color:var(--muted);white-space:nowrap}
+
+  .logbox{border:1px solid var(--rule);padding:14px 16px;margin-top:18px;font-size:14px;display:none}
+  .logbox.on{display:block}
+  .logbox h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .logbox ol{margin:0;padding-left:20px}
+  .logbox li{margin-bottom:6px;color:#2a2a2a}
+
+  @media (max-width:640px){
+    .shell{padding:20px 18px 150px}
+    nav.bar .inner{padding:10px 18px;gap:10px}
+    h1.cardtitle{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 4 — Building reliably with an unreliable model</div>
+    <div class="meta">v2.1 · 30 Aug 2026</div>
+  </header>
+
+  <main id="stage" tabindex="-1"></main>
+
+  <section class="ask">
+    <h2>Ask about this slide</h2>
+    <p class="hint">This reader has the slides but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the slide ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this slide?"></textarea>
+    <div class="btnrow">
+      <button id="copyq">Copy question for Claude</button>
+      <button id="copyall" class="ghost">Copy all questions from this session</button>
+      <span id="say" class="said"></span>
+    </div>
+    <div class="logbox" id="logbox">
+      <h3>Questions saved this session</h3>
+      <ol id="loglist"></ol>
+    </div>
+  </section>
+</div>
+
+<nav class="bar">
+  <div class="inner">
+    <button id="prev">← Back</button>
+    <div class="dots" id="dots"></div>
+    <span class="pos" id="pos"></span>
+    <button id="next">Next →</button>
+  </div>
+</nav>
+
+<script>
+const SVG_GAP4 = `
+<svg viewBox="0 0 680 250" role="img" aria-label="Two panels: a probability distribution with a sampled point on one side, and the single correct answer a business needs on the other, with a gap between them.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="170" y="34" font-size="14" font-weight="bold">What you have</text>
+<path d="M60 170 Q 110 168 140 120 Q 170 44 200 120 Q 230 168 280 170" fill="none" stroke="#156082" stroke-width="2"/>
+<line x1="60" y1="170" x2="280" y2="170" stroke="#1a1a1a" stroke-width="0.75"/>
+<circle cx="152" cy="170" r="5" fill="#156082"/>
+<line x1="152" y1="170" x2="152" y2="96" stroke="#156082" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="170" y="196" font-size="12" fill="#595959">a distribution, and one sample from it</text>
+<text x="170" y="214" font-size="12" fill="#595959">nothing inside distinguishes a confident</text>
+<text x="170" y="230" font-size="12" fill="#595959">right answer from a confident wrong one</text>
+<text x="510" y="34" font-size="14" font-weight="bold">What the work needs</text>
+<line x1="400" y1="120" x2="620" y2="120" stroke="#E97132" stroke-width="3"/>
+<line x1="400" y1="170" x2="620" y2="170" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="510" y="108" font-size="12" fill="#E97132">one acceptable answer</text>
+<text x="510" y="196" font-size="12" fill="#595959">reconcile the account, calculate the</text>
+<text x="510" y="214" font-size="12" fill="#595959">exposure, look up the position —</text>
+<text x="510" y="230" font-size="12" fill="#595959">approximately right is worthless</text>
+<text x="340" y="126" font-size="22" fill="#595959">⇥</text>
+<text x="340" y="152" font-size="12" fill="#595959">the gap</text>
+</g></svg>`;
+
+const SVG_STEER = `
+<svg viewBox="0 0 680 230" role="img" aria-label="A flow in which the language model interprets the request and chooses an action, deterministic code executes it, and the model phrases the result.">
+<defs><marker id="p1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="340" y="26" font-size="13" fill="#595959">Blue — interpretative: the model. Orange — deterministic: ordinary code.</text>
+<rect x="20" y="60" width="104" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="72" y="82" font-size="12">Request, in</text>
+<text x="72" y="98" font-size="12">plain language</text>
+<line x1="126" y1="86" x2="142" y2="86" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p1)"/>
+<rect x="146" y="52" width="140" height="68" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="216" y="76" font-size="13" font-weight="bold" fill="#156082">LLM</text>
+<text x="216" y="94" font-size="12" fill="#156082">understand intent,</text>
+<text x="216" y="110" font-size="12" fill="#156082">choose the action</text>
+<line x1="288" y1="86" x2="304" y2="86" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p1)"/>
+<rect x="308" y="60" width="120" height="52" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="368" y="82" font-size="12">structured call</text>
+<text x="368" y="98" font-size="12">function · JSON · SQL</text>
+<line x1="430" y1="86" x2="446" y2="86" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p1)"/>
+<rect x="450" y="52" width="140" height="68" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="520" y="76" font-size="13" font-weight="bold" fill="#E97132">Deterministic</text>
+<text x="520" y="94" font-size="13" font-weight="bold" fill="#E97132">system</text>
+<text x="520" y="110" font-size="12" fill="#E97132">executes it exactly</text>
+<path d="M590 86 L624 86 L624 160 L216 160 L216 126" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p1)"/>
+<text x="430" y="152" font-size="12" fill="#595959">result returns to the model to be phrased</text>
+<text x="340" y="200" font-size="13" fill="#595959">Never make the model be the calculator, the database or the rules engine.</text>
+<text x="340" y="218" font-size="13" fill="#595959">Make it decide which to call, and with what inputs.</text>
+</g></svg>`;
+
+const SVG_SQL = `
+<svg viewBox="0 0 680 250" role="img" aria-label="A text-to-SQL example in which the model writes plausible but possibly wrong SQL and the database executes it exactly, returning a precise wrong number.">
+<defs><marker id="q1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="24" y="52" width="150" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="99" y="76" font-size="12">"How many active</text>
+<text x="99" y="93" font-size="12">customers in Q2?"</text>
+<line x1="176" y1="80" x2="192" y2="80" stroke="#1a1a1a" stroke-width="1" marker-end="url(#q1)"/>
+<rect x="196" y="46" width="150" height="68" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="271" y="70" font-size="13" font-weight="bold" fill="#156082">LLM writes SQL</text>
+<text x="271" y="88" font-size="12" fill="#156082">interpretative — it picks</text>
+<text x="271" y="104" font-size="12" fill="#156082">one meaning of "active"</text>
+<line x1="348" y1="80" x2="364" y2="80" stroke="#1a1a1a" stroke-width="1" marker-end="url(#q1)"/>
+<rect x="368" y="46" width="150" height="68" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="443" y="70" font-size="13" font-weight="bold" fill="#E97132">Database runs it</text>
+<text x="443" y="88" font-size="12" fill="#E97132">deterministic — exactly</text>
+<text x="443" y="104" font-size="12" fill="#E97132">what it was asked</text>
+<line x1="520" y1="80" x2="536" y2="80" stroke="#1a1a1a" stroke-width="1" marker-end="url(#q1)"/>
+<rect x="540" y="52" width="116" height="56" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="598" y="76" font-size="16" font-weight="bold">1,247</text>
+<text x="598" y="96" font-size="12" fill="#595959">precise. confident.</text>
+<text x="340" y="150" font-size="13" fill="#595959">"Active" could mean logged in within 30 days, or holding a live subscription,</text>
+<text x="340" y="168" font-size="13" fill="#595959">or simply not marked closed. All three produce valid SQL. One matches what you meant.</text>
+<rect x="150" y="190" width="380" height="38" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="214" font-size="14" font-weight="bold">deterministic execution ≠ correct decision</text>
+</g></svg>`;
+
+const SVG_BUYS = `
+<svg viewBox="0 0 680 240" role="img" aria-label="The fuzzy region of the system shrinking from covering everything to covering only intent comprehension and action choice.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="170" y="32" font-size="14" font-weight="bold">Model does everything</text>
+<rect x="60" y="46" width="220" height="120" fill="#f2f2f2" stroke="#156082" stroke-width="2"/>
+<text x="170" y="82" font-size="12" fill="#156082">interpret · calculate · look up</text>
+<text x="170" y="102" font-size="12" fill="#156082">sort · format · judge · decide</text>
+<text x="170" y="130" font-size="12" font-weight="bold" fill="#156082">all of it unreliable</text>
+<text x="170" y="150" font-size="12" fill="#156082">and none of it checkable</text>
+<text x="510" y="32" font-size="14" font-weight="bold">Model steers, code executes</text>
+<rect x="400" y="46" width="220" height="120" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<rect x="418" y="60" width="184" height="40" fill="#f2f2f2" stroke="#156082" stroke-width="2"/>
+<text x="510" y="76" font-size="12" fill="#156082">understand intent,</text>
+<text x="510" y="92" font-size="12" fill="#156082">choose the action</text>
+<text x="510" y="126" font-size="12" fill="#E97132">everything else: deterministic,</text>
+<text x="510" y="144" font-size="12" fill="#E97132">validated, vetoable, stoppable</text>
+<text x="340" y="106" font-size="20" fill="#595959">→</text>
+<text x="340" y="200" font-size="13" fill="#595959">The blue region shrinks. It does not vanish — and pretending otherwise is the mistake.</text>
+<text x="340" y="222" font-size="13" fill="#595959">What it buys: fewer ways to be wrong, errors you can catch, and a designed way to fail safely.</text>
+</g></svg>`;
+
+const SVG_BARS4 = `
+<svg viewBox="0 0 680 230" role="img" aria-label="Two contrasting bars: models frequently recognise ambiguity when asked to judge it, but rarely ask a clarifying question in normal use.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="40" y="44" font-size="13" font-weight="bold">Recognises the question is ambiguous — when explicitly asked to judge</text>
+<rect x="40" y="54" width="470" height="38" fill="#156082" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="524" y="79" font-size="13" fill="#595959">frequently</text>
+<text x="40" y="132" font-size="13" font-weight="bold">Actually asks a clarifying question — given the same query in normal use</text>
+<rect x="40" y="142" width="44" height="38" fill="#E97132" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="98" y="167" font-size="13" fill="#595959">rarely — it answers directly instead</text>
+<text x="40" y="208" font-size="12" fill="#595959">Bars are directional, not measured percentages — see the sourcing note. Retrieved context widens the gap further.</text>
+</g></svg>`;
+
+const SVG_WHY = `
+<svg viewBox="0 0 680 200" role="img" aria-label="A causal chain from reinforcement learning on human feedback to clarifying questions being trained out of the model.">
+<defs><marker id="w4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="20" y="52" width="146" height="60" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="93" y="76" font-size="12">Post-training rewards</text>
+<text x="93" y="93" font-size="12">what raters prefer</text>
+<line x1="168" y1="82" x2="184" y2="82" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w4)"/>
+<rect x="188" y="52" width="146" height="60" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="261" y="76" font-size="12">"It depends" rates</text>
+<text x="261" y="93" font-size="12">worse than a guess</text>
+<line x1="336" y1="82" x2="352" y2="82" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w4)"/>
+<rect x="356" y="52" width="146" height="60" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="429" y="76" font-size="12">Guessing looks</text>
+<text x="429" y="93" font-size="12">more helpful</text>
+<line x1="504" y1="82" x2="520" y2="82" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w4)"/>
+<rect x="524" y="52" width="136" height="60" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="592" y="76" font-size="12" font-weight="bold" fill="#E97132">Asking is</text>
+<text x="592" y="93" font-size="12" font-weight="bold" fill="#E97132">trained out</text>
+<text x="340" y="152" font-size="13" fill="#595959">An alignment gap, not a knowledge gap. The capability is present; the behaviour is suppressed.</text>
+<text x="340" y="176" font-size="13" fill="#595959">Which is the good news — a suppressed behaviour can be rewarded back.</text>
+</g></svg>`;
+
+const SVG_WRAPPER = `
+<svg viewBox="0 0 680 240" role="img" aria-label="A wrapper pipeline around the model: classify the request for ambiguity, ask if needed, incorporate the answer, then respond, with the model as one component the pipeline calls.">
+<defs><marker id="r4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="30" y="40" width="620" height="130" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="120" y="62" font-size="13" font-weight="bold" fill="#E97132">Your pipeline — deterministic</text>
+<rect x="52" y="82" width="126" height="56" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="115" y="106" font-size="12">1. Classify:</text>
+<text x="115" y="123" font-size="12">is it ambiguous?</text>
+<line x1="180" y1="110" x2="196" y2="110" stroke="#1a1a1a" stroke-width="1" marker-end="url(#r4)"/>
+<rect x="200" y="82" width="126" height="56" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="263" y="106" font-size="12">2. Ask, only</text>
+<text x="263" y="123" font-size="12">if it needs it</text>
+<line x1="328" y1="110" x2="344" y2="110" stroke="#1a1a1a" stroke-width="1" marker-end="url(#r4)"/>
+<rect x="348" y="82" width="126" height="56" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="411" y="106" font-size="12">3. Incorporate</text>
+<text x="411" y="123" font-size="12">the answer</text>
+<line x1="476" y1="110" x2="492" y2="110" stroke="#1a1a1a" stroke-width="1" marker-end="url(#r4)"/>
+<rect x="496" y="82" width="126" height="56" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="559" y="106" font-size="12" font-weight="bold" fill="#156082">4. LLM</text>
+<text x="559" y="123" font-size="12" fill="#156082">responds</text>
+<text x="340" y="200" font-size="13" fill="#595959">The pipeline decides whether to ask. The model does not.</text>
+<text x="340" y="222" font-size="13" fill="#595959">This is 4.2 — the model steers, code executes — applied to the model's own behaviour.</text>
+</g></svg>`;
+
+const SVG_REGRET = `
+<svg viewBox="0 0 680 250" role="img" aria-label="A U-shaped cost curve: the cost of asking unnecessarily rises on one side, the cost of guessing wrong on the other, with calibration at the minimum.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<line x1="80" y1="190" x2="620" y2="190" stroke="#1a1a1a" stroke-width="0.75"/>
+<line x1="80" y1="40" x2="80" y2="190" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="70" y="46" font-size="12" text-anchor="end" fill="#595959">cost</text>
+<path d="M110 60 Q 250 205 350 170 Q 450 205 590 60" fill="none" stroke="#156082" stroke-width="2.5"/>
+<circle cx="350" cy="170" r="6" fill="#E97132"/>
+<line x1="350" y1="170" x2="350" y2="190" stroke="#E97132" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="350" y="212" font-size="13" font-weight="bold" text-anchor="middle" fill="#E97132">calibration</text>
+<text x="150" y="94" font-size="12" text-anchor="middle" fill="#595959">asks too much —</text>
+<text x="150" y="111" font-size="12" text-anchor="middle" fill="#595959">exhausting to use</text>
+<text x="552" y="94" font-size="12" text-anchor="middle" fill="#595959">asks too little —</text>
+<text x="552" y="111" font-size="12" text-anchor="middle" fill="#595959">confidently wrong</text>
+<text x="340" y="240" font-size="13" text-anchor="middle" fill="#595959">There is no setting at which both costs are zero. RegretBench scores the distance from the minimum.</text>
+</g></svg>`;
+
+const CARDS = [
+{
+ id:"S-036", num:"4.1", title:"The problem, stated plainly",
+ figure:SVG_GAP4,
+ body:`<p>Two words carry this chapter. A system is <strong>deterministic</strong> when the same input always produces the same output — ordinary code, a database, a spreadsheet formula. A system is <strong>interpretative</strong> when it works out what the input probably means and produces its best reading of it.</p>
+ <p><strong>An LLM is interpretative. Code is deterministic.</strong> That is the whole distinction, and every design decision in this chapter follows from deciding which of the two a given job needs.</p>
+ <p>The interpretative part is not a temporary weakness. It follows from 2.5: the model produces a probability distribution and samples from it. Nothing in that machinery distinguishes a confident right answer from a confident wrong one.</p>
+ <ul>
+ <li><strong>It is not a bug to be fixed.</strong> Interpretation is what the machinery does. There is no version of this architecture that becomes deterministic.</li>
+ <li><strong>It has no stable notion of "the same question."</strong> Ask twice, get two answers. Ask with one word changed, get a different one.</li>
+ <li><strong>It cannot reliably tell you when it does not know.</strong> The internal signal that would support that does not exist in a usable form.</li>
+ </ul>
+ <p>Meanwhile the work people actually want done — reconcile this account, calculate this exposure, look up this client's position — is deterministic work. It has exactly one acceptable answer, and being approximately right is worthless.</p>`,
+ band:`The engineering question is not "how do we make the model reliable." It is "how do we build a reliable system around a component that is not."`,
+ depth:`<p>This framing is worth sitting with, because most disappointment with these systems traces to skipping it. A team that believes reliability is a model problem waits for the next model. A team that believes it is a system problem starts building — and the next model makes their system better rather than making it necessary.</p>
+ <p>Note that neither property is better than the other. Interpretation is exactly what you want for "find me the paragraph about termination rights" and exactly what you do not want for "how much do we owe them." The skill is telling the two apart, and most of what follows is doing that deliberately rather than by accident.</p>
+ <p>There is a useful parallel in how ordinary software treats unreliable components. Networks drop packets, disks fail, third-party services time out. Nobody responds by demanding a network that never drops a packet; they wrap it in retries, checksums and timeouts. What is new here is not unreliability. It is a component that fails <em>silently and fluently</em>, which defeats every instinct developed for components that fail loudly.</p>`,
+ sources:"Follows from 2.5. No external claims."
+},
+{
+ id:"S-013a", num:"4.2", title:"The principle: the model steers, code executes",
+ figure:SVG_STEER,
+ body:`<p>Let the model do only the interpretative part — working out what a messy request means — and hand every deterministic job to ordinary code.</p>
+ <ul>
+ <li><strong>Never make the model <em>be</em> the calculator, the database or the rules engine.</strong> Make it decide <em>which</em> to call, and <em>with what inputs</em>.</li>
+ <li>The model becomes a <strong>translator and orchestrator</strong>: natural language in → structured intent → deterministic execution → natural language out.</li>
+ <li>This removes whole classes of error at a stroke — arithmetic, lookup, sorting, formatting, anything expressible as code.</li>
+ </ul>`,
+ band:`A well-built AI product is mostly ordinary deterministic software that the model steers.`,
+ depth:`<p>The phrase to hold onto is <em>the model is the interface, not the engine</em>. Almost every production system that works looks like this, and almost every demo that impresses and then fails in production does not.</p>
+ <p>It also reframes what you are buying. If the model's job is to turn a request into a structured call, then the thing you need from it is intent comprehension — not knowledge, not accuracy, not recall. That is a much narrower requirement, and a smaller, cheaper model often meets it, which is a Chapter 7 argument arriving early.</p>
+ <p>The pattern has a cost worth naming. Every deterministic component has to be built. The model does not save you from writing the calculator; it saves you from writing the parser for every way someone might ask for one.</p>`,
+ sources:"Established engineering practice. No dated claims."
+},
+{
+ id:"S-013b", num:"4.3", title:"The four mechanisms",
+ figure:`<table class="grid wide"><thead><tr><th>Mechanism</th><th>What it does</th><th>What it removes</th></tr></thead><tbody>
+ <tr><td><b>Tool use / function calling</b></td><td>The model emits a structured call naming a function and its arguments; your code runs it</td><td>Arithmetic, lookup, anything a function can do</td></tr>
+ <tr><td><b>Structured output</b></td><td>Output is required to match a schema, and is validated before anything acts on it</td><td>"Did it answer in the right shape" as a hope</td></tr>
+ <tr><td><b>Retrieval (RAG)</b></td><td>Puts the relevant documents in front of the model at query time</td><td>Claims recalled from weights rather than grounded in text (2.9)</td></tr>
+ <tr><td><b>Neurosymbolic</b></td><td>The model handles language; a symbolic engine or solver handles logic</td><td>Formal reasoning done by pattern-matching</td></tr>
+ </tbody></table>`,
+ body:`<p>Ordered by how much control they hand back to deterministic code. Most real systems use several at once.</p>`,
+ depth:`<p>Two things are worth separating, because they get conflated. Tool use and structured output constrain <em>what the model emits</em>. Retrieval constrains <em>what it knows when it emits it</em>. Systems that need both, need both.</p>
+ <p>Note where retrieval sits relative to Chapter 5. RAG is on the customization ladder as the cheap rung — but it is also a reliability mechanism, because grounding an answer in a document you supplied makes the answer checkable against that document. The same technique appears in two chapters for two different reasons.</p>
+ <p>A caution about "the model calls a tool." The model does not call anything. It emits text describing a call, and your code decides whether to execute it. That gap is where every validator, permission check and business rule lives — and treating it as a formality is how systems get built that let a language model issue trades.</p>`,
+ sources:"Established practice as of Aug 2026. Tooling names churn; the four categories do not."
+},
+{
+ id:"S-014a", num:"4.4", title:"The catch: you move the error, you do not delete it",
+ figure:SVG_SQL,
+ body:`<p>The boundary itself is probabilistic, and this is the part that gets missed.</p>
+ <ul>
+ <li>The model still picks <strong>which</strong> tool and <strong>what</strong> arguments. That natural-language-to-structured-call step <em>is</em> the unreliable part. It did not go away; it moved.</li>
+ <li><strong>The deterministic backend faithfully executes the wrong call.</strong> A database given wrong SQL returns a precise, confident, wrong number — and it looks exactly like a right one.</li>
+ </ul>`,
+ band:`The output of a deterministic system is exact. That is not the same as correct.`,
+ depth:`<p>This is the most important slide in the chapter for anyone evaluating a vendor demonstration, because the failure it describes is invisible in a demo. A wrong number, formatted correctly, delivered confidently, sourced from a real database, passes every check a casual observer makes.</p>
+ <p>Notice the compounding problem in an agentic system (1.2). If a single step has a small chance of choosing wrongly, a twenty-step chain has twenty opportunities — and a wrong step early produces a plausible-looking trajectory that is wrong from that point onward. This is a large part of why agentic cancellation rates are what Gartner forecasts on 1.6. Not that the models are weak, but that error compounds along the chain while every intermediate step looks fine.</p>`,
+ sources:"Illustrative example. The \u201Cactive customers\u201D ambiguity is generic, not drawn from a specific system."
+},
+{
+ id:"S-037", num:"4.5", title:"What the pattern actually buys",
+ figure:SVG_BUYS,
+ body:`<p>If the error moves rather than disappearing, why do this at all? Three reasons, none of which is "it becomes reliable."</p>
+ <ul>
+ <li><strong>The fuzzy surface shrinks.</strong> Instead of trusting the model with arithmetic, lookup, formatting and judgment, you trust it with one thing: understand the intent, choose the action.</li>
+ <li><strong>The errors become catchable.</strong> A structured call can be validated against a schema, checked against business rules, vetoed, or verified by a second model. A paragraph of confident prose cannot be checked by anything except a person reading it carefully.</li>
+ <li><strong>Failure becomes safe.</strong> Confidence thresholds, abstention, and a human in the loop for anything consequential. The system can be designed to stop rather than to guess — which the model alone will not do.</li>
+ </ul>`,
+ band:`You cannot make the natural-language-to-action step provably reliable. You can shrink it, wrap it in checkable code, and design what happens when it is wrong.`,
+ depth:`<p>"Design for graceful failure" sounds like a platitude until you notice how rarely it is done. The default build lets the model attempt everything and surfaces whatever comes out. The engineered build decides in advance which actions require what confidence, which require a second check, and which require a person — and then <em>builds the stopping path</em>, which is real work nobody enjoys.</p>
+ <p>For anyone assessing an internal proposal, the diagnostic question is not "how accurate is the model." It is: <em>what happens when it is wrong, and how would we know?</em> A proposal with no answer to the second half is not a system. It is a demonstration.</p>
+ <p>The obvious objection at this point — why not let the model decide for itself when to hand work to code — is the next slide.</p>`,
+ sources:"Established engineering practice. No dated claims."
+},
+{
+ id:"S-038", num:"4.6", title:"Will the model just decide this for itself?",
+ figure:`<div class="twocol"><div class="col blue"><h3>Already true, and getting faster</h3>
+ <p><b>Per turn</b> current assistants decide, request by request, whether to answer directly or write and run code</p>
+ <p><b>Sub-second</b> a classifier-based routing layer adds around 100 ms against a typical 800 ms inference — the overhead is not what you notice</p>
+ <p><b>Invisible</b> the round trip already happens inside one response; the user sees an answer, not a decision</p>
+ </div><div class="col orange"><h3>What does not dissolve</h3>
+ <p><b>The choice is interpretative</b> deciding "this needs exact arithmetic" is itself a judgment made by the interpretative component</p>
+ <p><b>4.4, one level up</b> a model that decides wrongly not to compute returns a fluent guess; a model that computes the wrong thing returns an exact wrong number</p>
+ <p><b>Not a scaling fix</b> a 2026 paper calls handing deterministic control flow to a probabilistic system a category error that scaling will not resolve</p>
+ </div></div>`,
+ body:`<p>The honest answer to "will it get fast enough that I never notice?" is that it largely already has. What it will not do is remove the problem, because the routing decision sits on the interpretative side of the line.</p>`,
+ band:`Expect the hit rate on "this one needs code" to keep improving. Do not expect it to reach 100%, and do not design as though it will — for anything consequential, the system should require exactness rather than leaving the model to decide it is needed.`,
+ depth:`<p>Worth separating three questions that get asked as one.</p>
+ <p><strong>Is it fast enough?</strong> Yes, and increasingly this is a solved engineering problem rather than a research one. Routing layers classify a request and dispatch it in roughly a tenth of the time the model itself takes to answer, and the code-execution round trip happens inside a single response. The user experience is already "it just answered."</p>
+ <p><strong>Does the model make the call itself?</strong> Increasingly yes, per turn. That is exactly what tool use (4.3) is, and it is the default behaviour of current assistants rather than a feature you configure.</p>
+ <p><strong>Does that fix reliability?</strong> No, and this is the part worth holding onto. Every improvement moves the interpretative step, it does not eliminate it. Today the model interprets your question; tomorrow it interprets your question <em>and</em> interprets whether your question needs deterministic treatment. The second judgment is better than nothing — it is a real gain — but it is still a judgment, made by the same machinery, with the same failure mode: confident, fluent, and occasionally wrong in a way that looks exactly like being right.</p>
+ <p>There is a structural argument in the 2026 literature that this is not merely unfinished but mis-specified: assigning the deterministic work of looping, branching and sequencing to a probabilistic system is a category error, so the failures are architectural and will not be resolved by scaling alone. The proposed remedy is the one this chapter has been making since 4.2 — control belongs in the program; judgment belongs in the model.</p>
+ <p>The practical consequence for anyone commissioning a system. "The model will work out when to be precise" is an acceptable design for low-stakes work and an unacceptable one for a calculation somebody trades on. In the second case you do not want the model electing to be exact. You want the path that produces the number to be deterministic by construction, with no branch in which a guess is possible.</p>`,
+ sources:"Routing latency and cost figures: Digital Applied LLM model routing guide (14 Jun 2026) and NeuralTrust (Jul 2026), citing RouteLLM (UC Berkeley, ICLR 2025) \u2014 secondary, though the underlying RouteLLM result is peer-reviewed. Category-error argument: \u201CLLM-as-Code: Agentic Programming for Agent Harness\u201D, arXiv:2606.15874, 2026 \u2014 primary preprint, and an argued position rather than a measured result. Current per-turn tool-use behaviour described as of Aug 2026; this is the fastest-moving claim on the slide."
+},
+{
+ id:"S-015a", num:"4.7", title:"Vague prompts: the model guesses instead of asking",
+ figure:SVG_BARS4,
+ body:`<p>A large share of the error on 4.4 is not the model being wrong. It is the model <strong>choosing silently among valid interpretations</strong> instead of asking which one you meant.</p>
+ <ul>
+ <li>A May 2026 study, "Knowing but Not Showing," tested this across three settings: ordinary question answering, explicit ambiguity judgment, and a behavioural analysis where a judge model classified each response as an answer, a refusal, or a clarifying question.</li>
+ <li><strong>The finding is a gap between recognition and behaviour.</strong> Models frequently identify a question as ambiguous when asked to judge it — then, given the same question in normal use, overwhelmingly answer it directly anyway.</li>
+ <li><strong>Retrieved context makes it worse.</strong> Supplying documents improves accuracy <em>and</em> makes the model even less likely to ask. Having material in hand reads as "this is answerable."</li>
+ <li>The test set: 575 ambiguous questions, 425 unambiguous, and 2,460 disambiguated rewrites isolating single interpretations — roughly 4.3 readings per ambiguous question.</li>
+ </ul>`,
+ depth:`<p>The retrieval finding is the one with immediate practical consequence, because it runs against instinct. Giving the model your documents feels like reducing risk. It reduces one risk — ungrounded claims — while increasing another, because the model now has material in hand and treats the question as answerable whether or not it understood it.</p>
+ <p>Note the asymmetry against a human analyst. Hand a junior colleague an ambiguous request with a folder of documents and they will more often come back with a question, because they know the cost of doing a day's work on the wrong reading. The model bears no such cost, and nothing in its training taught it to price one.</p>`,
+ sources:"Su et al., \u201CKnowing but Not Showing: LLMs Recognize Ambiguity but Rarely Ask Clarifying Questions\u201D, arXiv:2605.25284, 24 May 2026 \u2014 primary. Dataset counts from the paper's own statistics table. The precise percentages an earlier draft of this material carried (60\u201380% recognition, 0\u20135% asking) could not be found in the primary source and have been removed; the finding is stated qualitatively instead."
+},
+{
+ id:"S-015b", num:"4.8", title:"Why they do not ask",
+ figure:SVG_WHY,
+ body:`<p>The capability is present and the behaviour is absent, which tells you where the cause is.</p>
+ <ul>
+ <li>Post-training (2.9) optimises for responses people rate highly. A complete, confident answer reliably rates better than a clarifying question, which reads as unhelpful or evasive.</li>
+ <li>So the model learned that <strong>guessing looks more helpful than asking</strong> — and on the metric it was trained against, it is.</li>
+ <li>This is an <strong>alignment and behaviour gap, not a knowledge gap</strong>. Which is good news: a capability that is absent must be built, but a behaviour that is suppressed can be rewarded back.</li>
+ <li>One 2026 finding is discouraging in a specific way: reasoning modes, which improve performance on fully specified tasks, <strong>barely improve clarification</strong>.</li>
+ </ul>`,
+ depth:`<p>The reasoning-mode result is worth dwelling on. The intuitive fix — let the model think longer before answering — helps where the difficulty is in the reasoning. It does not help here, because the model is not failing to work out that the query is ambiguous. It already knows. It is failing to act on knowing, and more thinking does not change what the thinking is for.</p>
+ <p>There is a mild irony worth flagging. The guidance most often given for using these systems is "write better prompts." That is sound advice, and it is also the user absorbing a cost created by a training decision. The clarification gap is a defect in the tool that has been quietly converted into a skill requirement for the person holding it.</p>`,
+ sources:"The RLHF causal account is the standard explanation and well supported in principle, but no lab publishes enough detail to attribute it to a specific training choice \u2014 treat as sound reasoning rather than a documented finding. Reasoning-mode result: \u201CClarifyCodeBench: Evaluating LLMs on Clarifying Ambiguous Requirements for Code Generation\u201D, arXiv:2607.00711, Jul 2026 \u2014 primary preprint; uses an LLM judge and evaluates model behaviour rather than a production agent."
+},
+{
+ id:"S-016a", num:"4.9", title:"Closing the gap: training the behaviour back",
+ figure:`<table class="grid wide"><thead><tr><th>Approach</th><th>What it optimises</th><th>Where it falls short</th></tr></thead><tbody>
+ <tr><td><b>Supervised fine-tuning on clarification dialogues</b></td><td>Shows the model examples of asking well</td><td>Limited by the coverage and quality of the examples</td></tr>
+ <tr><td><b>Reinforcement and self-play</b></td><td>Which clarifications actually improve the final answer</td><td>Expensive; needs a reliable measure of "improved"</td></tr>
+ <tr><td><b>Double-turn preference</b></td><td>Rewards a question only when the answer after it is correct</td><td>The formulation that matters — prices the question by its consequence</td></tr>
+ <tr><td><b>Uncertainty as the trigger</b></td><td>Ask when the model is unsure</td><td>Confidence is least reliable exactly when the query is ambiguous</td></tr>
+ </tbody></table>`,
+ body:`<p>Every one of these has to penalise over-asking as well as under-asking. A model that asks about everything has not solved the problem; it has moved to the other end of 4.11's curve.</p>`,
+ depth:`<p>The uncertainty caveat is a genuine circularity, and not a minor one. The natural design is "ask when unsure." But the model's sense of its own uncertainty degrades most on ambiguous input, because it is confident about <em>an</em> interpretation — it simply picked one. It is not uncertain. It is certain about the wrong question.</p>
+ <p>That is why the formulations that work are outcome-based. They do not ask the model to introspect on its confidence; they check whether asking improved the result, which is observable from outside.</p>`,
+ sources:"Method categories are established in the literature \u2014 CLAMBER (ACL 2024), Learning to Clarify / action-based contrastive self-training (ICLR 2025), Zhang and Choi, \u201CModeling Future Conversation Turns to Teach LLMs to Ask Clarifying Questions\u201D (ICLR 2025), QuestBench and AbstentionBench (NeurIPS 2025). Specific figures an earlier draft carried \u2014 a 5,653-query dataset and a ~72% human-preference result \u2014 were not verified in this pass and have been removed pending a source check."
+},
+{
+ id:"S-016b", num:"4.10", title:"Closing the gap: what works today",
+ figure:SVG_WRAPPER,
+ body:`<p>Training is the durable fix. System design is the one available now — and it is the same pattern as the rest of the chapter.</p>
+ <ul>
+ <li><strong>Wrapper pipelines</strong> — classify the request for ambiguity, ask if needed, incorporate the answer, then respond. The classification step is a separate call whose only job is that judgment.</li>
+ <li><strong>A small model to disambiguate first</strong> — cheap, fast, and without the big model's trained-in reluctance to ask.</li>
+ <li><strong>Product patterns</strong> — slot filling, "did you mean…", explicit confirmation before any consequential action. Old interface design, and it works.</li>
+ <li><strong>State the assumption.</strong> The complement to asking: have the system say <em>"interpreting 'active' as logged in within 30 days…"</em> so a wrong reading is visible and cheap to correct rather than silent and expensive.</li>
+ </ul>`,
+ band:`Note what this is: the model steers, deterministic code executes (4.2), applied to the model's own conversational behaviour. The pipeline decides whether to ask. The model does not.`,
+ depth:`<p>Stating the assumption is the highest-value, lowest-effort item in this chapter, and it is systematically underused. It costs one sentence. It converts a silent wrong guess — the failure mode of 4.4 — into a visible one that the reader corrects in seconds. And unlike asking, it does not interrupt anyone: a reader who agrees with the assumption reads straight past it.</p>
+ <p>It is also the one pattern you can adopt personally today, with no system change, by asking for it. "State your interpretation before answering" is a prompt instruction that works with every current model.</p>`,
+ sources:"Established product and system-design practice as of Aug 2026. The CLAM wrapper formulation is the canonical published version of the classify-ask-incorporate pipeline."
+},
+{
+ id:"S-016c", num:"4.11", title:"It is a trade-off, not a bug",
+ figure:SVG_REGRET,
+ body:`<ul>
+ <li>Ask too much and the assistant is exhausting. Ask too little and it is wrong. <strong>There is no setting at which both costs are zero.</strong></li>
+ <li>The 2026 benchmark work reframed the problem accordingly. <strong>RegretBench</strong> evaluates clarification as a <em>policy</em> — whether to ask, what to ask, when to stop, when to answer — and scores it by <strong>regret</strong>: how much value the model loses against a reference clarification policy.</li>
+ <li>Its central finding is that <strong>final success alone is insufficient</strong>. Models with similar accuracy differ substantially in efficiency, in robustness to how the user behaves, and in when they stop asking.</li>
+ <li>So the trajectory is not "models will learn to read intent perfectly." It is <strong>better-calibrated asking</strong> — and calibration is measurable, which is what makes it improvable.</li>
+ </ul>`,
+ band:`The realistic target is a system that asks when it pays to ask, says what it assumed when it does not, and never quietly guesses on anything that matters.`,
+ depth:`<p>Regret is the right frame for this audience, because it is already the frame used for any decision under uncertainty: not "was the outcome good" but "how much worse was this than the best available policy." It also explains why two assistants scoring the same on accuracy can feel completely different to use — one gets there in one turn, the other in five.</p>
+ <p>Carry one thing from this chapter into the rest of the course. The failure mode described here — confident, fluent, precisely wrong, and invisible unless someone checks — is not confined to products someone else builds. It applies to this material, and to using an AI assistant to study it. The course's own argument is that these systems relocate error rather than removing it. You are the check.</p>`,
+ sources:"\u201COne More Turn, Less Regret: A Regret-Based Multi-Turn Benchmark for LLMs' Clarification Policies\u201D, arXiv:2607.21143, 24 Jul 2026 \u2014 primary. The benchmark is named RegretBench; experiments cover open-domain QA and product recommendation."
+},
+{
+ apparatus:true, label:"Glossary", title:"Chapter 4 — Glossary and organisations",
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Slide</th></tr></thead><tbody>
+ <tr><td>deterministic</td><td>Same input, same output, every time. Ordinary code, databases, formulas</td><td>4.1</td></tr>
+ <tr><td>interpretative</td><td>Works out what the input probably means and produces its best reading. An LLM</td><td>4.1</td></tr>
+ <tr><td>probabilistic</td><td>Samples from a distribution; the same input can give different output</td><td>4.1</td></tr>
+ <tr><td>routing</td><td>A layer deciding per request which model or tool should handle it</td><td>4.6</td></tr>
+ <tr><td>tool use / function calling</td><td>The model emits a structured call; your code decides whether to run it</td><td>4.3</td></tr>
+ <tr><td>structured output</td><td>Output required to match a schema and validated before anything acts on it</td><td>4.3</td></tr>
+ <tr><td>RAG</td><td>Retrieval-augmented generation: supply documents at query time to ground the answer</td><td>4.3</td></tr>
+ <tr><td>neurosymbolic</td><td>Model handles language; a symbolic engine or solver handles the logic</td><td>4.3</td></tr>
+ <tr><td>text-to-SQL</td><td>Turning a plain-language question into a database query. The canonical worked example</td><td>4.4</td></tr>
+ <tr><td>agentic chain</td><td>A sequence of model-chosen steps, where an early wrong choice corrupts everything after</td><td>4.4</td></tr>
+ <tr><td>abstention</td><td>The system declining to answer rather than guessing</td><td>4.5</td></tr>
+ <tr><td>human in the loop</td><td>A person required to approve before a consequential action executes</td><td>4.5</td></tr>
+ <tr><td>clarifying question</td><td>Asking which interpretation was meant instead of picking one silently</td><td>4.7</td></tr>
+ <tr><td>ambiguity recognition</td><td>Identifying that a query has several valid readings — which models do well</td><td>4.7</td></tr>
+ <tr><td>slot filling</td><td>Product pattern that collects required fields before acting</td><td>4.10</td></tr>
+ <tr><td>regret</td><td>How much value a policy loses against the best available one</td><td>4.11</td></tr>
+ <tr><td>calibration</td><td>Asking when it pays to ask — the realistic target, and a measurable one</td><td>4.11</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Carried forward from earlier chapters</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>sampling and the distribution</td><td>The model scores every token and samples one. The root of this whole chapter</td><td>2.5</td></tr>
+ <tr><td>hallucination</td><td>Confident wrong output, produced by the identical mechanism as confident right output</td><td>2.5</td></tr>
+ <tr><td>post-training / RLHF</td><td>Optimises for what raters prefer — which is where the asking behaviour went</td><td>2.9</td></tr>
+ <tr><td>agentic AI</td><td>Models that act: multi-step workflows operating tools</td><td>1.2</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Organisations and sources in this chapter</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>Academic author groups</td><td>Non-commercial</td><td>Knowing but Not Showing (arXiv:2605.25284), ClarifyCodeBench (arXiv:2607.00711), RegretBench (arXiv:2607.21143)</td></tr>
+ <tr><td>ACL, ICLR, NeurIPS</td><td>Non-commercial</td><td>Venues for the clarification literature — CLAMBER, QuestBench, AbstentionBench, Learning to Clarify</td></tr>
+ <tr><td>Gartner</td><td>NYSE: IT</td><td>The agentic cancellation forecast referenced on 4.4 <em>(also 1.6)</em></td></tr>
+ </tbody></table>
+ <p class="disclaim">Combined page, permitted under §12 where a chapter names fewer than about six organisations. Not investment advice and not a view on any security.</p>`,
+ body:`<p>Terms this chapter owns, in order of first appearance. This chapter is unusually light on companies — the material is academic rather than industrial.</p>`
+},
+{
+ apparatus:true, label:"What's next", title:"End of Chapter 4",
+ figure:null,
+ body:`<p>Eleven slides. The argument, in one line: an LLM is interpretative and code is deterministic, so you shrink what the interpretative part is trusted with, hand every exact job to code you can check, and design what happens when the interpretation is wrong — because the error moves rather than disappearing.</p>
+ <p>The clarification gap is the same story from the user's side. The model knows your request was ambiguous and answers anyway, because asking was trained out of it. Until that changes, ask it to state its assumptions.</p>
+ <p><strong>Chapter 5 — Customizing a model.</strong> How you make a general model do your specific job: the ladder from prompting to retrieval to tool use to fine-tuning, what fine-tuning actually is and the methods available, a worked example end to end, and when not to bother.</p>
+ <p class="warn">Chapter 5 is not built in this format yet. The button below copies a prompt that starts the work in Claude — drafted in markdown for your approval first, then built as a reader like this one.</p>
+ <div class="btnrow">
+   <button id="ch2btn">Copy prompt to start Chapter 5</button>
+   <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
+   <span id="say2" class="said"></span>
+ </div>
+ <p class="hint2">Send back only the questions tagged <code>[gap]</code> or <code>[correction]</code>. A gap two readers hit independently is a defect in the material, not in the reader.</p>`
+}
+];
+
+let i = 0;
+const seen = new Set([0]);
+const asked = [];
+
+const stage = document.getElementById('stage');
+const dotsEl = document.getElementById('dots');
+const posEl = document.getElementById('pos');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+const qEl = document.getElementById('q');
+const sayEl = document.getElementById('say');
+const logbox = document.getElementById('logbox');
+const loglist = document.getElementById('loglist');
+
+const CONTENT = CARDS.filter(function(c){ return !c.apparatus; }).length;
+
+function render(){
+  const c = CARDS[i];
+  seen.add(i);
+  stage.innerHTML =
+    '<h1 class="cardtitle">' + c.title + '</h1>' +
+    (c.apparatus ? '' :
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — slide ' + (i+1) + ' of ' + CONTENT + '</p>') +
+    (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
+    '<div class="body">' + c.body + '</div>' +
+    (c.band ? '<div class="band">' + c.band + '</div>' : '') +
+    (c.depth ? '<details class="deeper"><summary>Go deeper</summary><div class="inner">' + c.depth + '</div></details>' : '') +
+    (c.sources ? '<p class="sources">' + c.sources + '</p>' : '');
+
+  document.querySelector('.ask').style.display = c.apparatus ? 'none' : '';
+
+  const ch2 = document.getElementById('ch2btn');
+  const allb = document.getElementById('allbtn');
+  const say2 = document.getElementById('say2');
+  if (ch2) {
+    ch2.onclick = function(){
+      copyText(CH2_PROMPT, function(){
+        say2.className = 'said';
+        say2.textContent = 'Copied. Paste it into Claude.';
+      }, say2);
+    };
+  }
+  if (allb) { allb.onclick = function(){ copyAll(say2); }; }
+
+  posEl.textContent = c.apparatus ? c.label : (i+1) + ' / ' + CONTENT;
+  prevB.disabled = (i === 0);
+  nextB.disabled = (i === CARDS.length - 1);
+  qEl.value = '';
+  sayEl.textContent = '';
+  dotsEl.innerHTML = '';
+  CARDS.forEach(function(c2, n){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    if (n === i) b.setAttribute('aria-current','true');
+    let cls = c2.apparatus ? 'app' : '';
+    if (seen.has(n) && n !== i) cls += ' seen';
+    b.className = cls.trim();
+    b.innerHTML = '<i></i>';
+    b.onclick = function(){ i = n; render(); };
+    dotsEl.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+
+function go(d){
+  const n = i + d;
+  if (n < 0 || n >= CARDS.length) return;
+  i = n; render();
+}
+
+prevB.onclick = function(){ go(-1); };
+nextB.onclick = function(){ go(1); };
+
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { i = 0; render(); }
+  if (e.key === 'End')  { i = CARDS.length - 1; render(); }
+});
+
+function promptFor(card, q){
+  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
+    card.title + '".\n\nMy question: ' + q;
+}
+
+const CH2_PROMPT =
+'Understanding AI \u2014 I have finished Chapter 4 in the card reader.\n\n' +
+'Let\'s develop Chapter 5, "Customizing a model", the same way. Per the \u00A711 inventory it ' +
+'covers outline slides 17, 18, 19 and 20 \u2014 the customization ladder from prompting to RAG ' +
+'to tool use to fine-tuning, what fine-tuning is and the methods, a worked example end to ' +
+'end, and the pitfalls and when not to.\n\n' +
+'Search to check the method and tooling names, which churn. Draft the slides in markdown ' +
+'first for my approval, one idea per slide, with graphic specs and dated sources. Then build ' +
+'the HTML reader once I have signed off the wording.';
+
+function copyText(text, ok, target){
+  const el = target || sayEl;
+  function fallback(){
+    const t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); ok(); }
+    catch(e){ el.className = 'err'; el.textContent = 'Copy failed — select the text manually.'; }
+    document.body.removeChild(t);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else { fallback(); }
+}
+
+function copyAll(target){
+  const el = target || sayEl;
+  if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
+  let out = '# Understanding AI — questions from Chapter 4\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  asked.forEach(function(a){
+    out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
+  });
+  copyText(out, function(){
+    el.className = 'said';
+    el.textContent = 'Copied ' + asked.length + ' question(s) in notes-block format.';
+  }, el);
+}
+
+document.getElementById('copyq').onclick = function(){
+  const q = qEl.value.trim();
+  if (!q) { sayEl.className = 'err'; sayEl.textContent = 'Type a question first.'; qEl.focus(); return; }
+  const card = CARDS[i];
+  copyText(promptFor(card, q), function(){
+    asked.push({ card: card, q: q });
+    const li = document.createElement('li');
+    li.textContent = card.num + ' · ' + card.id + ' — ' + q;
+    loglist.appendChild(li);
+    logbox.classList.add('on');
+    sayEl.className = 'said';
+    sayEl.textContent = 'Copied. Paste it into Claude.';
+    qEl.value = '';
+  });
+};
+
+document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+render();
+</script>
+</body>
+</html>

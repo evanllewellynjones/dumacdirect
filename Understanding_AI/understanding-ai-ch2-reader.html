@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Chapter 2 reader</title>
+<style>
+  :root{
+    --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+    --blue:#156082; --orange:#E97132; --wash:#f2f2f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .shell{max-width:820px;margin:0 auto;padding:28px 28px 140px}
+
+  header.top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
+  header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
+  header.top .ch a.backlink:hover{text-decoration:underline}
+  header.top .ch .sep{color:var(--muted);font-weight:normal}
+  header.top .meta{color:var(--muted);font-size:13px}
+
+  h1.cardtitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.25;margin:0 0 4px}
+  .cardid{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .body p{margin:0 0 14px;max-width:70ch}
+  .body ul{margin:0 0 16px;padding-left:20px;max-width:70ch}
+  .body li{margin:0 0 7px}
+  .body strong{color:#000}
+  .figure{margin:22px 0 24px}
+  .figure svg{width:100%;height:auto;display:block}
+
+  table.grid{border-collapse:collapse;font-size:15px;margin:4px 0 18px;width:100%;max-width:560px}
+  table.grid th{text-align:left;font-weight:bold;border-bottom:1px solid var(--ink);padding:5px 12px 5px 0}
+  table.grid td{border-bottom:1px solid var(--rule);padding:5px 12px 5px 0;vertical-align:top}
+
+  .stats{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 20px}
+  .stat{flex:1 1 150px;border-top:2px solid var(--navy);padding-top:8px}
+  .stat b{display:block;color:var(--navy);font-size:26px;line-height:1.1}
+  .stat span{display:block;color:var(--muted);font-size:13px;margin-top:5px}
+
+  .band{background:var(--wash);padding:12px 16px;margin:20px 0;font-size:15px;max-width:70ch}
+
+  .twocol{display:flex;gap:22px;flex-wrap:wrap;margin:4px 0 6px}
+  .twocol .col{flex:1 1 260px;padding-top:9px}
+  .twocol .col.blue{border-top:2px solid var(--blue)}
+  .twocol .col.orange{border-top:2px solid var(--orange)}
+  .twocol h3{font-size:14px;margin:0 0 10px;font-weight:bold}
+  .twocol .blue h3{color:var(--blue)}
+  .twocol .orange h3{color:var(--orange)}
+  .twocol p{font-size:14px;margin:0 0 10px;color:#2a2a2a}
+  .twocol b{display:inline-block;min-width:96px;font-size:16px;color:var(--ink)}
+
+  table.grid.wide{max-width:100%}
+  table.grid.wide td:last-child{width:auto}
+  h4.grouplabel{font-size:14px;margin:18px 0 6px;color:var(--navy)}
+  p.disclaim{font-size:13px;font-style:italic;color:var(--muted)}
+  p.warn{background:var(--wash);padding:11px 14px;font-size:15px;max-width:70ch}
+  p.hint2{font-size:13px;color:var(--muted);margin-top:14px;max-width:70ch}
+  code{font-family:Consolas,monospace;font-size:13px;background:var(--wash);padding:1px 4px}
+  .dots button.app i{border-radius:0;width:8px;height:8px;margin:3px 2px}
+  p.nextlink{margin:20px 0 6px}
+  p.nextlink a{color:var(--blue);font-size:19px;font-weight:bold;text-decoration:none}
+  p.nextlink a:hover{text-decoration:underline}
+
+  details.deeper{border-top:1px solid var(--rule);margin-top:26px;padding-top:12px}
+  details.deeper summary{cursor:pointer;color:var(--blue);font-size:15px;list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:"▸ ";}
+  details.deeper[open] summary::before{content:"▾ ";}
+  details.deeper .inner{padding-top:12px}
+  details.deeper p{font-size:16px;color:#2a2a2a}
+
+  .sources{color:var(--muted);font-size:13px;font-style:italic;margin-top:22px;max-width:70ch}
+
+  .ask{border-top:1px solid var(--rule);margin-top:26px;padding-top:16px}
+  .ask h2{font-size:15px;color:var(--navy);margin:0 0 8px;font-weight:bold}
+  .ask p.hint{font-size:13px;color:var(--muted);margin:0 0 10px;max-width:70ch}
+  .ask textarea{width:100%;max-width:70ch;min-height:62px;font-family:inherit;font-size:15px;
+    padding:8px 10px;border:1px solid var(--rule);border-radius:3px;resize:vertical}
+  .ask textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--navy);
+    background:#fff;color:var(--navy);border-radius:3px;cursor:pointer}
+  button:hover{background:var(--navy);color:#fff}
+  button:disabled{opacity:.4;cursor:default}
+  button.ghost{border-color:var(--rule);color:var(--muted)}
+  button.ghost:hover{background:var(--wash);color:var(--ink)}
+  .said{font-size:13px;color:var(--blue)}
+  .err{font-size:13px;color:#a32d2d}
+
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--rule)}
+  nav.bar .inner{max-width:820px;margin:0 auto;padding:12px 28px;
+    display:flex;align-items:center;gap:16px}
+  .dots{display:flex;gap:7px;flex:1}
+  .dots button{padding:0;border:none;background:none;width:14px;height:14px;cursor:pointer}
+  .dots i{display:block;width:9px;height:9px;border-radius:50%;background:#fff;
+    border:1px solid var(--muted);margin:2px}
+  .dots button[aria-current="true"] i{background:var(--navy);border-color:var(--navy)}
+  .dots button.seen i{background:var(--rule);border-color:var(--rule)}
+  .pos{font-size:13px;color:var(--muted);white-space:nowrap}
+
+  .logbox{border:1px solid var(--rule);padding:14px 16px;margin-top:18px;font-size:14px;display:none}
+  .logbox.on{display:block}
+  .logbox h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .logbox ol{margin:0;padding-left:20px}
+  .logbox li{margin-bottom:6px;color:#2a2a2a}
+
+  @media (max-width:640px){
+    .shell{padding:20px 18px 150px}
+    nav.bar .inner{padding:10px 18px;gap:10px}
+    h1.cardtitle{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 2 — Inside the model: how it actually works</div>
+    <div class="meta">v2.1 · 30 Aug 2026</div>
+  </header>
+
+  <main id="stage" tabindex="-1"></main>
+
+  <section class="ask">
+    <h2>Ask about this card</h2>
+    <p class="hint">This reader has the cards but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the card ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this card?"></textarea>
+    <div class="btnrow">
+      <button id="copyq">Copy question for Claude</button>
+      <button id="copyall" class="ghost">Copy all questions from this session</button>
+      <span id="say" class="said"></span>
+    </div>
+    <div class="logbox" id="logbox">
+      <h3>Questions saved this session</h3>
+      <ol id="loglist"></ol>
+    </div>
+  </section>
+</div>
+
+<nav class="bar">
+  <div class="inner">
+    <button id="prev">← Back</button>
+    <div class="dots" id="dots"></div>
+    <span class="pos" id="pos"></span>
+    <button id="next">Next →</button>
+  </div>
+</nav>
+
+<script>
+const NB = '#1a1a1a', NG = '#595959', NBL = '#156082', NOR = '#E97132';
+
+function netSVG(){
+  const cols = [[110,[60,110,160]],[270,[40,90,140,190]],[430,[40,90,140,190]],[590,[85,135]]];
+  let s = '';
+  for (let c = 0; c < cols.length - 1; c++){
+    cols[c][1].forEach(function(y1){
+      cols[c+1][1].forEach(function(y2){
+        s += '<line x1="' + (cols[c][0]+13) + '" y1="' + y1 + '" x2="' + (cols[c+1][0]-13) +
+             '" y2="' + y2 + '" stroke="#d9d9d9" stroke-width="0.75"/>';
+      });
+    });
+  }
+  cols.forEach(function(col){
+    col[1].forEach(function(y){
+      s += '<circle cx="' + col[0] + '" cy="' + y + '" r="13" fill="#fff" stroke="' + NB + '" stroke-width="1"/>';
+    });
+  });
+  return '<svg viewBox="0 0 680 270" role="img" aria-label="A neural network: an input layer of three neurons, two hidden layers of four, and an output layer of two, fully connected.">' +
+    '<g font-family="Calibri, sans-serif" text-anchor="middle">' + s +
+    '<text x="110" y="230" font-size="13" fill="' + NG + '">Input</text>' +
+    '<text x="350" y="230" font-size="13" fill="' + NG + '">Hidden layers</text>' +
+    '<text x="590" y="230" font-size="13" fill="' + NG + '">Output</text>' +
+    '<text x="350" y="22" font-size="13" font-style="italic" fill="' + NG + '">Forward pass: data flows in \u2192</text>' +
+    '<text x="340" y="258" font-size="13" fill="' + NG + '">Every line carries its own weight. Nothing here was specified by a person.</text>' +
+    '</g></svg>';
+}
+
+const SVG_NEURON = `
+<svg viewBox="0 0 680 240" role="img" aria-label="Inside a single neuron: three weighted inputs and a bias feed a sum, which passes through an activation function to one output.">
+<defs><marker id="n1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="62" y="55" font-size="13" text-anchor="end">input 1</text>
+<text x="62" y="115" font-size="13" text-anchor="end">input 2</text>
+<text x="62" y="175" font-size="13" text-anchor="end">input 3</text>
+<path d="M72 50 L246 105" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#n1)"/>
+<path d="M72 110 L246 113" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#n1)"/>
+<path d="M72 170 L246 121" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#n1)"/>
+<text x="150" y="66" font-size="13" font-style="italic" fill="#595959">× weight 1</text>
+<text x="150" y="103" font-size="13" font-style="italic" fill="#595959">× weight 2</text>
+<text x="150" y="163" font-size="13" font-style="italic" fill="#595959">× weight 3</text>
+<circle cx="286" cy="115" r="36" fill="#fff" stroke="#1a1a1a" stroke-width="1"/>
+<text x="286" y="112" font-size="14" font-weight="bold" text-anchor="middle">sum</text>
+<text x="286" y="128" font-size="12" text-anchor="middle" fill="#595959">add them up</text>
+<path d="M286 205 L286 158" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#n1)"/>
+<text x="286" y="223" font-size="13" font-style="italic" text-anchor="middle" fill="#595959">+ bias</text>
+<path d="M324 115 L392 115" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#n1)"/>
+<circle cx="440" cy="115" r="44" fill="#fff" stroke="#1a1a1a" stroke-width="1"/>
+<text x="440" y="110" font-size="14" font-weight="bold" text-anchor="middle">activation</text>
+<text x="440" y="127" font-size="12" text-anchor="middle" fill="#595959">how strongly</text>
+<text x="440" y="141" font-size="12" text-anchor="middle" fill="#595959">to fire</text>
+<path d="M486 115 L586 115" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#n1)"/>
+<text x="620" y="120" font-size="13" text-anchor="middle">output</text>
+<text x="340" y="30" font-size="13" text-anchor="middle" fill="#595959">Two steps, always in this order — add up, then decide how strongly to fire.</text>
+</g></svg>`;
+
+const SVG_TRAINLOOP = `
+<svg viewBox="0 0 680 200" role="img" aria-label="The training loop: predict, compare to the correct answer, backpropagate, update every weight, and repeat.">
+<defs><marker id="t1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="38" y="34" width="134" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="105" y="58" font-size="14" font-weight="bold">1. Predict</text>
+<text x="105" y="76" font-size="12" fill="#595959">run it forward</text>
+<line x1="174" y1="62" x2="190" y2="62" stroke="#1a1a1a" stroke-width="1" marker-end="url(#t1)"/>
+<rect x="194" y="34" width="134" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="261" y="58" font-size="14" font-weight="bold">2. Compare</text>
+<text x="261" y="76" font-size="12" fill="#595959">how wrong? the loss</text>
+<line x1="330" y1="62" x2="346" y2="62" stroke="#1a1a1a" stroke-width="1" marker-end="url(#t1)"/>
+<rect x="350" y="34" width="134" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="417" y="58" font-size="14" font-weight="bold">3. Backpropagate</text>
+<text x="417" y="76" font-size="12" fill="#595959">assign blame</text>
+<line x1="486" y1="62" x2="502" y2="62" stroke="#1a1a1a" stroke-width="1" marker-end="url(#t1)"/>
+<rect x="506" y="34" width="134" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="573" y="58" font-size="14" font-weight="bold">4. Update</text>
+<text x="573" y="76" font-size="12" fill="#595959">nudge every weight</text>
+<path d="M573 92 L573 132 L105 132 L105 94" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#t1)"/>
+<text x="340" y="150" font-size="13" font-style="italic" fill="#595959">repeat, over billions of examples</text>
+<text x="340" y="180" font-size="13" fill="#595959">Weights are read and written here. This is the only place they change.</text>
+</g></svg>`;
+
+const SVG_TOKENS = `
+<svg viewBox="0 0 680 180" role="img" aria-label="Three steps turning text into numbers: tokenize, assign IDs, embed.">
+<defs><marker id="k1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="340" y="26" font-size="13" fill="#595959">The model does arithmetic. It does not read.</text>
+<rect x="60" y="44" width="150" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="135" y="66" font-size="14" font-weight="bold">Tokenize</text>
+<text x="135" y="85" font-size="12" fill="#595959">split into chunks</text>
+<text x="135" y="122" font-size="13" font-family="Consolas, monospace">"cats sleep"</text>
+<text x="135" y="140" font-size="13" font-family="Consolas, monospace">→ [cats, sleep]</text>
+<line x1="212" y1="70" x2="240" y2="70" stroke="#1a1a1a" stroke-width="1" marker-end="url(#k1)"/>
+<rect x="244" y="44" width="150" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="319" y="66" font-size="14" font-weight="bold">Assign IDs</text>
+<text x="319" y="85" font-size="12" fill="#595959">look up the number</text>
+<text x="319" y="122" font-size="13" font-family="Consolas, monospace">[9245, 6134]</text>
+<line x1="396" y1="70" x2="424" y2="70" stroke="#1a1a1a" stroke-width="1" marker-end="url(#k1)"/>
+<rect x="428" y="44" width="150" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="503" y="66" font-size="14" font-weight="bold">Embed</text>
+<text x="503" y="85" font-size="12" fill="#595959">place it in meaning-space</text>
+<text x="503" y="122" font-size="13" font-family="Consolas, monospace">[0.12, -0.85,</text>
+<text x="503" y="140" font-size="13" font-family="Consolas, monospace">0.03, …]</text>
+<text x="340" y="170" font-size="13" fill="#595959">Illustrative. Real vocabularies hold 100,000+ tokens; each vector is thousands of numbers long.</text>
+</g></svg>`;
+
+const SVG_FORWARD = `
+<svg viewBox="0 0 680 190" role="img" aria-label="The forward pass produces a score for every token in the vocabulary, converted by softmax into probabilities.">
+<defs><marker id="f1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="52" y="40" width="236" height="76" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="170" y="66" font-size="14" font-weight="bold">Forward pass</text>
+<text x="170" y="86" font-size="12" fill="#595959">billions of weights, plus attention</text>
+<text x="170" y="105" font-size="13" font-family="Consolas, monospace">matrix math × N layers</text>
+<line x1="290" y1="78" x2="330" y2="78" stroke="#1a1a1a" stroke-width="1" marker-end="url(#f1)"/>
+<rect x="334" y="40" width="294" height="76" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="481" y="62" font-size="14" font-weight="bold">Predict</text>
+<text x="481" y="80" font-size="12" fill="#595959">score every token, softmax to probabilities</text>
+<text x="481" y="102" font-size="13" font-family="Consolas, monospace">sleep 0.62 · run 0.11 · eat 0.05 · …</text>
+<text x="340" y="150" font-size="13" fill="#595959">What comes out is not a word. It is a probability for every one of 100,000+ tokens.</text>
+<text x="340" y="172" font-size="13" fill="#595959">The model does not decide what to say. It produces a distribution.</text>
+</g></svg>`;
+
+const SVG_LOOP = `
+<svg viewBox="0 0 680 210" role="img" aria-label="The autoregressive loop: sample a token, convert it to text, append it to the input, and run the whole forward pass again.">
+<defs><marker id="l1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="38" y="40" width="150" height="56" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="113" y="64" font-size="14" font-weight="bold">Forward pass</text>
+<text x="113" y="82" font-size="12" fill="#595959">reads every weight</text>
+<line x1="190" y1="68" x2="216" y2="68" stroke="#1a1a1a" stroke-width="1" marker-end="url(#l1)"/>
+<rect x="220" y="40" width="150" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="295" y="64" font-size="14" font-weight="bold">Sample one token</text>
+<text x="295" y="82" font-size="12" fill="#595959">from the distribution</text>
+<line x1="372" y1="68" x2="398" y2="68" stroke="#1a1a1a" stroke-width="1" marker-end="url(#l1)"/>
+<rect x="402" y="40" width="150" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="477" y="64" font-size="14" font-weight="bold">Decode to text</text>
+<text x="477" y="82" font-size="13" font-family="Consolas, monospace">→ "sleep"</text>
+<line x1="554" y1="68" x2="580" y2="68" stroke="#1a1a1a" stroke-width="1" marker-end="url(#l1)"/>
+<text x="618" y="64" font-size="13">append</text>
+<text x="618" y="82" font-size="13">to input</text>
+<path d="M618 96 L618 140 L113 140 L113 100" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#l1)"/>
+<text x="366" y="158" font-size="13" font-style="italic" fill="#595959">repeat — until a stop token</text>
+<text x="340" y="190" font-size="13" fill="#595959">A 500-word answer is roughly 700 separate passes, each reading every weight in the model.</text>
+</g></svg>`;
+
+const SVG_ATTN = `
+<svg viewBox="0 0 680 230" role="img" aria-label="Attention: the token being processed draws on every earlier token, with the strength of each link varying by relevance.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="340" y="26" font-size="13" fill="#595959">Processing the word "sat" — how much does each earlier token inform it?</text>
+<path d="M120 150 Q 200 66 268 150" fill="none" stroke="#595959" stroke-width="1"/>
+<path d="M196 150 Q 232 78 264 150" fill="none" stroke="#156082" stroke-width="5"/>
+<path d="M420 158 Q 360 210 288 158" fill="none" stroke="#595959" stroke-width="1"/>
+<path d="M500 158 Q 400 218 292 158" fill="none" stroke="#156082" stroke-width="3.5"/>
+<rect x="86" y="150" width="68" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="120" y="170" font-size="14">the</text>
+<rect x="162" y="150" width="68" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="196" y="170" font-size="14">cat</text>
+<rect x="238" y="150" width="68" height="30" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="272" y="170" font-size="14" font-weight="bold" fill="#156082">sat</text>
+<rect x="314" y="150" width="68" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="348" y="170" font-size="14">on</text>
+<rect x="390" y="150" width="68" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="424" y="170" font-size="14">the</text>
+<rect x="466" y="150" width="68" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="500" y="170" font-size="14">mat</text>
+<text x="340" y="214" font-size="13" fill="#595959">Thicker line — more relevant. Weights come from the content, and are recomputed at every layer.</text>
+</g></svg>`;
+
+const SVG_WEIGHTS = `
+<svg viewBox="0 0 680 235" role="img" aria-label="Two panels: in training the weights change; at inference they are fixed and only read.">
+<defs><marker id="w1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="38" y="34" width="290" height="150" fill="#fff" stroke="#156082" stroke-width="1.75"/>
+<text x="183" y="58" font-size="14" font-weight="bold" fill="#156082">Training</text>
+<rect x="70" y="76" width="106" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="123" y="98" font-size="12">forward pass</text>
+<rect x="196" y="76" width="106" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="249" y="98" font-size="12">compare</text>
+<line x1="178" y1="93" x2="192" y2="93" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w1)"/>
+<rect x="196" y="122" width="106" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="249" y="144" font-size="12">backpropagate</text>
+<rect x="70" y="122" width="106" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="123" y="144" font-size="12">update weights</text>
+<line x1="194" y1="139" x2="180" y2="139" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w1)"/>
+<text x="183" y="176" font-size="13" font-weight="bold" fill="#156082">weights change</text>
+<rect x="352" y="34" width="290" height="150" fill="#fff" stroke="#E97132" stroke-width="1.75"/>
+<text x="497" y="58" font-size="14" font-weight="bold" fill="#E97132">Inference</text>
+<rect x="374" y="90" width="80" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="414" y="112" font-size="12">your input</text>
+<line x1="456" y1="107" x2="472" y2="107" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w1)"/>
+<rect x="476" y="90" width="80" height="34" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="516" y="112" font-size="12">read weights</text>
+<line x1="558" y1="107" x2="574" y2="107" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w1)"/>
+<text x="606" y="112" font-size="12">output</text>
+<text x="497" y="176" font-size="13" font-weight="bold" fill="#E97132">weights fixed</text>
+<text x="340" y="212" font-size="13" fill="#595959">Blue — the only place weights are written. Orange — read-only; only activations and the KV cache change.</text>
+</g></svg>`;
+
+const SVG_GAP = `
+<svg viewBox="0 0 680 165" role="img" aria-label="A gap timeline between a model's training data cutoff and its release, with post-training, evaluation, red-teaming, safety review and staged rollout in between.">
+<defs><marker id="g1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<line x1="120" y1="66" x2="120" y2="98" stroke="#1a1a1a" stroke-width="1.5"/>
+<text x="120" y="56" font-size="14" font-weight="bold" text-anchor="middle">Training data cutoff</text>
+<line x1="560" y1="66" x2="560" y2="98" stroke="#1a1a1a" stroke-width="1.5"/>
+<text x="560" y="56" font-size="14" font-weight="bold" text-anchor="middle">Release</text>
+<line x1="120" y1="82" x2="552" y2="82" stroke="#1a1a1a" stroke-width="1" marker-end="url(#g1)"/>
+<text x="340" y="120" font-size="13" text-anchor="middle" fill="#595959">post-training · evaluation · red-teaming · safety review · staged rollout</text>
+<text x="340" y="146" font-size="13" text-anchor="middle" fill="#595959">The gap used to run about a year. On the current Opus tier it is roughly two months.</text>
+</g></svg>`;
+
+const SVG_STACK = `
+<svg viewBox="0 0 680 195" role="img" aria-label="A two-layer stack: what people write is Python, on top of what the GPU runs, which is C++ and CUDA.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="60" y="34" width="420" height="56" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="270" y="58" font-size="14" font-weight="bold" text-anchor="middle">What people write: Python</text>
+<text x="270" y="78" font-size="12" text-anchor="middle" fill="#595959">defines and trains the model; drives the frameworks</text>
+<rect x="60" y="90" width="420" height="56" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="270" y="114" font-size="14" font-weight="bold" text-anchor="middle">What the GPU runs: C++ and CUDA</text>
+<text x="270" y="134" font-size="12" text-anchor="middle" fill="#595959">where the heavy matrix arithmetic actually happens</text>
+<text x="502" y="52" font-size="13" font-weight="bold">Frameworks</text>
+<text x="502" y="70" font-size="12" fill="#595959">PyTorch · JAX</text>
+<text x="502" y="94" font-size="13" font-weight="bold">Kernels</text>
+<text x="502" y="112" font-size="12" fill="#595959">CUDA · Triton</text>
+<text x="502" y="136" font-size="13" font-weight="bold">Serving</text>
+<text x="502" y="154" font-size="12" fill="#595959">vLLM · llama.cpp · Rust</text>
+<text x="340" y="182" font-size="13" text-anchor="middle" fill="#595959">The top layer is portable across hardware. The bottom layer is not — that is the Chapter 3 argument.</text>
+</g></svg>`;
+
+const CARDS = [
+{
+ id:"S-030", num:"2.1", title:"Inside a single neuron",
+ figure:SVG_NEURON,
+ body:`<p>An artificial neuron is not a metaphor for a brain cell. It is two arithmetic steps.</p>
+ <ul>
+ <li><strong>Step one — the weighted sum.</strong> Each incoming number is multiplied by its own <strong>weight</strong>, a learned number saying how much that input matters. The results are added together, plus one extra learned number called the <strong>bias</strong> that shifts the total up or down.</li>
+ <li><strong>Step two — the activation.</strong> The total goes through an <strong>activation function</strong>, which decides how strongly the neuron fires. In practice this is usually ReLU: negative in, zero out; positive in, unchanged out.</li>
+ </ul>
+ <p>That is the whole unit. Multiply, add, then apply one simple rule. A frontier model is hundreds of billions of these numbers, arranged so the output of one becomes the input of the next.</p>`,
+ depth:`<p>The activation function is the part that looks trivial and is not. Without it, every layer would be a weighted sum of weighted sums — which collapses algebraically into a single weighted sum. A hundred stacked layers would have exactly the power of one. The non-linearity is what makes depth mean anything at all, and it is why "deep learning" is a claim about capability rather than just about size.</p>
+ <p>Worth being precise about what a weight is, because everything downstream depends on it. It is one number. Not a rule, not a fact, not a concept. When card 2.8 says weights are frozen at inference, it means these numbers — every one of them — stop changing.</p>
+ <p>The scale is the part that resists intuition. A single neuron doing 700 multiplications and one comparison is arithmetic you could do by hand. Nothing anywhere in the system is more complicated than this; there is simply an enormous amount of it, run very fast.</p>
+ <p><strong>How much of it:</strong> the working rule is two operations per parameter per token — one multiply, one add. A 70-billion-parameter model therefore does roughly <strong>140 billion operations to produce a single token</strong>. A 500-word answer is about 700 tokens, so on the order of <strong>100 trillion operations for one reply</strong> — and reading your question costs the same per token again. Frontier models hold far more parameters but activate only a fraction of them per token, so the figure lands in the same range rather than scaling with the headline size. Order of magnitude, not a measurement: it ignores attention, which grows with context length, and the arithmetic around the KV cache (2.7).</p>`,
+ sources:"Established ML fundamentals; no dated claims."
+},
+{
+ id:"S-005a", num:"2.2", title:"Neurons in layers: how a network is arranged",
+ figure:netSVG(),
+ body:`<p>Neurons are arranged in layers: an <strong>input layer</strong>, one or more <strong>hidden layers</strong>, and an <strong>output layer</strong>. Every connection between them carries its own weight.</p>
+ <ul>
+ <li>Data enters at the input layer and moves forward, one layer at a time. This is the <strong>forward pass</strong>.</li>
+ <li>Each layer's outputs become the next layer's inputs.</li>
+ <li>Layer by layer, raw inputs are transformed into higher-level features. In an image network, early layers respond to edges, later ones to shapes, later still to whole objects.</li>
+ <li>The output layer produces the prediction — a label, a number, or the next word.</li>
+ </ul>
+ <p>Nobody programmed the intermediate features. They are a by-product of training, which is the next card.</p>`,
+ depth:`<p>"Hidden" means only that the layer is neither the input nor the output — it is not hidden in any deeper sense. The name has caused an unreasonable amount of confusion.</p>
+ <p>The claim that the network "learns its own features" is the one that separates this from the machine-learning era on card 1.2. In the 1990s a person decided which properties of the data mattered and wrote code to extract them; the model only weighed features a human had chosen. Deep networks removed that step. This is genuine, and it is also the source of the interpretability problem — the features are real and useful, and nobody specified them, so nobody has a list of what they are.</p>
+ <p>Do not over-read the edges-to-shapes-to-objects story. It is well evidenced in image networks and reported honestly. In language models the picture is far messier: individual neurons respond to many unrelated things at once, and the tidy hierarchy is not what researchers find.</p>`,
+ sources:"Established ML fundamentals. The feature-hierarchy description is best evidenced in computer vision; language-model interpretability findings are more equivocal."
+},
+{
+ id:"S-005b", num:"2.3", title:"Training: how the weights get set",
+ figure:SVG_TRAINLOOP,
+ body:`<p>Weights start as random numbers. A freshly initialised network produces noise. Training is the process that turns those random numbers into useful ones, and it is one loop repeated:</p>
+ <ul>
+ <li><strong>Predict.</strong> Run an example forward through the network and see what comes out.</li>
+ <li><strong>Compare.</strong> Measure how wrong the output is against the correct answer. That gap is the <strong>loss</strong>.</li>
+ <li><strong>Backpropagate.</strong> Work backwards through the layers computing, for every single weight, how much it contributed to the error.</li>
+ <li><strong>Update.</strong> Nudge every weight a small step in the direction that would have reduced the error.</li>
+ </ul>
+ <p>Repeat across billions of examples. No individual step is clever. The result is.</p>`,
+ depth:`<p>Backpropagation is the 1986 algorithm from card 1.3 — the one that sat unused for twenty-five years because nobody had the compute to run it at depth. This loop is what card 1.3 means by "the theory was largely there."</p>
+ <p>Two things worth carrying into the cost chapters. First, <strong>training is the expensive direction</strong>, and it is expensive because of the update step: every weight is read, and then written. Card 2.8 is about why inference, which only reads, is a fundamentally lighter operation. Second, the "small step" is deliberately small. Too large and the model overshoots and destabilises; too small and training takes longer than the budget allows. That step size is the <strong>learning rate</strong>, and tuning it is one of the more expensive kinds of expertise in the field.</p>
+ <p>What the loop does not contain is any notion of understanding, or truth, or intent. It contains a number that goes down. Everything the model does is downstream of making that number go down on the data it was shown — which is also a fair summary of why models inherit the biases and errors in that data.</p>`,
+ sources:"Rumelhart, Hinton and Williams 1986 (backpropagation). Established ML fundamentals."
+},
+{
+ id:"S-006a", num:"2.4", title:"From words to numbers: tokens, IDs, embeddings",
+ figure:SVG_TOKENS,
+ body:`<p>The model does arithmetic. It does not read. Three steps convert your text into numbers it can multiply.</p>
+ <ul>
+ <li><strong>Tokenize.</strong> Split the text into <strong>tokens</strong> — vocabulary chunks, roughly a short word or a word fragment.</li>
+ <li><strong>Assign IDs.</strong> Look up each token's integer position in the vocabulary.</li>
+ <li><strong>Embed.</strong> Convert each ID into an <strong>embedding</strong> — a long list of decimal numbers positioning that token in a space where related meanings sit near each other.</li>
+ </ul>`,
+ depth:`<p>Tokens are why a model can be strangely bad at counting the letters in a word. It never sees letters. It sees token 9245, and the spelling of "cats" is not information available to it in the way you would assume.</p>
+ <p>Tokens are also the billing unit for the whole industry — Chapter 7 is denominated in them. A useful rule of thumb for English prose: about 0.75 words per token, so 1,000 tokens is roughly 750 words. Code, unusual names and non-English text tokenize less efficiently, sometimes far less, which means the same text can cost meaningfully more in one language than another.</p>
+ <p>The embedding is where "meaning" enters, in the only sense the system has one. Positions in that space are learned during training from which words appear in similar contexts. Nothing grounds them in the world; they encode how words are used, not what they refer to.</p>
+ <p><strong>Why there is no universal dictionary of token numbers.</strong> The ID is arbitrary — it is a row number, not a meaning. What carries meaning is the embedding vector that row points at, and those vectors are learned during that model's own training. Hand another model the number 9245 and it indexes a different row of a different table; the number does not travel. Each lab also builds its vocabulary by running an algorithm over its own training corpus, so the splits differ: how much code, how many languages, how aggressively rare words get broken up. A shared standard would force every lab onto one set of trade-offs and buy nothing, since the numbers are internal either way.</p>
+ <p>One consequence is practical. The same paragraph is a different number of tokens on each provider, so a per-token price is not directly comparable across labs without counting tokens with each one's own tokenizer.</p>`,
+ sources:"Established ML fundamentals. The 0.75-words-per-token ratio is a working average for English prose and varies substantially by content type."
+},
+{
+ id:"S-006b", num:"2.5", title:"The forward pass, and what \u201Cpredict\u201D means",
+ figure:SVG_FORWARD,
+ body:`<p>The embeddings are multiplied through the network's layers — the same forward pass as card 2.2, at a scale of billions of weights, with <strong>attention</strong> at each layer re-weighing which earlier tokens matter. This is where essentially all the compute goes.</p>
+ <p>The arithmetic is <strong>matrix multiplication</strong>: a matrix is just a grid of numbers, and multiplying two of them means taking each row of one against each column of the other, multiplying the pairs and adding the results. One number out per row-column pair. That is the entire operation — and every one of those pairs is independent of the others, which is why it suits a chip with thousands of small cores rather than a few fast ones.</p>
+ <p>What comes out is not a word. It is a score for <strong>every token in the vocabulary</strong> — all hundred-thousand-plus of them — converted by a function called <strong>softmax</strong> into probabilities that sum to 1.</p>
+ <p>The model does not decide what to say. It produces a probability distribution over what could come next.</p>`,
+ depth:`<p>This is the card that explains most model behaviour people find surprising.</p>
+ <p><strong>Hallucination</strong> is not a malfunction on this picture. The model always produces a distribution and always samples from it. A confident wrong answer and a confident right answer are produced by the identical mechanism; nothing in the machinery distinguishes them, which is why "just make it say when it doesn't know" is much harder than it sounds. Chapter 4 is about building around this rather than fixing it.</p>
+ <p><strong>Temperature</strong> is the dial on this distribution. Low temperature sharpens it toward the highest-scoring token, giving repeatable, conservative output. High temperature flattens it, giving variety and more errors. It is not a creativity setting in any deeper sense — it is how peaked the curve is before you sample from it.</p>
+ <p>And every number here is stored as binary. The GPU runs arithmetic over these numbers. It does not execute your words as a program — a point worth holding onto in Chapter 4, where the distinction between the model choosing an action and code executing it does real work.</p>`,
+ sources:"Established ML fundamentals; illustrative probability values."
+},
+{
+ id:"S-006c", num:"2.6", title:"Decode, then do it again: the autoregressive loop",
+ figure:SVG_LOOP,
+ body:`<p><strong>Decode</strong> is the last step: sample one token from the distribution, convert its ID back to text.</p>
+ <p>Then the model appends that token to its own input and runs the entire forward pass again to produce the next one. And again. This is what <strong>autoregressive</strong> means, and it continues until the model emits a stop token.</p>`,
+ depth:`<p>Three consequences follow from this loop, and all three matter later.</p>
+ <p><strong>It is why inference is a memory-bandwidth problem.</strong> Every token generated requires the entire set of weights to be read from memory. Not multiplied once and cached — read, per token. That is the through-line of Chapter 3 and the reason HBM bandwidth, rather than raw arithmetic throughput, gates how fast a model can answer.</p>
+ <p><strong>It is why the model cannot revise.</strong> Each token is committed once sampled. There is no mechanism to go back and change an earlier word after the sentence turns out badly. What looks like reasoning-then-answering in a reasoning model is the same loop, spending tokens on intermediate work before the answer, in the same forward-only stream.</p>
+ <p><strong>It is why long conversations get expensive.</strong> The input to each pass is the entire conversation so far. Turn twenty re-reads everything from turns one through nineteen. Chapter 7 puts a price on that; this is the mechanism underneath it.</p>`,
+ sources:"Established ML fundamentals."
+},
+{
+ id:"S-031", num:"2.7", title:"What attention is actually doing",
+ figure:SVG_ATTN,
+ body:`<p>Card 1.4 said attention re-weighs which parts of the input matter. Concretely:</p>
+ <p>For each token being processed, the model compares it against every other token in the context and produces a weight for each — how relevant that other token is to this one right now. Those weights determine how much of each other token's information gets mixed in.</p>
+ <ul>
+ <li>The weights are computed <strong>from the content</strong>, not fixed in advance. Change the sentence and they change.</li>
+ <li>Every token can attend to every other token. Distance costs nothing — a pronoun can attend to the noun it refers to forty words earlier as easily as to the word beside it.</li>
+ <li>This happens <strong>at every layer, independently</strong>, and in multiple parallel "heads" that learn to attend to different kinds of relationship.</li>
+ </ul>
+ <p>That is the mechanism behind the thing that feels like understanding context. It is a learned relevance score, applied everywhere at once.</p>
+ <p>Those comparisons would otherwise be redone from scratch for every new token, so the intermediate results are kept. That store is the <strong>KV cache</strong> — the key and value vectors already computed for every token in the conversation so far, held in GPU memory so each new token is compared against saved results instead of rebuilding the whole context. It grows as the conversation grows, and it competes for the same memory as the weights.</p>`,
+ depth:`<p>Two properties do real work downstream.</p>
+ <p><strong>All-to-all comparison is quadratic.</strong> Doubling the context length roughly quadruples the attention computation. This is why long context was expensive and hard for years, why it became a competitive axis when it got cheap, and why the intermediate results are cached rather than recomputed. Chapter 3 shows the KV cache competing for the same GPU memory as the weights, which is what makes long context a hardware question and not just a software one.</p>
+ <p><strong>Nothing better-targeted has replaced it.</strong> Attention is wasteful by construction: most token pairs are irrelevant to each other and it scores them all anyway. Many architectures have tried to be selective. None has displaced it at the frontier, which suggests the wastefulness is the point — you do not know in advance which relationship will matter, and attention does not need to.</p>
+ <p>A caution on language. Calling this "attention" invites the reading that the model is attending in the human sense. What is happening is a similarity computation between learned vectors, producing weights that determine a blend. The name was a convenience and it has done some damage to how the technology is discussed.</p>`,
+ sources:"Vaswani et al. 2017 (\u201CAttention Is All You Need\u201D). Established ML fundamentals."
+},
+{
+ id:"S-012", num:"2.8", title:"Weights: written in training, read-only at inference",
+ figure:SVG_WEIGHTS,
+ body:`<p>The weights are the billions of learned numbers from card 2.1. When they change, and when they do not, is the distinction people most often get wrong.</p>
+ <ul>
+ <li><strong>Training:</strong> weights are read <strong>and written</strong>. Backpropagation computes the error and updates every one of them. This is the only place they change.</li>
+ <li><strong>Inference</strong> — every time you use the model — weights are <strong>read-only</strong>. They are loaded and multiplied against your input to predict the next token. The values never change.</li>
+ <li>What does change at inference are <strong>activations</strong> and the <strong>KV cache</strong> (2.7): transient numbers computed fresh for your prompt and discarded afterwards.</li>
+ </ul>`,
+ band:`Training writes the cookbook. Inference reads the recipe. Cooking a thousand meals reads the recipe a thousand times and never rewrites it.`,
+ depth:`<p>The practical consequence people care about: <strong>your conversation does not change the model.</strong> Whatever you tell it is in the context window for this conversation and then gone. It did not learn anything. This is also why a model cannot be updated by talking to it, and why Chapter 5 exists — changing behaviour durably means changing weights, which is a training operation, not a conversation.</p>
+ <p>The engineering consequence is the one Chapter 3 turns on. "Streaming the weights" at inference means <em>reading</em> them, not editing them — which makes serving a memory-<strong>read</strong> bandwidth problem. A 70-billion-parameter model at 8-bit precision is roughly 70 GB read for every single token generated.</p>
+ <p>Where this genuinely gets confusing is memory features and retrieval. A product that appears to remember you across sessions is storing text somewhere and putting it back into the context window at the start of the next one. The weights are identical. Nothing was learned; something was filed and re-read.</p>`,
+ sources:"Established ML fundamentals."
+},
+{
+ id:"S-032", num:"2.9", title:"Why a model's knowledge lags its release date",
+ figure:SVG_GAP + `<table class="grid"><thead><tr><th>Model</th><th>Reliable cutoff</th><th>Released</th><th>Gap</th></tr></thead><tbody>
+ <tr><td>Claude Opus 5</td><td>May 2026</td><td>24 Jul 2026</td><td>~2 months</td></tr>
+ <tr><td>Claude Opus 4.8</td><td>Jan 2026</td><td>28 May 2026</td><td>~4 months</td></tr>
+ <tr><td>Claude Sonnet 5 / Fable 5</td><td>Jan 2026</td><td>Jun 2026</td><td>~5 months</td></tr>
+ </tbody></table>`,
+ body:`<p>Training cutoff is not release date. Pretraining freezes a snapshot of the world; the model ships later.</p>
+ <ul>
+ <li><strong>Two stages, and only the first sets the knowledge.</strong> <strong>Pretraining</strong> is the long self-supervised run of card 2.3 over a vast text corpus. It sets essentially all the weights, consumes most of the compute, takes months, and produces a <strong>base model</strong> that continues text but does not follow instructions. <strong>Post-training</strong> is everything after: supervised fine-tuning on instruction-and-response pairs, RLHF, reasoning training, safety work. It is a small fraction of the compute and it changes <em>behaviour</em> — what the model does with what it knows — not what it knows.</li>
+ <li><strong>What happens in the gap:</strong> post-training, evaluations, red-teaming, safety review, then a staged rollout. Months, not weeks.</li>
+ <li><strong>The published cutoff is deliberately conservative.</strong> Anthropic distinguishes the <em>training data cutoff</em> — the last date any data was included — from the <em>reliable knowledge cutoff</em>, the date through which the model answers dependably. The last months before a cutoff are thinly represented, so the reliable date is usually earlier.</li>
+ <li><strong>Point releases stretch it further.</strong> A "4.x" version is often refined mostly through post-training on a base model whose pretraining is older and shared across the family. The version number moves; the underlying knowledge may not — because the version number is tracking post-training, and the knowledge came from pretraining.</li>
+ </ul>`,
+ depth:`<p>The gap has narrowed sharply, and that is the news. The version of this material written in July 2026 used a roughly twelve-month gap as its illustration. The current Opus-tier gap is about two months. Two-plus-year gaps still exist in open-weight models that have no successor — Llama 4's August 2024 cutoff is the standing example — so the spread across the market is now very wide, and "models are about a year behind" has stopped being a safe general claim.</p>
+ <p>A caveat on the published dates. At least one independent analysis of Opus 5 argues its behaviour resembles a January 2026 cutoff despite the published May 2026 figure, and speculates that several Anthropic point releases share one pretraining run. That is inference from behaviour, not a disclosure, and Anthropic has not published the internal detail either way — but it is a reason to treat a published cutoff as the outer bound of what a model reliably knows rather than a guarantee.</p>
+ <p>The operational point for anyone relying on this: for anything time-sensitive, the cutoff is not the question. Whether the model searched is. A model with web access and a two-year-old cutoff will beat a model with a two-month cutoff and no access, on anything that happened last week.</p>`,
+ sources:"Claude Platform Docs, Claude Opus 5 overview (reliable and training data cutoff May 2026; released 24 July 2026), accessed 30 Aug 2026 \u2014 primary. Opus 4.8 and Sonnet 5 / Fable 5 cutoffs via the FixAEO knowledge-cutoff tracker, accessed 30 Aug 2026 \u2014 secondary, verify against Anthropic docs before external use. Llama 4 cutoff via Temso AI tracker, Jul 2026 \u2014 secondary. Behavioural-cutoff analysis: Shrivu Shankar, \u201CExploring Claude/GPT Knowledge Cutoffs\u201D, Aug 2026 \u2014 one analyst's inference, explicitly not a disclosure. Supersedes the earlier figure of a ~12-month gap, which was wrong for the example given and is no longer typical."
+},
+{
+ id:"S-033", num:"2.10", title:"What LLMs are written in",
+ figure:SVG_STACK,
+ body:`<ul>
+ <li>The code humans write to define and train these models is overwhelmingly <strong>Python</strong>.</li>
+ <li>Python is glue. It drives the frameworks — <strong>PyTorch</strong> dominant, <strong>JAX</strong> at Google and DeepMind, TensorFlow now largely historical.</li>
+ <li>Those frameworks are themselves <strong>C++ with CUDA</strong>, NVIDIA's GPU language, which is where the heavy matrix arithmetic actually runs.</li>
+ <li>Custom GPU kernels are increasingly written in <strong>Triton</strong>, a Python-like language, rather than raw CUDA.</li>
+ <li>Serving adds more C++ and, increasingly, <strong>Rust</strong> — llama.cpp in C and C++, Hugging Face's tokenizers and serving stack in Rust, vLLM in Python over CUDA.</li>
+ </ul>
+ <p>Short version: Python for what people write, C++ and CUDA for what the GPU runs.</p>
+ <p><strong>And where does that GPU sit?</strong> If you are using a hosted assistant, every calculation on the last six cards happens in the provider's data centre. Your laptop sends text and draws the reply; it does no model arithmetic at all, which is why a phone and a workstation give identical answers at identical speed. Only a model you have downloaded and run locally uses your own hardware — and then the size you can run is capped by your GPU's memory. Chapter 3 is that comparison in full.</p>`,
+ depth:`<p>The reason this matters commercially is Chapter 3. The Python layer is portable — a PyTorch model runs on anything PyTorch supports. The CUDA layer is not. Nineteen years of hand-tuned kernels were written CUDA-first, and that accumulated library, not the silicon, is the thing competitors have to replicate.</p>
+ <p>Triton is the name to watch for exactly this reason. It is hardware-agnostic: one kernel, either vendor. Its adoption inside production serving stacks is the leading indicator of whether the CUDA position erodes — which is a Chapter 3 argument, previewed here because this card is where the layer first appears.</p>
+ <p>Worth noting what this list implies about the skill. Almost nobody working on these systems writes CUDA. The Python layer is where the models are defined and trained, and it is unremarkable Python. The scarce expertise is in the kernel layer and in knowing what to train, not in the language.</p>`,
+ sources:"Established practice as of Aug 2026. Framework and tooling names churn faster than the underlying division of labour."
+},
+{
+ apparatus:true, label:"Glossary", title:"Chapter 2 — Glossary",
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Card</th></tr></thead><tbody>
+ <tr><td>neuron</td><td>The basic unit: a weighted sum of its inputs, then an activation function</td><td>2.1</td></tr>
+ <tr><td>weight</td><td>One learned number saying how much a given input matters</td><td>2.1</td></tr>
+ <tr><td>bias</td><td>A learned number added to the sum, shifting the total up or down</td><td>2.1</td></tr>
+ <tr><td>activation function</td><td>Decides how strongly a neuron fires; supplies the non-linearity depth depends on</td><td>2.1</td></tr>
+ <tr><td>ReLU</td><td>The common activation: negative in, zero out; positive in, unchanged out</td><td>2.1</td></tr>
+ <tr><td>input / hidden / output layer</td><td>Where data enters, where it is transformed, where the prediction emerges</td><td>2.2</td></tr>
+ <tr><td>forward pass</td><td>Data moving through the network from input to output</td><td>2.2</td></tr>
+ <tr><td>feature</td><td>A property of the data the network learns to respond to; not specified by a person</td><td>2.2</td></tr>
+ <tr><td>loss</td><td>The measured gap between the model's output and the correct answer</td><td>2.3</td></tr>
+ <tr><td>learning rate</td><td>How large a step each weight update takes</td><td>2.3</td></tr>
+ <tr><td>token</td><td>A vocabulary chunk — roughly a short word or word fragment. The billing unit</td><td>2.4</td></tr>
+ <tr><td>tokenization</td><td>Splitting text into tokens before anything else happens</td><td>2.4</td></tr>
+ <tr><td>embedding</td><td>A token's position in a learned space where related meanings sit near each other</td><td>2.4</td></tr>
+ <tr><td>matrix multiplication</td><td>Rows against columns: multiply the pairs, add the results. The core operation</td><td>2.5</td></tr>
+ <tr><td>softmax</td><td>Converts raw scores over the vocabulary into probabilities summing to 1</td><td>2.5</td></tr>
+ <tr><td>temperature</td><td>How peaked the distribution is before sampling; low is conservative, high varied</td><td>2.5</td></tr>
+ <tr><td>hallucination</td><td>Confident wrong output; the same mechanism that produces confident right output</td><td>2.5</td></tr>
+ <tr><td>decode</td><td>Sampling one token and converting its ID back to text</td><td>2.6</td></tr>
+ <tr><td>autoregressive</td><td>Appending each generated token to the input and running the whole pass again</td><td>2.6</td></tr>
+ <tr><td>stop token</td><td>The token that ends generation</td><td>2.6</td></tr>
+ <tr><td>attention head</td><td>One parallel attention computation; heads learn different kinds of relationship</td><td>2.7</td></tr>
+ <tr><td>KV cache</td><td>Cached intermediate attention results for the current context; working memory</td><td>2.7</td></tr>
+ <tr><td>context window</td><td>Everything the model is reading on this pass, including the conversation so far</td><td>2.7</td></tr>
+ <tr><td>activations</td><td>Transient numbers computed for your prompt, then discarded</td><td>2.8</td></tr>
+ <tr><td>inference</td><td>Running a trained model to produce output. Weights are read, never written</td><td>2.8</td></tr>
+ <tr><td>pretraining</td><td>The long self-supervised run that sets nearly all the weights and all the knowledge</td><td>2.9</td></tr>
+ <tr><td>base model</td><td>The output of pretraining: continues text, does not yet follow instructions</td><td>2.9</td></tr>
+ <tr><td>training data cutoff</td><td>The last date any data was included in training</td><td>2.9</td></tr>
+ <tr><td>reliable knowledge cutoff</td><td>The date through which the model answers dependably; usually earlier</td><td>2.9</td></tr>
+ <tr><td>post-training</td><td>Everything after pretraining — fine-tuning, RLHF, safety work. Changes behaviour, not knowledge</td><td>2.9</td></tr>
+ <tr><td>PyTorch</td><td>The dominant framework for defining and training models, driven from Python</td><td>2.10</td></tr>
+ <tr><td>CUDA</td><td>NVIDIA's GPU programming platform; where the matrix arithmetic actually runs</td><td>2.10</td></tr>
+ <tr><td>Triton</td><td>Hardware-agnostic kernel language; one kernel targeting either vendor</td><td>2.10</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Carried forward from Chapter 1</h4>
+ <table class="grid wide"><thead><tr><th>Term</th><th>Reminder</th><th>Owned by</th></tr></thead><tbody>
+ <tr><td>backpropagation</td><td>Adjusts every weight to shrink the error; the 1986 algorithm</td><td>1.3</td></tr>
+ <tr><td>deep learning</td><td>Machine learning with many-layered networks that find their own features</td><td>1.2</td></tr>
+ <tr><td>transformer</td><td>The 2017 architecture whose training is fully parallel</td><td>1.4</td></tr>
+ <tr><td>self-supervised pretraining</td><td>Predicting the next word, so any text is its own label</td><td>1.4</td></tr>
+ <tr><td>parameter</td><td>One of the learned numbers inside a model — a weight or a bias</td><td>1.4</td></tr>
+ <tr><td>RLHF</td><td>Reinforcement learning from human feedback; turns a predictor into an assistant</td><td>1.4</td></tr>
+ </tbody></table>`,
+ body:`<p>Terms this chapter owns, in order of first appearance. Later chapters reference them by card number rather than redefining.</p>`
+},
+{
+ apparatus:true, label:"Companies", title:"Chapter 2 — Companies and organisations",
+ figure:`<table class="grid wide"><thead><tr><th>Organisation</th><th>Listing</th><th>Role in this chapter</th></tr></thead><tbody>
+ <tr><td>Meta</td><td>Nasdaq: META</td><td>Maintains PyTorch, the framework most models are defined in. Also Llama, the standing example of a long cutoff gap <em>(also 1.5)</em></td></tr>
+ <tr><td>NVIDIA</td><td>Nasdaq: NVDA</td><td>CUDA — the layer the arithmetic actually runs on, and the one that is not portable <em>(also 1.3)</em></td></tr>
+ <tr><td>Google / DeepMind</td><td>Nasdaq: GOOGL</td><td>JAX, and the 2017 transformer paper behind the attention card <em>(also 1.4)</em></td></tr>
+ <tr><td>OpenAI</td><td>Private</td><td>Triton — the hardware-agnostic kernel language that would neutralise the CUDA position <em>(also 1.5)</em></td></tr>
+ <tr><td>Anthropic</td><td>Private</td><td>Publishes both a training data cutoff and a reliable knowledge cutoff; the worked examples on 2.9 <em>(also 1.5)</em></td></tr>
+ <tr><td>Hugging Face</td><td>Private</td><td>Tokenizers and serving stack, in Rust; where open weights are distributed <em>(also 1.5)</em></td></tr>
+ </tbody></table>`,
+ body:`<p class="disclaim">Descriptive map of the industry structure described in this chapter. Not investment advice and not a view on any security. Listing statuses as of Aug 2026.</p>`
+},
+{
+ apparatus:true, label:"What's next", title:"End of Chapter 2",
+ figure:null,
+ body:`<p>Ten cards. The argument, in one line: a neuron is two arithmetic steps, a model is a great many of them with fixed numbers inside, and every word you read cost one full pass over all of them.</p>
+ <p>Three things from this chapter get paid for later. Inference reads every weight per token — that is Chapter 3's bottleneck. The model samples from a distribution and cannot tell a right answer from a wrong one — that is Chapter 4. And each turn re-reads the whole conversation — that is Chapter 7.</p>
+ <p><strong>Chapter 3 — The hardware and the supply chain.</strong> What physically runs these models, and where the constraint sits: a PC against a data centre, where CUDA fits, HBM as the bottleneck, and why supply cannot simply scale.</p>
+ <p class="nextlink"><a href="understanding-ai-ch3-reader.html">Continue to Chapter 3 →</a></p>
+ <div class="btnrow">
+   <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
+   <span id="say2" class="said"></span>
+ </div>
+ <p class="hint2">Send back only the questions tagged <code>[gap]</code> or <code>[correction]</code>. A gap two readers hit independently is a defect in the material, not in the reader.</p>`
+}
+];
+
+let i = 0;
+const seen = new Set([0]);
+const asked = [];
+
+const stage = document.getElementById('stage');
+const dotsEl = document.getElementById('dots');
+const posEl = document.getElementById('pos');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+const qEl = document.getElementById('q');
+const sayEl = document.getElementById('say');
+const logbox = document.getElementById('logbox');
+const loglist = document.getElementById('loglist');
+
+const CONTENT = CARDS.filter(function(c){ return !c.apparatus; }).length;
+
+function render(){
+  const c = CARDS[i];
+  seen.add(i);
+  stage.innerHTML =
+    '<h1 class="cardtitle">' + c.title + '</h1>' +
+    (c.apparatus ? '' :
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — card ' + (i+1) + ' of ' + CONTENT + '</p>') +
+    (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
+    '<div class="body">' + c.body + '</div>' +
+    (c.band ? '<div class="band">' + c.band + '</div>' : '') +
+    (c.depth ? '<details class="deeper"><summary>Go deeper</summary><div class="inner">' + c.depth + '</div></details>' : '') +
+    (c.sources ? '<p class="sources">' + c.sources + '</p>' : '');
+
+  document.querySelector('.ask').style.display = c.apparatus ? 'none' : '';
+
+  const ch2 = document.getElementById('ch2btn');
+  const allb = document.getElementById('allbtn');
+  const say2 = document.getElementById('say2');
+  if (ch2) {
+    ch2.onclick = function(){
+      copyText(CH2_PROMPT, function(){
+        say2.className = 'said';
+        say2.textContent = 'Copied. Paste it into Claude.';
+      }, say2);
+    };
+  }
+  if (allb) { allb.onclick = function(){ copyAll(say2); }; }
+
+  posEl.textContent = c.apparatus ? c.label : (i+1) + ' / ' + CONTENT;
+  prevB.disabled = (i === 0);
+  nextB.disabled = (i === CARDS.length - 1);
+  qEl.value = '';
+  sayEl.textContent = '';
+  dotsEl.innerHTML = '';
+  CARDS.forEach(function(c2, n){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    if (n === i) b.setAttribute('aria-current','true');
+    let cls = c2.apparatus ? 'app' : '';
+    if (seen.has(n) && n !== i) cls += ' seen';
+    b.className = cls.trim();
+    b.innerHTML = '<i></i>';
+    b.onclick = function(){ i = n; render(); };
+    dotsEl.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+
+function go(d){
+  const n = i + d;
+  if (n < 0 || n >= CARDS.length) return;
+  i = n; render();
+}
+
+prevB.onclick = function(){ go(-1); };
+nextB.onclick = function(){ go(1); };
+
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { i = 0; render(); }
+  if (e.key === 'End')  { i = CARDS.length - 1; render(); }
+});
+
+function promptFor(card, q){
+  return 'Understanding AI — Chapter 1, card ' + card.num + ' (' + card.id + '), "' +
+    card.title + '".\n\nMy question: ' + q;
+}
+
+const CH2_PROMPT =
+'Understanding AI \u2014 I have finished Chapter 2 in the card reader.\n\n' +
+'Let\'s develop Chapter 3, "The hardware and the supply chain", the same way. ' +
+'Per the \u00A711 inventory it covers outline slides 9, 9a, 10 and 11 \u2014 personal PC against ' +
+'data centre, where CUDA fits, HBM as the AI bottleneck, and why HBM supply cannot just ' +
+'scale up.\n\n' +
+'Chapter 3 is the fastest-decaying material in the deck, so verify every figure by search ' +
+'against primary sources before drafting. Draft the cards in markdown first for my approval, ' +
+'one idea per card, with graphic specs and dated sources. Then build the HTML reader once I ' +
+'have signed off the wording.';
+
+function copyText(text, ok, target){
+  const el = target || sayEl;
+  function fallback(){
+    const t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); ok(); }
+    catch(e){ el.className = 'err'; el.textContent = 'Copy failed — select the text manually.'; }
+    document.body.removeChild(t);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else { fallback(); }
+}
+
+function copyAll(target){
+  const el = target || sayEl;
+  if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
+  let out = '# Understanding AI — questions from Chapter 2\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  asked.forEach(function(a){
+    out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
+  });
+  copyText(out, function(){
+    el.className = 'said';
+    el.textContent = 'Copied ' + asked.length + ' question(s) in notes-block format.';
+  }, el);
+}
+
+document.getElementById('copyq').onclick = function(){
+  const q = qEl.value.trim();
+  if (!q) { sayEl.className = 'err'; sayEl.textContent = 'Type a question first.'; qEl.focus(); return; }
+  const card = CARDS[i];
+  copyText(promptFor(card, q), function(){
+    asked.push({ card: card, q: q });
+    const li = document.createElement('li');
+    li.textContent = card.num + ' · ' + card.id + ' — ' + q;
+    loglist.appendChild(li);
+    logbox.classList.add('on');
+    sayEl.className = 'said';
+    sayEl.textContent = 'Copied. Paste it into Claude.';
+    qEl.value = '';
+  });
+};
+
+document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+render();
+</script>
+</body>
+</html>

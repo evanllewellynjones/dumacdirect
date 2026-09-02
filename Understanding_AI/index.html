@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — chapters</title>
+<style>
+  :root{ --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+         --blue:#156082; --orange:#E97132; --wash:#f2f2f2; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:#fff;color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;font-size:17px;line-height:1.55}
+  .shell{max-width:820px;margin:0 auto;padding:44px 28px 80px}
+
+  h1{color:var(--navy);font-size:30px;margin:0 0 6px;line-height:1.2}
+  p.sub{color:var(--muted);font-size:15px;margin:0 0 4px;max-width:70ch}
+  p.ver{color:var(--muted);font-size:13px;margin:0 0 30px}
+
+  .lede{max-width:70ch;margin:0 0 34px}
+  .lede p{margin:0 0 12px}
+
+  h2{font-size:15px;color:var(--navy);margin:34px 0 12px;padding-bottom:6px;
+     border-bottom:1px solid var(--rule)}
+
+  ol.chapters{list-style:none;margin:0;padding:0}
+  ol.chapters li{border-bottom:1px solid var(--rule);padding:16px 0}
+  .row{display:flex;gap:18px;align-items:baseline}
+  .no{color:var(--navy);font-weight:bold;font-size:15px;min-width:26px}
+  .main{flex:1}
+  .title{font-size:19px;color:var(--navy);font-weight:bold;line-height:1.25}
+  a.title{text-decoration:none}
+  a.title:hover{text-decoration:underline}
+  .q{font-size:15px;color:#2a2a2a;margin:4px 0 0;max-width:64ch}
+  .facts{font-size:13px;color:var(--muted);margin-top:6px}
+  .tag{font-size:12px;padding:2px 8px;border:1px solid var(--rule);color:var(--muted);
+       white-space:nowrap}
+  .tag.ready{border-color:var(--blue);color:var(--blue)}
+  .tag.drafting{border-color:var(--orange);color:var(--orange)}
+  li.pending .title{color:var(--muted)}
+
+  .note{background:var(--wash);padding:14px 16px;font-size:14px;margin:30px 0 0;max-width:70ch}
+  .note b{color:var(--navy)}
+  code{font-family:Consolas,monospace;font-size:13px;background:#fff;padding:1px 4px;
+       border:1px solid var(--rule)}
+  footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--rule);
+    font-size:13px;color:var(--muted);max-width:70ch}
+  @media (max-width:640px){ .shell{padding:30px 18px 60px} h1{font-size:25px} .row{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <h1>Understanding AI</h1>
+  <p class="sub">AI explained for people who are numerate but have no machine-learning background.</p>
+  <p class="ver">Deck version v3.0 · 30 Aug 2026</p>
+
+  <div class="lede">
+    <p>Chapters are added as the subject moves, so this list grows. Each is one sitting of twenty to thirty minutes. Each chapter is a set of cards — one idea per card. Arrow keys move; every card has a <em>Go deeper</em> block, and an ask box that hands your question to Claude tagged with the card it came from.</p>
+    <p>The early chapters build on each other, so read them in order the first time. After that they stand alone as reference, and the numbering is for convenience rather than sequence — no chapter is the last one.</p>
+  </div>
+
+  <h2>Chapters</h2>
+  <ol class="chapters">
+
+    <li>
+      <div class="row">
+        <span class="no">1</span>
+        <div class="main">
+          <a class="title" href="understanding-ai-ch1-reader.html">How AI got here, and where it stands</a>
+          <p class="q">What is this technology, how did it arrive, and what is actually true about it in 2026 rather than claimed?</p>
+          <p class="facts">11 slides · about 24 minutes · glossary and companies pages included</p>
+        </div>
+        <span class="tag ready">Ready</span>
+      </div>
+    </li>
+
+    <li>
+      <div class="row">
+        <span class="no">2</span>
+        <div class="main">
+          <a class="title" href="understanding-ai-ch2-reader.html">Inside the model: how it actually works</a>
+          <p class="q">What is happening between typing a question and reading an answer — and what is the model actually doing?</p>
+          <p class="facts">10 slides · about 24 minutes · glossary and companies pages included</p>
+        </div>
+        <span class="tag ready">Ready</span>
+      </div>
+    </li>
+
+    <li>
+      <div class="row">
+        <span class="no">3</span>
+        <div class="main">
+          <a class="title" href="understanding-ai-ch3-reader.html">The hardware and the supply chain</a>
+          <p class="q">What physically runs these models, and where is the constraint?</p>
+          <p class="facts">12 slides · about 32 minutes · the fastest-decaying material in the course</p>
+        </div>
+        <span class="tag ready">Ready</span>
+      </div>
+    </li>
+
+    <li>
+      <div class="row">
+        <span class="no">4</span>
+        <div class="main">
+          <a class="title" href="understanding-ai-ch4-reader.html">Building reliably with an unreliable model</a>
+          <p class="q">If the model is probabilistic, how does anyone build something dependable on top of it?</p>
+          <p class="facts">11 slides · about 28 minutes · the best-sourced chapter in the course</p>
+        </div>
+        <span class="tag ready">Ready</span>
+      </div>
+    </li>
+
+    <li>
+      <div class="row">
+        <span class="no">5</span>
+        <div class="main">
+          <a class="title" href="understanding-ai-ch5-reader.html">Customizing a model</a>
+          <p class="q">How do you make a general model do your specific job?</p>
+          <p class="facts">13 slides · about 32 minutes · four of them one worked example, end to end</p>
+        </div>
+        <span class="tag ready">Ready</span>
+      </div>
+    </li>
+
+    <li class="pending">
+      <div class="row">
+        <span class="no">6</span>
+        <div class="main">
+          <span class="title">Where the model runs: deployment choices</span>
+          <p class="q">On-premises or hosted — and why do the best-resourced firms mostly rent?</p>
+          <p class="facts">A model is a file · running it on-prem · the economics · the deployment spectrum · what banks actually do</p>
+        </div>
+        <span class="tag drafting">In development</span>
+      </div>
+    </li>
+
+    <li>
+      <div class="row">
+        <span class="no">7</span>
+        <div class="main">
+          <a class="title" href="understanding-ai-ch7-reader.html">What it costs, and what drives the cost</a>
+          <p class="q">Where does the money go, and which of your habits are expensive?</p>
+          <p class="facts">10 slides · about 25 minutes · prices are point-in-time and will change</p>
+        </div>
+        <span class="tag ready">Ready</span>
+      </div>
+    </li>
+
+    <li>
+      <div class="row">
+        <span class="no">8</span>
+        <div class="main">
+          <a class="title" href="understanding-ai-ch8-reader.html">Mapping AI capex</a>
+          <p class="q">The money is being spent — on what, exactly, and who sits at each link?</p>
+          <p class="facts">10 slides · about 28 minutes · the half of the value chain Chapter 3 does not cover</p>
+        </div>
+        <span class="tag ready">Ready</span>
+      </div>
+    </li>
+
+  </ol>
+
+  <div class="note">
+    <p><b>Keep these files together.</b> Each chapter is a separate HTML file in this folder and the links above are relative. Move one on its own and the link breaks — move the folder instead.</p>
+    <p style="margin-bottom:0">Nothing here calls the internet. The cards, diagrams and sources are all inside the files, so they work offline and behind the firewall — and they go stale on their own. Anything dated, check before you rely on it. Chapters 3, 6 and 7 decay fastest.</p>
+  </div>
+
+  <footer>
+    Descriptive material on industry structure. Not investment advice and not a view on any security.
+    Figures gathered July and August 2026 unless a card says otherwise.
+  </footer>
+
+</div>
+</body>
+</html>

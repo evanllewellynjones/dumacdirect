@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Chapter 7 reader</title>
+<style>
+  :root{
+    --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+    --blue:#156082; --orange:#E97132; --wash:#f2f2f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .shell{max-width:820px;margin:0 auto;padding:28px 28px 140px}
+
+  header.top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
+  header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
+  header.top .ch a.backlink:hover{text-decoration:underline}
+  header.top .ch .sep{color:var(--muted);font-weight:normal}
+  header.top .meta{color:var(--muted);font-size:13px}
+
+  h1.cardtitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.25;margin:0 0 4px}
+  .cardid{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .body p{margin:0 0 14px;max-width:70ch}
+  .body ul{margin:0 0 16px;padding-left:20px;max-width:70ch}
+  .body li{margin:0 0 7px}
+  .body strong{color:#000}
+  .figure{margin:22px 0 24px}
+  .figure svg{width:100%;height:auto;display:block}
+
+  table.grid{border-collapse:collapse;font-size:15px;margin:4px 0 18px;width:100%;max-width:560px}
+  table.grid th{text-align:left;font-weight:bold;border-bottom:1px solid var(--ink);padding:5px 12px 5px 0}
+  table.grid td{border-bottom:1px solid var(--rule);padding:5px 12px 5px 0;vertical-align:top}
+
+  .stats{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 20px}
+  .stat{flex:1 1 150px;border-top:2px solid var(--navy);padding-top:8px}
+  .stat b{display:block;color:var(--navy);font-size:26px;line-height:1.1}
+  .stat span{display:block;color:var(--muted);font-size:13px;margin-top:5px}
+
+  .band{background:var(--wash);padding:12px 16px;margin:20px 0;font-size:15px;max-width:70ch}
+
+  .twocol{display:flex;gap:22px;flex-wrap:wrap;margin:4px 0 6px}
+  .twocol .col{flex:1 1 260px;padding-top:9px}
+  .twocol .col.blue{border-top:2px solid var(--blue)}
+  .twocol .col.orange{border-top:2px solid var(--orange)}
+  .twocol h3{font-size:14px;margin:0 0 10px;font-weight:bold}
+  .twocol .blue h3{color:var(--blue)}
+  .twocol .orange h3{color:var(--orange)}
+  .twocol p{font-size:14px;margin:0 0 10px;color:#2a2a2a}
+  .twocol b{display:inline-block;min-width:96px;font-size:16px;color:var(--ink)}
+
+  table.grid.wide{max-width:100%}
+  table.grid.wide td:last-child{width:auto}
+  h4.grouplabel{font-size:14px;margin:18px 0 6px;color:var(--navy)}
+  p.disclaim{font-size:13px;font-style:italic;color:var(--muted)}
+  p.warn{background:var(--wash);padding:11px 14px;font-size:15px;max-width:70ch}
+  p.hint2{font-size:13px;color:var(--muted);margin-top:14px;max-width:70ch}
+  code{font-family:Consolas,monospace;font-size:13px;background:var(--wash);padding:1px 4px}
+  .dots button.app i{border-radius:0;width:8px;height:8px;margin:3px 2px}
+  p.nextlink{margin:20px 0 6px}
+  p.nextlink a{color:var(--blue);font-size:19px;font-weight:bold;text-decoration:none}
+  p.nextlink a:hover{text-decoration:underline}
+
+  details.deeper{border-top:1px solid var(--rule);margin-top:26px;padding-top:12px}
+  details.deeper summary{cursor:pointer;color:var(--blue);font-size:15px;list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:"▸ ";}
+  details.deeper[open] summary::before{content:"▾ ";}
+  details.deeper .inner{padding-top:12px}
+  details.deeper p{font-size:16px;color:#2a2a2a}
+
+  .sources{color:var(--muted);font-size:13px;font-style:italic;margin-top:22px;max-width:70ch}
+
+  .ask{border-top:1px solid var(--rule);margin-top:26px;padding-top:16px}
+  .ask h2{font-size:15px;color:var(--navy);margin:0 0 8px;font-weight:bold}
+  .ask p.hint{font-size:13px;color:var(--muted);margin:0 0 10px;max-width:70ch}
+  .ask textarea{width:100%;max-width:70ch;min-height:62px;font-family:inherit;font-size:15px;
+    padding:8px 10px;border:1px solid var(--rule);border-radius:3px;resize:vertical}
+  .ask textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--navy);
+    background:#fff;color:var(--navy);border-radius:3px;cursor:pointer}
+  button:hover{background:var(--navy);color:#fff}
+  button:disabled{opacity:.4;cursor:default}
+  button.ghost{border-color:var(--rule);color:var(--muted)}
+  button.ghost:hover{background:var(--wash);color:var(--ink)}
+  .said{font-size:13px;color:var(--blue)}
+  .err{font-size:13px;color:#a32d2d}
+
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--rule)}
+  nav.bar .inner{max-width:820px;margin:0 auto;padding:12px 28px;
+    display:flex;align-items:center;gap:16px}
+  .dots{display:flex;gap:7px;flex:1}
+  .dots button{padding:0;border:none;background:none;width:14px;height:14px;cursor:pointer}
+  .dots i{display:block;width:9px;height:9px;border-radius:50%;background:#fff;
+    border:1px solid var(--muted);margin:2px}
+  .dots button[aria-current="true"] i{background:var(--navy);border-color:var(--navy)}
+  .dots button.seen i{background:var(--rule);border-color:var(--rule)}
+  .pos{font-size:13px;color:var(--muted);white-space:nowrap}
+
+  .logbox{border:1px solid var(--rule);padding:14px 16px;margin-top:18px;font-size:14px;display:none}
+  .logbox.on{display:block}
+  .logbox h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .logbox ol{margin:0;padding-left:20px}
+  .logbox li{margin-bottom:6px;color:#2a2a2a}
+
+  @media (max-width:640px){
+    .shell{padding:20px 18px 150px}
+    nav.bar .inner{padding:10px 18px;gap:10px}
+    h1.cardtitle{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 7 — What it costs, and what drives the cost</div>
+    <div class="meta">v2.1 · 30 Aug 2026</div>
+  </header>
+
+  <main id="stage" tabindex="-1"></main>
+
+  <section class="ask">
+    <h2>Ask about this slide</h2>
+    <p class="hint">This reader has the slides but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the slide ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this slide?"></textarea>
+    <div class="btnrow">
+      <button id="copyq">Copy question for Claude</button>
+      <button id="copyall" class="ghost">Copy all questions from this session</button>
+      <span id="say" class="said"></span>
+    </div>
+    <div class="logbox" id="logbox">
+      <h3>Questions saved this session</h3>
+      <ol id="loglist"></ol>
+    </div>
+  </section>
+</div>
+
+<nav class="bar">
+  <div class="inner">
+    <button id="prev">← Back</button>
+    <div class="dots" id="dots"></div>
+    <span class="pos" id="pos"></span>
+    <button id="next">Next →</button>
+  </div>
+</nav>
+
+<script>
+const SVG_TWOMODELS = `
+<svg viewBox="0 0 680 270" role="img" aria-label="Two pricing models side by side: a flat consumer subscription throttled by rate limits, and a metered API billed per token, both resting on the same token economics.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="30" y="40" width="300" height="140" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="180" y="64" font-size="13" font-weight="bold" text-anchor="middle" fill="#156082">Consumer subscription</text>
+<text x="180" y="90" font-size="20" font-weight="bold" text-anchor="middle" fill="#156082">flat fee</text>
+<text x="48" y="118" font-size="12">You buy capacity, not consumption</text>
+<text x="48" y="138" font-size="12">Throttled by rate limits, not billed</text>
+<text x="48" y="154" font-size="12">per token</text>
+<text x="48" y="172" font-size="12" font-style="italic" fill="#595959">The provider absorbs the variance.</text>
+<rect x="350" y="40" width="300" height="140" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="500" y="64" font-size="13" font-weight="bold" text-anchor="middle" fill="#E97132">API and enterprise</text>
+<text x="500" y="90" font-size="20" font-weight="bold" text-anchor="middle" fill="#E97132">per token</text>
+<text x="368" y="118" font-size="12">Input and output priced separately</text>
+<text x="368" y="138" font-size="12">By model tier, itemised per request</text>
+<text x="368" y="172" font-size="12" font-style="italic" fill="#595959">You absorb the variance.</text>
+<rect x="30" y="196" width="620" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="216" font-size="13" font-weight="bold" text-anchor="middle">The token economics underneath are identical</text>
+<text x="340" y="234" font-size="12" text-anchor="middle" fill="#595959">What differs is who carries the risk of a heavy month.</text>
+</g></svg>`;
+
+const SVG_LEVERS = `
+<svg viewBox="0 0 680 310" role="img" aria-label="A ranked ladder of cost drivers from model choice down to agentic loops, with prompt caching and batch discounts shown working in the opposite direction.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="30" y="26" font-size="13" fill="#595959">Ranked by typical impact. The worst combinations multiply rather than add.</text>
+<rect x="30" y="40" width="410" height="34" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="46" y="62" font-size="12"><tspan font-weight="bold">1 · Model choice</tspan> — Opus is 5× Sonnet, Sonnet is 2× Haiku</text>
+<rect x="30" y="78" width="380" height="34" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="46" y="100" font-size="12"><tspan font-weight="bold">2 · Output length</tspan> — output costs 5× input, everywhere</text>
+<rect x="30" y="116" width="350" height="34" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="46" y="138" font-size="12"><tspan font-weight="bold">3 · Conversation length</tspan> — every turn re-sends the history (2.6)</text>
+<rect x="30" y="154" width="320" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="46" y="176" font-size="12"><tspan font-weight="bold">4 · Attachments</tspan> — re-read on every reference</text>
+<rect x="30" y="192" width="290" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="46" y="214" font-size="12"><tspan font-weight="bold">5 · Extended thinking</tspan> — tokens before the answer</text>
+<rect x="30" y="230" width="410" height="34" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="46" y="252" font-size="12"><tspan font-weight="bold">6 · Agentic loops</tspan> — the sleeper. See 7.7</text>
+<rect x="458" y="40" width="192" height="120" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="554" y="62" font-size="12" font-weight="bold" text-anchor="middle" fill="#156082">Working the other way</text>
+<text x="554" y="86" font-size="12" text-anchor="middle" fill="#156082">Prompt caching</text>
+<text x="554" y="104" font-size="14" font-weight="bold" text-anchor="middle" fill="#156082">0.1× input</text>
+<text x="554" y="128" font-size="12" text-anchor="middle" fill="#156082">Batch API</text>
+<text x="554" y="146" font-size="14" font-weight="bold" text-anchor="middle" fill="#156082">50% off</text>
+<text x="554" y="186" font-size="12" text-anchor="middle" fill="#595959">Both API-only.</text>
+<text x="554" y="204" font-size="12" text-anchor="middle" fill="#595959">Neither helps on a</text>
+<text x="554" y="220" font-size="12" text-anchor="middle" fill="#595959">flat subscription.</text>
+<text x="340" y="292" font-size="13" text-anchor="middle" fill="#595959">Opus + a large file + a long session + many iterations is the expensive combination.</text>
+</g></svg>`;
+
+const SVG_WINDOWS = `
+<svg viewBox="0 0 680 260" role="img" aria-label="Two overlapping limits: a rolling five-hour window that starts with your first message, and a weekly cap on top, both drawing from one shared pool.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="30" y="28" font-size="13" font-weight="bold">Two limits run at once</text>
+<rect x="30" y="42" width="620" height="46" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="46" y="62" font-size="12" font-weight="bold" fill="#156082">Rolling 5-hour window</text>
+<text x="46" y="80" font-size="12" fill="#156082">Starts with your first message. Refreshes five hours later — not at midnight, not on the hour.</text>
+<rect x="30" y="96" width="620" height="46" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="46" y="116" font-size="12" font-weight="bold" fill="#E97132">Weekly cap, on top</text>
+<text x="46" y="134" font-size="12" fill="#E97132">Resets seven days from your first message. Applies across all models.</text>
+<rect x="30" y="156" width="620" height="42" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="46" y="176" font-size="12" font-weight="bold">One shared pool</text>
+<text x="46" y="192" font-size="12" fill="#595959">claude.ai, the desktop app and Claude Code all draw from the same allowance.</text>
+<text x="30" y="224" font-size="12" fill="#595959">Anthropic publishes no fixed message counts. The official anchors are relative: Pro is at least 5× free,</text>
+<text x="30" y="242" font-size="12" fill="#595959">Max 5× is 5× Pro, Max 20× is 20× Pro. Everything else circulating is a practitioner estimate.</text>
+</g></svg>`;
+
+const SVG_LAYERS = `
+<svg viewBox="0 0 680 250" role="img" aria-label="Three layers of enterprise cost visibility, from per-request API billing up to per-user analytics.">
+<defs><marker id="e7" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="30" y="150" width="400" height="44" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="46" y="170" font-size="12" font-weight="bold">API usage billing</text>
+<text x="46" y="187" font-size="12" fill="#595959">every call priced per input and output token, per model, per request</text>
+<rect x="30" y="96" width="400" height="44" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="46" y="116" font-size="12" font-weight="bold">Admin Usage and Cost API</text>
+<text x="46" y="133" font-size="12" fill="#595959">tokens grouped by workspace, API key, model, service tier</text>
+<rect x="30" y="42" width="400" height="44" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="46" y="62" font-size="12" font-weight="bold" fill="#E97132">Enterprise Analytics API</text>
+<text x="46" y="79" font-size="12" fill="#E97132">per-user cost and usage, with engagement data alongside</text>
+<path d="M230 146 L230 142" stroke="#1a1a1a" stroke-width="1" marker-end="url(#e7)"/>
+<path d="M230 92 L230 88" stroke="#1a1a1a" stroke-width="1" marker-end="url(#e7)"/>
+<rect x="446" y="42" width="204" height="152" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="548" y="62" font-size="12" font-weight="bold" text-anchor="middle">What the top layer produces</text>
+<text x="462" y="86" font-size="11" fill="#595959">User</text>
+<text x="600" y="86" font-size="11" text-anchor="end" fill="#595959">Tokens · $ · PRs</text>
+<line x1="462" y1="92" x2="634" y2="92" stroke="#d9d9d9" stroke-width="0.75"/>
+<text x="462" y="110" font-size="11">a.smith@</text>
+<text x="634" y="110" font-size="11" text-anchor="end">4.1M · $38 · 12</text>
+<text x="462" y="130" font-size="11">b.jones@</text>
+<text x="634" y="130" font-size="11" text-anchor="end">0.9M · $9 · 3</text>
+<text x="462" y="150" font-size="11">c.patel@</text>
+<text x="634" y="150" font-size="11" text-anchor="end">7.6M · $71 · 21</text>
+<text x="548" y="178" font-size="11" text-anchor="middle" fill="#595959">Cost is the denominator.</text>
+<text x="340" y="228" font-size="13" text-anchor="middle" fill="#595959">Consumers want predictability and get a flat fee. Enterprises want accountability and get a meter.</text>
+</g></svg>`;
+
+const SVG_AGENTIC = `
+<svg viewBox="0 0 680 250" role="img" aria-label="One user instruction expanding into an agentic loop of read, reason, act and observe, with the token count incrementing on every pass.">
+<defs><marker id="g7" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="30" y="90" width="130" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="95" y="112" font-size="12" font-weight="bold">One instruction</text>
+<text x="95" y="129" font-size="11" fill="#595959">what you typed</text>
+<line x1="162" y1="116" x2="178" y2="116" stroke="#1a1a1a" stroke-width="1" marker-end="url(#g7)"/>
+<rect x="184" y="56" width="106" height="44" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="237" y="83" font-size="12" fill="#E97132">Read</text>
+<rect x="304" y="56" width="106" height="44" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="357" y="83" font-size="12" fill="#E97132">Reason</text>
+<rect x="304" y="134" width="106" height="44" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="357" y="161" font-size="12" fill="#E97132">Act</text>
+<rect x="184" y="134" width="106" height="44" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="237" y="161" font-size="12" fill="#E97132">Observe</text>
+<line x1="292" y1="78" x2="300" y2="78" stroke="#1a1a1a" stroke-width="1" marker-end="url(#g7)"/>
+<path d="M357 102 L357 130" stroke="#1a1a1a" stroke-width="1" marker-end="url(#g7)"/>
+<line x1="302" y1="156" x2="294" y2="156" stroke="#1a1a1a" stroke-width="1" marker-end="url(#g7)"/>
+<path d="M237 132 L237 104" stroke="#1a1a1a" stroke-width="1" marker-end="url(#g7)"/>
+<text x="297" y="200" font-size="12" font-style="italic" fill="#595959">each pass is a full request, carrying everything before it</text>
+<rect x="440" y="80" width="210" height="72" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="545" y="106" font-size="20" font-weight="bold">10–50×</text>
+<text x="545" y="126" font-size="12" fill="#595959">a single chat turn,</text>
+<text x="545" y="142" font-size="12" fill="#595959">for one instruction</text>
+<text x="340" y="234" font-size="13" fill="#595959">And it draws from the same shared pool as chat — so the cost lands where you were not watching.</text>
+</g></svg>`;
+
+const SVG_REVISIONS = `
+<svg viewBox="0 0 680 250" role="img" aria-label="A one-shot build against the same job over twenty revision rounds, showing cost accumulating because each round re-sends the growing codebase.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="30" y="26" font-size="13" fill="#595959">The same five-page site, two ways.</text>
+<text x="30" y="58" font-size="12" font-weight="bold">One-shot build</text>
+<rect x="30" y="66" width="70" height="30" fill="#156082" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="112" y="87" font-size="12" fill="#595959">tens of thousands of output tokens — a small slice of one session</text>
+<text x="30" y="132" font-size="12" font-weight="bold">Twenty revision rounds</text>
+<rect x="30" y="140" width="600" height="30" fill="#E97132" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="30" y="192" font-size="12" fill="#595959">Round one sends a short prompt. Round twenty sends the prompt plus nineteen rounds of accumulated</text>
+<text x="30" y="210" font-size="12" fill="#595959">code and discussion. If the codebase reaches 30,000 tokens, every later round pays for all of it again.</text>
+<text x="30" y="236" font-size="13" font-weight="bold">Twenty rounds is not 20× one round. It is closer to 200×, and none of it is visible while it happens.</text>
+</g></svg>`;
+
+const SVG_EXCEL = `
+<svg viewBox="0 0 680 260" role="img" aria-label="The same spreadsheet request handled by a person in chat and by the agentic add-in, showing that the agent's cost scales with what it must read.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="30" y="44" width="300" height="130" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="180" y="68" font-size="13" font-weight="bold" text-anchor="middle" fill="#156082">You, in chat</text>
+<text x="48" y="94" font-size="12">You paste the range that matters</text>
+<text x="48" y="114" font-size="12">You know where the answer goes</text>
+<text x="48" y="134" font-size="12">One turn, maybe two</text>
+<text x="48" y="160" font-size="12" font-weight="bold" fill="#156082">Cheap — if you already know how</text>
+<rect x="350" y="44" width="300" height="130" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="500" y="68" font-size="13" font-weight="bold" text-anchor="middle" fill="#E97132">The add-in</text>
+<text x="368" y="94" font-size="12">Reads the whole workbook</text>
+<text x="368" y="114" font-size="12">Tracks cross-tab dependencies</text>
+<text x="368" y="134" font-size="12">Multiple tool calls to make and verify</text>
+<text x="368" y="160" font-size="12" font-weight="bold" fill="#E97132">The most token-intensive mode there is</text>
+<rect x="30" y="190" width="620" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="210" font-size="13" font-weight="bold" text-anchor="middle">The agent's cost scales with what it must read, not with what you asked for</text>
+<text x="340" y="228" font-size="12" text-anchor="middle" fill="#595959">"Add a column" against a 200-tab workbook is an expensive instruction, however short.</text>
+</g></svg>`;
+
+const SVG_HABITS = `
+<svg viewBox="0 0 680 260" role="img" aria-label="A habit checklist beside a falling price trend, with the strategic implication annotated.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="30" y="40" width="330" height="176" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="195" y="64" font-size="13" font-weight="bold" text-anchor="middle" fill="#E97132">The habits, in order of effect</text>
+<text x="48" y="90" font-size="12">Match the model to the job — a 5× decision,</text>
+<text x="48" y="106" font-size="12">made dozens of times a day</text>
+<text x="48" y="128" font-size="12">Start fresh conversations when the topic changes</text>
+<text x="48" y="150" font-size="12">Do not paste what you can point at</text>
+<text x="48" y="172" font-size="12">On the API: cache reused prefixes, batch what</text>
+<text x="48" y="188" font-size="12">is not interactive</text>
+<text x="48" y="208" font-size="12">Watch the warning — it is your only signal</text>
+<rect x="380" y="40" width="270" height="176" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="515" y="64" font-size="13" font-weight="bold" text-anchor="middle" fill="#156082">Where prices are going</text>
+<path d="M400 90 C 460 96 520 150 630 176" fill="none" stroke="#156082" stroke-width="2.5"/>
+<text x="515" y="200" font-size="12" text-anchor="middle" fill="#156082">API prices fell roughly 80%</text>
+<text x="515" y="216" font-size="12" text-anchor="middle" fill="#156082">between early 2025 and early 2026</text>
+<text x="340" y="248" font-size="13" text-anchor="middle" fill="#595959">Optimise for the habits, not the arithmetic. The price is falling faster than you can shop.</text>
+</g></svg>`;
+
+const CARDS = [
+{
+ id:"S-026a", num:"7.1", title:"Two pricing models, and they do not resemble each other",
+ figure:SVG_TWOMODELS,
+ body:`<ul>
+ <li><strong>Consumer subscription</strong> (Claude Pro, Max): a flat monthly fee for access plus an allowance, throttled by <strong>rate limits</strong> rather than billed per token. You are buying capacity, not consumption.</li>
+ <li><strong>API and enterprise</strong>: billed <strong>per token</strong>, input and output priced separately, by model tier, itemised per request.</li>
+ </ul>`,
+ band:`On a subscription your marginal cost per answer is effectively zero until you hit the limit — at which point it becomes waiting. On the API it is a number on an invoice.`,
+ depth:`<p>The design difference is about who carries the risk of a heavy month. On a flat plan, the provider bets on average usage across its subscriber base: light users subsidise heavy ones, and the provider absorbs the variance. On the API the customer carries it entirely.</p>
+ <p>That explains a pattern worth recognising in vendor conversations generally. Flat pricing is offered where usage is bounded by human attention — a person can only read so much. Metered pricing is the norm where software drives the consumption, because software has no such limit. Which is exactly why agentic tools (7.7) sit awkwardly on flat plans.</p>`,
+ sources:"Structure current as of Aug 2026. Pricing and plan mechanics vary and change frequently \u2014 every figure in this chapter is point-in-time. Specific numbers and their sourcing are on 7.2, 7.3 and 7.4."
+},
+{
+ id:"S-043", num:"7.2", title:"What a token actually costs",
+ figure:`<table class="grid wide"><thead><tr><th>Model</th><th>Input / MTok</th><th>Output / MTok</th><th>Context</th><th>Knowledge cutoff</th></tr></thead><tbody>
+ <tr><td>Claude Fable 5</td><td>$10</td><td>$50</td><td>1M</td><td>Jan 2026</td></tr>
+ <tr><td><b>Claude Opus 5</b></td><td><b>$5</b></td><td><b>$25</b></td><td>1M</td><td>May 2026</td></tr>
+ <tr><td>Claude Sonnet 5</td><td>$2</td><td>$10</td><td>1M</td><td>Jan 2026</td></tr>
+ <tr><td>Claude Haiku 4.5</td><td>$1</td><td>$5</td><td>200K</td><td>Feb 2025</td></tr>
+ </tbody></table>
+ <table class="grid wide"><thead><tr><th>Mechanism</th><th>Effect</th><th>When it pays</th></tr></thead><tbody>
+ <tr><td><b>Prompt caching</b></td><td>Cache read at <b>$0.50 / MTok on Opus 5</b> — one tenth of input. Cache writes cost more than input ($6.25 for 5 min, $10 for 1 hr)</td><td>Whenever a long prefix is reused. Minimum cacheable prompt: 512 tokens</td></tr>
+ <tr><td><b>Batch API</b></td><td><b>50% off</b> both input and output</td><td>Anything that does not need an immediate answer</td></tr>
+ </tbody></table>`,
+ body:`<p>The chapter discussed per-token pricing four times without ever showing one. These are Anthropic's published list prices, as of 30 August 2026.</p>`,
+ band:`Output costs five times input on every tier. Opus is five times Sonnet. Sonnet is twice Haiku. Those three ratios explain most of any bill.`,
+ depth:`<p>Prompt caching deserves the most attention from anyone building on the API, because it attacks the structural problem from 2.6 directly. Every turn re-sends the whole conversation, so a long session pays repeatedly for the same tokens — and caching drops the price of that repetition by 90%.</p>
+ <p>The batch discount is the other underused one. Any work that is not interactive — overnight document processing, backfills, evaluation runs (5.8) — is half price for the cost of waiting.</p>
+ <p>Note also what the table shows about model choice. Fable 5 costs double Opus 5 and carries a knowledge cutoff four months older. "Use the most capable model" is not automatically the right default even before cost enters the argument.</p>`,
+ sources:"Anthropic model documentation, platform.claude.com, fetched 30 Aug 2026 \u2014 primary. List prices only; they exclude negotiated enterprise terms, and this is a point-in-time snapshot. Pricing has moved repeatedly and will again \u2014 re-check before quoting any figure here."
+},
+{
+ id:"S-026b", num:"7.3", title:"Why your subscription shows no per-token cost",
+ figure:null,
+ body:`<ul>
+ <li><strong>Tokens are not the billing unit. The month is.</strong> There is no line item because there is no line.</li>
+ <li><strong>Predictability.</strong> No bill shock, no meter running, no reason to hesitate before asking. That friction is a real product cost, and removing it is the point.</li>
+ <li><strong>It smooths enormous per-message variance.</strong> One message costs 500 tokens; another costs 200,000. Averaging that across subscribers is the business model.</li>
+ <li><strong>Your effective cost per answer</strong> is the monthly fee divided by answers used — so the more you use it, the cheaper each one gets. The per-token figure is undefined by design.</li>
+ </ul>
+ <p><strong>Estimating trick:</strong> count the tokens and multiply by the published API rate (7.2). That tells you what the work <em>would</em> cost on the API — not what you are paying.</p>`,
+ depth:`<p>The estimate is worth doing occasionally, because it calibrates intuition in both directions. A long Opus session with large attachments can represent tens of dollars of API equivalent inside a $20 subscription. A month of light chat use might represent two dollars.</p>
+ <p>There is also a middle path now. <strong>Usage credits</strong> let a Pro or Max subscriber continue past the included limit at standard API rates, reportedly capped at $2,000 of redemption per day — which turns the hard stop into a price, for those who want that.</p>`,
+ sources:"Usage-credit mechanism and the $2,000 daily redemption cap: Morph Claude Code limits guide (Aug 2026) \u2014 secondary. Point-in-time; verify in-product before relying on it."
+},
+{
+ id:"S-028a", num:"7.4", title:"What the limits actually are",
+ figure:SVG_WINDOWS,
+ body:`<ul>
+ <li><strong>Anthropic publishes no fixed message counts.</strong> Widely reported practitioner estimates put Pro near 45 messages per five-hour window, Max 5× near 225, Max 20× near 900 — <strong>estimates, not published figures</strong>.</li>
+ <li><strong>Consumption is opaque by design</strong> — a blend of message length, attachment size, conversation length, model, feature and effort level. Your only real signal is the limit warning.</li>
+ <li><strong>Pro is $17/month billed annually, $20 monthly.</strong> Max 5× is $100; Max 20× is $200.</li>
+ </ul>`,
+ band:`On 6 May 2026 Anthropic doubled the five-hour limits for Pro, Max, Team and seat-based Enterprise plans, and removed the previous peak-hour reductions. Any figure quoted from before that date understates what you get.`,
+ depth:`<p>The shared pool is the practically important point, and it is the one people discover the hard way. An hour of agentic work in the morning can leave a materially smaller chat allowance in the afternoon, from what feels like a different product.</p>
+ <p>On the message-count estimates: treat them as folklore with a good empirical basis. They recur consistently across independent trackers, which is mild evidence they are roughly right, and Anthropic's own position is that capacity scales by plan multiplier rather than by a countable number of messages. Quoting "225 messages" as though it were published is the kind of specific, checkable, wrong claim this course keeps warning about.</p>`,
+ sources:"Relative anchors, the dual five-hour and weekly structure, the shared pool and the 6 May 2026 doubling: Morph (Aug 2026), DeployHyre (Aug 2026), ClaudeLimit (verified 16 Aug 2026), Pranoti (Jul 2026) \u2014 all secondary, all consistent. Message-count estimates are practitioner-reported, not published by Anthropic. One source attributes the May doubling specifically to Claude Code; others describe it as plan-wide \u2014 the scope is ambiguous and should be checked. Plans and limits are point-in-time and change often."
+},
+{
+ id:"S-027a", num:"7.5", title:"Enterprise cost attribution",
+ figure:SVG_LAYERS,
+ body:`<p>Enterprises get the itemisation consumers do not, in three layers. Together they answer the question executives actually ask: <em>"Employee A completed Y processes, used Z tokens, at a cost of $___."</em></p>
+ <p>The top layer carries engagement data alongside cost — conversation counts, Claude Code sessions, commits, pull requests, lines changed.</p>`,
+ band:`Consumers want predictability, so they get a flat fee. Enterprises want accountability for chargebacks, ROI and governance, so they get a meter and a dashboard. Same token economics, opposite bills.`,
+ depth:`<p>Worth thinking about what per-user attribution is actually for, because it can be used two ways. Chargeback and capacity planning are the benign uses. Performance measurement is the other one, and "tokens consumed" is a spectacularly bad proxy for value delivered — it rewards verbosity, long sessions and expensive models. The employee who solves a problem in one well-aimed Haiku call looks like a low performer.</p>
+ <p>If you are asked to build reporting on this, the engagement metrics (commits, pull requests, processes completed) are the numerator, and cost is the denominator. Reporting the denominator alone measures nothing.</p>`,
+ sources:"The three-layer structure is described in secondary sources (Finout, 2026). Specific claims an earlier draft carried \u2014 Enterprise-plan only, Primary Owner access, cost data in beta, roughly four-hour refresh with up to 24-hour delay, aggregation by user and time rather than per request, Bedrock-routed usage excluded \u2014 were not verified in this pass and are stated in general terms here instead. Check Anthropic's documentation before putting the specifics in front of anyone."
+},
+{
+ id:"S-028b", num:"7.6", title:"The cost levers, ranked",
+ figure:SVG_LEVERS,
+ body:`<p>The context-length lever is the one that surprises people, because the cost is invisible at the point you incur it. Your twentieth message may be four words long; the request that carries it includes everything from messages one to nineteen.</p>`,
+ band:`Which produces the single most effective habit in this chapter: start a fresh conversation when the topic changes. It costs nothing, it sheds accumulated context, and it usually improves answer quality too — the model is no longer weighing irrelevant history.`,
+ depth:`<p>The bill grows quadratically with conversation length even though your typing does not. Ten short exchanges cost far less than the tenth exchange of a long one.</p>
+ <p>Note which levers are available to whom. Model choice, output length, context length and attachments are yours on any plan. Caching and batching exist only on the API — a subscriber cannot reach them, which is part of why the flat plan smooths cost rather than reducing it.</p>`,
+ sources:"Price ratios from 7.2 (primary). The ranking is a judgment about typical usage, not a measurement."
+},
+{
+ id:"S-028c", num:"7.7", title:"The sleeper: agentic tools",
+ figure:SVG_AGENTIC,
+ body:`<ul>
+ <li>Claude Code, Claude for Excel, Cowork and similar tools make <strong>many model calls per action</strong>. One instruction becomes read → reason → act → observe → repeat, and each pass is a full request carrying its accumulated context.</li>
+ <li>A single agentic action can cost <strong>10–50× a single chat turn</strong>.</li>
+ <li>It draws from the <strong>same shared pool</strong> as chat (7.4), so the cost lands somewhere you were not watching.</li>
+ </ul>`,
+ depth:`<p>The economics are not unreasonable — the agent is doing work that would otherwise be many manual turns, and often does it better. The problem is purely one of <em>visibility</em>. A chat turn feels like a unit of consumption because you typed it. An agentic action feels like one instruction and is fifty.</p>
+ <p>Two habits follow. Use Sonnet rather than Opus for agentic work unless the task genuinely needs the reasoning — the loop multiplies whatever per-token rate you chose. And scope the task before starting it, because an agent given a vague objective (4.7) explores, and exploration is where the multiplier lives.</p>`,
+ sources:"The 10\u201350\u00d7 range is a practitioner estimate carried from the earlier draft and not verified against a published measurement. The mechanism is not in dispute; the multiplier is indicative."
+},
+{
+ id:"S-029a", num:"7.8", title:"Worked case: building a five-page website",
+ figure:SVG_REVISIONS,
+ body:`<ul>
+ <li><strong>Reframe the question.</strong> Limits are per five-hour session and per week, not per month. The real question is "will this blow my current window," not "what percentage of my month is this."</li>
+ <li><strong>A one-shot build</strong> of a five-page site is tens of thousands of output tokens — a small slice of one five-hour session. Not half your month.</li>
+ <li><strong>What inflates it:</strong> Opus rather than Sonnet; twenty rounds of revisions, each re-sending the growing codebase; large reference files or images.</li>
+ <li><strong>Practical:</strong> build in Sonnet, and start a fresh conversation for each page.</li>
+ </ul>`,
+ depth:`<p>The revisions are the whole story. Round one sends a short prompt. Round twenty sends the prompt plus nineteen rounds of accumulated code and discussion. If the codebase has grown to 30,000 tokens, every subsequent round pays for all of it again, before generating anything new.</p>
+ <p>Twenty rounds against a growing context is not twenty times the cost of one round. It is closer to two hundred times, and none of it is visible while it is happening.</p>`,
+ sources:"Illustrative arithmetic based on the published mechanics of 2.6 and the price ratios of 7.2, not a measured case."
+},
+{
+ id:"S-029b", num:"7.9", title:"Worked case: Claude for Excel against desktop chat",
+ figure:SVG_EXCEL,
+ body:`<ul>
+ <li>One pivot table on a small tidy sheet is <strong>modest</strong>. The same pivot on a large multi-tab workbook, iterated, in Opus, <strong>burns fast</strong> — the whole workbook is context on every loop.</li>
+ <li><strong>If you know how and the sheet is simple, doing it yourself is cheaper.</strong> That instinct is correct.</li>
+ <li><strong>If you use the agent:</strong> Sonnet not Opus, and reserve it for cross-tab reasoning that saves real time rather than for one-liners.</li>
+ </ul>`,
+ band:`A single website or a single pivot table will not exhaust your month. Long Opus sessions, large files and agentic tools on big inputs are what do.`,
+ depth:`<p>The decision rule generalises well beyond Excel. Use the agent when <em>the reading is the work</em> — cross-tab dependencies, tracing a value through a model, finding what breaks if a number changes. Do it yourself when the writing is the work and you already know where to put it.</p>
+ <p>It also explains why the same tool feels cheap to one colleague and ruinous to another. They are not using it differently. Their workbooks are different sizes.</p>`,
+ sources:"Mechanism from descriptions of the Excel add-in's behaviour as of Aug 2026. An anecdote the earlier draft carried \u2014 that some users \u201Cmaxed out Pro in five minutes\u201D \u2014 was unsourced and has been dropped. Relative cost is directional, not measured."
+},
+{
+ id:"S-044", num:"7.10", title:"What to actually do, and where prices are going",
+ figure:SVG_HABITS,
+ body:`<p>Two things worth carrying out of this chapter: a short list of habits, and one trend that reframes all of them.</p>
+ <ul>
+ <li>API prices fell roughly <strong>80% between early 2025 and early 2026</strong>, with open-weight APIs pushing the floor to around <strong>$0.07–0.14 per million input tokens</strong> (6.4).</li>
+ <li>Capability per dollar is improving faster than capability alone.</li>
+ </ul>`,
+ band:`Optimise for the habits, not the arithmetic. The per-token price is falling fast enough that the durable saving comes from not doing wasteful things, rather than from picking the cheapest provider.`,
+ depth:`<p>The price trend has a strategic reading that matters more than the tactical one. If cost per unit of capability keeps falling at anything like this rate, then decisions that lock in cost structures — self-hosting on owned hardware (6.4), long-term capacity commitments, architectures built to minimise token consumption at the expense of quality — are being made against a rapidly moving denominator.</p>
+ <p>The corollary is uncomfortable for planning. Building something to be cheap today can leave you with a worse product and no cost advantage in eighteen months. The things that hold their value are the ones from Chapter 5: your data, your tools, your evaluations.</p>
+ <p>And the honest caveat: an 80% decline in list price does not mean an 80% decline in your bill. Consumption has risen at least as fast, because agentic tools consume what falls in price. That is not a paradox — it is what happens to any input whose price drops while its usefulness rises.</p>`,
+ sources:"The 80% decline figure and the open-weight price floor: packet.ai (27 Jul 2026) \u2014 secondary, the same source used on 6.4. The habits follow from the mechanics on 7.6. The strategic reading is analysis. All prices point-in-time."
+},
+{
+ apparatus:true, label:"Glossary", title:"Chapter 7 — Glossary and organisations",
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Slide</th></tr></thead><tbody>
+ <tr><td>list price</td><td>The published per-token rate, before negotiated enterprise terms</td><td>7.2</td></tr>
+ <tr><td>input / output tokens</td><td>Priced separately. Output costs roughly 5× input on every tier</td><td>7.2</td></tr>
+ <tr><td>prompt caching</td><td>Reusing a long prefix at a fraction of input price. Writes cost more than input</td><td>7.2</td></tr>
+ <tr><td>Batch API</td><td>Half price, for work that does not need an immediate answer</td><td>7.2</td></tr>
+ <tr><td>rolling window</td><td>A five-hour allowance starting at your first message, not at a fixed clock time</td><td>7.4</td></tr>
+ <tr><td>weekly cap</td><td>A second limit on top of the session window, resetting seven days from first use</td><td>7.4</td></tr>
+ <tr><td>shared pool</td><td>Chat, desktop and Claude Code all drawing from one allowance</td><td>7.4</td></tr>
+ <tr><td>usage credits</td><td>Continuing past the included limit at API rates, rather than stopping</td><td>7.3</td></tr>
+ <tr><td>effort level</td><td>How much reasoning the model spends before answering. Affects consumption</td><td>7.4</td></tr>
+ <tr><td>per-user attribution</td><td>Cost and usage reported by named user, for chargeback and governance</td><td>7.5</td></tr>
+ <tr><td>chargeback</td><td>Allocating shared platform cost back to the team that incurred it</td><td>7.5</td></tr>
+ <tr><td>agentic loop cost</td><td>One instruction becoming many billed model calls</td><td>7.7</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Carried forward from earlier chapters</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>token</td><td>The billing unit. Roughly 0.75 words of English prose per token</td><td>2.4</td></tr>
+ <tr><td>the re-sent history</td><td>Every turn carries the whole conversation. The root of most cost surprises</td><td>2.6</td></tr>
+ <tr><td>extended thinking</td><td>Tokens spent reasoning before the answer appears</td><td>2.5</td></tr>
+ <tr><td>agentic tools</td><td>Models that act across multiple steps, operating tools</td><td>1.6, 4.4</td></tr>
+ <tr><td>what holds its value</td><td>Your data, your tools, your evaluations — not the model you picked</td><td>5.13</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Sources in this chapter</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>Anthropic</td><td>Private</td><td>The price table on 7.2, from its own model documentation — the only primary pricing source in the course <em>(also 1.5)</em></td></tr>
+ <tr><td>Independent limit trackers</td><td>Various</td><td>Morph, DeployHyre, ClaudeLimit and others. Consistent with each other, unaffiliated with Anthropic, and the only source for limit mechanics because Anthropic does not publish them</td></tr>
+ </tbody></table>
+ <p class="disclaim">Combined page, permitted under §12. Every price and limit in this chapter is point-in-time and will change. Not investment advice and not a view on any security.</p>`,
+ body:`<p>Terms this chapter owns, in order of first appearance.</p>`
+},
+{
+ apparatus:true, label:"What's next", title:"End of Chapter 7",
+ figure:null,
+ body:`<p>Ten slides. The argument, in one line: a subscription buys capacity and an API bills consumption, the same token economics underneath both; model choice, output length and conversation length drive most of the bill; agentic tools are the sleeper because one instruction becomes fifty calls; and the price is falling fast enough that habits matter more than arithmetic.</p>
+ <p><strong>Every price and limit in this chapter is point-in-time.</strong> The list prices came from Anthropic's documentation on 30 August 2026 and the limit mechanics from independent trackers, because Anthropic does not publish them. Both move. Check before you quote.</p>
+ <p><strong>Chapter 8 — Mapping AI capex.</strong> Where the money actually goes across the whole value chain: half of every dollar to something other than chips, power as the second-biggest line, and the constraints nobody models.</p>
+ <p class="nextlink"><a href="understanding-ai-ch8-reader.html">Continue to Chapter 8 →</a></p>
+ <p class="hint2">Chapters are added as the subject moves, and it moves constantly — data centres in orbit, energy siting, architectures that break the assumptions in Chapter 2. The numbering is for convenience, not sequence, and no chapter is the last one.</p>
+ <div class="btnrow">
+   <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
+   <span id="say2" class="said"></span>
+ </div>`
+}
+];
+
+let i = 0;
+const seen = new Set([0]);
+const asked = [];
+
+const stage = document.getElementById('stage');
+const dotsEl = document.getElementById('dots');
+const posEl = document.getElementById('pos');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+const qEl = document.getElementById('q');
+const sayEl = document.getElementById('say');
+const logbox = document.getElementById('logbox');
+const loglist = document.getElementById('loglist');
+
+const CONTENT = CARDS.filter(function(c){ return !c.apparatus; }).length;
+
+function render(){
+  const c = CARDS[i];
+  seen.add(i);
+  stage.innerHTML =
+    '<h1 class="cardtitle">' + c.title + '</h1>' +
+    (c.apparatus ? '' :
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — slide ' + (i+1) + ' of ' + CONTENT + '</p>') +
+    (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
+    '<div class="body">' + c.body + '</div>' +
+    (c.band ? '<div class="band">' + c.band + '</div>' : '') +
+    (c.depth ? '<details class="deeper"><summary>Go deeper</summary><div class="inner">' + c.depth + '</div></details>' : '') +
+    (c.sources ? '<p class="sources">' + c.sources + '</p>' : '');
+
+  document.querySelector('.ask').style.display = c.apparatus ? 'none' : '';
+
+  const ch2 = document.getElementById('ch2btn');
+  const allb = document.getElementById('allbtn');
+  const say2 = document.getElementById('say2');
+  if (ch2) {
+    ch2.onclick = function(){
+      copyText(CH2_PROMPT, function(){
+        say2.className = 'said';
+        say2.textContent = 'Copied. Paste it into Claude.';
+      }, say2);
+    };
+  }
+  if (allb) { allb.onclick = function(){ copyAll(say2); }; }
+
+  posEl.textContent = c.apparatus ? c.label : (i+1) + ' / ' + CONTENT;
+  prevB.disabled = (i === 0);
+  nextB.disabled = (i === CARDS.length - 1);
+  qEl.value = '';
+  sayEl.textContent = '';
+  dotsEl.innerHTML = '';
+  CARDS.forEach(function(c2, n){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    if (n === i) b.setAttribute('aria-current','true');
+    let cls = c2.apparatus ? 'app' : '';
+    if (seen.has(n) && n !== i) cls += ' seen';
+    b.className = cls.trim();
+    b.innerHTML = '<i></i>';
+    b.onclick = function(){ i = n; render(); };
+    dotsEl.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+
+function go(d){
+  const n = i + d;
+  if (n < 0 || n >= CARDS.length) return;
+  i = n; render();
+}
+
+prevB.onclick = function(){ go(-1); };
+nextB.onclick = function(){ go(1); };
+
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { i = 0; render(); }
+  if (e.key === 'End')  { i = CARDS.length - 1; render(); }
+});
+
+function promptFor(card, q){
+  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
+    card.title + '".\n\nMy question: ' + q;
+}
+
+const CH2_PROMPT = '';
+
+function copyText(text, ok, target){
+  const el = target || sayEl;
+  function fallback(){
+    const t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); ok(); }
+    catch(e){ el.className = 'err'; el.textContent = 'Copy failed — select the text manually.'; }
+    document.body.removeChild(t);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else { fallback(); }
+}
+
+function copyAll(target){
+  const el = target || sayEl;
+  if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
+  let out = '# Understanding AI — questions from Chapter 7\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  asked.forEach(function(a){
+    out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
+  });
+  copyText(out, function(){
+    el.className = 'said';
+    el.textContent = 'Copied ' + asked.length + ' question(s) in notes-block format.';
+  }, el);
+}
+
+document.getElementById('copyq').onclick = function(){
+  const q = qEl.value.trim();
+  if (!q) { sayEl.className = 'err'; sayEl.textContent = 'Type a question first.'; qEl.focus(); return; }
+  const card = CARDS[i];
+  copyText(promptFor(card, q), function(){
+    asked.push({ card: card, q: q });
+    const li = document.createElement('li');
+    li.textContent = card.num + ' · ' + card.id + ' — ' + q;
+    loglist.appendChild(li);
+    logbox.classList.add('on');
+    sayEl.className = 'said';
+    sayEl.textContent = 'Copied. Paste it into Claude.';
+    qEl.value = '';
+  });
+};
+
+document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+render();
+</script>
+</body>
+</html>

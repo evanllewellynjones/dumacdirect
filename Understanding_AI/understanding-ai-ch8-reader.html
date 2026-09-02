@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Chapter 8 reader</title>
+<style>
+  :root{
+    --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+    --blue:#156082; --orange:#E97132; --wash:#f2f2f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .shell{max-width:820px;margin:0 auto;padding:28px 28px 140px}
+
+  header.top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
+  header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
+  header.top .ch a.backlink:hover{text-decoration:underline}
+  header.top .ch .sep{color:var(--muted);font-weight:normal}
+  header.top .meta{color:var(--muted);font-size:13px}
+
+  h1.cardtitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.25;margin:0 0 4px}
+  .cardid{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .body p{margin:0 0 14px;max-width:70ch}
+  .body ul{margin:0 0 16px;padding-left:20px;max-width:70ch}
+  .body li{margin:0 0 7px}
+  .body strong{color:#000}
+  .figure{margin:22px 0 24px}
+  .figure svg{width:100%;height:auto;display:block}
+
+  table.grid{border-collapse:collapse;font-size:15px;margin:4px 0 18px;width:100%;max-width:560px}
+  table.grid th{text-align:left;font-weight:bold;border-bottom:1px solid var(--ink);padding:5px 12px 5px 0}
+  table.grid td{border-bottom:1px solid var(--rule);padding:5px 12px 5px 0;vertical-align:top}
+
+  .stats{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 20px}
+  .stat{flex:1 1 150px;border-top:2px solid var(--navy);padding-top:8px}
+  .stat b{display:block;color:var(--navy);font-size:26px;line-height:1.1}
+  .stat span{display:block;color:var(--muted);font-size:13px;margin-top:5px}
+
+  .band{background:var(--wash);padding:12px 16px;margin:20px 0;font-size:15px;max-width:70ch}
+
+  .twocol{display:flex;gap:22px;flex-wrap:wrap;margin:4px 0 6px}
+  .twocol .col{flex:1 1 260px;padding-top:9px}
+  .twocol .col.blue{border-top:2px solid var(--blue)}
+  .twocol .col.orange{border-top:2px solid var(--orange)}
+  .twocol h3{font-size:14px;margin:0 0 10px;font-weight:bold}
+  .twocol .blue h3{color:var(--blue)}
+  .twocol .orange h3{color:var(--orange)}
+  .twocol p{font-size:14px;margin:0 0 10px;color:#2a2a2a}
+  .twocol b{display:inline-block;min-width:96px;font-size:16px;color:var(--ink)}
+
+  table.grid.wide{max-width:100%}
+  table.grid a{color:var(--blue);text-decoration:none}
+  table.grid a:hover{text-decoration:underline}
+  table.grid.wide td:last-child{width:auto}
+  h4.grouplabel{font-size:14px;margin:18px 0 6px;color:var(--navy)}
+  p.disclaim{font-size:13px;font-style:italic;color:var(--muted)}
+  p.warn{background:var(--wash);padding:11px 14px;font-size:15px;max-width:70ch}
+  p.hint2{font-size:13px;color:var(--muted);margin-top:14px;max-width:70ch}
+  code{font-family:Consolas,monospace;font-size:13px;background:var(--wash);padding:1px 4px}
+  .dots button.app i{border-radius:0;width:8px;height:8px;margin:3px 2px}
+  p.nextlink{margin:20px 0 6px}
+  p.nextlink a{color:var(--blue);font-size:19px;font-weight:bold;text-decoration:none}
+  p.nextlink a:hover{text-decoration:underline}
+
+  details.deeper{border-top:1px solid var(--rule);margin-top:26px;padding-top:12px}
+  details.deeper summary{cursor:pointer;color:var(--blue);font-size:15px;list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:"▸ ";}
+  details.deeper[open] summary::before{content:"▾ ";}
+  details.deeper .inner{padding-top:12px}
+  details.deeper p{font-size:16px;color:#2a2a2a}
+
+  .sources{color:var(--muted);font-size:13px;font-style:italic;margin-top:22px;max-width:70ch}
+
+  .ask{border-top:1px solid var(--rule);margin-top:26px;padding-top:16px}
+  .ask h2{font-size:15px;color:var(--navy);margin:0 0 8px;font-weight:bold}
+  .ask p.hint{font-size:13px;color:var(--muted);margin:0 0 10px;max-width:70ch}
+  .ask textarea{width:100%;max-width:70ch;min-height:62px;font-family:inherit;font-size:15px;
+    padding:8px 10px;border:1px solid var(--rule);border-radius:3px;resize:vertical}
+  .ask textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--navy);
+    background:#fff;color:var(--navy);border-radius:3px;cursor:pointer}
+  button:hover{background:var(--navy);color:#fff}
+  button:disabled{opacity:.4;cursor:default}
+  button.ghost{border-color:var(--rule);color:var(--muted)}
+  button.ghost:hover{background:var(--wash);color:var(--ink)}
+  .said{font-size:13px;color:var(--blue)}
+  .err{font-size:13px;color:#a32d2d}
+
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--rule)}
+  nav.bar .inner{max-width:820px;margin:0 auto;padding:12px 28px;
+    display:flex;align-items:center;gap:16px}
+  .dots{display:flex;gap:7px;flex:1}
+  .dots button{padding:0;border:none;background:none;width:14px;height:14px;cursor:pointer}
+  .dots i{display:block;width:9px;height:9px;border-radius:50%;background:#fff;
+    border:1px solid var(--muted);margin:2px}
+  .dots button[aria-current="true"] i{background:var(--navy);border-color:var(--navy)}
+  .dots button.seen i{background:var(--rule);border-color:var(--rule)}
+  .pos{font-size:13px;color:var(--muted);white-space:nowrap}
+
+  .logbox{border:1px solid var(--rule);padding:14px 16px;margin-top:18px;font-size:14px;display:none}
+  .logbox.on{display:block}
+  .logbox h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .logbox ol{margin:0;padding-left:20px}
+  .logbox li{margin-bottom:6px;color:#2a2a2a}
+
+  @media (max-width:640px){
+    .shell{padding:20px 18px 150px}
+    nav.bar .inner{padding:10px 18px;gap:10px}
+    h1.cardtitle{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 8 — Mapping AI capex</div>
+    <div class="meta">v2.1 · 30 Aug 2026</div>
+  </header>
+
+  <main id="stage" tabindex="-1"></main>
+
+  <section class="ask">
+    <h2>Ask about this slide</h2>
+    <p class="hint">This reader has the slides but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the slide ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this slide?"></textarea>
+    <div class="btnrow">
+      <button id="copyq">Copy question for Claude</button>
+      <button id="copyall" class="ghost">Copy all questions from this session</button>
+      <span id="say" class="said"></span>
+    </div>
+    <div class="logbox" id="logbox">
+      <h3>Questions saved this session</h3>
+      <ol id="loglist"></ol>
+    </div>
+  </section>
+</div>
+
+<nav class="bar">
+  <div class="inner">
+    <button id="prev">← Back</button>
+    <div class="dots" id="dots"></div>
+    <span class="pos" id="pos"></span>
+    <button id="next">Next →</button>
+  </div>
+</nav>
+
+<script>
+const SVG_SANKEY = `<svg viewBox="0 0 680 996" role="img" aria-label="Sankey diagram showing where each 100 dollars of AI capital expenditure flows: 50 dollars to semiconductor chips and servers, 20 to power, 15 to networking, and 7.5 each to cooling and to facilities and construction, then onward to around twenty end nodes.">
+<g font-family="Calibri, sans-serif">
+<text x="30" y="26" font-size="14" font-weight="bold" fill="#1a1a1a">Where does $100 of AI capex flow?</text>
+<text x="30" y="44" font-size="12" fill="#595959">Blue — the chip and memory chain Chapter 3 already covered. Grey — what this chapter adds.</text>
+<path d="M44.0,170.0 C120.0,170.0 120.0,75.0 196.0,75.0 L196.0,375.0 C120.0,375.0 120.0,470.0 44.0,470.0 Z" fill="#156082" fill-opacity="0.28" stroke="none"/>
+<path d="M44.0,470.0 C120.0,470.0 120.0,422.5 196.0,422.5 L196.0,512.5 C120.0,512.5 120.0,560.0 44.0,560.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M44.0,560.0 C120.0,560.0 120.0,560.0 196.0,560.0 L196.0,680.0 C120.0,680.0 120.0,680.0 44.0,680.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M44.0,680.0 C120.0,680.0 120.0,727.5 196.0,727.5 L196.0,772.5 C120.0,772.5 120.0,725.0 44.0,725.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M44.0,725.0 C120.0,725.0 120.0,820.0 196.0,820.0 L196.0,865.0 C120.0,865.0 120.0,770.0 44.0,770.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,75.0 C307.0,75.0 307.0,64.0 404.0,64.0 L404.0,214.0 C307.0,214.0 307.0,225.0 210.0,225.0 Z" fill="#156082" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,225.0 C307.0,225.0 307.0,225.0 404.0,225.0 L404.0,315.0 C307.0,315.0 307.0,315.0 210.0,315.0 Z" fill="#156082" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,315.0 C307.0,315.0 307.0,326.0 404.0,326.0 L404.0,386.0 C307.0,386.0 307.0,375.0 210.0,375.0 Z" fill="#156082" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,422.5 C307.0,422.5 307.0,406.0 404.0,406.0 L404.0,424.0 C307.0,424.0 307.0,440.5 210.0,440.5 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,440.5 C307.0,440.5 307.0,435.0 404.0,435.0 L404.0,447.0 C307.0,447.0 307.0,452.5 210.0,452.5 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,452.5 C307.0,452.5 307.0,458.0 404.0,458.0 L404.0,485.0 C307.0,485.0 307.0,479.5 210.0,479.5 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,479.5 C307.0,479.5 307.0,496.0 404.0,496.0 L404.0,529.0 C307.0,529.0 307.0,512.5 210.0,512.5 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,560.0 C307.0,560.0 307.0,549.0 404.0,549.0 L404.0,588.0 C307.0,588.0 307.0,599.0 210.0,599.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,599.0 C307.0,599.0 307.0,599.0 404.0,599.0 L404.0,659.0 C307.0,659.0 307.0,659.0 210.0,659.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,659.0 C307.0,659.0 307.0,670.0 404.0,670.0 L404.0,691.0 C307.0,691.0 307.0,680.0 210.0,680.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,727.5 C307.0,727.5 307.0,711.0 404.0,711.0 L404.0,720.0 C307.0,720.0 307.0,736.5 210.0,736.5 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,736.5 C307.0,736.5 307.0,731.0 404.0,731.0 L404.0,743.0 C307.0,743.0 307.0,748.5 210.0,748.5 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,748.5 C307.0,748.5 307.0,754.0 404.0,754.0 L404.0,769.0 C307.0,769.0 307.0,763.5 210.0,763.5 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,763.5 C307.0,763.5 307.0,780.0 404.0,780.0 L404.0,789.0 C307.0,789.0 307.0,772.5 210.0,772.5 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,820.0 C307.0,820.0 307.0,809.0 404.0,809.0 L404.0,815.0 C307.0,815.0 307.0,826.0 210.0,826.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,826.0 C307.0,826.0 307.0,826.0 404.0,826.0 L404.0,850.0 C307.0,850.0 307.0,850.0 210.0,850.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<path d="M210.0,850.0 C307.0,850.0 307.0,861.0 404.0,861.0 L404.0,876.0 C307.0,876.0 307.0,865.0 210.0,865.0 Z" fill="#A6A6A6" fill-opacity="0.28" stroke="none"/>
+<rect x="30" y="170.0" width="14" height="600.0" fill="#1a1a1a"/>
+<text x="30" y="146.0" font-size="13" font-weight="bold" fill="#1a1a1a">AI capex</text>
+<text x="30" y="162.0" font-size="13" font-weight="bold" fill="#1a1a1a">$100</text>
+<rect x="196" y="75.0" width="14" height="300.0" fill="#156082"/>
+<text x="187" y="223.0" font-size="12" font-weight="bold" text-anchor="end" fill="#1a1a1a">Semi chips</text>
+<text x="187" y="238.0" font-size="13" font-weight="bold" text-anchor="end" fill="#595959">$50</text>
+<rect x="196" y="422.5" width="14" height="90.0" fill="#A6A6A6"/>
+<text x="187" y="465.5" font-size="12" font-weight="bold" text-anchor="end" fill="#1a1a1a">Networking equipment</text>
+<text x="187" y="480.5" font-size="13" font-weight="bold" text-anchor="end" fill="#595959">$15</text>
+<rect x="196" y="560.0" width="14" height="120.0" fill="#A6A6A6"/>
+<text x="187" y="618.0" font-size="12" font-weight="bold" text-anchor="end" fill="#1a1a1a">Power</text>
+<text x="187" y="633.0" font-size="13" font-weight="bold" text-anchor="end" fill="#595959">$20</text>
+<rect x="196" y="727.5" width="14" height="45.0" fill="#A6A6A6"/>
+<text x="187" y="748.0" font-size="12" font-weight="bold" text-anchor="end" fill="#1a1a1a">Cooling</text>
+<text x="187" y="763.0" font-size="13" font-weight="bold" text-anchor="end" fill="#595959">$7.5</text>
+<rect x="196" y="820.0" width="14" height="45.0" fill="#A6A6A6"/>
+<text x="187" y="840.5" font-size="12" font-weight="bold" text-anchor="end" fill="#1a1a1a">Facilities & Construction</text>
+<text x="187" y="855.5" font-size="13" font-weight="bold" text-anchor="end" fill="#595959">$7.5</text>
+<rect x="404" y="64.0" width="14" height="150.0" fill="#156082"/>
+<text x="428" y="143.0" font-size="12" fill="#1a1a1a">Accelerator <tspan font-weight="bold">$25</tspan></text>
+<rect x="404" y="225.0" width="14" height="90.0" fill="#156082"/>
+<text x="428" y="274.0" font-size="12" fill="#1a1a1a">Memory ICs <tspan font-weight="bold">$15</tspan></text>
+<rect x="404" y="326.0" width="14" height="60.0" fill="#156082"/>
+<text x="428" y="353.0" font-size="12" fill="#1a1a1a">CPUs, other chips</text>
+<text x="428" y="368.0" font-size="12" fill="#1a1a1a">& server production <tspan font-weight="bold">$10</tspan></text>
+<rect x="404" y="406.0" width="14" height="18.0" fill="#A6A6A6"/>
+<text x="428" y="419.0" font-size="12" fill="#1a1a1a">Network processors <tspan font-weight="bold">$3</tspan></text>
+<rect x="404" y="435.0" width="14" height="12.0" fill="#A6A6A6"/>
+<text x="428" y="445.0" font-size="12" fill="#1a1a1a">Cabling <tspan font-weight="bold">$2</tspan></text>
+<rect x="404" y="458.0" width="14" height="27.0" fill="#A6A6A6"/>
+<text x="428" y="475.5" font-size="12" fill="#1a1a1a">Switches <tspan font-weight="bold">$4.5</tspan></text>
+<rect x="404" y="496.0" width="14" height="33.0" fill="#A6A6A6"/>
+<text x="428" y="516.5" font-size="12" fill="#1a1a1a">Optical transceivers <tspan font-weight="bold">$5.5</tspan></text>
+<rect x="404" y="549.0" width="14" height="39.0" fill="#A6A6A6"/>
+<text x="428" y="572.5" font-size="12" fill="#1a1a1a">Power distribution <tspan font-weight="bold">$6.5</tspan></text>
+<rect x="404" y="599.0" width="14" height="60.0" fill="#A6A6A6"/>
+<text x="428" y="626.0" font-size="12" fill="#1a1a1a">Grid connection &</text>
+<text x="428" y="641.0" font-size="12" fill="#1a1a1a">independent generation <tspan font-weight="bold">$10</tspan></text>
+<rect x="404" y="670.0" width="14" height="21.0" fill="#A6A6A6"/>
+<text x="428" y="684.5" font-size="12" fill="#1a1a1a">On-site electrical routing <tspan font-weight="bold">$3.5</tspan></text>
+<rect x="404" y="711.0" width="14" height="9.0" fill="#A6A6A6"/>
+<text x="428" y="719.5" font-size="12" fill="#1a1a1a">Cold plates <tspan font-weight="bold">$1.5</tspan></text>
+<rect x="404" y="731.0" width="14" height="12.0" fill="#A6A6A6"/>
+<text x="428" y="741.0" font-size="12" fill="#1a1a1a">Coolant distribution unit <tspan font-weight="bold">$2</tspan></text>
+<rect x="404" y="754.0" width="14" height="15.0" fill="#A6A6A6"/>
+<text x="428" y="765.5" font-size="12" fill="#1a1a1a">Chillers and cooling towers <tspan font-weight="bold">$2.5</tspan></text>
+<rect x="404" y="780.0" width="14" height="9.0" fill="#A6A6A6"/>
+<text x="428" y="788.5" font-size="12" fill="#1a1a1a">Other <tspan font-weight="bold">$1.5</tspan></text>
+<rect x="404" y="809.0" width="14" height="6.0" fill="#A6A6A6"/>
+<text x="428" y="816.0" font-size="12" fill="#1a1a1a">Land & site acquisition <tspan font-weight="bold">$1</tspan></text>
+<rect x="404" y="826.0" width="14" height="24.0" fill="#A6A6A6"/>
+<text x="428" y="835.0" font-size="12" fill="#1a1a1a">Building shell &</text>
+<text x="428" y="850.0" font-size="12" fill="#1a1a1a">structural works <tspan font-weight="bold">$4</tspan></text>
+<rect x="404" y="861.0" width="14" height="15.0" fill="#A6A6A6"/>
+<text x="428" y="865.5" font-size="12" fill="#1a1a1a">Interior fit out</text>
+<text x="428" y="880.5" font-size="12" fill="#1a1a1a">& facilities support <tspan font-weight="bold">$2.5</tspan></text>
+<rect x="30" y="894.0" width="620" height="58" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="42" y="913.0" font-size="12" font-weight="bold" fill="#156082">Of which wafer fab equipment — $8, embedded in the accelerator and memory flows</text>
+<text x="42" y="930.0" font-size="12" fill="#1a1a1a">Deposition $2  ·  Lithography $2  ·  Etching $1  ·  Inspection $1  ·  Packaging &amp; other $2</text>
+<text x="42" y="945.0" font-size="11" fill="#595959">The tools that make the chips — not a separate slice of the $100. It sits inside the blue chain above.</text>
+<text x="30" y="984.0" font-size="11" font-style="italic" fill="#595959">Structure and allocations after BNP Paribas Equity Research, 27 Aug 2026. High-level estimates in a volatile component-cost environment.</text>
+</g></svg>`;
+
+const SVG_WFE = `
+<svg viewBox="0 0 680 200" role="img" aria-label="The wafer fabrication sequence as seven steps from quartz through deposition, lithography, etching, inspection and packaging, with each step's share of AI capex.">
+<defs><marker id="w8" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="340" y="26" font-size="13" fill="#595959">Each step is a near-monopoly. They are not the same company.</text>
+<rect x="20" y="44" width="82" height="62" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="61" y="66" font-size="11" font-weight="bold">Quartz</text>
+<text x="61" y="80" font-size="11">to wafer</text>
+<text x="61" y="98" font-size="12" font-weight="bold" fill="#595959">&lt;1%</text>
+<rect x="114" y="44" width="82" height="62" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="155" y="66" font-size="11" font-weight="bold">Deposition</text>
+<text x="155" y="80" font-size="11">CVD·PVD·ALD</text>
+<text x="155" y="98" font-size="12" font-weight="bold" fill="#595959">2%</text>
+<rect x="208" y="44" width="82" height="62" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="249" y="66" font-size="11" font-weight="bold" fill="#E97132">Lithography</text>
+<text x="249" y="80" font-size="11" fill="#E97132">see 3.11</text>
+<text x="249" y="98" font-size="12" font-weight="bold" fill="#E97132">2%</text>
+<rect x="302" y="44" width="82" height="62" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="343" y="66" font-size="11" font-weight="bold">Etching</text>
+<text x="343" y="80" font-size="11">removes</text>
+<text x="343" y="98" font-size="12" font-weight="bold" fill="#595959">1%</text>
+<rect x="396" y="44" width="82" height="62" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="437" y="66" font-size="11" font-weight="bold">Inspection</text>
+<text x="437" y="80" font-size="11">defects</text>
+<text x="437" y="98" font-size="12" font-weight="bold" fill="#595959">1%</text>
+<rect x="490" y="44" width="82" height="62" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="531" y="66" font-size="11" font-weight="bold">Dicing</text>
+<text x="531" y="80" font-size="11">cut the wafer</text>
+<text x="531" y="98" font-size="12" font-weight="bold" fill="#595959">—</text>
+<rect x="584" y="44" width="82" height="62" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="625" y="66" font-size="11" font-weight="bold" fill="#E97132">Packaging</text>
+<text x="625" y="80" font-size="11" fill="#E97132">see 3.8</text>
+<text x="625" y="98" font-size="12" font-weight="bold" fill="#E97132">2%</text>
+<line x1="104" y1="75" x2="112" y2="75" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w8)"/>
+<line x1="198" y1="75" x2="206" y2="75" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w8)"/>
+<line x1="292" y1="75" x2="300" y2="75" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w8)"/>
+<line x1="386" y1="75" x2="394" y2="75" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w8)"/>
+<line x1="480" y1="75" x2="488" y2="75" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w8)"/>
+<line x1="574" y1="75" x2="582" y2="75" stroke="#1a1a1a" stroke-width="1" marker-end="url(#w8)"/>
+<text x="340" y="140" font-size="13" fill="#595959">Orange — the two steps Chapter 3 already covers. The rest are new here.</text>
+<text x="340" y="168" font-size="13" fill="#595959">Fab stages repeat in cycles over many layers. A leading-edge logic chip runs roughly 90 of them (3.11).</text>
+</g></svg>`;
+
+const SVG_NET = `
+<svg viewBox="0 0 680 280" role="img" aria-label="A three-layer data centre network: racks with top-of-rack switches, spine switches above them, and a core layer, with optical transceivers marked at every hop that leaves a rack.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="270" y="36" width="140" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="56" font-size="12" font-weight="bold">Core</text>
+<rect x="150" y="102" width="150" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="225" y="122" font-size="12" font-weight="bold">Spine switch</text>
+<rect x="380" y="102" width="150" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="455" y="122" font-size="12" font-weight="bold">Spine switch</text>
+<line x1="320" y1="66" x2="240" y2="100" stroke="#1a1a1a" stroke-width="0.75"/>
+<line x1="360" y1="66" x2="440" y2="100" stroke="#1a1a1a" stroke-width="0.75"/>
+<rect x="40" y="180" width="130" height="30" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="105" y="200" font-size="11" font-weight="bold">Top-of-rack switch</text>
+<rect x="200" y="180" width="130" height="30" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="265" y="200" font-size="11" font-weight="bold">Top-of-rack switch</text>
+<rect x="360" y="180" width="130" height="30" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="425" y="200" font-size="11" font-weight="bold">Top-of-rack switch</text>
+<rect x="520" y="180" width="130" height="30" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="585" y="200" font-size="11" font-weight="bold">Top-of-rack switch</text>
+<line x1="200" y1="134" x2="120" y2="176" stroke="#156082" stroke-width="1.75"/>
+<line x1="240" y1="134" x2="260" y2="176" stroke="#156082" stroke-width="1.75"/>
+<line x1="430" y1="134" x2="420" y2="176" stroke="#156082" stroke-width="1.75"/>
+<line x1="470" y1="134" x2="570" y2="176" stroke="#156082" stroke-width="1.75"/>
+<circle cx="160" cy="155" r="4" fill="#156082"/><circle cx="250" cy="155" r="4" fill="#156082"/>
+<circle cx="425" cy="155" r="4" fill="#156082"/><circle cx="520" cy="155" r="4" fill="#156082"/>
+<rect x="40" y="222" width="130" height="26" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="105" y="240" font-size="11">servers · copper</text>
+<rect x="200" y="222" width="130" height="26" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="265" y="240" font-size="11">servers · copper</text>
+<rect x="360" y="222" width="130" height="26" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="425" y="240" font-size="11">servers · copper</text>
+<rect x="520" y="222" width="130" height="26" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="585" y="240" font-size="11">servers · copper</text>
+<text x="340" y="24" font-size="13" fill="#595959">Blue dots — an optical transceiver. One at each end of every link that leaves a rack.</text>
+<text x="340" y="270" font-size="13" fill="#595959">Copper under 100 m. Light beyond, because copper loses signal to interference over distance.</text>
+</g></svg>`;
+
+const SVG_POWER = `
+<svg viewBox="0 0 680 250" role="img" aria-label="The power path from utility grid through switchgear, transformer, uninterruptible supply and power distribution unit to the server rack, with on-site generation branching in.">
+<defs><marker id="p8" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="20" y="96" width="94" height="46" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="67" y="116" font-size="11" font-weight="bold">Utility grid</text>
+<text x="67" y="132" font-size="11" fill="#595959">+ transmission</text>
+<rect x="140" y="96" width="94" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="187" y="116" font-size="11" font-weight="bold">Switchgear</text>
+<text x="187" y="132" font-size="11" fill="#595959">trips on fault</text>
+<rect x="260" y="96" width="94" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="307" y="116" font-size="11" font-weight="bold">Transformer</text>
+<text x="307" y="132" font-size="11" fill="#595959">steps down</text>
+<rect x="380" y="96" width="94" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="427" y="116" font-size="11" font-weight="bold">UPS</text>
+<text x="427" y="132" font-size="11" fill="#595959">bridges + smooths</text>
+<rect x="500" y="96" width="70" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="535" y="116" font-size="11" font-weight="bold">PDU</text>
+<text x="535" y="132" font-size="11" fill="#595959">to racks</text>
+<rect x="596" y="96" width="64" height="46" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="628" y="123" font-size="11" font-weight="bold">Rack</text>
+<line x1="116" y1="119" x2="136" y2="119" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p8)"/>
+<line x1="236" y1="119" x2="256" y2="119" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p8)"/>
+<line x1="356" y1="119" x2="376" y2="119" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p8)"/>
+<line x1="476" y1="119" x2="496" y2="119" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p8)"/>
+<line x1="572" y1="119" x2="592" y2="119" stroke="#1a1a1a" stroke-width="1" marker-end="url(#p8)"/>
+<rect x="20" y="180" width="212" height="46" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="126" y="200" font-size="11" font-weight="bold" fill="#E97132">Behind the meter</text>
+<text x="126" y="216" font-size="11" fill="#E97132">gas turbines · diesel · nuclear · fuel cells</text>
+<path d="M187 176 L187 146" fill="none" stroke="#E97132" stroke-width="1.5" marker-end="url(#p8)"/>
+<text x="340" y="34" font-size="13" fill="#595959">Power is $20 of every $100 — bigger than networking, nearly three times cooling.</text>
+<text x="340" y="58" font-size="12" fill="#595959">Utilities and independent generation 10% · distribution 6.5% · on-site routing 3.5%</text>
+<text x="452" y="205" font-size="12" fill="#595959">Grid queues run 5–10 years. A data centre takes 18–24 months</text>
+<text x="452" y="221" font-size="12" fill="#595959">to build. That gap is why on-site generation stopped being a backup.</text>
+</g></svg>`;
+
+const SVG_COOL = `
+<svg viewBox="0 0 680 250" role="img" aria-label="The two-loop cooling architecture: a coolant loop from the processor cold plate to the coolant distribution unit, and a facility water loop from there to the chiller and cooling tower, with a closed-loop dry cooler as an alternative.">
+<defs><marker id="c8" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="340" y="26" font-size="13" fill="#595959">Two loops, joined by a heat exchanger. Heat moves left to right and leaves at the far end.</text>
+<rect x="20" y="60" width="120" height="52" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="80" y="82" font-size="11" font-weight="bold">Cold plate</text>
+<text x="80" y="98" font-size="11" fill="#595959">on the processor</text>
+<text x="80" y="128" font-size="12" font-weight="bold" fill="#595959">1.5%</text>
+<rect x="176" y="60" width="120" height="52" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="236" y="82" font-size="11" font-weight="bold">Coolant distribution</text>
+<text x="236" y="98" font-size="11" fill="#595959">unit (CDU)</text>
+<text x="236" y="128" font-size="12" font-weight="bold" fill="#595959">2%</text>
+<rect x="332" y="60" width="120" height="52" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="392" y="82" font-size="11" font-weight="bold">Chiller</text>
+<text x="392" y="98" font-size="11" fill="#595959">refrigerant cycle</text>
+<rect x="488" y="60" width="120" height="52" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="548" y="82" font-size="11" font-weight="bold" fill="#156082">Cooling tower</text>
+<text x="548" y="98" font-size="11" fill="#156082">evaporates water</text>
+<text x="470" y="128" font-size="12" font-weight="bold" fill="#595959">chillers + towers 2.5%</text>
+<line x1="142" y1="86" x2="172" y2="86" stroke="#1a1a1a" stroke-width="1" marker-end="url(#c8)"/>
+<line x1="298" y1="86" x2="328" y2="86" stroke="#1a1a1a" stroke-width="1" marker-end="url(#c8)"/>
+<line x1="454" y1="86" x2="484" y2="86" stroke="#1a1a1a" stroke-width="1" marker-end="url(#c8)"/>
+<text x="158" y="52" font-size="11" font-style="italic" fill="#595959">secondary loop</text>
+<text x="470" y="52" font-size="11" font-style="italic" fill="#595959">facility water loop</text>
+<rect x="440" y="164" width="216" height="52" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="548" y="186" font-size="11" font-weight="bold" fill="#E97132">Closed-loop dry cooler</text>
+<text x="548" y="202" font-size="11" fill="#E97132">heat through metal walls — zero water</text>
+<path d="M548 116 L548 160" fill="none" stroke="#E97132" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#c8)"/>
+<text x="220" y="186" font-size="12" text-anchor="start" fill="#595959">Local opposition to data centres is increasingly</text>
+<text x="220" y="202" font-size="12" text-anchor="start" fill="#595959">organised around water, not electricity.</text>
+</g></svg>`;
+
+const SVG_PERMIT = `
+<svg viewBox="0 0 680 230" role="img" aria-label="A timeline comparing the eighteen to twenty-four months needed to build a data centre against a grid interconnection queue of five to ten years.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="30" y="28" font-size="13" fill="#595959">Two clocks, running at very different speeds.</text>
+<text x="30" y="60" font-size="12" font-weight="bold">Build the data centre</text>
+<rect x="30" y="68" width="104" height="28" fill="#156082" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="146" y="88" font-size="12" fill="#595959">18–24 months</text>
+<text x="30" y="126" font-size="12" font-weight="bold">Connect it to the grid</text>
+<rect x="30" y="134" width="600" height="28" fill="#E97132" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="330" y="153" font-size="12" text-anchor="middle" fill="#fff" font-weight="bold">5–10 years</text>
+<text x="30" y="192" font-size="12" fill="#595959">And now a third variable that is not a queue at all: in July 2026 New York became the first state with a</text>
+<text x="30" y="208" font-size="12" fill="#595959">moratorium on new hyperscaler data centres; in early August Texas paused approvals pending energy audits.</text>
+</g></svg>`;
+
+const SVG_CONSTRAINT = `
+<svg viewBox="0 0 680 320" role="img" aria-label="Constraints plotted on two axes, supplier concentration against supply scarcity, with six critical constraints clustered in the high-high corner.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<line x1="70" y1="270" x2="640" y2="270" stroke="#1a1a1a" stroke-width="0.75"/>
+<line x1="70" y1="40" x2="70" y2="270" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="355" y="296" font-size="12" text-anchor="middle" fill="#595959">Supply scarcity →</text>
+<text x="60" y="46" font-size="12" text-anchor="end" fill="#595959">high</text>
+<text x="60" y="266" font-size="12" text-anchor="end" fill="#595959">low</text>
+<text x="24" y="160" font-size="12" text-anchor="middle" fill="#595959" transform="rotate(-90 24 160)">Supplier concentration →</text>
+<path d="M400 40 Q 660 40 640 210 Q 480 250 400 200 Z" fill="#E97132" fill-opacity="0.10" stroke="#E97132" stroke-width="1.25" stroke-dasharray="5 4"/>
+<circle cx="470" cy="62" r="5" fill="#E97132"/><text x="484" y="66" font-size="11" fill="#E97132">Lithography (3.11)</text>
+<circle cx="520" cy="92" r="5" fill="#E97132"/><text x="534" y="96" font-size="11" fill="#E97132">Advanced logic foundry</text>
+<circle cx="560" cy="126" r="5" fill="#E97132"/><text x="574" y="130" font-size="11" text-anchor="end" fill="#E97132">Adv. packaging (3.8)</text>
+<circle cx="588" cy="156" r="5" fill="#E97132"/><text x="580" y="172" font-size="11" text-anchor="end" fill="#E97132">DRAM &amp; HBM (3.6–3.10)</text>
+<circle cx="472" cy="182" r="5" fill="#156082"/><text x="486" y="186" font-size="11" font-weight="bold" fill="#156082">Optical transceivers — InP</text>
+<circle cx="600" cy="200" r="5" fill="#156082"/><text x="592" y="216" font-size="11" font-weight="bold" text-anchor="end" fill="#156082">Grid interconnection</text>
+<circle cx="150" cy="80" r="4" fill="#A6A6A6"/><text x="162" y="84" font-size="11" fill="#595959">Vacuum valves</text>
+<circle cx="120" cy="120" r="4" fill="#A6A6A6"/><text x="132" y="124" font-size="11" fill="#595959">Quartz</text>
+<circle cx="200" cy="140" r="4" fill="#A6A6A6"/><text x="212" y="144" font-size="11" fill="#595959">CMP pads · photoresist</text>
+<circle cx="250" cy="180" r="4" fill="#A6A6A6"/><text x="262" y="184" font-size="11" fill="#595959">Probe cards</text>
+<circle cx="330" cy="210" r="4" fill="#A6A6A6"/><text x="342" y="214" font-size="11" fill="#595959">Hafnium · helium · copper</text>
+<circle cx="300" cy="246" r="4" fill="#A6A6A6"/><text x="312" y="250" font-size="11" fill="#595959">Workforce</text>
+<text x="340" y="24" font-size="13" text-anchor="middle" fill="#595959">Orange — critical, and already covered in Chapter 3. Blue — critical, and new here. Grey — secondary.</text>
+</g></svg>`;
+
+const CARDS = [
+{
+ id:"S-045", num:"8.1", title:"Where $100 of AI capex flows",
+ figure:SVG_SANKEY,
+ body:`<p>Consensus AI capital expenditure is approaching <strong>a trillion dollars a year</strong>. Where it goes, per $100:</p>
+ <ul>
+ <li><strong>Chips and servers — $50.</strong> Accelerators $25, memory ICs $15, CPUs and other chips and server production $10.</li>
+ <li><strong>Power — $20.</strong> The second-largest line, and the one least covered anywhere else.</li>
+ <li><strong>Networking — $15.</strong> Network processors $3, cabling $2, switches $4.50, optical transceivers $5.50.</li>
+ <li><strong>Cooling — $7.50.</strong> Cold plates $1.50, coolant distribution units $2, chillers and cooling towers $2.50, other $1.50.</li>
+ <li><strong>Facilities and construction — $7.50.</strong> Land $1, building shell $4, interior fit-out $2.50.</li>
+ <li><strong>Wafer fab equipment — $8</strong>, embedded inside the chip flows rather than added to them.</li>
+ </ul>`,
+ band:`Chapter 3 spent twelve slides on the blue half of this chart. The grey half — power, networking, cooling, buildings — is half the money and has had no coverage at all. That is what this chapter is for.`,
+ depth:`<p><strong>Power is bigger than networking, and much bigger than cooling.</strong> The intuitive ordering — chips, then networking, then everything else — is wrong. Twenty cents of every dollar goes to generation, transmission, distribution and on-site routing, which is why the constraint on 8.8 that has nothing to do with semiconductors may be the one that binds hardest.</p>
+ <p><strong>Wafer fab equipment is not a sixth slice.</strong> It is the equipment that makes the chips, and its $8 sits inside the $50. Adding it to the total double-counts. The source draws it as a branch off the chip flows for exactly this reason, and it is the easiest thing on the chart to misread.</p>`,
+ sources:"BNP Paribas Equity Research, \u201CWill AI Hardware Continue Eating the World?\u201D, 27 Aug 2026, Figure 11. The allocations are that firm's high-level estimates, described in the source as subject to change given rapidly shifting costs and demand-supply dynamics. Redrawn in house style: the structure and figures are theirs, the diagram is ours."
+},
+{
+ id:"S-046", num:"8.2", title:"Chips and servers: $50, and mostly covered",
+ figure:`<table class="grid wide"><thead><tr><th>Component</th><th>Share</th><th>Status here</th></tr></thead><tbody>
+ <tr><td><b>Accelerators</b> — GPUs, plus hyperscaler ASICs: Google TPU, AWS Trainium and Inferentia, Meta MTIA, Microsoft MAIA</td><td>$25</td><td>Covered — see 3.3 for what they are, 3.5 for why the software layer matters more</td></tr>
+ <tr><td><b>Memory ICs</b> — DRAM, HBM, NAND</td><td>$15</td><td>Covered — see 3.6 to 3.10</td></tr>
+ <tr><td><b>CPUs, power management and server assembly</b></td><td>$10</td><td><b>Not covered. This slide.</b></td></tr>
+ </tbody></table>`,
+ body:`<p>The remaining $10 holds three things and two live debates.</p>
+ <ul>
+ <li><strong>CPUs</strong> — the host processors that feed and orchestrate the accelerators (3.3). Intel is the data-centre incumbent with x86; AMD has been taking share; Arm licenses the architecture and has moved into direct CPU development.</li>
+ <li><strong>Power management ICs</strong> — regulate, convert and distribute power to each component's exact requirements. A quiet line about to become a loud one, because of 8.5's voltage shift.</li>
+ <li><strong>Server assembly</strong> — the box itself, and the vendors who build it.</li>
+ </ul>
+ <p><strong>Debate one: the GPU-to-CPU ratio</strong>, currently around <strong>1:4–8</strong>. As inference overtakes training — reportedly toward 60% of compute demand in 2026 — that ratio may compress, because agentic workloads are more CPU-intensive than training runs. One vendor estimates the data-centre CPU addressable market rising from roughly <strong>$26bn in 2025 to $220bn in 2030</strong>.</p>
+ <p><strong>Debate two: how electricity reaches the chip.</strong> Existing designs step voltage down near the processor with multi-phase buck converters. The new <strong>800 V architecture</strong> runs high voltage all the way to the rack, requiring more advanced PMICs and a redesigned data-centre layout.</p>`,
+ depth:`<p>The CPU point inverts a widely held assumption. The story of the last three years has been GPUs displacing everything; the story implied here is that the <em>shift from training to inference</em> partially rehabilitates the CPU, because agentic work involves more orchestration, more tool calls and more conventional computation between the model calls (4.3, 7.7).</p>
+ <p>Note that this is a vendor's own market estimate, and vendors estimating their own addressable market is a genre with known biases. The direction is plausible and follows from what Chapters 4 and 7 describe about agentic workloads. The magnitude is a claim by an interested party.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, pages 10\u201312. The GPU:CPU ratio, the 60% inference figure and the $26bn \u2192 $220bn CPU addressable-market estimate are attributed in the source to AMD's own Advancing AI Day \u2014 a vendor estimate about its own market. The 800 V architecture is described as an industry direction with timing unresolved."
+},
+{
+ id:"S-047", num:"8.3", title:"Wafer fab equipment: $8, and eleven companies",
+ figure:SVG_WFE,
+ body:`<table class="grid wide"><thead><tr><th>Step</th><th>Share</th><th>What it does</th><th>Who</th></tr></thead><tbody>
+ <tr><td>Quartz to wafer</td><td>&lt;1%</td><td>High-purity quartz → single-crystal ingot → sliced wafers</td><td>Quartz Corp, Sibelco, Shin-Etsu</td></tr>
+ <tr><td><b>Deposition</b></td><td>2%</td><td>Ultra-thin conducting or insulating layers onto the wafer</td><td>Applied Materials, ASM (ALD), Lam, Tokyo Electron, Aixtron</td></tr>
+ <tr><td><b>Lithography</b></td><td>2%</td><td>Projects the circuit pattern. See <b>3.11</b></td><td>ASML, sole EUV supplier</td></tr>
+ <tr><td>Etching</td><td>1%</td><td>Removes the unwanted layers the pattern exposed</td><td>Lam, Applied Materials, Tokyo Electron, AMEC</td></tr>
+ <tr><td>Inspection</td><td>1%</td><td>Checks for atomic-level defects</td><td>KLA, dominant in optical inspection</td></tr>
+ <tr><td><b>Packaging and test</b></td><td>2%</td><td>Dice the wafer, encapsulate, bond, test. See <b>3.8</b></td><td>TSMC (CoWoS), ASE, ASMPT, Besi, Advantest</td></tr>
+ </tbody></table>
+ <p>Three techniques inside deposition: <strong>CVD</strong> uses reactive gases to form films, <strong>PVD</strong> physically blasts material onto the surface, and <strong>ALD</strong> builds one atomic layer at a time. CVD dominates; ALD is growing fastest as transistors shrink.</p>`,
+ depth:`<p>The point of this slide is not the taxonomy. It is that <strong>each step is a near-monopoly held by a different company</strong>, and they are not the same companies. Lithography is ASML. Inspection is KLA. Atomic layer deposition is ASM. Dicing is Disco. Vacuum valves — a component, not even a step — are one firm at over 90% share at the leading edge.</p>
+ <p>The industry looks concentrated at the level people discuss it, and is <em>more</em> concentrated one level down, in a way that is much less visible. There is no single company that could be removed to stop the industry, and there are perhaps fifteen that could each stop one step of it.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, pages 13\u201315. Process descriptions are standard semiconductor engineering. Market-share characterisations are the source's, not independently verified."
+},
+{
+ id:"S-048", num:"8.4", title:"Networking: $15, and the line Chapter 3 skipped",
+ figure:SVG_NET,
+ body:`<p>Chapter 3 covered NVLink inside the rack and named InfiniBand and Ethernet in one line (3.3). This is what that line contains.</p>
+ <p><strong>The path a packet takes:</strong> a data processing unit on the server card initiates it → in-rack copper or active optical cable to the <strong>top-of-rack switch</strong> → if it leaves the rack, an <strong>optical transceiver</strong> converts electrical signal to light → fibre carries it across the data centre → another transceiver converts back for the <strong>spine switch</strong> → distributed onward.</p>
+ <table class="grid wide"><thead><tr><th>Component</th><th>Share</th><th>Note</th></tr></thead><tbody>
+ <tr><td><b>Optical transceivers</b></td><td>5.5%</td><td>The largest single networking line. 400G, 800G and 1.6T, with 3.2T coming</td></tr>
+ <tr><td><b>Switches</b></td><td>4.5%</td><td>Ethernet (~500+ ns latency, cost-effective) against InfiniBand (~100 ns, cut-through switching, favoured for training clusters)</td></tr>
+ <tr><td><b>Network processors</b></td><td>3%</td><td>SmartNICs and DPUs, offloading network and security work from the host CPU</td></tr>
+ <tr><td><b>Cabling</b></td><td>2%</td><td>Copper under 100 m; fibre beyond, because copper suffers electromagnetic interference over distance</td></tr>
+ </tbody></table>
+ <p><strong>The live debate:</strong> how fast Ethernet displaces InfiniBand. One estimate puts the 2028 split at roughly <strong>$64.9bn Ethernet against $13.7bn InfiniBand</strong>.</p>`,
+ depth:`<p>Optical transceivers being the largest networking line — larger than the switches they plug into — is the counterintuitive fact here, and it has a physical cause. Every rack-to-rack hop needs a transceiver at each end. As clusters scale out, transceiver count grows faster than switch count.</p>
+ <p>Which is why the indium phosphide constraint on 8.8 matters more than its size suggests: it sits underneath the largest networking line item, and it is a materials constraint rather than a manufacturing one.</p>
+ <p>Note the recurring structure. Copper for short distances, light for long ones, and a conversion device at every boundary — the same pattern as the memory hierarchy in 3.2, where proximity to the compute determines what technology is viable.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, pages 16\u201318. The Ethernet/InfiniBand 2028 split is that firm's analyst estimate. Latency figures are typical rather than specified."
+},
+{
+ id:"S-049", num:"8.5", title:"Power: $20, the second-biggest line",
+ figure:SVG_POWER,
+ body:`<ul>
+ <li><strong>Utilities and transmission, and independent generation — 10% combined.</strong> The split is project-specific, so the source does not separate them. The IEA forecasts data centres rising from roughly <strong>1–2% of global electricity demand to about 3% by 2030</strong>.</li>
+ <li><strong>Power distribution — 6.5%.</strong> Switchgear trips the circuit on a fault. Transformers step voltage down. <strong>UPS</strong> systems bridge to battery if utility power drops and smooth fluctuations. <strong>PDUs</strong> step down again to feed the racks.</li>
+ <li><strong>On-site electrical routing — 3.5%.</strong> Flexible cable and rigid busways from the PDU to individual racks.</li>
+ </ul>
+ <p><strong>Behind the meter.</strong> Grid connection delays are pushing operators toward on-site generation: backup diesel, gas turbines as the most common approach so far, and nuclear, renewables and fuel cells beyond that.</p>`,
+ band:`The gas turbine bottleneck is the sharpest here — manufacturing capacity is reported sold out to the end of the decade. Deciding to generate your own power does not mean you can.`,
+ depth:`<p>This is the chapter's most important slide for anyone who has only followed the semiconductor story, because <strong>power is a bigger line than networking and nearly three times cooling</strong>, and almost none of the public discussion reflects that.</p>
+ <p>The strategic point is the interaction between two timelines on 8.7: a modern data centre takes <strong>18 to 24 months</strong> to build, and a grid interconnection queue runs <strong>5 to 10 years</strong>. When the connection takes four times as long as the building, on-site generation stops being a contingency and becomes the plan — which is why gas turbine order books are worth watching as closely as accelerator shipments.</p>
+ <p>The 800 V shift from 8.2 lands here too. Running high voltage to the rack changes the transformer and PDU architecture and reduces copper per rack, with the offsetting question of whether re-architecture costs absorb the saving.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, pages 19\u201321, citing the IEA for the electricity demand forecast. The 10% combined allocation is deliberately unsplit in the source because grid connection cost shares vary by project. The gas turbine sold-out claim is that firm's analyst comment."
+},
+{
+ id:"S-050", num:"8.6", title:"Cooling: $7.50, and the water problem",
+ figure:SVG_COOL,
+ body:`<p>Liquid cooling, not air conditioning, is now standard for new AI data centres.</p>
+ <ul>
+ <li><strong>Direct-to-chip</strong> mounts metal cold plates onto the processors. <strong>Immersion</strong> submerges the whole server in dielectric liquid. Each can be single-phase, where the coolant stays liquid, or two-phase, where it boils and condenses. <strong>Single-phase direct-to-chip is most common.</strong></li>
+ <li><strong>The loop:</strong> processor → cold plate → secondary coolant loop → coolant distribution unit → heat exchanger → facility water → chiller → cooling tower, where evaporation dumps the heat to the atmosphere.</li>
+ </ul>
+ <p><strong>The debate is water.</strong> Cooling towers dissipate heat by evaporation, which consumes it, and local opposition to data centres is increasingly organised around water scarcity. <strong>Closed-loop dry coolers</strong> replace the evaporation stage with heat transfer through metal walls — no water consumed — and the open question is how fast that shift happens.</p>`,
+ depth:`<p>Cooling is the smallest capex line in this chapter and the one most likely to be decided by something other than engineering. Water is visible, local and politically legible in a way that megawatts are not. A community that will tolerate a large electrical load will organise against a large water draw, and the industry's response — dry coolers — is a design change driven by public opposition rather than by cost or performance.</p>
+ <p>There is also a chemistry constraint. Two-phase immersion coolants have historically been fluorinated compounds, and pressure to reduce PFAS production has already led one major producer to exit coolant product lines. A cooling architecture that depends on a chemical class under regulatory pressure carries a risk that appears on no capacity chart.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, pages 21\u201323. The PFAS and product-line exit detail is from the same source. Adoption pace for dry coolers is an open question there, not a forecast."
+},
+{
+ id:"S-051", num:"8.7", title:"Facilities and construction: $7.50, and the permits",
+ figure:SVG_PERMIT,
+ body:`<ul>
+ <li><strong>Land and site acquisition — 1%.</strong> New campuses run <strong>over 1,000 acres</strong>; one reported development approaches <strong>4,000 acres</strong>. Costs vary enormously by location.</li>
+ <li><strong>Building shell and structural works — 4%.</strong> Civil construction, foundations, physical security, architectural fees. The largest single line in this section.</li>
+ <li><strong>Interior fit-out and facilities support — 2.5%.</strong> Raised flooring, structural ceiling grids, hot and cold aisle containment, cable trays, fire suppression, water and waste management.</li>
+ </ul>
+ <p><strong>The live risk is permitting, and it is now political.</strong> Two US state-level actions in 2026: <strong>New York</strong> became the first state with a moratorium on new hyperscaler data centres, by executive order in July; <strong>Texas</strong> ordered a pause on approvals in early August, pending completion of energy audits.</p>`,
+ band:`The open question is whether local opposition produces short-term permitting delays or further state-level moratoriums. That is not a technology variable, and nothing in Chapters 1 to 7 would help you forecast it.`,
+ depth:`<p>For an audience that has followed this course through supply chains and chip physics, this slide is the reminder that the binding constraint may end up being none of those things.</p>
+ <p>Two states acting within a month of each other is a pattern rather than an incident, and they acted on different grounds — one on data centres as a category, one on energy consumption specifically. That suggests the political objection is broad rather than narrow, and it interacts directly with 8.5: if you cannot connect to the grid and you cannot get permission to generate on site, the constraint is not a component at all.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, pages 23\u201324, citing a New York state press release and news reporting on the Texas action. Both are recent and political and may already have evolved \u2014 verify current status before quoting. Campus acreage figures are reported examples, not averages."
+},
+{
+ id:"S-052", num:"8.8", title:"The critical constraints",
+ figure:SVG_CONSTRAINT,
+ body:`<table class="grid wide"><thead><tr><th>Constraint</th><th>Why it binds</th><th>Covered</th></tr></thead><tbody>
+ <tr><td><b>Advanced logic foundry</b></td><td>One firm holds over 70% of foundry, rising to ~90% at leading-edge nodes. Announced US, Japan and Germany capacity is expected to be only 10–15% of total when built, with sub-2nm staying in Taiwan</td><td>3.3, 3.8</td></tr>
+ <tr><td><b>DRAM and HBM</b></td><td>Triopoly. HBM production demands roughly a <b>3:1 wafer ratio</b>, pressuring DDR5 supply. A new fab is ~$20bn and 2–3 years to usable volume</td><td>3.6–3.10</td></tr>
+ <tr><td><b>Lithography</b></td><td>ASML monopoly on advanced EUV; Trumpf sole supplier of the lasers; Zeiss SMT sole producer of the mirrors</td><td>3.11</td></tr>
+ <tr><td><b>Advanced packaging</b></td><td>CoWoS. Alternatives exist, but accelerators are co-designed around specific packaging rules</td><td>3.8</td></tr>
+ <tr><td><b>Optical transceivers — InP</b></td><td><b>New.</b> Indium phosphide is the substrate for the laser chips in transceivers. Silicon photonics reduces but cannot eliminate it, because silicon cannot emit light efficiently. Three main suppliers; China holds roughly <b>70% of global indium mining output</b></td><td>—</td></tr>
+ <tr><td><b>Grid interconnection</b></td><td><b>New.</b> Queues of <b>5 to 10 years</b> against <b>18 to 24 months</b> to build the data centre</td><td>—</td></tr>
+ </tbody></table>`,
+ depth:`<p>The two new ones are the interesting ones, and they are new for the same reason: this course, like most coverage, followed the semiconductor story and stopped.</p>
+ <p><strong>Indium phosphide</strong> sits under the largest networking line (8.4) and is a <em>materials</em> constraint with a geographic concentration — a different kind of risk from a manufacturing bottleneck. You cannot build your way out of a mineral concentration, and the source raises the possibility of retaliation if trade measures target Chinese optical transceivers.</p>
+ <p><strong>Grid interconnection</strong> cuts across everything. It is not a semiconductor problem, it is not solved by capital, and its timescale is four times the build time of the facility it gates. Of the six, it is the one where the constraint and the industry's usual tools are least well matched.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, pages 25\u201326, Figure 31. The critical/secondary classification is that firm's judgment, based on producer concentration, expected supply-demand imbalance and its own sector teams' input \u2014 the source states explicitly that these are fluid and will change in severity over time."
+},
+{
+ id:"S-053", num:"8.9", title:"The secondary constraints, or the long tail nobody models",
+ figure:`<table class="grid wide"><thead><tr><th>Constraint</th><th>The concentration</th></tr></thead><tbody>
+ <tr><td><b>High-purity quartz</b></td><td>One North Carolina mining district, two companies, ~80% of world supply. Reserves cover 100+ years, so the risk is disruption not depletion — a 2024 hurricane caused a two-week shutdown</td></tr>
+ <tr><td><b>Photoresist</b></td><td>Three Japanese producers at ~90% of EUV photoresist. A political risk rather than a supply one: Japan restricted exports to Korea in 2019 and did not lift them until 2023</td></tr>
+ <tr><td><b>ABF substrate film</b></td><td>One company holds a monopoly on the raw chemical film; an oligopoly of three on the finished substrates</td></tr>
+ <tr><td><b>High-pressure annealing</b></td><td>One South Korean firm monopolises the tools that heal atomic-level defects at 3 nm</td></tr>
+ <tr><td><b>Vacuum valves</b></td><td>One firm at over 90% share at the cutting edge</td></tr>
+ <tr><td><b>CMP polishing pads</b></td><td>One supplier, a DuPont spin-off, at over 70% global share</td></tr>
+ <tr><td><b>Probe cards</b></td><td>The interface between test system and wafer. Crucial for HBM, where a single defective layer must be caught before packaging. An oligopoly of two</td></tr>
+ <tr><td><b>Hafnium</b></td><td>A byproduct of purifying zirconium for nuclear reactors, which constrains world supply to roughly <b>80 tonnes a year</b></td></tr>
+ <tr><td><b>Semiconductor-grade helium</b></td><td>One Qatari facility historically supplied a third of commercial helium, and was affected during regional conflict</td></tr>
+ <tr><td><b>High-voltage equipment</b></td><td>Substation transformers at <b>160 weeks</b> of lead time; medium-voltage switchgear rising from 54 weeks</td></tr>
+ <tr><td><b>Copper</b></td><td>Data centres are only 1–2% of current global demand but are expected to be a key price driver in the 2030s</td></tr>
+ <tr><td><b>Skilled workforce</b></td><td>High-voltage electricians, HVAC technicians, mechanical-electrical-plumbing specialists. A shortage of people, not parts</td></tr>
+ </tbody></table>`,
+ body:`<p>Material constraints that are either easier to resolve or not yet biting — and a useful inventory of how deep the concentration goes.</p>`,
+ band:`Read as a list, this is the answer to "how many single points of failure does this industry have?" The answer is at least a dozen more than the ones that get discussed.`,
+ depth:`<p><strong>Concentration is fractal.</strong> Every time you look one level deeper, you find another near-monopoly. That is not an accident of this moment; it is what happens in industries where process knowledge compounds and volumes are too small to support several suppliers.</p>
+ <p><strong>The most-discussed constraints are not obviously the most fragile.</strong> HBM has three suppliers and enormous investment flowing in. Hafnium has a fixed world supply of about 80 tonnes because of what it is a byproduct of, and no amount of capital changes that.</p>
+ <p><strong>The last entry is not like the others.</strong> A shortage of high-voltage electricians cannot be fixed by a fab, a mine or a foundry, and it has the longest lead time on the list, because it is measured in apprenticeships. It is also the entry that most resembles the adoption constraint this course keeps running into elsewhere.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, pages 26\u201327. Market-share and lead-time figures are that firm's estimates and sector-team input, not independently verified. The high-voltage equipment lead times cite an electrical equipment lead-time index."
+},
+{
+ id:"S-054", num:"8.10", title:"How to use this map",
+ figure:`<div class="twocol"><div class="col blue"><h3>What it is good for</h3>
+ <p><b>Tracing propagation</b> when a constraint moves, this tells you what is downstream. A packaging shortage does not affect transformers; a grid delay affects everything</p>
+ <p><b>Sizing surprise</b> power is 20% and cooling is 7.5%. If your mental model had those reversed, this corrects a real error</p>
+ <p><b>Finding what is not discussed</b> 8.9 is a map of where concentration hides</p>
+ </div><div class="col orange"><h3>What it is not good for</h3>
+ <p><b>It is one firm's estimate</b> described in the source as high-level and subject to change in a volatile cost environment. The allocations are not measurements</p>
+ <p><b>It is a snapshot of a moving structure</b> the 800 V shift, the Ethernet transition and the move to dry coolers each change the shares</p>
+ <p><b>It says nothing about who captures the value</b> a 20% share of capex is not a 20% share of profit</p>
+ </div></div>`,
+ body:`<p><strong>The demand side, for context:</strong> consensus hyperscaler capital expenditure has risen steeply from the low hundreds of billions in the early 2020s and is forecast to approach and exceed a trillion dollars annually later this decade. What to watch: whether monetisation shows through in free cash flow estimates, how the buildout is being financed, and the political risk on 8.7.</p>`,
+ band:`The map tells you where the money goes. It does not tell you whether it should be going there, and this course does not take a view on that.`,
+ depth:`<p>The value-capture point deserves emphasis, because a capex map invites exactly the wrong inference. Facilities and construction is 7.5% of the spend, and general construction is not a high-margin business. Lithography is 2% of the spend and is a monopoly with the pricing power to match. The size of a slice tells you about volume; it tells you nothing about who keeps the money.</p>
+ <p>The second thing to hold: this map is drawn as a <em>flow</em>, which implies steady state. It is actually a snapshot of the steepest build-out in the industry's history, and several of the allocations exist because a constraint is currently binding. If HBM pricing normalised, memory's $15 would fall — not because less memory was bought, but because it cost less. Reading a constrained market's prices as structural shares is the standard error with a chart like this.</p>`,
+ sources:"BNP Paribas Equity Research, 27 Aug 2026, throughout, including its hyperscaler capex consensus series. Capex forecasts are consensus estimates, not commitments, and the source itself lists funding conditions, political risk and sentiment as reasons the trajectory may not hold. The value-capture observation is ours, not the source's."
+},
+{
+ apparatus:true, label:"Glossary", title:"Chapter 8 — Glossary",
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Slide</th></tr></thead><tbody>
+ <tr><td>capex allocation</td><td>How each dollar of build-out spend divides across the value chain</td><td>8.1</td></tr>
+ <tr><td>wafer fab equipment (WFE)</td><td>The machines that make chips. Embedded inside the chip spend, not additional to it</td><td>8.1, 8.3</td></tr>
+ <tr><td>PMIC</td><td>Power management IC — regulates and distributes power to each component</td><td>8.2</td></tr>
+ <tr><td>800 V architecture</td><td>Running high voltage all the way to the rack instead of stepping down near the chip</td><td>8.2, 8.5</td></tr>
+ <tr><td>CVD · PVD · ALD</td><td>Chemical, physical and atomic-layer deposition. Three ways to lay thin films on a wafer</td><td>8.3</td></tr>
+ <tr><td>optical inspection</td><td>Checking a wafer for atomic-level defects, brightfield or darkfield</td><td>8.3</td></tr>
+ <tr><td>dicing</td><td>Cutting the finished wafer into individual dies</td><td>8.3</td></tr>
+ <tr><td>optical transceiver</td><td>Converts electrical signal to light and back. One at each end of every rack-to-rack link</td><td>8.4</td></tr>
+ <tr><td>DPU / SmartNIC</td><td>Processors that offload network, security and storage work from the host CPU</td><td>8.4</td></tr>
+ <tr><td>leaf and spine</td><td>The two switching layers: top-of-rack, then the fabric connecting racks</td><td>8.4</td></tr>
+ <tr><td>InfiniBand vs Ethernet</td><td>~100 ns cut-through switching against ~500+ ns store-and-forward. Latency against cost</td><td>8.4</td></tr>
+ <tr><td>switchgear</td><td>Trips the circuit on a fault and splits power to different streams</td><td>8.5</td></tr>
+ <tr><td>UPS</td><td>Uninterruptible power supply — bridges to battery and smooths fluctuations</td><td>8.5</td></tr>
+ <tr><td>PDU</td><td>Power distribution unit — steps voltage down again to feed the racks</td><td>8.5</td></tr>
+ <tr><td>busway</td><td>Rigid copper or aluminium strips carrying power overhead or under floors</td><td>8.5</td></tr>
+ <tr><td>behind-the-meter</td><td>Generating your own power on site rather than drawing it from the grid</td><td>8.5</td></tr>
+ <tr><td>direct-to-chip cooling</td><td>Cold plates mounted onto the processors. The current standard</td><td>8.6</td></tr>
+ <tr><td>immersion cooling</td><td>Submerging the whole server in dielectric liquid</td><td>8.6</td></tr>
+ <tr><td>coolant distribution unit</td><td>The junction between the server coolant loop and the facility water loop</td><td>8.6</td></tr>
+ <tr><td>dry cooler</td><td>Closed-loop heat rejection through metal walls. Consumes no water</td><td>8.6</td></tr>
+ <tr><td>aisle containment</td><td>Enclosing rack rows to keep cold supply air separate from hot exhaust</td><td>8.7</td></tr>
+ <tr><td>grid interconnection queue</td><td>The wait to connect a new load to the grid. Currently 5–10 years</td><td>8.7, 8.8</td></tr>
+ <tr><td>indium phosphide (InP)</td><td>The substrate for transceiver laser chips. Silicon cannot emit light efficiently</td><td>8.8</td></tr>
+ <tr><td>ABF substrate</td><td>Microscopic wiring and insulating base used in semiconductor packaging</td><td>8.9</td></tr>
+ <tr><td>probe card</td><td>The needle interface between a test system and a wafer</td><td>8.9</td></tr>
+ <tr><td>photoresist</td><td>The light-sensitive coating lithography exposes to transfer the pattern</td><td>8.9</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Carried forward from Chapter 3</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>accelerators and HBM</td><td>The $40 of the $50 this chapter does not re-explain</td><td>3.3, 3.6–3.10</td></tr>
+ <tr><td>CoWoS</td><td>Advanced packaging, and the second gate in the series bottleneck</td><td>3.8</td></tr>
+ <tr><td>lithography and ASML</td><td>Sole EUV supplier; roughly 50–60 machines a year</td><td>3.11</td></tr>
+ <tr><td>the consumer spillover</td><td>Why the same reallocation reached your own hardware bill</td><td>3.12</td></tr>
+ </tbody></table>`,
+ body:`<p>Terms this chapter owns, in order of first appearance. Chapter 3 owns the chip and memory vocabulary; this chapter owns everything downstream of the server.</p>`
+},
+{
+ apparatus:true, label:"Companies", title:"Chapter 8 — Companies and organisations",
+ figure:`<h4 class="grouplabel">Materials and wafer fab equipment</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>ASML</td><td>Nasdaq: ASML</td><td>Sole EUV supplier <em>(also 3.11)</em></td></tr>
+ <tr><td>Applied Materials · Lam Research · Tokyo Electron</td><td>Nasdaq: AMAT, LRCX · 8035.T</td><td>Deposition and etch, across CVD, PVD and ALD</td></tr>
+ <tr><td>ASM International</td><td>ASM.AS</td><td>Atomic layer deposition, where it holds roughly 55% of the market</td></tr>
+ <tr><td>KLA</td><td>Nasdaq: KLAC</td><td>Dominant in optical and e-beam inspection</td></tr>
+ <tr><td>Disco</td><td>6146.T</td><td>Dicing saws and grinders</td></tr>
+ <tr><td>Advantest · Teradyne · ASMPT · Besi</td><td>6857.T · Nasdaq: TER · 0522.HK · BESI.AS</td><td>Test, and packaging and assembly equipment</td></tr>
+ <tr><td>Shin-Etsu · Quartz Corp · Sibelco</td><td>4063.T · private · private</td><td>Silicon ingots and high-purity quartz</td></tr>
+ <tr><td>VAT · Zeiss SMT · Trumpf</td><td>VACN.SW · division · private</td><td>Vacuum valves, EUV optics, EUV lasers <em>(also 3.11)</em></td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Chips and servers</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>NVIDIA · AMD · Intel</td><td>Nasdaq: NVDA, AMD, INTC</td><td>Accelerators and host CPUs <em>(also 3.3)</em></td></tr>
+ <tr><td>Broadcom</td><td>Nasdaq: AVGO</td><td>Custom accelerators for hyperscalers, plus networking silicon</td></tr>
+ <tr><td>Arm</td><td>Nasdaq: ARM</td><td>Architecture licensing, and now direct CPU development</td></tr>
+ <tr><td>TSMC</td><td>NYSE: TSM · 2330.TW</td><td>Foundry and CoWoS packaging <em>(also 3.3, 3.8)</em></td></tr>
+ <tr><td>SK Hynix · Samsung · Micron</td><td>000660.KS · 005930.KS · Nasdaq: MU</td><td>DRAM, HBM and NAND <em>(also 3.7)</em></td></tr>
+ <tr><td>Infineon · STMicroelectronics · Texas Instruments · Analog Devices</td><td>IFX.DE · STM · Nasdaq: TXN, ADI</td><td>Power management ICs, and the 800 V transition</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Networking</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>Arista · Cisco · Celestica</td><td>NYSE: ANET · Nasdaq: CSCO · NYSE: CLS</td><td>Ethernet switching</td></tr>
+ <tr><td>Coherent · Lumentum · Fabrinet · Ciena</td><td>NYSE: COHR · Nasdaq: LITE · NYSE: FN · NYSE: CIEN</td><td>Optical transceivers, lasers and optical circuit switching</td></tr>
+ <tr><td>Marvell · Credo · Astera Labs</td><td>Nasdaq: MRVL, CRDO, ALAB</td><td>Interconnect silicon, retimers and active electrical cables</td></tr>
+ <tr><td>Corning · Prysmian · Amphenol</td><td>NYSE: GLW · PRY.MI · NYSE: APH</td><td>Fibre and copper cabling</td></tr>
+ <tr><td>AXT · Sumitomo Electric · JX Advanced Metals</td><td>Nasdaq: AXTI · 5802.T · 5016.T</td><td>Indium phosphide substrates — the 8.8 constraint</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Power, cooling and construction</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>Schneider Electric · Eaton · ABB · Legrand · Siemens</td><td>SU.PA · NYSE: ETN · ABBN.SW · LR.PA · SIE.DE</td><td>Switchgear through to PDUs and busways</td></tr>
+ <tr><td>GE Vernova · Siemens Energy · Mitsubishi Heavy · Caterpillar · Cummins · Bloom Energy</td><td>NYSE: GEV · ENR.DE · 7011.T · NYSE: CAT, CMI, BE</td><td>Gas turbines, diesel generators and fuel cells for behind-the-meter generation</td></tr>
+ <tr><td>Vertiv · Trane · Johnson Controls · Carrier · Alfa Laval</td><td>NYSE: VRT, TT, JCI, CARR · ALFA.ST</td><td>Cold plates, CDUs, chillers, dry coolers <em>(Vertiv also 3.3)</em></td></tr>
+ <tr><td>Dover · Parker Hannifin · Ecolab · Henkel · 3M</td><td>NYSE: DOV, PH, ECL, MMM · HEN3.DE</td><td>Heat exchangers, couplings, water monitoring, thermal interface materials, coolants</td></tr>
+ <tr><td>ACS · Hochtief · Kingspan · AECOM · Assa Abloy</td><td>ACS.MC · HOT.DE · KRX.IR · NYSE: ACM · ASSAB.ST</td><td>Data-centre construction, structural systems and physical security</td></tr>
+ <tr><td>Digital Realty · Equinix</td><td>NYSE: DLR, EQIX</td><td>Data-centre real estate</td></tr>
+ </tbody></table>
+ <p class="disclaim">Descriptive map of the industry structure described in this chapter, drawn from BNP Paribas Equity Research, 27 Aug 2026. Company inclusion follows the source's value-chain mapping; no rating, target price or recommendation from that report is reproduced here. Not investment advice and not a view on any security. Tickers as of Aug 2026 and not individually verified.</p>`,
+ body:`<p>Roughly sixty organisations across the chain, grouped by layer. The concentration described on 8.3 and 8.9 is visible in how few names appear at several of these steps.</p>`
+},
+{
+ apparatus:true, label:"What's next", title:"End of Chapter 8",
+ figure:null,
+ body:`<p>Ten slides. The argument, in one line: half of every capex dollar goes somewhere other than chips, the power line is bigger than the networking line, and the constraints that bind hardest may be a mineral concentration and a queue at the electricity utility rather than anything made in a fab.</p>
+ <p><strong>One source, and it is sell-side.</strong> Every other chapter in this course triangulates across several. This one rests on a single research note, whose allocations are that firm's own high-level estimates in a volatile cost environment. The value chain and the constraint taxonomy are structural; the numbers are estimates. No rating, price target or recommendation from that report appears anywhere in this chapter.</p>
+ <p>Chapters are added as the subject moves, and the subject moves constantly. Data centres in orbit, energy siting, model architectures that break the assumptions in Chapter 2 — any of it could become a chapter. Nothing here is a final word, and the numbering is for convenience rather than sequence.</p>
+ <h4 class="grouplabel">The chapters so far</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>1</td><td><a href="understanding-ai-ch1-reader.html">How AI got here, and where it stands</a></td><td>11 slides</td></tr>
+ <tr><td>2</td><td><a href="understanding-ai-ch2-reader.html">Inside the model: how it actually works</a></td><td>10 slides</td></tr>
+ <tr><td>3</td><td><a href="understanding-ai-ch3-reader.html">The hardware and the supply chain</a></td><td>12 slides</td></tr>
+ <tr><td>4</td><td><a href="understanding-ai-ch4-reader.html">Building reliably with an unreliable model</a></td><td>11 slides</td></tr>
+ <tr><td>5</td><td><a href="understanding-ai-ch5-reader.html">Customizing a model</a></td><td>13 slides</td></tr>
+ <tr><td>6</td><td>Where the model runs: deployment choices</td><td><em>in development</em></td></tr>
+ <tr><td>7</td><td><a href="understanding-ai-ch7-reader.html">What it costs, and what drives the cost</a></td><td>10 slides</td></tr>
+ <tr><td>8</td><td>Mapping AI capex</td><td><em>you are here</em></td></tr>
+ </tbody></table>
+ <p class="nextlink"><a href="index.html">Full chapter list →</a></p>
+ <div class="btnrow">
+   <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
+   <span id="say2" class="said"></span>
+ </div>
+ <p class="hint2">Send back only the questions tagged <code>[gap]</code> or <code>[correction]</code>. A gap two readers hit independently is a defect in the material, not in the reader.</p>`
+}
+];
+
+let i = 0;
+const seen = new Set([0]);
+const asked = [];
+
+const stage = document.getElementById('stage');
+const dotsEl = document.getElementById('dots');
+const posEl = document.getElementById('pos');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+const qEl = document.getElementById('q');
+const sayEl = document.getElementById('say');
+const logbox = document.getElementById('logbox');
+const loglist = document.getElementById('loglist');
+
+const CONTENT = CARDS.filter(function(c){ return !c.apparatus; }).length;
+
+function render(){
+  const c = CARDS[i];
+  seen.add(i);
+  stage.innerHTML =
+    '<h1 class="cardtitle">' + c.title + '</h1>' +
+    (c.apparatus ? '' :
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — slide ' + (i+1) + ' of ' + CONTENT + '</p>') +
+    (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
+    '<div class="body">' + c.body + '</div>' +
+    (c.band ? '<div class="band">' + c.band + '</div>' : '') +
+    (c.depth ? '<details class="deeper"><summary>Go deeper</summary><div class="inner">' + c.depth + '</div></details>' : '') +
+    (c.sources ? '<p class="sources">' + c.sources + '</p>' : '');
+
+  document.querySelector('.ask').style.display = c.apparatus ? 'none' : '';
+
+  const ch2 = document.getElementById('ch2btn');
+  const allb = document.getElementById('allbtn');
+  const say2 = document.getElementById('say2');
+  if (ch2) {
+    ch2.onclick = function(){
+      copyText(CH2_PROMPT, function(){
+        say2.className = 'said';
+        say2.textContent = 'Copied. Paste it into Claude.';
+      }, say2);
+    };
+  }
+  if (allb) { allb.onclick = function(){ copyAll(say2); }; }
+
+  posEl.textContent = c.apparatus ? c.label : (i+1) + ' / ' + CONTENT;
+  prevB.disabled = (i === 0);
+  nextB.disabled = (i === CARDS.length - 1);
+  qEl.value = '';
+  sayEl.textContent = '';
+  dotsEl.innerHTML = '';
+  CARDS.forEach(function(c2, n){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    if (n === i) b.setAttribute('aria-current','true');
+    let cls = c2.apparatus ? 'app' : '';
+    if (seen.has(n) && n !== i) cls += ' seen';
+    b.className = cls.trim();
+    b.innerHTML = '<i></i>';
+    b.onclick = function(){ i = n; render(); };
+    dotsEl.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+
+function go(d){
+  const n = i + d;
+  if (n < 0 || n >= CARDS.length) return;
+  i = n; render();
+}
+
+prevB.onclick = function(){ go(-1); };
+nextB.onclick = function(){ go(1); };
+
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { i = 0; render(); }
+  if (e.key === 'End')  { i = CARDS.length - 1; render(); }
+});
+
+function promptFor(card, q){
+  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
+    card.title + '".\n\nMy question: ' + q;
+}
+
+const CH2_PROMPT = '';
+
+function copyText(text, ok, target){
+  const el = target || sayEl;
+  function fallback(){
+    const t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); ok(); }
+    catch(e){ el.className = 'err'; el.textContent = 'Copy failed — select the text manually.'; }
+    document.body.removeChild(t);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else { fallback(); }
+}
+
+function copyAll(target){
+  const el = target || sayEl;
+  if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
+  let out = '# Understanding AI — questions from Chapter 8\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  asked.forEach(function(a){
+    out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
+  });
+  copyText(out, function(){
+    el.className = 'said';
+    el.textContent = 'Copied ' + asked.length + ' question(s) in notes-block format.';
+  }, el);
+}
+
+document.getElementById('copyq').onclick = function(){
+  const q = qEl.value.trim();
+  if (!q) { sayEl.className = 'err'; sayEl.textContent = 'Type a question first.'; qEl.focus(); return; }
+  const card = CARDS[i];
+  copyText(promptFor(card, q), function(){
+    asked.push({ card: card, q: q });
+    const li = document.createElement('li');
+    li.textContent = card.num + ' · ' + card.id + ' — ' + q;
+    loglist.appendChild(li);
+    logbox.classList.add('on');
+    sayEl.className = 'said';
+    sayEl.textContent = 'Copied. Paste it into Claude.';
+    qEl.value = '';
+  });
+};
+
+document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+render();
+</script>
+</body>
+</html>

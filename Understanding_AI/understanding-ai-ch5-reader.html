@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Chapter 5 reader</title>
+<style>
+  :root{
+    --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+    --blue:#156082; --orange:#E97132; --wash:#f2f2f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .shell{max-width:820px;margin:0 auto;padding:28px 28px 140px}
+
+  header.top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
+  header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
+  header.top .ch a.backlink:hover{text-decoration:underline}
+  header.top .ch .sep{color:var(--muted);font-weight:normal}
+  header.top .meta{color:var(--muted);font-size:13px}
+
+  h1.cardtitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.25;margin:0 0 4px}
+  .cardid{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .body p{margin:0 0 14px;max-width:70ch}
+  .body ul{margin:0 0 16px;padding-left:20px;max-width:70ch}
+  .body li{margin:0 0 7px}
+  .body strong{color:#000}
+  .figure{margin:22px 0 24px}
+  .figure svg{width:100%;height:auto;display:block}
+
+  table.grid{border-collapse:collapse;font-size:15px;margin:4px 0 18px;width:100%;max-width:560px}
+  table.grid th{text-align:left;font-weight:bold;border-bottom:1px solid var(--ink);padding:5px 12px 5px 0}
+  table.grid td{border-bottom:1px solid var(--rule);padding:5px 12px 5px 0;vertical-align:top}
+
+  .stats{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 20px}
+  .stat{flex:1 1 150px;border-top:2px solid var(--navy);padding-top:8px}
+  .stat b{display:block;color:var(--navy);font-size:26px;line-height:1.1}
+  .stat span{display:block;color:var(--muted);font-size:13px;margin-top:5px}
+
+  .band{background:var(--wash);padding:12px 16px;margin:20px 0;font-size:15px;max-width:70ch}
+
+  .twocol{display:flex;gap:22px;flex-wrap:wrap;margin:4px 0 6px}
+  .twocol .col{flex:1 1 260px;padding-top:9px}
+  .twocol .col.blue{border-top:2px solid var(--blue)}
+  .twocol .col.orange{border-top:2px solid var(--orange)}
+  .twocol h3{font-size:14px;margin:0 0 10px;font-weight:bold}
+  .twocol .blue h3{color:var(--blue)}
+  .twocol .orange h3{color:var(--orange)}
+  .twocol p{font-size:14px;margin:0 0 10px;color:#2a2a2a}
+  .twocol b{display:inline-block;min-width:96px;font-size:16px;color:var(--ink)}
+
+  table.grid.wide{max-width:100%}
+  table.grid.wide td:last-child{width:auto}
+  h4.grouplabel{font-size:14px;margin:18px 0 6px;color:var(--navy)}
+  p.disclaim{font-size:13px;font-style:italic;color:var(--muted)}
+  p.warn{background:var(--wash);padding:11px 14px;font-size:15px;max-width:70ch}
+  p.hint2{font-size:13px;color:var(--muted);margin-top:14px;max-width:70ch}
+  code{font-family:Consolas,monospace;font-size:13px;background:var(--wash);padding:1px 4px}
+  .dots button.app i{border-radius:0;width:8px;height:8px;margin:3px 2px}
+  p.nextlink{margin:20px 0 6px}
+  p.nextlink a{color:var(--blue);font-size:19px;font-weight:bold;text-decoration:none}
+  p.nextlink a:hover{text-decoration:underline}
+
+  details.deeper{border-top:1px solid var(--rule);margin-top:26px;padding-top:12px}
+  details.deeper summary{cursor:pointer;color:var(--blue);font-size:15px;list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:"▸ ";}
+  details.deeper[open] summary::before{content:"▾ ";}
+  details.deeper .inner{padding-top:12px}
+  details.deeper p{font-size:16px;color:#2a2a2a}
+
+  .sources{color:var(--muted);font-size:13px;font-style:italic;margin-top:22px;max-width:70ch}
+
+  .ask{border-top:1px solid var(--rule);margin-top:26px;padding-top:16px}
+  .ask h2{font-size:15px;color:var(--navy);margin:0 0 8px;font-weight:bold}
+  .ask p.hint{font-size:13px;color:var(--muted);margin:0 0 10px;max-width:70ch}
+  .ask textarea{width:100%;max-width:70ch;min-height:62px;font-family:inherit;font-size:15px;
+    padding:8px 10px;border:1px solid var(--rule);border-radius:3px;resize:vertical}
+  .ask textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--navy);
+    background:#fff;color:var(--navy);border-radius:3px;cursor:pointer}
+  button:hover{background:var(--navy);color:#fff}
+  button:disabled{opacity:.4;cursor:default}
+  button.ghost{border-color:var(--rule);color:var(--muted)}
+  button.ghost:hover{background:var(--wash);color:var(--ink)}
+  .said{font-size:13px;color:var(--blue)}
+  .err{font-size:13px;color:#a32d2d}
+
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--rule)}
+  nav.bar .inner{max-width:820px;margin:0 auto;padding:12px 28px;
+    display:flex;align-items:center;gap:16px}
+  .dots{display:flex;gap:7px;flex:1}
+  .dots button{padding:0;border:none;background:none;width:14px;height:14px;cursor:pointer}
+  .dots i{display:block;width:9px;height:9px;border-radius:50%;background:#fff;
+    border:1px solid var(--muted);margin:2px}
+  .dots button[aria-current="true"] i{background:var(--navy);border-color:var(--navy)}
+  .dots button.seen i{background:var(--rule);border-color:var(--rule)}
+  .pos{font-size:13px;color:var(--muted);white-space:nowrap}
+
+  .logbox{border:1px solid var(--rule);padding:14px 16px;margin-top:18px;font-size:14px;display:none}
+  .logbox.on{display:block}
+  .logbox h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .logbox ol{margin:0;padding-left:20px}
+  .logbox li{margin-bottom:6px;color:#2a2a2a}
+
+  @media (max-width:640px){
+    .shell{padding:20px 18px 150px}
+    nav.bar .inner{padding:10px 18px;gap:10px}
+    h1.cardtitle{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 5 — Customizing a model</div>
+    <div class="meta">v2.1 · 30 Aug 2026</div>
+  </header>
+
+  <main id="stage" tabindex="-1"></main>
+
+  <section class="ask">
+    <h2>Ask about this slide</h2>
+    <p class="hint">This reader has the slides but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the slide ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this slide?"></textarea>
+    <div class="btnrow">
+      <button id="copyq">Copy question for Claude</button>
+      <button id="copyall" class="ghost">Copy all questions from this session</button>
+      <span id="say" class="said"></span>
+    </div>
+    <div class="logbox" id="logbox">
+      <h3>Questions saved this session</h3>
+      <ol id="loglist"></ol>
+    </div>
+  </section>
+</div>
+
+<nav class="bar">
+  <div class="inner">
+    <button id="prev">← Back</button>
+    <div class="dots" id="dots"></div>
+    <span class="pos" id="pos"></span>
+    <button id="next">Next →</button>
+  </div>
+</nav>
+
+<script>
+const SVG_PIPE = `
+<svg viewBox="0 0 680 300" role="img" aria-label="A retrieval preparation pipeline: parse to markdown, chunk on structure, enrich with metadata, embed and index, with a note that most failures happen at the first step.">
+<defs><marker id="rp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="20" y="60" width="118" height="58" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="79" y="82" font-size="12" font-weight="bold">Source docs</text>
+<text x="79" y="99" font-size="11" fill="#595959">PDF · DOCX · email</text>
+<line x1="140" y1="89" x2="152" y2="89" stroke="#1a1a1a" stroke-width="1" marker-end="url(#rp)"/>
+<rect x="156" y="52" width="126" height="74" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="219" y="74" font-size="12" font-weight="bold" fill="#E97132">Parse → Markdown</text>
+<text x="219" y="91" font-size="11" fill="#E97132">layout-aware: keeps</text>
+<text x="219" y="106" font-size="11" fill="#E97132">headings, tables, order</text>
+<line x1="284" y1="89" x2="296" y2="89" stroke="#1a1a1a" stroke-width="1" marker-end="url(#rp)"/>
+<rect x="300" y="52" width="118" height="74" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="359" y="74" font-size="12" font-weight="bold" fill="#E97132">Chunk</text>
+<text x="359" y="91" font-size="11" fill="#E97132">on structure, not</text>
+<text x="359" y="106" font-size="11" fill="#E97132">on character count</text>
+<line x1="420" y1="89" x2="432" y2="89" stroke="#1a1a1a" stroke-width="1" marker-end="url(#rp)"/>
+<rect x="436" y="52" width="118" height="74" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="495" y="74" font-size="12" font-weight="bold" fill="#E97132">Tag</text>
+<text x="495" y="91" font-size="11" fill="#E97132">metadata on every</text>
+<text x="495" y="106" font-size="11" fill="#E97132">chunk</text>
+<line x1="556" y1="89" x2="568" y2="89" stroke="#1a1a1a" stroke-width="1" marker-end="url(#rp)"/>
+<rect x="572" y="60" width="88" height="58" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="616" y="82" font-size="12" font-weight="bold">Embed</text>
+<text x="616" y="99" font-size="11" fill="#595959">and index</text>
+<text x="340" y="30" font-size="13" fill="#595959">Orange — where the work is, and where most RAG systems actually fail.</text>
+<rect x="20" y="150" width="640" height="118" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="40" y="172" font-size="13" font-weight="bold" text-anchor="start">What every chunk carries — the tags that do real work</text>
+<text x="40" y="194" font-size="12" text-anchor="start"><tspan font-weight="bold">Provenance</tspan> — source file, page, section, version. Without it you cannot cite, and 5.2's advantage is gone.</text>
+<text x="40" y="214" font-size="12" text-anchor="start"><tspan font-weight="bold">Time</tspan> — effective date and superseded-by. Lets retrieval prefer the version that currently governs.</text>
+<text x="40" y="234" font-size="12" text-anchor="start"><tspan font-weight="bold">Authority</tspan> — is this the policy, a precedent, or someone's draft? Decides which wins when two conflict.</text>
+<text x="40" y="254" font-size="12" text-anchor="start"><tspan font-weight="bold">Permission</tspan> — who may see it. Enforced at query time, so one system serves everyone correctly.</text>
+</g></svg>`;
+
+const SVG_WHODOES = `
+<svg viewBox="0 0 680 270" role="img" aria-label="Two columns showing which parts of AI implementation work can be bought from outside and which have to stay inside the organisation.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="30" y="44" width="300" height="176" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="180" y="68" font-size="13" font-weight="bold" text-anchor="middle" fill="#156082">Buyable from outside</text>
+<text x="48" y="94" font-size="12">The ingestion pipeline and its plumbing</text>
+<text x="48" y="116" font-size="12">Infrastructure, serving, MLOps</text>
+<text x="48" y="138" font-size="12">The first build, and the pattern library</text>
+<text x="48" y="160" font-size="12">from having done it twenty times</text>
+<text x="48" y="182" font-size="12">Scarce skills you cannot hire fast</text>
+<text x="48" y="204" font-size="12" font-style="italic" fill="#595959">Undifferentiated. Rent it.</text>
+<rect x="350" y="44" width="300" height="176" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="500" y="68" font-size="13" font-weight="bold" text-anchor="middle" fill="#E97132">Has to stay inside</text>
+<text x="368" y="94" font-size="12">Judging which examples are exemplary</text>
+<text x="368" y="116" font-size="12">The taxonomy — what your terms mean</text>
+<text x="368" y="138" font-size="12">The evaluation rubric, and owning the</text>
+<text x="368" y="160" font-size="12">decision to ship or not</text>
+<text x="368" y="182" font-size="12">The correction flywheel (5.9)</text>
+<text x="368" y="204" font-size="12" font-style="italic" fill="#595959">Tacit, and it is the actual asset.</text>
+<text x="340" y="248" font-size="13" text-anchor="middle" fill="#595959">The work does not disappear. It moves — from writing the document to running the system.</text>
+</g></svg>`;
+
+const SVG_VERTICAL = `
+<svg viewBox="0 0 680 290" role="img" aria-label="Two possible futures for domain-specific models against what is actually happening: general base models with specialised layers on top.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="30" y="44" width="300" height="104" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="180" y="68" font-size="13" font-weight="bold" text-anchor="middle">Outcome A — vertical models</text>
+<text x="48" y="92" font-size="12">A legal LLM, a biotech LLM, a</text>
+<text x="48" y="108" font-size="12">financial LLM, each trained on its</text>
+<text x="48" y="124" font-size="12">own corpus. BloombergGPT was this</text>
+<text x="48" y="140" font-size="12">bet, at 50B parameters.</text>
+<rect x="350" y="44" width="300" height="104" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="500" y="68" font-size="13" font-weight="bold" text-anchor="middle">Outcome B — one general model</text>
+<text x="368" y="92" font-size="12">A frontier model good enough at</text>
+<text x="368" y="108" font-size="12">everything that specialising the</text>
+<text x="368" y="124" font-size="12">weights stops being worth the</text>
+<text x="368" y="140" font-size="12">maintenance.</text>
+<rect x="30" y="166" width="620" height="90" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="340" y="190" font-size="13" font-weight="bold" text-anchor="middle" fill="#E97132">What is actually happening — specialisation moved up the stack</text>
+<text x="340" y="212" font-size="12" text-anchor="middle">General base model  +  your documents (RAG)  +  your tools  +  your evals  +  a light fine-tune</text>
+<text x="340" y="232" font-size="12" text-anchor="middle" fill="#595959">Vertical systems on general foundations. The domain knowledge lives in the layers you can change</text>
+<text x="340" y="248" font-size="12" text-anchor="middle" fill="#595959">in an afternoon, not in weights you would have to retrain.</text>
+</g></svg>`;
+
+const SVG_LADDER = `
+<svg viewBox="0 0 680 290" role="img" aria-label="Four ascending rungs of the customization ladder: prompting, retrieval, tool use, and fine-tuning, with a marker showing most teams should stop before the top rung.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="60" y="212" width="480" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="76" y="232" font-size="13" font-weight="bold">1 · Prompting and system prompts</text>
+<text x="76" y="249" font-size="12" fill="#595959">free, instant, and better than it was — often enough on its own</text>
+<rect x="96" y="160" width="444" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="112" y="180" font-size="13" font-weight="bold">2 · Retrieval (RAG)</text>
+<text x="112" y="197" font-size="12" fill="#595959">your documents at query time — open book (4.3)</text>
+<rect x="132" y="108" width="408" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="148" y="128" font-size="13" font-weight="bold">3 · Tool use</text>
+<text x="148" y="145" font-size="12" fill="#595959">connect it to your systems so it can act, not only answer (4.3)</text>
+<line x1="132" y1="102" x2="600" y2="102" stroke="#E97132" stroke-width="1.25" stroke-dasharray="5 4"/>
+<text x="600" y="98" font-size="12" text-anchor="end" fill="#E97132">most teams should stop here</text>
+<rect x="168" y="44" width="372" height="46" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="184" y="64" font-size="13" font-weight="bold" fill="#E97132">4 · Fine-tuning</text>
+<text x="184" y="81" font-size="12" fill="#E97132">actually change the weights — the heaviest lever</text>
+<text x="600" y="200" font-size="12" fill="#595959">heavier</text>
+<text x="600" y="216" font-size="12" fill="#595959">slower to change</text>
+<text x="600" y="232" font-size="12" fill="#595959">harder to undo</text>
+<text x="60" y="26" font-size="13" fill="#595959">Climb in order. Each rung up costs more to change, not just more to build.</text>
+</g></svg>`;
+
+const SVG_SPLIT = `
+<svg viewBox="0 0 680 280" role="img" aria-label="Two columns answering what is missing: if the model does not know something use retrieval, if it does not behave correctly use fine-tuning.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="340" y="26" font-size="14" font-weight="bold" text-anchor="middle">What is actually missing?</text>
+<rect x="30" y="44" width="300" height="150" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="180" y="68" font-size="13" font-weight="bold" text-anchor="middle" fill="#156082">It does not KNOW something</text>
+<text x="180" y="92" font-size="14" font-weight="bold" text-anchor="middle" fill="#156082">→ Retrieval (RAG)</text>
+<text x="48" y="118" font-size="12" fill="#1a1a1a">Facts · policies · precedents · documents</text>
+<text x="48" y="136" font-size="12" fill="#1a1a1a">Anything that changes</text>
+<text x="48" y="154" font-size="12" fill="#1a1a1a">Anything that must be cited</text>
+<text x="48" y="178" font-size="12" font-style="italic" fill="#595959">Open book. The weights never move.</text>
+<rect x="350" y="44" width="300" height="150" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="500" y="68" font-size="13" font-weight="bold" text-anchor="middle" fill="#E97132">It does not BEHAVE as needed</text>
+<text x="500" y="92" font-size="14" font-weight="bold" text-anchor="middle" fill="#E97132">→ Fine-tuning</text>
+<text x="368" y="118" font-size="12" fill="#1a1a1a">Exact output schema</text>
+<text x="368" y="136" font-size="12" fill="#1a1a1a">Narrow domain vocabulary</text>
+<text x="368" y="154" font-size="12" fill="#1a1a1a">House voice and format</text>
+<text x="368" y="178" font-size="12" font-style="italic" fill="#595959">Changes its instincts.</text>
+<rect x="30" y="210" width="620" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="230" font-size="13" font-weight="bold" text-anchor="middle">The common wrong turn: fine-tuning to add facts</text>
+<text x="340" y="248" font-size="12" text-anchor="middle" fill="#595959">They blur, they cannot be cited, and they go stale the day the document changes.</text>
+</g></svg>`;
+
+const SVG_ADAPTER = `
+<svg viewBox="0 0 680 250" role="img" aria-label="A frozen base model with small trainable adapter blocks attached, fed by a stack of curated example pairs.">
+<defs><marker id="a5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="40" y="60" width="170" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="125" y="80" font-size="12" text-anchor="middle">contract excerpt → memo</text>
+<rect x="40" y="98" width="170" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="125" y="118" font-size="12" text-anchor="middle">contract excerpt → memo</text>
+<rect x="40" y="136" width="170" height="30" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="125" y="156" font-size="12" text-anchor="middle">contract excerpt → memo</text>
+<text x="125" y="188" font-size="12" text-anchor="middle" fill="#595959">hundreds to thousands</text>
+<text x="125" y="204" font-size="12" text-anchor="middle" fill="#595959">of ideal examples</text>
+<line x1="216" y1="113" x2="256" y2="113" stroke="#1a1a1a" stroke-width="1" marker-end="url(#a5)"/>
+<rect x="264" y="44" width="230" height="150" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="1"/>
+<text x="379" y="74" font-size="14" font-weight="bold" text-anchor="middle">Base model</text>
+<text x="379" y="94" font-size="12" text-anchor="middle" fill="#595959">frozen — billions of weights,</text>
+<text x="379" y="110" font-size="12" text-anchor="middle" fill="#595959">unchanged</text>
+<rect x="500" y="66" width="34" height="20" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<rect x="500" y="108" width="34" height="20" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<rect x="500" y="150" width="34" height="20" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<line x1="494" y1="76" x2="500" y2="76" stroke="#E97132" stroke-width="1.5"/>
+<line x1="494" y1="118" x2="500" y2="118" stroke="#E97132" stroke-width="1.5"/>
+<line x1="494" y1="160" x2="500" y2="160" stroke="#E97132" stroke-width="1.5"/>
+<text x="544" y="112" font-size="13" font-weight="bold" fill="#E97132">Adapters</text>
+<text x="544" y="129" font-size="12" fill="#E97132">0.1–1% of the</text>
+<text x="544" y="145" font-size="12" fill="#E97132">parameters — trained</text>
+<text x="340" y="234" font-size="13" text-anchor="middle" fill="#595959">You are not teaching it English. You are teaching it your way of doing one job.</text>
+</g></svg>`;
+
+const SVG_TASKSPLIT = `
+<svg viewBox="0 0 680 250" role="img" aria-label="One legal task split into the parts that need retrieval and the parts that need fine-tuning.">
+<defs><marker id="t5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="30" y="90" width="180" height="66" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="1"/>
+<text x="120" y="114" font-size="13" font-weight="bold" text-anchor="middle">The one job</text>
+<text x="120" y="132" font-size="12" text-anchor="middle" fill="#595959">contract in,</text>
+<text x="120" y="148" font-size="12" text-anchor="middle" fill="#595959">risk memo out</text>
+<path d="M214 112 L280 76" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#t5)"/>
+<path d="M214 136 L280 172" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#t5)"/>
+<rect x="288" y="40" width="360" height="72" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="304" y="62" font-size="13" font-weight="bold" fill="#156082">Knowledge → RAG</text>
+<text x="304" y="82" font-size="12" fill="#1a1a1a">Firm precedents · the clause playbook</text>
+<text x="304" y="100" font-size="12" fill="#595959">changes often, and must be citable</text>
+<rect x="288" y="140" width="360" height="72" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="304" y="162" font-size="13" font-weight="bold" fill="#E97132">Behaviour → fine-tuning</text>
+<text x="304" y="182" font-size="12" fill="#1a1a1a">House style · memo structure · risk flagging</text>
+<text x="304" y="200" font-size="12" fill="#595959">stable, and impossible to prompt reliably</text>
+<text x="340" y="240" font-size="13" text-anchor="middle" fill="#595959">A real system needs both. Build the retrieval layer first — it is useful on its own.</text>
+</g></svg>`;
+
+const SVG_FUNNEL = `
+<svg viewBox="0 0 680 270" role="img" aria-label="A funnel from every past matter down to a curated training set, with a held-out test set split off before any training begins.">
+<defs><marker id="f5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="150" y="40" width="380" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="62" font-size="12">Every past matter in the archive</text>
+<path d="M340 76 L340 90" stroke="#1a1a1a" stroke-width="1" marker-end="url(#f5)"/>
+<rect x="190" y="96" width="300" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="118" font-size="12">Cleaned and de-identified</text>
+<path d="M340 132 L340 146" stroke="#1a1a1a" stroke-width="1" marker-end="url(#f5)"/>
+<rect x="230" y="152" width="220" height="34" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="174" font-size="12">Judged genuinely exemplary</text>
+<path d="M340 188 L340 202" stroke="#1a1a1a" stroke-width="1" marker-end="url(#f5)"/>
+<rect x="255" y="208" width="170" height="38" fill="#f2f2f2" stroke="#E97132" stroke-width="2"/>
+<text x="340" y="226" font-size="13" font-weight="bold" fill="#E97132">500–2,000 pairs</text>
+<text x="340" y="241" font-size="11" fill="#E97132">the training set</text>
+<path d="M490 113 L590 113 L590 200" fill="none" stroke="#156082" stroke-width="1.5" marker-end="url(#f5)"/>
+<rect x="512" y="206" width="150" height="40" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="587" y="224" font-size="12" font-weight="bold" fill="#156082">Held-out test set</text>
+<text x="587" y="239" font-size="11" fill="#156082">split off first</text>
+<text x="140" y="26" font-size="13" text-anchor="start" fill="#595959">Blue — separated before any training. Split afterwards and your evaluation is worthless.</text>
+</g></svg>`;
+
+const SVG_GATE = `
+<svg viewBox="0 0 680 250" role="img" aria-label="Three-way evaluation comparing the base model, retrieval only, and the fine-tuned model, with a ship gate that only opens if the fine-tune beats both.">
+<defs><marker id="g5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<text x="340" y="26" font-size="13" fill="#595959">The same held-out contracts, scored three ways.</text>
+<rect x="38" y="46" width="180" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="128" y="68" font-size="13" font-weight="bold">Base model</text>
+<text x="128" y="86" font-size="12" fill="#595959">no customization</text>
+<rect x="250" y="46" width="180" height="52" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="68" font-size="13" font-weight="bold">RAG only</text>
+<text x="340" y="86" font-size="12" fill="#595959">the cheaper rung</text>
+<rect x="462" y="46" width="180" height="52" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="552" y="68" font-size="13" font-weight="bold" fill="#E97132">Fine-tuned</text>
+<text x="552" y="86" font-size="12" fill="#E97132">what you just built</text>
+<path d="M128 102 L128 130 L340 130" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+<path d="M552 102 L552 130 L340 130" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+<path d="M340 102 L340 144" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#g5)"/>
+<rect x="190" y="150" width="300" height="48" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="170" font-size="13" font-weight="bold">Ship only if it clearly beats both</text>
+<text x="340" y="188" font-size="12" fill="#595959">format matched · risky clauses caught · nothing invented</text>
+<text x="340" y="228" font-size="13" fill="#595959">If it does not, you have added a training pipeline for nothing.</text>
+</g></svg>`;
+
+const SVG_STACK5 = `
+<svg viewBox="0 0 680 280" role="img" aria-label="The deployed stack: a fine-tuned model with retrieval, tool access and a human review gate, with corrections feeding back into the next training round.">
+<defs><marker id="s5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a" text-anchor="middle">
+<rect x="30" y="60" width="150" height="60" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="105" y="84" font-size="13" font-weight="bold" fill="#E97132">Fine-tuned model</text>
+<text x="105" y="102" font-size="12" fill="#E97132">house style, structure</text>
+<rect x="196" y="60" width="150" height="60" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="271" y="84" font-size="13" font-weight="bold" fill="#156082">RAG</text>
+<text x="271" y="102" font-size="12" fill="#156082">precedents, playbook</text>
+<rect x="362" y="60" width="150" height="60" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="437" y="84" font-size="13" font-weight="bold" fill="#156082">Tool use</text>
+<text x="437" y="102" font-size="12" fill="#156082">clause database</text>
+<rect x="528" y="60" width="122" height="60" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="1"/>
+<text x="589" y="84" font-size="13" font-weight="bold">Human</text>
+<text x="589" y="102" font-size="12" fill="#595959">a lawyer approves</text>
+<line x1="182" y1="90" x2="192" y2="90" stroke="#1a1a1a" stroke-width="1" marker-end="url(#s5)"/>
+<line x1="348" y1="90" x2="358" y2="90" stroke="#1a1a1a" stroke-width="1" marker-end="url(#s5)"/>
+<line x1="514" y1="90" x2="524" y2="90" stroke="#1a1a1a" stroke-width="1" marker-end="url(#s5)"/>
+<path d="M589 124 L589 168 L105 168 L105 126" fill="none" stroke="#1a1a1a" stroke-width="1" stroke-dasharray="5 4" marker-end="url(#s5)"/>
+<text x="347" y="186" font-size="12" font-style="italic" fill="#595959">corrections feed the next training round</text>
+<rect x="30" y="204" width="620" height="46" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="224" font-size="13" font-weight="bold">The flywheel is the asset, not the model</text>
+<text x="340" y="242" font-size="12" fill="#595959">Every correction is a labelled example of the failure and the right answer beside it.</text>
+</g></svg>`;
+
+const SVG_WHEN = `
+<svg viewBox="0 0 680 260" role="img" aria-label="Two panels: when fine-tuning earns its place, and what changed in 2026 as retrieval and fine-tuning stopped being alternatives.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="30" y="40" width="300" height="170" fill="#fff" stroke="#E97132" stroke-width="2"/>
+<text x="180" y="64" font-size="13" font-weight="bold" text-anchor="middle" fill="#E97132">When it earns its place</text>
+<text x="48" y="92" font-size="12">A format or house style prompting</text>
+<text x="48" y="108" font-size="12">cannot reliably enforce</text>
+<text x="48" y="132" font-size="12">A narrow, repeated, high-volume task</text>
+<text x="48" y="156" font-size="12">A small tuned model replacing a large</text>
+<text x="48" y="172" font-size="12">general one — latency and cost</text>
+<text x="48" y="196" font-size="12">Strict schema compliance</text>
+<rect x="350" y="40" width="300" height="170" fill="#fff" stroke="#156082" stroke-width="2"/>
+<text x="500" y="64" font-size="13" font-weight="bold" text-anchor="middle" fill="#156082">What changed in 2026</text>
+<text x="368" y="92" font-size="12">Not "RAG or fine-tuning" —</text>
+<text x="368" y="108" font-size="12" font-weight="bold">RAG with fine-tuning</text>
+<text x="368" y="132" font-size="12">Retrieval became the default</text>
+<text x="368" y="148" font-size="12">starting point for enterprise work</text>
+<text x="368" y="172" font-size="12">New reason to tune: teaching a model</text>
+<text x="368" y="188" font-size="12">to be a good agent controller</text>
+<text x="340" y="240" font-size="13" text-anchor="middle" fill="#595959">Fine-tune the behaviour, retrieve the knowledge, and let evaluation decide when to stop climbing.</text>
+</g></svg>`;
+
+const CARDS = [
+{
+ id:"S-017a", num:"5.1", title:"The ladder: try the cheapest rung first",
+ figure:SVG_LADDER,
+ body:`<p>Customization is a ladder, and the discipline is climbing it in order.</p>
+ <ul>
+ <li><strong>Prompting and system prompts</strong> — free, instant, and more capable than it was. Often enough on its own.</li>
+ <li><strong>Retrieval (RAG)</strong> — give the model your documents at query time. Open-book (4.3).</li>
+ <li><strong>Tool use</strong> — connect it to your systems so it can act rather than only answer (4.3).</li>
+ <li><strong>Fine-tuning</strong> — actually change the model's weights. The heaviest lever. Reach for it last.</li>
+ </ul>`,
+ band:`If prompting plus retrieval gets you there, do not fine-tune. It is cheaper to run, faster to change, and it survives the next model release.`,
+ depth:`<p>The ladder is not a ranking of sophistication, though it gets treated as one. Teams reach for fine-tuning early because it sounds like the serious answer — the one that means you have really built something. It is usually the answer that means you have committed to maintaining a training pipeline.</p>
+ <p>Note what has happened to the bottom rung. The discipline that in 2024 was called prompt engineering is now generally called <strong>context engineering</strong>: the systematic management of what the model knows, remembers and can reach at each step. That is a bigger job than writing a good instruction, and it has absorbed a great deal of what people used to fine-tune for. A frontier model in 2026 follows instructions well enough that the marginal return on the top rung has fallen for most tasks — and the cost of the bottom rung has fallen further.</p>
+ <p>One structural point for anyone budgeting this. Each rung up costs more to <em>change</em>, not just more to build. A prompt is edited in a minute. A retrieval corpus is re-indexed overnight. A fine-tuned model is retrained, re-evaluated and re-deployed — and has to be redone when the base model is replaced, which in 2026 is quarterly (1.5).</p>`,
+ sources:"Ladder structure is established practice. The context-engineering framing, and the observation that it has displaced fine-tuning for many tasks, comes from multiple 2026 practitioner sources \u2014 secondary."
+},
+{
+ id:"S-017b", num:"5.2", title:"Knowledge or behaviour: the question that decides it",
+ figure:SVG_SPLIT,
+ body:`<ul>
+ <li><strong>RAG gives it new <em>knowledge</em></strong> — facts, policies, documents, anything that changes. The model reads them at query time and can cite them.</li>
+ <li><strong>Fine-tuning gives it new <em>behaviour</em></strong> — house format, tone, domain reasoning, following a schema, doing one specialised task consistently. It changes the model's instincts.</li>
+ </ul>
+ <p><strong>Rule of thumb: RAG for what it should know. Fine-tuning for how it should behave.</strong></p>
+ <p>Retrieval sounds like the easy rung, and it is the cheaper one — but only if the documents underneath it were prepared properly, which is the next slide.</p>
+ <p>The three things frontier models still reliably fail at, and that fine-tuning fixes: <strong>exact output schema</strong>, <strong>narrow domain vocabulary</strong>, and <strong>house voice</strong>. A strong base model will describe your process in plausible English, and will not consistently emit the JSON your downstream parser expects.</p>`,
+ depth:`<p>There is a second reason to prefer retrieval for knowledge that has nothing to do with accuracy: <strong>attribution</strong>. A retrieved answer can point at the document it came from. A fine-tuned answer cannot — the fact has been dissolved into weights and there is nothing to cite. For compliance, model risk and anything a regulator might ask about, that difference decides the architecture on its own.</p>
+ <p>Retrieval also carries query-time access control. One system can serve users with different permissions, showing each only what they are entitled to see. A fine-tuned model has no such notion — whatever it learned, it knows for everybody.</p>`,
+ sources:"The knowledge/behaviour distinction is settled practice. The attribution and access-control arguments: Contextual AI (Jan 2026) and enterprise comparisons through 2026 \u2014 secondary, and from vendors with a position, though the mechanism is not in dispute."
+},
+{
+ id:"S-040", num:"5.3", title:"Preparing your data so retrieval actually works",
+ figure:SVG_PIPE,
+ body:`<p>Retrieval is the rung most teams reach for, and the one they most often build badly. <strong>Most RAG systems do not fail at retrieval or generation. They fail earlier, at parsing.</strong> If the document was flattened wrongly, everything downstream inherits the damage.</p>
+ <ul>
+ <li><strong>Convert to Markdown, layout-aware.</strong> A PDF is a description of ink on a page, not a structured document. Layout-aware parsing treats it as a visual artefact — detecting semantic blocks, preserving reading order, keeping page numbers and element types — and emits Markdown, which retains headings, lists and tables and gives natural split points.</li>
+ <li><strong>Chunk on structure, not on character count.</strong> Fixed-size splitting cuts through sentences, merges unrelated topics and separates a heading from the text it governs. Structure-aware chunking respects titles, sections and paragraph boundaries.</li>
+ <li><strong>Tag every chunk.</strong> Provenance, effective date, authority, permission. This is the part that turns a pile of text into something a system can reason over.</li>
+ <li><strong>Then embed and index.</strong> This step is nearly automatic, and it is the one people spend their time on.</li>
+ </ul>`,
+ band:`Improving parsing and chunking usually delivers a bigger gain than switching to a better model — and it is far cheaper.`,
+ depth:`<p><strong>On JSON.</strong> The question of whether you need JSON files has a slightly unsatisfying answer: yes, but you do not create them. Nobody hand-converts documents into JSON. The pipeline emits one record per chunk — an identifier, the text, the embedding vector and the metadata — and whether that is JSON, a database row or a vector-store entry is an implementation detail. What matters is that the record exists and carries its tags. If someone proposes a "JSON conversion project" as a deliverable, ask what the records are <em>for</em>.</p>
+ <p><strong>On taxonomy, and importance.</strong> The instinct is to tag richly. The better discipline is to tag only what you would <em>filter</em> by, <em>cite</em> by, or <em>rank</em> by, because every other tag is maintenance you will not do. Three earn their place in almost any professional setting. <em>Effective date</em>, so a superseded policy loses to the current one. <em>Authority</em>, so the governing document beats somebody's draft memo — this is your "importance" tag, and it is the one that stops a system confidently citing a discarded draft. <em>Permission</em>, so one corpus can serve people with different entitlements.</p>
+ <p><strong>On overlap.</strong> Common advice is to overlap chunks by 10–20% so context is not lost at the boundary. A January 2026 systematic analysis found overlap provided no measurable benefit and only increased indexing cost. Treat it as a parameter to test on your own corpus, not a rule.</p>
+ <p><strong>On tables and charts.</strong> The historic failure mode of RAG in finance is that the numbers live in tables and the text extractor destroys them. Vision-language retrieval models that index PDF page images directly, without a fragile text-extraction step, are the 2026 answer to that — and they are what makes retrieval viable over filings, decks and scanned material.</p>
+ <p><strong>And evaluate retrieval separately from generation.</strong> When the answer is wrong, the usual cause is that the right chunk was never retrieved — the model then did its best with the wrong material. Benchmarks built specifically to test the retrieval half exist because that is where most production failures originate. If you only measure the final answer, you cannot tell which half broke.</p>`,
+ sources:"Parsing-as-the-failure-point, layout-aware parsing and structure-aware chunking: Omdena document parsing guide (Apr 2026) and Databricks chunking guide (Mar 2026) \u2014 secondary practitioner sources. PDF-to-Markdown as standard practice, with Docling and layout-aware PyMuPDF named in the literature: arXiv:2510.24402 (metadata-driven financial RAG) and arXiv:2604.22095 \u2014 primary. The January 2026 overlap finding is reported secondhand via Firecrawl; the underlying analysis was not read directly \u2014 treat as a reason to test, not a settled result. Retrieval-side failure dominance in legal RAG: Kili Technology benchmark survey (May 2026), secondary."
+},
+{
+ id:"S-018a", num:"5.4", title:"What fine-tuning actually is",
+ figure:SVG_ADAPTER,
+ body:`<ul>
+ <li><strong>What it is:</strong> continue training a pretrained model on curated input→output example pairs, so its weights shift toward the behaviour you want. The training loop of 2.3, run briefly on your data instead of the internet.</li>
+ <li><strong>What you are teaching:</strong> not language, not general knowledge — <em>your way of doing a specific job</em>, demonstrated across hundreds to thousands of ideal examples.</li>
+ <li><strong>Supervised fine-tuning (SFT)</strong> on instruction→response pairs is the workhorse. Everything on the next slide either makes it cheaper or refines what it produced.</li>
+ </ul>`,
+ depth:`<p>The useful mental model is onboarding rather than education. A new senior hire already speaks the language and knows the domain; what they lack is your house format, your conventions and your judgment about what matters. You do not teach them English. You show them twenty good examples of the memo you expect.</p>
+ <p>That framing also predicts the failure mode. Show a new hire twenty examples that are subtly wrong and they will produce work that is confidently, consistently wrong in exactly that way — which is 5.10.</p>
+ <p>And note what fine-tuning does <em>not</em> touch: the model's knowledge cutoff (2.9), its general capability, or its tendency to be interpretative rather than deterministic (4.1). A fine-tuned model is the same machine with different instincts.</p>`,
+ sources:"Established practice. No dated claims."
+},
+{
+ id:"S-018b", num:"5.5", title:"The methods, cheapest to heaviest",
+ figure:`<table class="grid wide"><thead><tr><th>Method</th><th>What it does</th><th>When you reach for it</th></tr></thead><tbody>
+ <tr><td><b>LoRA</b></td><td>Freezes the model, trains small low-rank adapters — <b>0.1–1%</b> of the parameters. Adapters ship as 50–500 MB files and are swappable</td><td>The default</td></tr>
+ <tr><td><b>QLoRA</b></td><td>LoRA on a 4-bit quantized base. Puts a <b>70B-class model on a single 80 GB H100</b></td><td>When GPU memory is the binding constraint — usually</td></tr>
+ <tr><td><b>Full fine-tuning</b></td><td>Updates every weight. Powerful, expensive, risks catastrophic forgetting (5.10)</td><td>Rare outside labs</td></tr>
+ <tr><td><b>DPO</b> — preference tuning</td><td>Learns from preferred-versus-rejected answer pairs to shape style and judgment. Now the <b>default preference method</b>. Cousins: IPO, KTO, ORPO</td><td>After SFT, when you have preference pairs</td></tr>
+ <tr><td><b>GRPO</b> — reinforcement</td><td>Reward-based. The one place fine-tuning shows a step change rather than a polish</td><td>When the answer is <b>verifiable</b>: maths, code, extraction, tool-call accuracy</td></tr>
+ </tbody></table>`,
+ body:`<p><strong>The typical 2026 stack:</strong> base → SFT (usually QLoRA) → DPO if you have preference pairs → GRPO if your reward is verifiable.</p>`,
+ depth:`<p><strong>Rank is the one hyperparameter worth knowing.</strong> LoRA's <code>r</code> sets adapter capacity: 8 for simple format or style work, <strong>16 as the sensible default</strong>, 32–64 for genuine domain shift or very large datasets. Start at 16, get a baseline, raise it only if validation stops improving. Tuning it obsessively before you have a baseline is wasted effort.</p>
+ <p><strong>Tooling churns faster than method.</strong> As of 2026: <code>trl</code> for the widest range of correct objective implementations, <code>unsloth</code> for speed and memory on a single GPU, <code>axolotl</code> for a YAML-configured pipeline. Expect these names to change; the methods above will not.</p>
+ <p>The reason GRPO is the interesting one for this audience: it needs a reward you can <em>check automatically</em>. That is a strong constraint, and it maps almost exactly onto the deterministic side of 4.1. Where you can write code that scores the answer, reinforcement fine-tuning works. Where you cannot, you are back to preference pairs and human judgment.</p>`,
+ sources:"LoRA \u2014 Hu et al. 2021, arXiv:2106.09685. QLoRA \u2014 Dettmers et al. 2023, arXiv:2305.14314. DPO \u2014 Rafailov et al. 2023, arXiv:2305.18290. GRPO \u2014 DeepSeekMath, arXiv:2402.03300, mainstreamed by DeepSeek-R1 in early 2025. Primary papers. Adapter sizes, rank guidance, the single-H100 claim and the 2026 tooling landscape come from practitioner guides (FutureAGI, DEV, Apr\u2013Jun 2026) \u2014 secondary, directionally consistent across several."
+},
+{
+ id:"S-019a", num:"5.6", title:"Worked example: define the task, then decide",
+ figure:SVG_TASKSPLIT,
+ body:`<p><strong>The example, running through 5.6 to 5.9:</strong> a law firm wants a model that reads a contract and drafts a risk-review memo in house format, flagging problematic clauses.</p>
+ <ul>
+ <li><strong>Narrow it to one job.</strong> Not "help our lawyers." One task: contract in, risk memo out. A fine-tune with a fuzzy target produces a model that is worse at everything.</li>
+ <li><strong>Split the requirement by 5.2.</strong> Firm precedents and the clause playbook are <em>knowledge</em> — they change, they must be cited → <strong>RAG</strong>. House style, memo structure and the risk-flagging behaviour are <em>a skill</em> → <strong>fine-tuning</strong>.</li>
+ <li><strong>Write down what "good" looks like before you start.</strong> Format matched, risky clauses caught, no invented terms. If you cannot state the test now, you cannot evaluate the result later.</li>
+ </ul>`,
+ depth:`<p>Most fine-tuning projects fail here rather than at the training step, and they fail in a specific way: the task was never narrowed enough to have a right answer.</p>
+ <p>The split above also tells you what to build first. The RAG layer is independently useful — a lawyer can search precedents with it on day one — and it is the cheaper rung. Building it first gives you the baseline you will need to prove the fine-tune was worth doing (5.8).</p>`,
+ sources:"Illustrative worked example, not drawn from a specific firm."
+},
+{
+ id:"S-019b", num:"5.7", title:"Worked example: the data is 80% of the work",
+ figure:SVG_FUNNEL,
+ body:`<ul>
+ <li><strong>Collect and curate: ~500–2,000 pairs</strong> of <em>(contract excerpt → ideal senior-associate memo)</em> from past matters. Clean them, de-identify them, and — the hard part — confirm each one is genuinely exemplary rather than merely typical.</li>
+ <li><strong>Quality beats quantity, decisively.</strong> Five hundred excellent examples produce a better model than five thousand mixed ones, because the model learns the average of what you showed it.</li>
+ <li><strong>Format as instruction pairs:</strong> <code>{system: "You are the firm's contract reviewer…", user: &lt;contract text&gt;, assistant: &lt;ideal memo&gt;}</code>.</li>
+ <li><strong>Hold back a test set first.</strong> Before any training, set aside contracts the model will never see. Split afterwards and you contaminate it.</li>
+ </ul>`,
+ band:`This slide is 80% of the project. Everything after it is comparatively mechanical.`,
+ depth:`<p>The curation problem is organisational rather than technical, which is why it gets underestimated. Someone senior has to read old memos and judge which represent the standard — and that person's time is the actual cost of the project, not the GPUs.</p>
+ <p>Watch for a particular trap in a professional-services setting: the examples in your archive were written for specific clients in specific circumstances, and the reasoning that made them right is often not in the document. The model learns the visible output, not the invisible judgment. Where the judgment matters and is not written down, fine-tuning will produce confident memos with the reasoning hollowed out.</p>
+ <p>De-identification is not optional and not simple. Client names, matter numbers and distinguishing facts all have to go, and a model trained on insufficiently scrubbed data can reproduce them.</p>`,
+ sources:"Dataset sizes are typical ranges from practitioner guidance, not a rule."
+},
+{
+ id:"S-019c", num:"5.8", title:"Worked example: train, then prove it was worth it",
+ figure:SVG_GATE,
+ body:`<ul>
+ <li><strong>Pick base and method.</strong> An open model in the Llama, Qwen or Mistral class for control and privacy, or a provider's fine-tuning API for ease. <strong>QLoRA</strong> to train adapters cheaply.</li>
+ <li><strong>Train.</strong> A few epochs. Hours on one or a few GPUs; for a small model, tens to low hundreds of dollars. Watch for overfitting.</li>
+ <li><strong>Evaluate against baselines — and this is the gate.</strong> Rubric plus human review, with an LLM judge as a supplement rather than the decision.</li>
+ <li><strong>Compare against the base model and against RAG-only.</strong> If the fine-tune does not clearly beat both, <strong>do not ship it.</strong></li>
+ </ul>`,
+ band:`The teams that ship reliable systems in 2026 are not the ones with the best fine-tune. They are the ones with the best evaluations, because that is what tells them when to stop climbing the ladder.`,
+ depth:`<p>The three-way comparison is the single most valuable discipline in this chapter and the one most often skipped. Skipping it means you never learn whether the expensive rung was necessary — and the honest outcome is often that the RAG-only baseline was close enough.</p>
+ <p>On cost: the headline numbers are genuinely small, and that is a change worth internalising. LoRA and QLoRA moved a 7–13B fine-tune from a capital project to a line item. But the GPU cost was never the expensive part — the curation on 5.7 was, and it has not become cheaper.</p>
+ <p>On the LLM judge: it is a model evaluating a model, with all of Chapter 4's failure modes intact. Useful for triage across hundreds of outputs. Not the thing that decides whether a legal memo is correct.</p>`,
+ sources:"Cost figures are practitioner estimates and vary widely by model size and provider \u2014 directional. Evaluation-as-gate framing from 2026 practitioner sources, secondary but consistent. Provider fine-tuning APIs are referred to generically here because current availability by vendor was not verified \u2014 check the provider's own documentation before relying on it."
+},
+{
+ id:"S-019d", num:"5.9", title:"Worked example: what actually gets deployed",
+ figure:SVG_STACK5,
+ body:`<p>The fine-tuned model is one component of four. Deploying it alone would be a mistake.</p>
+ <ul>
+ <li><strong>Fine-tuned model</strong> — house style and memo structure.</li>
+ <li><strong>RAG</strong> — precedents and the playbook, current and citable.</li>
+ <li><strong>Tool use</strong> — the clause database, queried rather than remembered.</li>
+ <li><strong>Human in the loop</strong> — a lawyer approves. In legal work, never fully autonomous (4.5).</li>
+ </ul>`,
+ band:`This is Chapter 4's architecture with a fine-tuned model in the interpretative slot. Customization changes what the model is good at. It does not change what it is.`,
+ depth:`<p>The flywheel is the part worth understanding commercially. Every correction a lawyer makes is a labelled example of the model getting something wrong and the right answer beside it — which is precisely the training data that is otherwise so expensive to produce (5.7). A system designed to capture corrections gets cheaper to improve over time. One that discards them pays the curation cost again at every retrain.</p>
+ <p>This is also where the "we fine-tuned a model" story quietly becomes an ordinary software project: version control for adapters, a retraining cadence, monitoring for drift, and a plan for what happens when the base model is superseded. None of that is exotic. All of it is work somebody has to own.</p>`,
+ sources:"Illustrative. The four-component stack is standard practice."
+},
+{
+ id:"S-020a", num:"5.10", title:"Pitfalls",
+ figure:`<table class="grid wide"><thead><tr><th>The failure</th><th>What it looks like</th><th>Mitigation</th></tr></thead><tbody>
+ <tr><td><b>Fine-tuning to add facts</b></td><td>They blur, cannot be cited, and go stale</td><td>That is RAG's job (5.2)</td></tr>
+ <tr><td><b>Catastrophic forgetting</b></td><td>Better at your task, worse at everything adjacent</td><td>LoRA plus modest, high-quality data. It bites hardest on full fine-tuning</td></tr>
+ <tr><td><b>Garbage in, confident garbage out</b></td><td>It learns your examples' flaws and applies them consistently</td><td>Curation (5.7). A human would notice the pattern was odd; it will not</td></tr>
+ <tr><td><b>Skipping the cheaper rungs</b></td><td>A training pipeline solving a prompt-shaped problem</td><td>The three-way evaluation on 5.8</td></tr>
+ <tr><td><b>The base model moves</b></td><td>You tuned a model superseded within a quarter (1.5)</td><td>Retrain on the new base, or accept being frozen on the old one</td></tr>
+ </tbody></table>`,
+ body:`<p>The last one is the least technical and the most consequential.</p>`,
+ depth:`<p>It deserves more weight than it usually gets, because it is a <em>strategic</em> cost rather than a technical one. A fine-tuned model is a fork of someone else's product. Every time they ship a better base, you choose between paying the retraining cost again or accepting that your specialised model is now worse than the general one.</p>
+ <p>That calculus has shifted against fine-tuning as release cadence compressed. It is why the right question is not "would fine-tuning help?" — it usually would, marginally — but "will it still be helping in a year, net of what maintaining it costs?"</p>`,
+ sources:"Established practice. The cadence argument follows from 1.5."
+},
+{
+ id:"S-041", num:"5.11", title:"Who actually does this work?",
+ figure:SVG_WHODOES,
+ body:`<p>Everything in this chapter is work somebody has to do — curate the data, build the taxonomy, run the evaluations, own the pipeline. The question of whether that is bought or built is the one most professional-services firms are currently being repriced on.</p>
+ <ul>
+ <li><strong>The work did not shrink. It changed shape.</strong> What disappeared is the deliverable that was mostly a document. What appeared is a standing operational requirement.</li>
+ <li><strong>The buyable half is real</strong> — pipelines, infrastructure, serving, and the pattern library that comes from having built this twenty times before. Chapter 6 makes the same argument about inference infrastructure: undifferentiated heavy lifting is a thing you rent.</li>
+ <li><strong>The unbuyable half is the judgment.</strong> Deciding which past memos represent the standard (5.7) is tacit, senior and internal. Nobody outside your firm can tell you which of your own work product was excellent.</li>
+ </ul>`,
+ band:`The likely settlement: consultants build the machine, and the organisation feeds it. Whoever owns the judgment and the evaluation loop owns the asset.`,
+ depth:`<p><strong>This slide is my analysis rather than a sourced finding</strong>, and it is a contested question — read it as a framework rather than a forecast.</p>
+ <p>The sharpest version of the test: <em>if your deliverable is a document, the model competes with you; if your deliverable is a running system you are accountable for, it does not.</em> That distinction cuts across the consulting industry rather than along it. Strategy decks are exposed. Implementation, integration and managed operations are not obviously exposed at all — they may be in more demand, because every organisation now needs a data pipeline it did not need three years ago and cannot staff internally.</p>
+ <p>There is a second dynamic that argues for outside help specifically. The failure modes in this chapter are non-obvious and expensive: fine-tuning to add facts, skipping the three-way evaluation, curating data badly. An organisation doing this for the first time makes those mistakes. One that has done it repeatedly does not. That is a genuine information asymmetry, and it is what consulting has always actually sold.</p>
+ <p>Against that, the flywheel argument (5.9) says the compounding value sits with whoever holds the corrections — and that is the operator, not the builder. A firm that outsources the whole loop is renting its own improvement curve back from a supplier.</p>
+ <p>The indicator to watch is whether professional-services revenue decouples from headcount. If firms can grow revenue without adding people proportionally, the work has been genuinely absorbed by the tooling and the model. If headcount tracks revenue as it always has, the work merely moved.</p>`,
+ sources:"Analysis, not a sourced finding. The undifferentiated-heavy-lifting framing follows from Chapter 6's argument about bank self-hosting. The headcount-versus-revenue indicator is a suggested test, not a published metric."
+},
+{
+ id:"S-042", num:"5.12", title:"Will models go vertical, or stay general?",
+ figure:SVG_VERTICAL,
+ body:`<p>There is no settled answer, but the possible outcomes are clear and the evidence currently points somewhere specific.</p>
+ <ul>
+ <li><strong>The case for vertical.</strong> Gartner projects that more than half of enterprise generative-AI models will be domain-specific by 2027, against roughly 1% in 2024. Domain benchmarks have proliferated because general ones saturated (1.5b) — HealthBench uses 48,562 rubric criteria written by 262 physicians; LegalBench-RAG carries 6,858 expert-annotated pairs.</li>
+ <li><strong>The case against.</strong> BloombergGPT — 50 billion parameters on a 363-billion-token financial corpus — is the landmark experiment, and even Bloomberg took a <em>mixed</em> approach rather than training purely on domain data. Meanwhile general models improved so quickly that pretraining a domain model from scratch rarely repays the cost before it is overtaken.</li>
+ <li><strong>What is actually happening.</strong> Most things called "domain-specific" in 2026 are a general base with retrieval, tools, evaluations and a light fine-tune on top — the composition of 5.13. The specialisation is real; it just does not live in the weights.</li>
+ </ul>`,
+ band:`Expect vertical systems on general foundations, rather than vertical foundation models. Specialisation is moving up the stack, into the layers you can change in an afternoon.`,
+ depth:`<p>The economic logic is what decides this, and it is worth stating plainly. Pretraining a domain model is a large fixed cost against a depreciating asset — the base model underneath is superseded roughly quarterly (1.5, 5.10). Building a domain <em>system</em> is a smaller cost against an appreciating one, because your documents, tools and evaluation rubric keep their value when the base model changes. Under a fast release cadence, the second strategy wins on arithmetic alone.</p>
+ <p>Two things would flip it. If scaling stalls and general models stop improving, the fixed cost of a vertical model stops being eroded and starts paying off. Or if proprietary domain data becomes the genuinely scarce input — which is the more plausible of the two, and is roughly Bloomberg's original argument.</p>
+ <p>A note on the benchmark evidence, because it is easy to misread. The proliferation of vertical benchmarks is <em>not</em> evidence that vertical models are winning. It is evidence that general benchmarks saturated and buyers needed a way to evaluate general models on specific work. A bank does not want to know a model scores 92% on an aggregate; it wants to know whether it can read a 10-K without hallucinating a number. That demand is satisfied by better evaluation, not necessarily by a different model.</p>
+ <p>For anyone assessing a vendor claiming a proprietary vertical model: ask what the base is, when it was last refreshed, and how they evaluate against the current general frontier. A domain model that is not re-based is a depreciating asset dressed as a moat.</p>`,
+ sources:"Gartner projection (>50% domain-specific by 2027 vs ~1% in 2024), HealthBench and LegalBench-RAG figures: Kili Technology, \u201CDomain-Specific LLM Benchmarks: 2026 Vertical AI Map\u201D, May 2026 \u2014 secondary, and the Gartner figure is a forecast reported at second hand. BloombergGPT parameters, corpus size and the explicit mixed-approach rationale: Wu et al., arXiv:2303.17564 \u2014 primary. The read on what is actually happening is analysis, consistent with the 2026 practitioner sources on 5.13 but not itself a published finding."
+},
+{
+ id:"S-039", num:"5.13", title:"When to fine-tune, and what 2026 changed",
+ figure:SVG_WHEN,
+ body:`<p>Fine-tuning earns its place for a consistent format or house style that prompting cannot enforce; a narrow, repeated, high-volume task; latency and cost, where a small tuned model replaces a large general one; and strict schema compliance.</p>
+ <p>What changed is the framing around it:</p>
+ <ul>
+ <li><strong>The question stopped being "RAG or fine-tuning."</strong> It is now <em>RAG with fine-tuning</em> — retrieval for knowledge, a tuned model for behaviour, composed in one system. That is what 5.9 describes.</li>
+ <li><strong>Retrieval became the default starting point</strong> for enterprise work: faster to deploy, more current, citable, and no training pipeline to maintain.</li>
+ <li><strong>A new reason to fine-tune appeared</strong> — teaching a model to be a good <em>agent controller</em>: which tool to select, how to format the call, how to read what comes back, when to chain.</li>
+ </ul>`,
+ band:`Fine-tune the behaviour, retrieve the knowledge, and let evaluation decide when to stop climbing.`,
+ depth:`<p>The agent-controller development is the one to watch, because it is fine-tuning pointed at the problem Chapter 4 says is the residual one. If the weak link is the model choosing the wrong tool or malforming the call, then training it specifically on your tools, your schemas and your call patterns attacks the failure directly — and unlike general capability, that is narrow enough for a small model to learn well.</p>
+ <p>It does not make the step deterministic. Nothing does (4.6). It raises the hit rate on a decision previously left to a general model's instincts, which is a real gain and a bounded one.</p>
+ <p>For anyone assessing a vendor: "we fine-tuned a model on your industry" is close to meaningless. "We fine-tuned a small model on your tool schemas and evaluate it against the base model weekly" is a claim you can check.</p>`,
+ sources:"Hybrid framing, retrieval-as-default and the agent-controller use case: AI Conference London (11 Jul 2026), Sculptsoft (19 Jun 2026), Unico Connect (17 Jun 2026), Sthambh (Apr 2026) \u2014 all secondary, several from vendors with a commercial position. The direction is consistent across independent sources; treat specific claims as directional."
+},
+{
+ apparatus:true, label:"Glossary", title:"Chapter 5 — Glossary and organisations",
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Slide</th></tr></thead><tbody>
+ <tr><td>customization ladder</td><td>Prompting → retrieval → tool use → fine-tuning, cheapest rung first</td><td>5.1</td></tr>
+ <tr><td>context engineering</td><td>Managing what the model knows, remembers and can reach at each step</td><td>5.1</td></tr>
+ <tr><td>layout-aware parsing</td><td>Reading a document as a visual artefact — blocks, reading order, page numbers — not flat text</td><td>5.3</td></tr>
+ <tr><td>chunking</td><td>Splitting a document into retrievable units. Structure-aware beats fixed-size</td><td>5.3</td></tr>
+ <tr><td>chunk metadata</td><td>The tags on each chunk: provenance, effective date, authority, permission</td><td>5.3</td></tr>
+ <tr><td>embedding index</td><td>The store holding each chunk's vector, text and tags, queried at retrieval time</td><td>5.3</td></tr>
+ <tr><td>fine-tuning</td><td>Continuing training on curated examples so the weights shift toward your behaviour</td><td>5.4</td></tr>
+ <tr><td>supervised fine-tuning (SFT)</td><td>The workhorse: training on instruction→response pairs</td><td>5.4</td></tr>
+ <tr><td>LoRA</td><td>Freezes the model, trains small low-rank adapters — 0.1–1% of parameters</td><td>5.5</td></tr>
+ <tr><td>adapter</td><td>The small trained file that carries the new behaviour; swappable</td><td>5.5</td></tr>
+ <tr><td>rank (r)</td><td>Adapter capacity. 16 is the sensible default</td><td>5.5</td></tr>
+ <tr><td>QLoRA</td><td>LoRA on a 4-bit base — a 70B-class model on a single 80 GB GPU</td><td>5.5</td></tr>
+ <tr><td>DPO</td><td>Preference tuning from preferred-versus-rejected pairs. The 2026 default</td><td>5.5</td></tr>
+ <tr><td>GRPO</td><td>Reinforcement fine-tuning. Needs a reward that can be checked automatically</td><td>5.5</td></tr>
+ <tr><td>verifiable reward</td><td>An answer a program can score — maths, code, schema, tool calls</td><td>5.5</td></tr>
+ <tr><td>epoch</td><td>One full pass of the training data through the model</td><td>5.8</td></tr>
+ <tr><td>overfitting</td><td>Learning the training examples rather than the pattern behind them</td><td>5.8</td></tr>
+ <tr><td>held-out test set</td><td>Examples separated before training, kept unseen, used to judge the result</td><td>5.7</td></tr>
+ <tr><td>LLM-as-judge</td><td>Using a model to score another model's output. Triage, not the decision</td><td>5.8</td></tr>
+ <tr><td>catastrophic forgetting</td><td>General ability eroding as the model specialises</td><td>5.10</td></tr>
+ <tr><td>agent controller</td><td>A model tuned to choose tools, format calls and read results well</td><td>5.13</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Carried forward from earlier chapters</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>RAG</td><td>Documents supplied at query time, so the answer is grounded and citable</td><td>4.3</td></tr>
+ <tr><td>tool use</td><td>The model emits a structured call; your code decides whether to run it</td><td>4.3</td></tr>
+ <tr><td>interpretative vs deterministic</td><td>An LLM interprets; code executes exactly. The distinction this all serves</td><td>4.1</td></tr>
+ <tr><td>weights and training</td><td>Written in training, read-only at inference. Fine-tuning writes again, briefly</td><td>2.3, 2.8</td></tr>
+ <tr><td>knowledge cutoff</td><td>Fine-tuning does not move it</td><td>2.9</td></tr>
+ <tr><td>release cadence</td><td>The base model under you is replaced roughly quarterly</td><td>1.5</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Organisations in this chapter</h4>
+ <table class="grid wide"><tbody>
+ <tr><td>Meta · Alibaba · Mistral AI</td><td>META · BABA · private</td><td>Llama, Qwen and Mistral — the open bases most fine-tuning starts from <em>(also 1.5)</em></td></tr>
+ <tr><td>DeepSeek</td><td>Private (China)</td><td>GRPO, via DeepSeekMath and DeepSeek-R1 <em>(also 1.5)</em></td></tr>
+ <tr><td>Hugging Face</td><td>Private</td><td><code>trl</code>, and where open weights and adapters are distributed <em>(also 2.10)</em></td></tr>
+ <tr><td>OpenAI · Anthropic · Google</td><td>Private · private · GOOGL</td><td>Managed fine-tuning offerings — availability and coverage not verified in this pass</td></tr>
+ </tbody></table>
+ <p class="disclaim">Combined page, permitted under §12. Descriptive only. Not investment advice and not a view on any security.</p>`,
+ body:`<p>Terms this chapter owns, in order of first appearance.</p>`
+},
+{
+ apparatus:true, label:"What's next", title:"End of Chapter 5",
+ figure:null,
+ body:`<p>Thirteen slides. The argument, in one line: climb the ladder in order, prepare the documents properly before blaming retrieval, use RAG for what the model should know and fine-tuning for how it should behave, prove the expensive rung beat the cheap one before you ship — and expect to compose the two rather than choose between them.</p>
+ <p>Two of the slides here are open questions rather than settled material: who does this work (5.11) and whether models go vertical (5.12). Both are flagged on the slide as analysis.</p>
+ <p>The through-line from Chapter 4 holds. Customization changes what the model is good at. It does not change that it is interpretative, so the architecture around it stays the same.</p>
+ <p><strong>Chapter 6 — Where the model runs: deployment choices.</strong> A model is just a file; what it takes to run one on your own hardware; the economics, and why they only work at scale; the deployment spectrum between public API and on-premises; and why the best-resourced banks in the world mostly rent rather than self-host.</p>
+ <p class="warn">Chapter 6 is not built in this format yet. The button below copies a prompt that starts the work in Claude — drafted in markdown for your approval first, then built as a reader like this one.</p>
+ <div class="btnrow">
+   <button id="ch2btn">Copy prompt to start Chapter 6</button>
+   <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
+   <span id="say2" class="said"></span>
+ </div>
+ <p class="hint2">Send back only the questions tagged <code>[gap]</code> or <code>[correction]</code>. A gap two readers hit independently is a defect in the material, not in the reader.</p>`
+}
+];
+
+let i = 0;
+const seen = new Set([0]);
+const asked = [];
+
+const stage = document.getElementById('stage');
+const dotsEl = document.getElementById('dots');
+const posEl = document.getElementById('pos');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+const qEl = document.getElementById('q');
+const sayEl = document.getElementById('say');
+const logbox = document.getElementById('logbox');
+const loglist = document.getElementById('loglist');
+
+const CONTENT = CARDS.filter(function(c){ return !c.apparatus; }).length;
+
+function render(){
+  const c = CARDS[i];
+  seen.add(i);
+  stage.innerHTML =
+    '<h1 class="cardtitle">' + c.title + '</h1>' +
+    (c.apparatus ? '' :
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — slide ' + (i+1) + ' of ' + CONTENT + '</p>') +
+    (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
+    '<div class="body">' + c.body + '</div>' +
+    (c.band ? '<div class="band">' + c.band + '</div>' : '') +
+    (c.depth ? '<details class="deeper"><summary>Go deeper</summary><div class="inner">' + c.depth + '</div></details>' : '') +
+    (c.sources ? '<p class="sources">' + c.sources + '</p>' : '');
+
+  document.querySelector('.ask').style.display = c.apparatus ? 'none' : '';
+
+  const ch2 = document.getElementById('ch2btn');
+  const allb = document.getElementById('allbtn');
+  const say2 = document.getElementById('say2');
+  if (ch2) {
+    ch2.onclick = function(){
+      copyText(CH2_PROMPT, function(){
+        say2.className = 'said';
+        say2.textContent = 'Copied. Paste it into Claude.';
+      }, say2);
+    };
+  }
+  if (allb) { allb.onclick = function(){ copyAll(say2); }; }
+
+  posEl.textContent = c.apparatus ? c.label : (i+1) + ' / ' + CONTENT;
+  prevB.disabled = (i === 0);
+  nextB.disabled = (i === CARDS.length - 1);
+  qEl.value = '';
+  sayEl.textContent = '';
+  dotsEl.innerHTML = '';
+  CARDS.forEach(function(c2, n){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    if (n === i) b.setAttribute('aria-current','true');
+    let cls = c2.apparatus ? 'app' : '';
+    if (seen.has(n) && n !== i) cls += ' seen';
+    b.className = cls.trim();
+    b.innerHTML = '<i></i>';
+    b.onclick = function(){ i = n; render(); };
+    dotsEl.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+
+function go(d){
+  const n = i + d;
+  if (n < 0 || n >= CARDS.length) return;
+  i = n; render();
+}
+
+prevB.onclick = function(){ go(-1); };
+nextB.onclick = function(){ go(1); };
+
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { i = 0; render(); }
+  if (e.key === 'End')  { i = CARDS.length - 1; render(); }
+});
+
+function promptFor(card, q){
+  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
+    card.title + '".\n\nMy question: ' + q;
+}
+
+const CH2_PROMPT =
+'Understanding AI \u2014 I have finished Chapter 5 in the card reader.\n\n' +
+'Let\'s develop Chapter 6, "Where the model runs: deployment choices", the same way. Per the ' +
+'\u00A711 inventory it covers outline slides 21, 22, 23, 24 and 25 \u2014 a model is just a file, ' +
+'running one on-premises, the economics and why they need scale, the deployment spectrum, and ' +
+'why Fortune 500 banks buy frontier rather than self-host open weights.\n\n' +
+'This chapter decays fast: hardware prices, GPU lead times, model sizes and the bank evidence ' +
+'all need verifying by search against primary sources. Draft the slides in markdown first for ' +
+'my approval, one idea per slide, with graphic specs and dated sources. Then build the reader.';
+
+function copyText(text, ok, target){
+  const el = target || sayEl;
+  function fallback(){
+    const t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); ok(); }
+    catch(e){ el.className = 'err'; el.textContent = 'Copy failed — select the text manually.'; }
+    document.body.removeChild(t);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else { fallback(); }
+}
+
+function copyAll(target){
+  const el = target || sayEl;
+  if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
+  let out = '# Understanding AI — questions from Chapter 5\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  asked.forEach(function(a){
+    out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
+  });
+  copyText(out, function(){
+    el.className = 'said';
+    el.textContent = 'Copied ' + asked.length + ' question(s) in notes-block format.';
+  }, el);
+}
+
+document.getElementById('copyq').onclick = function(){
+  const q = qEl.value.trim();
+  if (!q) { sayEl.className = 'err'; sayEl.textContent = 'Type a question first.'; qEl.focus(); return; }
+  const card = CARDS[i];
+  copyText(promptFor(card, q), function(){
+    asked.push({ card: card, q: q });
+    const li = document.createElement('li');
+    li.textContent = card.num + ' · ' + card.id + ' — ' + q;
+    loglist.appendChild(li);
+    logbox.classList.add('on');
+    sayEl.className = 'said';
+    sayEl.textContent = 'Copied. Paste it into Claude.';
+    qEl.value = '';
+  });
+};
+
+document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+render();
+</script>
+</body>
+</html>

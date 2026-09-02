@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Chapter 1 reader</title>
+<style>
+  :root{
+    --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+    --blue:#156082; --orange:#E97132; --wash:#f2f2f2;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .shell{max-width:820px;margin:0 auto;padding:28px 28px 140px}
+
+  header.top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
+  header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
+  header.top .ch a.backlink:hover{text-decoration:underline}
+  header.top .ch .sep{color:var(--muted);font-weight:normal}
+  header.top .meta{color:var(--muted);font-size:13px}
+
+  h1.cardtitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.25;margin:0 0 4px}
+  .cardid{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .body p{margin:0 0 14px;max-width:70ch}
+  .body ul{margin:0 0 16px;padding-left:20px;max-width:70ch}
+  .body li{margin:0 0 7px}
+  .body strong{color:#000}
+  .figure{margin:22px 0 24px}
+  .figure svg{width:100%;height:auto;display:block}
+
+  table.grid{border-collapse:collapse;font-size:15px;margin:4px 0 18px;width:100%;max-width:560px}
+  table.grid th{text-align:left;font-weight:bold;border-bottom:1px solid var(--ink);padding:5px 12px 5px 0}
+  table.grid td{border-bottom:1px solid var(--rule);padding:5px 12px 5px 0;vertical-align:top}
+
+  .stats{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 20px}
+  .stat{flex:1 1 150px;border-top:2px solid var(--navy);padding-top:8px}
+  .stat b{display:block;color:var(--navy);font-size:26px;line-height:1.1}
+  .stat span{display:block;color:var(--muted);font-size:13px;margin-top:5px}
+
+  .band{background:var(--wash);padding:12px 16px;margin:20px 0;font-size:15px;max-width:70ch}
+
+  .twocol{display:flex;gap:22px;flex-wrap:wrap;margin:4px 0 6px}
+  .twocol .col{flex:1 1 260px;padding-top:9px}
+  .twocol .col.blue{border-top:2px solid var(--blue)}
+  .twocol .col.orange{border-top:2px solid var(--orange)}
+  .twocol h3{font-size:14px;margin:0 0 10px;font-weight:bold}
+  .twocol .blue h3{color:var(--blue)}
+  .twocol .orange h3{color:var(--orange)}
+  .twocol p{font-size:14px;margin:0 0 10px;color:#2a2a2a}
+  .twocol b{display:inline-block;min-width:96px;font-size:16px;color:var(--ink)}
+
+  table.grid.wide{max-width:100%}
+  table.grid.wide td:last-child{width:auto}
+  h4.grouplabel{font-size:14px;margin:18px 0 6px;color:var(--navy)}
+  p.disclaim{font-size:13px;font-style:italic;color:var(--muted)}
+  p.warn{background:var(--wash);padding:11px 14px;font-size:15px;max-width:70ch}
+  p.hint2{font-size:13px;color:var(--muted);margin-top:14px;max-width:70ch}
+  code{font-family:Consolas,monospace;font-size:13px;background:var(--wash);padding:1px 4px}
+  .dots button.app i{border-radius:0;width:8px;height:8px;margin:3px 2px}
+  p.nextlink{margin:20px 0 6px}
+  p.nextlink a{color:var(--blue);font-size:19px;font-weight:bold;text-decoration:none}
+  p.nextlink a:hover{text-decoration:underline}
+
+  details.deeper{border-top:1px solid var(--rule);margin-top:26px;padding-top:12px}
+  details.deeper summary{cursor:pointer;color:var(--blue);font-size:15px;list-style:none}
+  details.deeper summary::-webkit-details-marker{display:none}
+  details.deeper summary::before{content:"▸ ";}
+  details.deeper[open] summary::before{content:"▾ ";}
+  details.deeper .inner{padding-top:12px}
+  details.deeper p{font-size:16px;color:#2a2a2a}
+
+  .sources{color:var(--muted);font-size:13px;font-style:italic;margin-top:22px;max-width:70ch}
+
+  .ask{border-top:1px solid var(--rule);margin-top:26px;padding-top:16px}
+  .ask h2{font-size:15px;color:var(--navy);margin:0 0 8px;font-weight:bold}
+  .ask p.hint{font-size:13px;color:var(--muted);margin:0 0 10px;max-width:70ch}
+  .ask textarea{width:100%;max-width:70ch;min-height:62px;font-family:inherit;font-size:15px;
+    padding:8px 10px;border:1px solid var(--rule);border-radius:3px;resize:vertical}
+  .ask textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--navy);
+    background:#fff;color:var(--navy);border-radius:3px;cursor:pointer}
+  button:hover{background:var(--navy);color:#fff}
+  button:disabled{opacity:.4;cursor:default}
+  button.ghost{border-color:var(--rule);color:var(--muted)}
+  button.ghost:hover{background:var(--wash);color:var(--ink)}
+  .said{font-size:13px;color:var(--blue)}
+  .err{font-size:13px;color:#a32d2d}
+
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--rule)}
+  nav.bar .inner{max-width:820px;margin:0 auto;padding:12px 28px;
+    display:flex;align-items:center;gap:16px}
+  .dots{display:flex;gap:7px;flex:1}
+  .dots button{padding:0;border:none;background:none;width:14px;height:14px;cursor:pointer}
+  .dots i{display:block;width:9px;height:9px;border-radius:50%;background:#fff;
+    border:1px solid var(--muted);margin:2px}
+  .dots button[aria-current="true"] i{background:var(--navy);border-color:var(--navy)}
+  .dots button.seen i{background:var(--rule);border-color:var(--rule)}
+  .pos{font-size:13px;color:var(--muted);white-space:nowrap}
+
+  .logbox{border:1px solid var(--rule);padding:14px 16px;margin-top:18px;font-size:14px;display:none}
+  .logbox.on{display:block}
+  .logbox h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .logbox ol{margin:0;padding-left:20px}
+  .logbox li{margin-bottom:6px;color:#2a2a2a}
+
+  @media (max-width:640px){
+    .shell{padding:20px 18px 150px}
+    nav.bar .inner{padding:10px 18px;gap:10px}
+    h1.cardtitle{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 1 — How AI got here, and where it stands</div>
+    <div class="meta">v2.1 · 30 Aug 2026</div>
+  </header>
+
+  <main id="stage" tabindex="-1"></main>
+
+  <section class="ask">
+    <h2>Ask about this card</h2>
+    <p class="hint">This reader has the cards but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the card ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this card?"></textarea>
+    <div class="btnrow">
+      <button id="copyq">Copy question for Claude</button>
+      <button id="copyall" class="ghost">Copy all questions from this session</button>
+      <span id="say" class="said"></span>
+    </div>
+    <div class="logbox" id="logbox">
+      <h3>Questions saved this session</h3>
+      <ol id="loglist"></ol>
+    </div>
+  </section>
+</div>
+
+<nav class="bar">
+  <div class="inner">
+    <button id="prev">← Back</button>
+    <div class="dots" id="dots"></div>
+    <span class="pos" id="pos"></span>
+    <button id="next">Next →</button>
+  </div>
+</nav>
+
+<script>
+const SVG_TIMELINE = `
+<svg viewBox="0 0 680 380" role="img" aria-label="Timeline of eight moments in AI from 1950 to 2026, with 2012 and 2017 marked as the two architectural step changes.">
+<line x1="50" y1="230" x2="620" y2="230" stroke="#d9d9d9" stroke-width="1"/>
+<g font-family="Calibri, sans-serif" text-anchor="middle">
+<text x="78" y="152" font-size="15" font-weight="bold">1950</text>
+<text x="78" y="172" font-size="13">Turing test</text>
+<text x="78" y="188" font-size="13">proposed</text>
+<text x="78" y="206" font-size="13" font-style="italic" fill="#595959">Alan Turing</text>
+<circle cx="78" cy="230" r="5" fill="#1a1a1a"/>
+<text x="150" y="258" font-size="15" font-weight="bold">1956</text>
+<text x="150" y="278" font-size="13">"AI" coined</text>
+<text x="150" y="312" font-size="13" font-style="italic" fill="#595959">Dartmouth workshop</text>
+<circle cx="150" cy="230" r="5" fill="#1a1a1a"/>
+<text x="223" y="152" font-size="15" font-weight="bold">1997</text>
+<text x="223" y="172" font-size="13">Deep Blue beats</text>
+<text x="223" y="188" font-size="13">Kasparov</text>
+<text x="223" y="206" font-size="13" font-style="italic" fill="#595959">IBM</text>
+<circle cx="223" cy="230" r="5" fill="#1a1a1a"/>
+<text x="295" y="258" font-size="15" font-weight="bold" fill="#156082">2012</text>
+<text x="295" y="278" font-size="13">Deep learning</text>
+<text x="295" y="294" font-size="13">works: AlexNet</text>
+<text x="295" y="312" font-size="13" font-style="italic" fill="#595959">Univ. of Toronto</text>
+<circle cx="295" cy="230" r="6.5" fill="#156082"/>
+<text x="368" y="152" font-size="15" font-weight="bold" fill="#156082">2017</text>
+<text x="368" y="172" font-size="13">Transformer</text>
+<text x="368" y="188" font-size="13">architecture</text>
+<text x="368" y="206" font-size="13" font-style="italic" fill="#595959">Google</text>
+<circle cx="368" cy="230" r="6.5" fill="#156082"/>
+<text x="440" y="258" font-size="15" font-weight="bold">2020</text>
+<text x="440" y="278" font-size="13">Large language</text>
+<text x="440" y="294" font-size="13">models: GPT-3</text>
+<text x="440" y="312" font-size="13" font-style="italic" fill="#595959">OpenAI</text>
+<circle cx="440" cy="230" r="5" fill="#1a1a1a"/>
+<text x="513" y="152" font-size="15" font-weight="bold">2022</text>
+<text x="513" y="172" font-size="13">ChatGPT:</text>
+<text x="513" y="188" font-size="13">generative AI</text>
+<text x="513" y="206" font-size="13" font-style="italic" fill="#595959">OpenAI</text>
+<circle cx="513" cy="230" r="5" fill="#1a1a1a"/>
+<text x="585" y="258" font-size="15" font-weight="bold">2026</text>
+<text x="585" y="278" font-size="13">Reasoning models</text>
+<text x="585" y="294" font-size="13">and agents</text>
+<text x="585" y="312" font-size="13" font-style="italic" fill="#595959">frontier labs</text>
+<circle cx="585" cy="230" r="5" fill="#1a1a1a"/>
+<text x="340" y="352" font-size="13" fill="#595959">Blue — the two architectural step changes. Black — progress along a path that already existed.</text>
+</g></svg>`;
+
+const SVG_ERAS = `
+<svg viewBox="0 0 680 275" role="img" aria-label="Four eras of AI left to right: symbolic AI, machine learning, deep learning, and generative and agentic AI, with arrows between them.">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" text-anchor="middle" fill="#1a1a1a">
+<rect x="38" y="40" width="134" height="128" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="105" y="70" font-size="15" font-weight="bold">Symbolic AI</text>
+<text x="105" y="98" font-size="13" font-style="italic" fill="#595959">1950s–1980s</text>
+<text x="105" y="122" font-size="13">Hand-coded rules</text>
+<text x="105" y="138" font-size="13">Expert systems</text>
+<text x="105" y="154" font-size="13">No learning</text>
+<text x="105" y="192" font-size="13" font-style="italic" fill="#595959">Dartmouth, IBM</text>
+<line x1="174" y1="104" x2="190" y2="104" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar)"/>
+<rect x="194" y="40" width="134" height="128" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="261" y="62" font-size="15" font-weight="bold">Machine</text>
+<text x="261" y="79" font-size="15" font-weight="bold">learning</text>
+<text x="261" y="99" font-size="13" font-style="italic" fill="#595959">1990s–2000s</text>
+<text x="261" y="122" font-size="13">Learns patterns</text>
+<text x="261" y="138" font-size="13">Stats over rules</text>
+<text x="261" y="154" font-size="13">Manual features</text>
+<text x="261" y="192" font-size="13" font-style="italic" fill="#595959">Statistics, academia</text>
+<line x1="330" y1="104" x2="346" y2="104" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar)"/>
+<rect x="350" y="40" width="134" height="128" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="417" y="70" font-size="15" font-weight="bold">Deep learning</text>
+<text x="417" y="98" font-size="13" font-style="italic" fill="#595959">2010s</text>
+<text x="417" y="122" font-size="13">Networks at scale</text>
+<text x="417" y="138" font-size="13">Finds own features</text>
+<text x="417" y="154" font-size="13">Vision and speech</text>
+<text x="417" y="192" font-size="13" font-style="italic" fill="#595959">Toronto, Google,</text>
+<text x="417" y="208" font-size="13" font-style="italic" fill="#595959">NVIDIA</text>
+<line x1="486" y1="104" x2="502" y2="104" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar)"/>
+<rect x="506" y="40" width="134" height="128" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="573" y="62" font-size="15" font-weight="bold">Generative and</text>
+<text x="573" y="79" font-size="15" font-weight="bold">agentic</text>
+<text x="573" y="99" font-size="13" font-style="italic" fill="#595959">2020s</text>
+<text x="573" y="122" font-size="13">Text, images, code</text>
+<text x="573" y="138" font-size="13">General-purpose</text>
+<text x="573" y="154" font-size="13">Reasoning, agents</text>
+<text x="573" y="192" font-size="13" font-style="italic" fill="#595959">OpenAI, Anthropic,</text>
+<text x="573" y="208" font-size="13" font-style="italic" fill="#595959">Google</text>
+<text x="340" y="248" font-size="13" fill="#595959">Italic beneath each box — the principal actors of that era, not an exhaustive list.</text>
+</g></svg>`;
+
+const SVG_CONVERGE = `
+<svg viewBox="0 0 680 250" role="img" aria-label="Three inputs — data, compute and algorithms — converging into one outcome: deep learning works, AlexNet 2012.">
+<defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<rect x="40" y="34" width="180" height="46" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="130" y="54" font-size="15" font-weight="bold" text-anchor="middle">Data</text>
+<text x="130" y="71" font-size="13" text-anchor="middle" fill="#595959">ImageNet, the open web</text>
+<rect x="40" y="102" width="180" height="46" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="130" y="122" font-size="15" font-weight="bold" text-anchor="middle">Compute</text>
+<text x="130" y="139" font-size="13" text-anchor="middle" fill="#595959">GPUs, CUDA (2007)</text>
+<rect x="40" y="170" width="180" height="46" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="130" y="190" font-size="15" font-weight="bold" text-anchor="middle">Algorithms</text>
+<text x="130" y="207" font-size="13" text-anchor="middle" fill="#595959">Deep nets trainable</text>
+<path d="M220 57 L300 57 L300 118" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar2)"/>
+<path d="M220 125 L370 125" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar2)"/>
+<path d="M220 193 L300 193 L300 132" fill="none" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar2)"/>
+<rect x="376" y="96" width="264" height="58" fill="#fff" stroke="#156082" stroke-width="1.75"/>
+<text x="508" y="120" font-size="15" font-weight="bold" text-anchor="middle" fill="#156082">Deep learning works</text>
+<text x="508" y="140" font-size="13" text-anchor="middle" fill="#156082">AlexNet, 2012</text>
+<text x="340" y="238" font-size="13" text-anchor="middle" fill="#595959">Blue — the outcome the three inputs jointly produced. None of the three was sufficient alone.</text>
+</g></svg>`;
+
+const SVG_FLOW = `
+<svg viewBox="0 0 680 190" role="img" aria-label="Left to right flow: the transformer in 2017, then self-supervised pretraining, then scaling laws around 2020, then RLHF and ChatGPT in 2022.">
+<defs><marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+<g font-family="Calibri, sans-serif" text-anchor="middle" fill="#1a1a1a">
+<rect x="38" y="46" width="134" height="62" fill="#fff" stroke="#156082" stroke-width="1.75"/>
+<text x="105" y="72" font-size="15" font-weight="bold" fill="#156082">Transformer</text>
+<text x="105" y="92" font-size="13" fill="#156082">2017</text>
+<line x1="174" y1="77" x2="190" y2="77" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar3)"/>
+<rect x="194" y="46" width="134" height="62" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="261" y="68" font-size="15" font-weight="bold">Self-supervised</text>
+<text x="261" y="85" font-size="15" font-weight="bold">pretraining</text>
+<text x="261" y="101" font-size="13" fill="#595959">2018–</text>
+<line x1="330" y1="77" x2="346" y2="77" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar3)"/>
+<rect x="350" y="46" width="134" height="62" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="417" y="76" font-size="15" font-weight="bold">Scaling laws</text>
+<text x="417" y="96" font-size="13" fill="#595959">~2020</text>
+<line x1="486" y1="77" x2="502" y2="77" stroke="#1a1a1a" stroke-width="1" marker-end="url(#ar3)"/>
+<rect x="506" y="46" width="134" height="62" fill="#fff" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="573" y="68" font-size="15" font-weight="bold">RLHF and</text>
+<text x="573" y="85" font-size="15" font-weight="bold">ChatGPT</text>
+<text x="573" y="101" font-size="13" fill="#595959">2022</text>
+<text x="340" y="160" font-size="13" fill="#595959">Blue — the single architectural unlock. The other three are what it made possible.</text>
+</g></svg>`;
+
+const CARDS = [
+{
+ id:"S-001", num:"1.1", title:"Sixty years in eight moments",
+ figure:SVG_TIMELINE,
+ body:`<p>Rules → learning → deep learning → generative AI. Each era let machines do more with less hand-coding by humans.</p>
+ <p>Two of these eight are architectural step changes. The other six are the field executing on them. Telling those apart is most of what this chapter is for.</p>`,
+ depth:`<p>The thing to hold onto is that the ideas are old. The perceptron dates to the late 1950s and backpropagation to 1986. What changed was never the concept — it was having enough data and compute to make depth pay, which is card 3. This pattern recurs: capability arrives when a physical constraint lifts, not when someone has an idea.</p>
+ <p>The 1997 Deep Blue result is worth noticing precisely because it was <em>not</em> a step change — it was brute-force search plus hand-coded chess knowledge, the symbolic era at its peak, and it produced nothing that generalised.</p>`,
+ sources:"Established computing history; dates uncontroversial. The 2026 marker characterises the current period rather than a dated event."
+},
+{
+ id:"S-002", num:"1.2", title:"Four eras, and what actually changed at each",
+ figure:SVG_ERAS,
+ body:`<p>The trend across all four: less hand-coding by humans, more learning directly from data, steadily broader capability.</p>
+ <p>The terms nest rather than compete: <strong>AI</strong> is the whole field, all four boxes. <strong>Machine learning</strong> is the second box onward — systems that learn from data instead of following written rules. <strong>Deep learning</strong> is machine learning done with many-layered neural networks. <strong>Generative AI</strong> is deep learning that produces output rather than classifying it. The first box is AI and is not machine learning. Press usage where "AI" means a chatbot is the fourth box standing in for the whole field.</p>`,
+ depth:`<p>Each era absorbed the last rather than replacing it — rules-based systems still run inside modern products, they just stopped being the frontier. The commercial locus moved with the technique: symbolic AI belonged to research labs and IBM; deep learning to universities and NVIDIA; the generative era to a handful of well-capitalised private labs.</p>
+ <p>The boundary that matters commercially is between the third and fourth boxes. Deep learning made machines good at <em>recognising</em> things. Generative models made them <em>producers</em> — which is what created a market for tokens rather than a market for predictions.</p>
+ <p>Note what the fourth box does not claim: nothing here says the model understands. It says the model produces useful output. That is a different and considerably weaker claim.</p>`,
+ sources:"Standard periodisation; boundaries are approximate and drawn differently by different authors. \u201CDriven by\u201D names principal actors, not an exhaustive list."
+},
+{
+ id:"S-007a", num:"1.3", title:"The ideas were old and they didn't work",
+ figure:null,
+ body:`<p>The perceptron — the earliest artificial neuron — dates to the late 1950s. Backpropagation, the algorithm that actually trains a network by adjusting every weight to shrink its error, was popularised in 1986 by Rumelhart, Hinton and Williams.</p>
+ <p>And then, for roughly twenty-five years, neural networks underperformed. The field went through two <strong>AI winters</strong> — periods when funding and interest collapsed after AI underdelivered on its claims.</p>
+ <p>The theory was largely there. The fuel was not. Networks were too shallow, datasets too small, and computers too slow to train anything deep.</p>`,
+ depth:`<p>This is the single most useful frame in the chapter, and it is worth resisting the instinct to skip it. The story people tell about AI is a story about ideas — someone had an insight and everything followed. The actual history is closer to the opposite: the insight sat on the shelf for a quarter century because the physical inputs to make it work did not exist.</p>
+ <p>Which means the right question to ask about any AI claim is usually not "is the idea good" but "what physical constraint is currently binding, and is it lifting." Chapters 4 through 7 are that question applied to the present.</p>`,
+ sources:"Rumelhart, Hinton and Williams 1986 (backpropagation). Established ML history."
+},
+{
+ id:"S-007b", num:"1.3", title:"Three things converged, and then it worked",
+ figure:SVG_CONVERGE,
+ body:`<p>Around 2012 three enablers reached critical mass at the same time:</p>
+ <ul>
+ <li><strong>Data</strong> — internet-scale datasets. ImageNet (2009) was 14 million labelled images; the web itself a trillion-word corpus.</li>
+ <li><strong>Compute</strong> — GPUs suit the parallel matrix arithmetic neural networks need. NVIDIA's CUDA (2007) made that hardware programmable for general mathematics rather than just graphics.</li>
+ <li><strong>Algorithms</strong> — techniques that finally made <em>deep</em> networks trainable rather than merely describable.</li>
+ </ul>
+ <p><strong>AlexNet, 2012.</strong> A deep network trained on GPUs won the ImageNet contest and roughly halved the error rate overnight. It ended the second AI winter and started the deep-learning boom.</p>`,
+ depth:`<p>The convergence <em>is</em> the event. No single one of the three explains the timing, which is why arguments about who deserves credit tend to go nowhere.</p>
+ <p>Two details worth carrying forward. First, the compute enabler was an accident of an unrelated market — GPUs existed to render video games, and CUDA is what made that hardware addressable for anything else. NVIDIA's position today traces back to a bet made when the evidence was anecdotal.</p>
+ <p>Second, a caveat that gets lost: AlexNet is <em>discriminative</em>. It classifies images. This was the <strong>enabling</strong> tipping point, not the generative one. The generative unlock is five years later and is a different thing entirely — that's the next card.</p>`,
+ sources:"Krizhevsky, Sutskever and Hinton 2012 (AlexNet); Deng et al. 2009 (ImageNet)."
+},
+{
+ id:"S-008a", num:"1.4", title:"The transformer, and why parallelism was the point",
+ figure:null,
+ body:`<p>In 2017 a Google paper titled "Attention Is All You Need" introduced the <strong>transformer</strong>.</p>
+ <p>Its headline operation is <strong>attention</strong>: at each step the model re-weighs which parts of the input matter most for what it is about to predict. It adapts to the input rather than following a fixed recipe.</p>
+ <p>But the reason it won is more mundane than that, and more important. The architectures it replaced processed a sequence one step at a time: a <strong>recurrent neural network (RNN)</strong> reads one item at a time, carrying a running summary of everything before it into the next step, and an <strong>LSTM (long short-term memory)</strong> is an RNN with gates that decide what to keep and what to discard, which let it hold context over longer spans. Both were state of the art for language from roughly 2014 to 2017. Both share the property that matters here: word five waits for word four — so training could not be spread across many chips.</p>
+ <p><strong>Transformer training is fully parallel.</strong> Which is to say: it could actually use all those GPUs.</p>`,
+ depth:`<p>It is worth being precise about the causation here, because it is commonly garbled. The transformer did not win because attention is a better model of language. It won because it converted capital expenditure into capability. An architecture that soaks up compute, in a world where compute was becoming abundant, beats a more elegant architecture that cannot.</p>
+ <p>The secondary property that matters: attention represents <em>any</em> pairwise relationship. Any token can attend to any other token. You may not need all-to-all modelling, but if a relationship exists anywhere in the sequence, attention can find it — and nothing better-targeted has displaced it since.</p>
+ <p>Scale of the jump this permitted: support vector machines worked in the thousands of parameters; deep computer-vision models reached roughly 150 million; transformers took the field to hundreds of billions and now trillions.</p>`,
+ sources:"Vaswani et al. 2017."
+},
+{
+ id:"S-008b", num:"1.4", title:"Self-supervision and scaling laws",
+ figure:SVG_FLOW,
+ body:`<p>Two things followed the transformer, and neither is an architecture.</p>
+ <p><strong>Self-supervised pretraining</strong> removed the labelling bottleneck. Train the model to predict the next word, and any text becomes its own training label. No humans annotating anything. The whole internet becomes usable training data.</p>
+ <p><strong>Scaling laws</strong>, observed around 2020, established that more data plus more compute produces <em>predictably</em> better models, with new abilities appearing at scale. GPT-1 → GPT-2 → GPT-3 demonstrated that "make it bigger" kept working.</p>
+ <p>The combination is the point: an architecture that soaks up compute, a method that soaks up data, and a law that makes spending on both pay off.</p>`,
+ depth:`<p>Scaling laws are the load-bearing assumption underneath essentially every capital commitment in this industry. Every gigawatt data centre, every multi-year chip order, every frontier lab valuation embeds a belief that the relationship continues to hold. If it weakens, the buildout case weakens with it — not because the models get worse, but because the marginal return on the next order of magnitude of spend stops justifying the spend.</p>
+ <p>That is the single most important thing to watch in this material, and it is unusually hard to observe directly: labs publish capability results, not the cost curve behind them.</p>`,
+ sources:"Kaplan et al. 2020 (scaling laws); Brown et al. 2020 (GPT-3)."
+},
+{
+ id:"S-008c", num:"1.4", title:"Three different tipping points, routinely confused",
+ figure:null,
+ body:`<p>The public tipping point was <strong>ChatGPT, November 2022</strong>. RLHF — reinforcement learning from human feedback — plus instruction-tuning turned a raw next-word predictor into something a non-specialist could use. Research capability became mass product.</p>
+ <p>But "when did generative AI happen" has three defensible answers, and conversations go wrong when people are holding different ones:</p>
+ <ul>
+ <li><strong>Technical</strong> — transformer, self-supervision, scaling: 2017 to 2020.</li>
+ <li><strong>Underlying enabler</strong> — the 2012 convergence of GPU compute and internet-scale data.</li>
+ <li><strong>Cultural and market</strong> — ChatGPT, late 2022.</li>
+ </ul>`,
+ depth:`<p>The distinction has practical consequences. Someone arguing that AI progress is recent and therefore fragile is usually pointing at 2022. Someone arguing it is long-running and therefore durable is pointing at 2012 or 2017. Both are describing real things; they are just not describing the same thing.</p>
+ <p>The through-line for the whole chapter: the missing ingredient was never the <em>idea</em> of neural networks. It was enough compute and data, plus an architecture that turns more of both into reliably better — without hand-labelling.</p>`,
+ sources:"Ouyang et al. 2022 (InstructGPT / RLHF)."
+},
+{
+ id:"S-003a", num:"1.5", title:"The frontier, as of 30 August 2026",
+ figure:`<table class="grid"><thead><tr><th>Lab</th><th>Notable model</th></tr></thead><tbody>
+ <tr><td>OpenAI</td><td>GPT-5.6 — Sol / Terra / Luna (Jun 2026)</td></tr>
+ <tr><td>Anthropic</td><td>Claude Opus 5 (Jul); Fable 5, Mythos tier (Jun)</td></tr>
+ <tr><td>Google</td><td>Gemini 3.7 Flash (Aug 2026)</td></tr>
+ <tr><td>xAI</td><td>Grok 4.6 (Aug 2026)</td></tr>
+ <tr><td>Meta</td><td>Muse Spark 1.2 (Aug 2026)</td></tr>
+ <tr><td>DeepSeek</td><td>V4-Pro / V4-Flash — open weight</td></tr>
+ <tr><td>Moonshot AI</td><td>Kimi K3 — open weight (Jul 2026)</td></tr>
+ <tr><td>Z.ai</td><td>GLM-5.3 Flash — open weight (Aug 2026)</td></tr>
+ <tr><td>Alibaba</td><td>Qwen3.8-Max — open weight (Aug 2026)</td></tr>
+ <tr><td>Mistral AI</td><td>Mistral Large 3 — open weight, Apache 2.0</td></tr>
+ </tbody></table>`,
+ body:`<p>Release cadence has compressed to weeks. Fourteen models from eight providers shipped in August 2026 alone; trackers count 360-plus releases across 50-plus organisations this year.</p>
+ <p>Reasoning and agent use are built-in defaults now, not add-ons. Open weights stayed close to the frontier — five of these ten labs publish downloadable weights. And price has become a competitive axis in its own right rather than a footnote to capability.</p>`,
+ depth:`<p>Do not memorise this table. It is wrong within weeks — four of these entries changed in the six weeks before it was compiled. What is durable is the cadence and the shape: a small number of closed frontier labs, a substantial open-weight tier close behind, and Chinese labs competing seriously on both capability and price.</p>
+ <p>If you want the current state, ask in chat and have Claude search — that is a better use of the format than the table is.</p>`,
+ sources:"Verified 30 Aug 2026 against public release trackers (aireleasetracker, llm-stats, LLM Gateway). Some trackers now list xAI as \u201CSpaceXAI\u201D; corporate structure not verified. Open-weight status as published by each lab."
+},
+{
+ id:"S-003c", num:"1.5b", title:"What the weekly releases actually contain",
+ figure:`<div class="twocol">
+ <div class="col blue"><h3>Saturating — knowledge benchmarks</h3>
+ <p><b>&gt;89%</b> top models clustered on MMLU-Pro, Epoch AI, 27 Apr 2026 — close enough that the benchmark stops separating them</p>
+ <p><b>Single digits</b> percentage points gained on MMLU-Pro and GPQA Diamond across H1 2026, from a high-80s start</p></div>
+ <div class="col orange"><h3>Still moving — agentic work and price</h3>
+ <p><b>17% → 65%</b> agent performance on MLE-bench, 2024 to early 2026</p>
+ <p><b>1 in 3</b> production attempts still failed by frontier models — Stanford AI Index 2026</p></div>
+ </div>`,
+ body:`<p>The last architectural step change on the timeline is <strong>2017</strong>. Everything shipping weekly since is the field executing on it — better training, better post-training, better serving. Incremental in kind, which is not the same as small in effect.</p>
+ <p><strong>Saturation measures the exam, not the model.</strong> A test everyone passes has stopped being a test. It is evidence the benchmark ran out of headroom — not, on its own, evidence that capability stopped improving.</p>
+ <p>Where headroom remains is long-horizon, multi-step, tool-using work. That is where the distance between labs is still visible.</p>
+ <p><strong>What actually moved in 2026 was the commercial envelope, not the ceiling:</strong> price per unit of capability fell, million-token context became standard and economical, reasoning-effort routing became a default rather than a mode, and agent loops became a native primitive.</p>`,
+ band:`Incremental does not mean immaterial. The 2017 architecture has not been displaced; what changed in 2026 is that running it got cheaper, longer-context and more reliable at multi-step work. Watch the agentic and cost measures, not the knowledge scores.`,
+ depth:`<p>The cadence has compressed procurement, not just engineering. Buyers who ran six-month model evaluations are being pushed onto roughly four-week cycles, because the leading model on a given task can change two or three times inside a quarter.</p>
+ <p>The practical consequence for selection: choosing a model on a headline knowledge benchmark now selects on a saturated measure — every serious candidate scores the same. The evaluation that separates them is your own task, run on your own data, which is work no vendor can do for you.</p>
+ <p>Watch also for the reverse error. "Benchmarks have saturated" is being used both as evidence that progress has stalled and as evidence that measurement has failed. Only the second is supported by the numbers. Whether the underlying capability curve has bent is a question the public benchmarks can no longer answer, which is itself the finding.</p>`,
+ sources:"Epoch AI frontier benchmark update, 27 Apr 2026, via TechJack Solutions summary; Digital Applied \u201CFrontier Models H1 2026 Retrospective\u201D, 15 May 2026; VentureBeat summary of Stanford AI Index 2026, Apr 2026; Digital Applied Frontier Model Release Velocity Index Q2 2026, Jul 2026. All four are secondary aggregators, not primary sources — flagged per \u00A716. Verify the MLE-bench and one-in-three figures against the Stanford AI Index itself, and the H1 deltas against Epoch AI directly, before external use."
+},
+{
+ id:"S-003b", num:"1.5", title:"Export control stopped being an abstraction",
+ figure:null,
+ body:`<p>In June 2026 Anthropic introduced a Mythos tier above Opus — Fable 5 and Mythos 5.</p>
+ <p>On <strong>12 June 2026</strong> it suspended access to both under a US Department of Commerce export-control directive. The directive was lifted on 30 June and access was restored on <strong>1 July 2026</strong>.</p>`,
+ depth:`<p>This is worth a card of its own because of what kind of event it is. Every other entry in this chapter is a capability event — someone built something that works better. This is a regulatory action that removed a frontier model from the market for nineteen days.</p>
+ <p>For anyone modelling this sector, that is a different risk category than the ones usually discussed. It is not about whether a lab can build the model, or fund it, or sell it. It is about whether it is permitted to ship it, and that variable can move in days rather than quarters.</p>
+ <p>It also cuts across the open-versus-closed question that runs through Chapter 10. Export controls are enforceable against a hosted API in a way they are not enforceable against a weight file that has already been downloaded.</p>`,
+ sources:"Anthropic's own statement on the June 2026 suspension and restoration. Dates as published."
+},
+{
+ id:"S-004", num:"1.6", title:"From demos to deployment, and the reality check",
+ figure:`<div class="stats">
+ <div class="stat"><b>40%</b><span>of enterprise applications to include task-specific AI agents by end-2026, up from under 5% in 2025 — Gartner</span></div>
+ <div class="stat"><b>&gt;40%</b><span>of agentic AI projects likely cancelled by end-2027 on cost, unclear value or weak risk controls — Gartner</span></div>
+ <div class="stat"><b>$2.6–4.4T</b><span>potential annual value from agentic AI across business — McKinsey</span></div>
+ <div class="stat"><b>58%</b><span>of firms already using physical AI or robotics; about 80% within two years — Deloitte</span></div>
+ </div>`,
+ body:`<p>2026 is the year of agents: AI shifted from answering to acting — writing code, running multi-step workflows, operating tools on a user's behalf. Enterprises moved from pilots to production. And a reality check arrived alongside: hype cooling, ROI scrutiny, and a high projected cancellation rate driving consolidation among vendors.</p>`,
+ depth:`<p>The first two figures come from the same firm and are not in tension. One forecasts adoption; the other forecasts discipline. Read together they say: this is happening, and most attempts at it will be managed badly.</p>
+ <p>Gartner names the causes of cancellation precisely, and this is the part worth carrying out of the chapter — <strong>model capability is not among them.</strong> The three named causes are escalating cost, unclear business value, and inadequate risk controls. Those are management problems, not engineering problems. Which means the variable that determines whether an AI programme succeeds is mostly not which model you picked.</p>
+ <p>Two figures held back from the printed version, mentioned here because you will probably have encountered them: MIT's NANDA initiative is widely cited for a finding that roughly 95% of generative-AI pilots show no measurable profit-and-loss return, and IDC with Microsoft report an average 3.7x return per dollar invested. They are the two poles of this argument. Both are contested and both come from secondary coverage — treat as directional, and ask in chat if either matters to you.</p>`,
+ sources:"Gartner figures verified 30 Aug 2026 against Gartner's own press releases (task-specific agents, published Aug 2025; project cancellations, published 25 Jun 2025) — both are forecasts, not measurements. McKinsey and Deloitte figures from a secondary summary gathered Jul 2026, not primary-verified."
+},
+{
+ apparatus:true, label:"Glossary", title:"Chapter 1 — Glossary",
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Card</th></tr></thead><tbody>
+ <tr><td>artificial intelligence</td><td>The whole field — all four eras, rules-based and learned alike</td><td>1.1</td></tr>
+ <tr><td>symbolic AI</td><td>Hand-coded rules and logic; no learning from data</td><td>1.2</td></tr>
+ <tr><td>machine learning</td><td>Systems that learn patterns from data instead of following written rules</td><td>1.2</td></tr>
+ <tr><td>deep learning</td><td>Machine learning with many-layered neural networks that find their own features</td><td>1.2</td></tr>
+ <tr><td>generative AI</td><td>Deep learning that produces output rather than classifying it</td><td>1.2</td></tr>
+ <tr><td>agentic AI</td><td>Models that act — running multi-step workflows and operating tools</td><td>1.2</td></tr>
+ <tr><td>perceptron</td><td>The earliest artificial neuron, late 1950s</td><td>1.3</td></tr>
+ <tr><td>backpropagation</td><td>Algorithm that trains a network by adjusting every weight to shrink its error</td><td>1.3</td></tr>
+ <tr><td>AI winter</td><td>Period when funding and interest collapsed after AI underdelivered</td><td>1.3</td></tr>
+ <tr><td>ImageNet</td><td>2009 dataset of 14 million labelled images; the contest AlexNet won</td><td>1.3</td></tr>
+ <tr><td>GPU</td><td>Chip built for parallel arithmetic; suits the matrix maths networks need</td><td>1.3</td></tr>
+ <tr><td>CUDA</td><td>NVIDIA's 2007 platform making GPUs programmable for general mathematics</td><td>1.3</td></tr>
+ <tr><td>discriminative model</td><td>Classifies its input rather than producing new output. AlexNet is one</td><td>1.3</td></tr>
+ <tr><td>recurrent neural network</td><td>Reads a sequence one step at a time, carrying a running summary forward</td><td>1.4</td></tr>
+ <tr><td>LSTM</td><td>RNN variant with gates controlling what to keep and discard; longer context</td><td>1.4</td></tr>
+ <tr><td>transformer</td><td>2017 architecture whose training is fully parallel across many chips</td><td>1.4</td></tr>
+ <tr><td>attention</td><td>Re-weighing which parts of the input matter for the next prediction</td><td>1.4</td></tr>
+ <tr><td>self-supervised pretraining</td><td>Predicting the next word, so any text becomes its own training label</td><td>1.4</td></tr>
+ <tr><td>scaling laws</td><td>More data plus more compute produces predictably better models</td><td>1.4</td></tr>
+ <tr><td>parameter</td><td>One of the learned numbers inside a model; counted in billions or trillions</td><td>1.4</td></tr>
+ <tr><td>RLHF</td><td>Reinforcement learning from human feedback; turns a predictor into an assistant</td><td>1.4</td></tr>
+ <tr><td>frontier model</td><td>A lab's most capable current model, at the edge of what exists</td><td>1.5</td></tr>
+ <tr><td>open-weight model</td><td>A model whose weight file the lab publishes for download</td><td>1.5</td></tr>
+ <tr><td>benchmark saturation</td><td>Top models scoring close enough together that a benchmark stops separating them</td><td>1.5b</td></tr>
+ <tr><td>agentic benchmark</td><td>Scores multi-step, tool-using task completion rather than single-answer knowledge</td><td>1.5b</td></tr>
+ </tbody></table>`,
+ body:`<p>Terms this chapter owns. Later chapters reference them by card number rather than redefining.</p>`
+},
+{
+ apparatus:true, label:"Companies", title:"Chapter 1 — Companies and organisations",
+ figure:`<h4 class="grouplabel">Frontier labs</h4>
+ <table class="grid wide"><thead><tr><th>Organisation</th><th>Listing</th><th>Role in this chapter</th></tr></thead><tbody>
+ <tr><td>OpenAI</td><td>Private</td><td>GPT-5.6 family. Largest consumer distribution of any lab</td></tr>
+ <tr><td>Anthropic</td><td>Private</td><td>Claude family; added a Mythos tier above Opus, Jun 2026. Enterprise and coding strength</td></tr>
+ <tr><td>Google (Alphabet)</td><td>Nasdaq: GOOGL</td><td>Published the transformer paper. Only frontier lab owning architecture, accelerator and distribution</td></tr>
+ <tr><td>xAI</td><td>Private</td><td>Grok line; competes on price rather than peak capability</td></tr>
+ <tr><td>Meta</td><td>Nasdaq: META</td><td>Llama, now Muse. Publishes weights, commoditising what rivals sell</td></tr>
+ <tr><td>DeepSeek</td><td>Private (China)</td><td>V4 line; cuts inference price through architecture, not cheaper hardware</td></tr>
+ <tr><td>Moonshot AI</td><td>Private (China)</td><td>Kimi K3 — open weights at trillion-parameter scale</td></tr>
+ <tr><td>Z.ai (Zhipu)</td><td>Private (China)</td><td>GLM line</td></tr>
+ <tr><td>Alibaba</td><td>NYSE: BABA</td><td>Qwen line, fast open-weights cadence</td></tr>
+ <tr><td>Mistral AI</td><td>Private (France)</td><td>Apache-2.0 frontier family; European sovereignty positioning</td></tr>
+ </tbody></table>
+ <h4 class="grouplabel">Origins, enablers and forecasters</h4>
+ <table class="grid wide"><thead><tr><th>Organisation</th><th>Listing</th><th>Role in this chapter</th></tr></thead><tbody>
+ <tr><td>Dartmouth College</td><td>Non-commercial</td><td>Host of the 1956 workshop that coined the term</td></tr>
+ <tr><td>IBM</td><td>NYSE: IBM</td><td>Deep Blue, 1997 — the symbolic era's last great showcase</td></tr>
+ <tr><td>University of Toronto</td><td>Non-commercial</td><td>Hinton's group — the 1986 backpropagation paper and, through his students Krizhevsky and Sutskever, AlexNet in 2012. Kept working on neural networks through both AI winters</td></tr>
+ <tr><td>Stanford / Princeton</td><td>Non-commercial</td><td>ImageNet, 2009 — the dataset, not the algorithm, was the binding constraint</td></tr>
+ <tr><td>NVIDIA</td><td>Nasdaq: NVDA</td><td>CUDA (2007) made GPUs programmable for general maths. Moat is the kernel library and developer habit, not the silicon</td></tr>
+ <tr><td>Microsoft</td><td>Nasdaq: MSFT</td><td>Azure capacity plus the OpenAI relationship; principal channel into enterprise IT</td></tr>
+ <tr><td>Hugging Face</td><td>Private</td><td>Where open weights are distributed and discovered</td></tr>
+ <tr><td>Epoch AI</td><td>Non-commercial</td><td>Frontier benchmark tracking; source of the MMLU-Pro saturation figure</td></tr>
+ <tr><td>Gartner</td><td>NYSE: IT</td><td>Source of both figures on the deployment card</td></tr>
+ <tr><td>McKinsey &amp; Company</td><td>Private</td><td>The $2.6–4.4T agentic-value estimate</td></tr>
+ <tr><td>Deloitte</td><td>Private</td><td>Physical-AI adoption survey</td></tr>
+ </tbody></table>`,
+ body:`<p class="disclaim">Descriptive map of the industry structure described in this chapter. Not investment advice and not a view on any security. Listing statuses as of Aug 2026.</p>`
+},
+{
+ apparatus:true, label:"What's next", title:"End of Chapter 1",
+ figure:null,
+ body:`<p>That's the eleven cards. The argument, in one line: the ideas were old, the constraint was physical, and what lifted it in 2012 and again in 2017 is still what the rest of the course is about.</p>
+ <p><strong>Chapter 2 — Inside the model: how it actually works.</strong> A neuron, a network, the pipeline that turns your words into an answer, what attention is doing, why weights are written in training and read-only at inference, and why a model's knowledge lags its release date.</p>
+ <p class="nextlink"><a href="understanding-ai-ch2-reader.html">Continue to Chapter 2 →</a></p>
+ <div class="btnrow">
+   <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
+   <span id="say2" class="said"></span>
+ </div>
+ <p class="hint2">Send back only the questions tagged <code>[gap]</code> or <code>[correction]</code>. A gap two readers hit independently is a defect in the material, not in the reader.</p>`
+}
+];
+
+let i = 0;
+const seen = new Set([0]);
+const asked = [];
+
+const stage = document.getElementById('stage');
+const dotsEl = document.getElementById('dots');
+const posEl = document.getElementById('pos');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+const qEl = document.getElementById('q');
+const sayEl = document.getElementById('say');
+const logbox = document.getElementById('logbox');
+const loglist = document.getElementById('loglist');
+
+const CONTENT = CARDS.filter(function(c){ return !c.apparatus; }).length;
+
+function render(){
+  const c = CARDS[i];
+  seen.add(i);
+  stage.innerHTML =
+    '<h1 class="cardtitle">' + c.title + '</h1>' +
+    (c.apparatus ? '' :
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — card ' + (i+1) + ' of ' + CONTENT + '</p>') +
+    (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
+    '<div class="body">' + c.body + '</div>' +
+    (c.band ? '<div class="band">' + c.band + '</div>' : '') +
+    (c.depth ? '<details class="deeper"><summary>Go deeper</summary><div class="inner">' + c.depth + '</div></details>' : '') +
+    (c.sources ? '<p class="sources">' + c.sources + '</p>' : '');
+
+  document.querySelector('.ask').style.display = c.apparatus ? 'none' : '';
+
+  const ch2 = document.getElementById('ch2btn');
+  const allb = document.getElementById('allbtn');
+  const say2 = document.getElementById('say2');
+  if (ch2) {
+    ch2.onclick = function(){
+      copyText(CH2_PROMPT, function(){
+        say2.className = 'said';
+        say2.textContent = 'Copied. Paste it into Claude.';
+      }, say2);
+    };
+  }
+  if (allb) { allb.onclick = function(){ copyAll(say2); }; }
+
+  posEl.textContent = c.apparatus ? c.label : (i+1) + ' / ' + CONTENT;
+  prevB.disabled = (i === 0);
+  nextB.disabled = (i === CARDS.length - 1);
+  qEl.value = '';
+  sayEl.textContent = '';
+  dotsEl.innerHTML = '';
+  CARDS.forEach(function(c2, n){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    if (n === i) b.setAttribute('aria-current','true');
+    let cls = c2.apparatus ? 'app' : '';
+    if (seen.has(n) && n !== i) cls += ' seen';
+    b.className = cls.trim();
+    b.innerHTML = '<i></i>';
+    b.onclick = function(){ i = n; render(); };
+    dotsEl.appendChild(b);
+  });
+  window.scrollTo(0,0);
+}
+
+function go(d){
+  const n = i + d;
+  if (n < 0 || n >= CARDS.length) return;
+  i = n; render();
+}
+
+prevB.onclick = function(){ go(-1); };
+nextB.onclick = function(){ go(1); };
+
+document.addEventListener('keydown', function(e){
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+  if (e.key === 'Home') { i = 0; render(); }
+  if (e.key === 'End')  { i = CARDS.length - 1; render(); }
+});
+
+function promptFor(card, q){
+  return 'Understanding AI — Chapter 1, card ' + card.num + ' (' + card.id + '), "' +
+    card.title + '".\n\nMy question: ' + q;
+}
+
+const CH2_PROMPT =
+'Understanding AI — I have finished Chapter 1 in the card reader.\n\n' +
+'Let\'s develop Chapter 2, "Inside the model: how it actually works", the same way. ' +
+'Per the §11 inventory it covers outline slides 5, the single-neuron zoom, 6, attention, ' +
+'12, 7 and 8 — a neuron, a network, the pipeline from words to an answer, what attention ' +
+'is doing, weights written in training and read-only at inference, and why a model\'s ' +
+'knowledge lags its release date.\n\n' +
+'Draft the cards in markdown first for my approval, one idea per card, with graphic specs ' +
+'and dated sources. Then build the HTML reader once I have signed off the wording.';
+
+function copyText(text, ok, target){
+  const el = target || sayEl;
+  function fallback(){
+    const t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); ok(); }
+    catch(e){ el.className = 'err'; el.textContent = 'Copy failed — select the text manually.'; }
+    document.body.removeChild(t);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else { fallback(); }
+}
+
+function copyAll(target){
+  const el = target || sayEl;
+  if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
+  let out = '# Understanding AI — questions from Chapter 1\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  asked.forEach(function(a){
+    out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
+  });
+  copyText(out, function(){
+    el.className = 'said';
+    el.textContent = 'Copied ' + asked.length + ' question(s) in notes-block format.';
+  }, el);
+}
+
+document.getElementById('copyq').onclick = function(){
+  const q = qEl.value.trim();
+  if (!q) { sayEl.className = 'err'; sayEl.textContent = 'Type a question first.'; qEl.focus(); return; }
+  const card = CARDS[i];
+  copyText(promptFor(card, q), function(){
+    asked.push({ card: card, q: q });
+    const li = document.createElement('li');
+    li.textContent = card.num + ' · ' + card.id + ' — ' + q;
+    loglist.appendChild(li);
+    logbox.classList.add('on');
+    sayEl.className = 'said';
+    sayEl.textContent = 'Copied. Paste it into Claude.';
+    qEl.value = '';
+  });
+};
+
+document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+render();
+</script>
+</body>
+</html>
