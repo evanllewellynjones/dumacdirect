@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reports &amp; Search</title>
+<link rel="stylesheet" href="rc-style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home" href="../index.html">DUMAC</a>
+  <h1>Reports &amp; Search</h1>
+  <span class="sp"></span>
+  <a class="modelink" href="entry.html">Entry</a>
+  <a class="modelink cur" href="reports.html">Reports</a>
+  <a class="modelink" href="admin.html">Admin</a>
+  <span class="badge" id="folder">no folder</span>
+</div>
+
+<div class="wrap wide">
+
+<div class="banner" id="banner"></div>
+
+<div class="tabs">
+  <div class="tab cur" data-v="company">Company</div>
+  <div class="tab" data-v="theme">Theme</div>
+  <div class="tab" data-v="review">Review Queue <span id="duebadge"></span></div>
+  <div class="tab" data-v="search">Search</div>
+  <span class="sp" style="flex:1"></span>
+  <button class="btn" id="btn_reload">Reload notes</button>
+  <button class="btn" id="btn_export">Export CSV</button>
+</div>
+
+<!-- COMPANY -->
+<div id="v_company">
+  <div class="card">
+    <label for="q_ticker">Ticker</label>
+    <input type="text" id="q_ticker" list="alltkr" class="mono"
+           placeholder="start typing a ticker&hellip;" autocomplete="off"
+           style="text-transform:uppercase">
+    <datalist id="alltkr"></datalist>
+    <div class="sub" id="tkrsummary"></div>
+  </div>
+  <div id="company_out"></div>
+</div>
+
+<!-- THEME -->
+<div id="v_theme" class="hide">
+  <div class="card">
+    <label for="q_theme">Theme</label>
+    <select id="q_theme"></select>
+  </div>
+  <div id="theme_out"></div>
+</div>
+
+<!-- REVIEW -->
+<div id="v_review" class="hide">
+  <div class="card">
+    <div class="row">
+      <div style="flex:2">
+        <label>Show</label>
+        <select id="q_revstatus">
+          <option value="open">Open only</option>
+          <option value="all">All, including done</option>
+        </select>
+      </div>
+      <div style="flex:3">
+        <label>Contributor</label>
+        <select id="q_revwho"><option value="">Everyone</option></select>
+      </div>
+    </div>
+  </div>
+  <div id="review_out"></div>
+</div>
+
+<!-- SEARCH -->
+<div id="v_search" class="hide">
+  <div class="card">
+    <div class="row">
+      <div style="flex:3">
+        <label for="q_text">Text</label>
+        <input type="text" id="q_text" placeholder="subject or note body&hellip;" autocomplete="off">
+      </div>
+      <div style="flex:2">
+        <label for="q_tag">Tag</label>
+        <select id="q_tag"><option value="">Any tag</option></select>
+      </div>
+      <div style="flex:2">
+        <label for="q_who">Contributor</label>
+        <select id="q_who"><option value="">Everyone</option></select>
+      </div>
+    </div>
+  </div>
+  <div id="search_out"></div>
+</div>
+
+</div>
+
+<!-- note reader -->
+<div class="modal" id="reader">
+  <div class="box">
+    <div class="hd">
+      <h3 id="rd_title"></h3>
+      <button class="btn" id="rd_close">Close</button>
+    </div>
+    <div class="bd">
+      <div class="tiny" id="rd_meta" style="margin-bottom:10px"></div>
+      <pre id="rd_body"></pre>
+    </div>
+  </div>
+</div>
+
+<script src="rc-core.js"></script>
+<script>
+let VIEW="company";
+function banner(t,ok){ const b=$("#banner"); b.textContent=t||"";
+  b.className="banner"+(t?" show":"")+(ok?" ok":""); }
+
+/* ---------- selectors over the corpus ---------- */
+const companies = ns => ns.filter(n=>n.record_type==="Company"
+                                 || (n.record_type==null && n.ticker));
+const themes    = ns => ns.filter(n=>n.record_type==="Theme"
+                                 || (n.record_type==null && !n.ticker));
+
+/* Themes that reference a ticker in tickers[] — the reverse index. */
+function themesForTicker(ns,tk){
+  const seen=new Map();
+  for(const n of themes(ns)){
+    const list=Array.isArray(n.tickers)?n.tickers:[];
+    if(list.includes(tk)){
+      if(!seen.has(n.entity)) seen.set(n.entity,[]);
+      seen.get(n.entity).push(n);
+    }
+  }
+  return seen;
+}
+
+/* Current price target per contributor.
+   Blank = "this note did not address the target", NOT a reset.
+   Buy and sell carry forward independently.
+   Contributors with no target at all are omitted entirely. */
+function targetGrid(recs){
+  const by=new Map();
+  const asc=[...recs].sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  for(const n of asc){
+    const who=n.contributor||"unknown";
+    if(!by.has(who)) by.set(who,{who,buy:null,buyDate:null,sell:null,sellDate:null,conv:null,convDate:null});
+    const r=by.get(who);
+    if(n.price_target_buy!==null&&n.price_target_buy!==undefined&&n.price_target_buy!==""){
+      r.buy=n.price_target_buy; r.buyDate=n.date; }
+    if(n.price_target_sell!==null&&n.price_target_sell!==undefined&&n.price_target_sell!==""){
+      r.sell=n.price_target_sell; r.sellDate=n.date; }
+    if(n.conviction){ r.conv=n.conviction; r.convDate=n.date; }
+  }
+  return [...by.values()].filter(r=>r.buy!==null||r.sell!==null);
+}
+function convGrid(recs){
+  const by=new Map();
+  const asc=[...recs].sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  for(const n of asc){
+    if(!n.conviction) continue;
+    by.set(n.contributor||"unknown",{who:n.contributor||"unknown",
+      conv:n.conviction,date:n.date});
+  }
+  return [...by.values()];
+}
+
+/* ---------- rendering helpers ---------- */
+function noteRow(n){
+  const d=el("div","noterow");
+  const hd=el("div","hd");
+  const s=el("span","subj",n.subject||"(no subject)");
+  s.onclick=()=>openReader(n);
+  hd.appendChild(s);
+  if(n.review_date){
+    const days=ageDays(n.review_date);
+    const cls = n.review_status==="Done" ? "pill done"
+              : (days!==null&&days>=0) ? "pill overdue" : "pill due";
+    hd.appendChild(el("span",cls,"review "+fmtDate(n.review_date)));
+  }
+  hd.appendChild(el("span","meta",fmtDate(n.date)+" \u00b7 "+(n.contributor||"")));
+  d.appendChild(hd);
+  if(Array.isArray(n.tags)&&n.tags.length){
+    const t=el("div","meta",n.tags.join(" \u00b7 "));
+    t.style.marginTop="2px"; d.appendChild(t);
+  }
+  if(n._body) d.appendChild(el("div","body",n._body.replace(/[#*`>]/g,"").slice(0,220)));
+  return d;
+}
+function section(title){
+  const c=el("div","card");
+  c.appendChild(el("div","sect",title));
+  return c;
+}
+function emptyLine(t){ return el("div","empty",t); }
+
+function openReader(n){
+  $("#rd_title").textContent=n.subject||"(no subject)";
+  $("#rd_meta").textContent=
+    [n.note_id, n.record_type||"unclassified", n.contributor, fmtDate(n.date),
+     n.ticker?("ticker "+n.ticker):"", (n.tags||[]).join(", ")]
+    .filter(Boolean).join("  \u00b7  ");
+  $("#rd_body").textContent=n._body||"(empty)";
+  $("#reader").classList.add("show");
+}
+$("#rd_close").onclick=()=>$("#reader").classList.remove("show");
+$("#reader").onclick=e=>{ if(e.target.id==="reader") $("#reader").classList.remove("show"); };
+
+/* ---------- COMPANY VIEW ---------- */
+async function renderCompany(){
+  const out=$("#company_out"); out.innerHTML="";
+  const tk=$("#q_ticker").value.trim().toUpperCase();
+  const ns=await walkNotes();
+  if(!tk){ out.appendChild(emptyLine("Enter a ticker above.")); return; }
+
+  const own=companies(ns).filter(n=>n.ticker===tk);
+  const themeMap=themesForTicker(ns,tk);
+
+  if(!own.length && !themeMap.size){
+    out.appendChild(emptyLine("No records for "+tk+".")); return; }
+
+  const name=(own.find(n=>n.entity)||{}).entity||tk;
+  const isPrivate=tk.startsWith("P.");
+  const listed=own.length ? own[own.length-1].listed : null;
+
+  // header
+  const h=section(name+"  \u00b7  "+tk);
+  const meta=el("div","tiny");
+  meta.textContent=own.length+" record(s)"
+    + (isPrivate||listed===false||listed==="false" ? "  \u00b7  private \u2014 no price data" : "")
+    + (themeMap.size ? "  \u00b7  "+themeMap.size+" theme(s)" : "");
+  h.appendChild(meta);
+  out.appendChild(h);
+
+  // price targets — only contributors who have one
+  const grid=targetGrid(own);
+  if(grid.length){
+    const c=section("Price targets");
+    const t=el("table","grid");
+    t.innerHTML="<thead><tr><th>Contributor</th><th>Buy</th><th>As of</th>"
+               +"<th>Sell</th><th>As of</th></tr></thead>";
+    const tb=el("tbody");
+    for(const r of grid){
+      const tr=el("tr");
+      tr.appendChild(el("td","",r.who));
+      const bd=ageDays(r.buyDate), sd=ageDays(r.sellDate);
+      const cb=el("td","num",r.buy===null?"\u2014":String(r.buy));
+      if(bd!==null&&bd>180) cb.classList.add("stale");
+      tr.appendChild(cb);
+      tr.appendChild(el("td","tiny",r.buyDate?fmtDate(r.buyDate)+"  ("+ageLabel(r.buyDate)+")":""));
+      const cs=el("td","num",r.sell===null?"\u2014":String(r.sell));
+      if(sd!==null&&sd>180) cs.classList.add("stale");
+      tr.appendChild(cs);
+      tr.appendChild(el("td","tiny",r.sellDate?fmtDate(r.sellDate)+"  ("+ageLabel(r.sellDate)+")":""));
+      tb.appendChild(tr);
+    }
+    t.appendChild(tb); c.appendChild(t);
+    c.appendChild(el("div","tiny","Greyed values are more than six months old."));
+    out.appendChild(c);
+  }
+
+  // conviction — same sparse rule
+  const cg=convGrid(own);
+  if(cg.length){
+    const c=section("Conviction");
+    const t=el("table","grid");
+    t.innerHTML="<thead><tr><th>Contributor</th><th>Conviction</th><th>As of</th></tr></thead>";
+    const tb=el("tbody");
+    for(const r of cg){
+      const tr=el("tr");
+      tr.appendChild(el("td","",r.who));
+      tr.appendChild(el("td","",r.conv));
+      tr.appendChild(el("td","tiny",fmtDate(r.date)+"  ("+ageLabel(r.date)+")"));
+      tb.appendChild(tr);
+    }
+    t.appendChild(tb); c.appendChild(t); out.appendChild(c);
+  }
+
+  // themes — names and links only, not the theme notes
+  if(themeMap.size){
+    const c=section("Themes");
+    for(const [theme,recs] of themeMap){
+      const d=el("div","noterow");
+      const a=el("span","linkish",theme);
+      a.onclick=()=>{ setView("theme"); $("#q_theme").value=theme; renderTheme(); };
+      d.appendChild(a);
+      d.appendChild(el("span","meta","   "+recs.length+" theme note(s)"));
+      c.appendChild(d);
+    }
+    out.appendChild(c);
+  }
+
+  // reviews on this name
+  const due=own.filter(n=>n.review_date && n.review_status!=="Done");
+  if(due.length){
+    const c=section("Reviews due");
+    due.sort((a,b)=>String(a.review_date).localeCompare(String(b.review_date)));
+    due.forEach(n=>c.appendChild(noteRow(n)));
+    out.appendChild(c);
+  }
+
+  // notes
+  const c=section("Notes ("+own.length+")");
+  if(!own.length) c.appendChild(emptyLine("No company records \u2014 this ticker appears only in theme records."));
+  own.forEach(n=>c.appendChild(noteRow(n)));
+  out.appendChild(c);
+}
+
+/* ---------- THEME VIEW ---------- */
+async function renderTheme(){
+  const out=$("#theme_out"); out.innerHTML="";
+  const th=$("#q_theme").value;
+  const ns=await walkNotes();
+  if(!th){ out.appendChild(emptyLine("Pick a theme above.")); return; }
+
+  const recs=themes(ns).filter(n=>n.entity===th);
+  if(!recs.length){ out.appendChild(emptyLine("No records for "+th+".")); return; }
+
+  const h=section(th);
+  h.appendChild(el("div","tiny",recs.length+" record(s)"));
+  out.appendChild(h);
+
+  // catalysts = anything with a review date
+  const cat=recs.filter(n=>n.review_date);
+  if(cat.length){
+    const c=section("Catalysts \u2014 dated reviews");
+    cat.sort((a,b)=>String(a.review_date).localeCompare(String(b.review_date)));
+    cat.forEach(n=>c.appendChild(noteRow(n)));
+    out.appendChild(c);
+  }
+
+  // members: union of tickers[] across the theme's records
+  const union=new Map();
+  for(const n of recs) for(const t of (Array.isArray(n.tickers)?n.tickers:[]))
+    union.set(t,(union.get(t)||0)+1);
+  if(union.size){
+    const c=section("Associated tickers ("+union.size+")");
+    const byName=new Map();
+    for(const n of companies(ns)) if(n.ticker&&n.entity) byName.set(n.ticker,n.entity);
+    const wrapd=el("div","chips");
+    [...union.keys()].sort().forEach(t=>{
+      const e=el("span","chip"); e.dataset.src="tkr";
+      const b=el("b","",t); e.appendChild(b);
+      const nm=byName.get(t);
+      if(nm) e.appendChild(el("span","tiny"," "+nm));
+      e.style.cursor="pointer";
+      e.onclick=()=>{ setView("company"); $("#q_ticker").value=t; renderCompany(); };
+      wrapd.appendChild(e);
+    });
+    c.appendChild(wrapd);
+    c.appendChild(el("div","tiny","Click a ticker to open its company page. "
+      + "P. prefix marks a private company."));
+    out.appendChild(c);
+  }
+
+  const c=section("Notes ("+recs.length+")");
+  recs.forEach(n=>c.appendChild(noteRow(n)));
+  out.appendChild(c);
+}
+
+/* ---------- REVIEW QUEUE ---------- */
+async function renderReview(){
+  const out=$("#review_out"); out.innerHTML="";
+  const ns=await walkNotes();
+  const mode=$("#q_revstatus").value, who=$("#q_revwho").value;
+  let rows=ns.filter(n=>n.review_date);
+  if(mode==="open") rows=rows.filter(n=>n.review_status!=="Done");
+  if(who) rows=rows.filter(n=>n.contributor===who);
+  rows.sort((a,b)=>String(a.review_date).localeCompare(String(b.review_date)));
+
+  if(!rows.length){ out.appendChild(emptyLine("Nothing scheduled.")); return; }
+
+  const today=new Date().toISOString().slice(0,10);
+  const overdue=rows.filter(n=>n.review_date<=today);
+  const later=rows.filter(n=>n.review_date>today);
+
+  if(overdue.length){
+    const c=section("Due now ("+overdue.length+")");
+    overdue.forEach(n=>c.appendChild(reviewRow(n))); out.appendChild(c);
+  }
+  if(later.length){
+    const c=section("Upcoming ("+later.length+")");
+    later.forEach(n=>c.appendChild(reviewRow(n))); out.appendChild(c);
+  }
+}
+function reviewRow(n){
+  const d=noteRow(n);
+  const tgt = n.ticker || (Array.isArray(n.tickers)&&n.tickers.length
+              ? n.tickers.join(" ") : n.entity);
+  const line=el("div","meta");
+  line.textContent="\u2192 "+(n.record_type||"")+"  \u00b7  "+tgt;
+  d.appendChild(line);
+  const btn=el("button","btn",n.review_status==="Done"?"Reopen":"Mark done");
+  btn.style.marginTop="5px";
+  btn.onclick=async()=>{
+    btn.disabled=true;
+    const next=n.review_status==="Done"?"Pending":"Done";
+    try{
+      await rewriteNote(n,txt=>setFMLine(txt,"review_status",next));
+      n.review_status=next; renderReview();
+    }catch(e){ alert("Could not update: "+e.message); btn.disabled=false; }
+  };
+  d.appendChild(btn);
+  return d;
+}
+
+/* ---------- SEARCH ---------- */
+async function renderSearch(){
+  const out=$("#search_out"); out.innerHTML="";
+  const ns=await walkNotes();
+  const q=$("#q_text").value.trim().toLowerCase();
+  const tag=$("#q_tag").value, who=$("#q_who").value;
+  let rows=ns;
+  if(q) rows=rows.filter(n=>((n.subject||"")+" "+(n._body||"")).toLowerCase().includes(q));
+  if(tag) rows=rows.filter(n=>Array.isArray(n.tags)&&n.tags.includes(tag));
+  if(who) rows=rows.filter(n=>n.contributor===who);
+  const c=section(rows.length+" record(s)");
+  if(!rows.length) c.appendChild(emptyLine("No match."));
+  rows.slice(0,200).forEach(n=>c.appendChild(noteRow(n)));
+  if(rows.length>200) c.appendChild(el("div","tiny","Showing first 200."));
+  out.appendChild(c);
+}
+
+/* ---------- CSV export ---------- */
+const csvCell = v => {
+  if(v===null||v===undefined) return "";
+  const s=Array.isArray(v)?v.join("; "):String(v);
+  return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+};
+const csvRows = r => r.map(x=>x.map(csvCell).join(",")).join("\r\n")+"\r\n";
+
+async function exportCSV(){
+  if(!RC.dir){ banner("Choose a folder first."); return; }
+  banner("Reading notes\u2026");
+  try{
+    const ns=await walkNotes(true);
+    const wide=[["note_id","date","record_type","contributor","entity","ticker",
+      "listed","tickers","subject","tags","attachments","price_target_buy",
+      "price_target_sell","conviction","review_date","review_status","priority",
+      "last_updated","revision"]];
+    for(const n of ns) wide.push([n.note_id,n.date,n.record_type,n.contributor,
+      n.entity,n.ticker,n.listed,n.tickers,n.subject,n.tags,n.attachments,
+      n.price_target_buy,n.price_target_sell,n.conviction,n.review_date,
+      n.review_status,n.priority,n.last_updated,n.revision]);
+
+    // long: one row per note x ticker — the join table for ticker reporting
+    const link=[["note_id","date","record_type","contributor","entity","ticker","role","subject","tags"]];
+    for(const n of ns){
+      if(n.ticker) link.push([n.note_id,n.date,n.record_type,n.contributor,
+        n.entity,n.ticker,"primary",n.subject,n.tags]);
+      for(const t of (Array.isArray(n.tickers)?n.tickers:[]))
+        link.push([n.note_id,n.date,n.record_type,n.contributor,n.entity,t,
+                   "associated",n.subject,n.tags]);
+    }
+    await writeFile(RC.dir,"_export_notes.csv",csvRows(wide));
+    await writeFile(RC.dir,"_export_links.csv",csvRows(link));
+    banner("Wrote _export_notes.csv ("+(wide.length-1)+" notes) and "
+         + "_export_links.csv ("+(link.length-1)+" links).",true);
+  }catch(e){ banner("Export failed: "+e.message); }
+}
+
+/* ---------- view switching ---------- */
+function setView(v){
+  VIEW=v;
+  $$(".tab").forEach(t=>t.classList.toggle("cur",t.dataset.v===v));
+  ["company","theme","review","search"].forEach(x=>
+    $("#v_"+x).classList.toggle("hide",x!==v));
+}
+$$(".tab").forEach(t=>t.onclick=()=>{
+  setView(t.dataset.v);
+  if(t.dataset.v==="review") renderReview();
+  if(t.dataset.v==="search") renderSearch();
+});
+
+/* ---------- boot ---------- */
+async function boot(){
+  await restoreFolder();
+  if(!RC.dir){ banner("No folder connected. Click the badge, top right."); return; }
+  banner("Loading\u2026");
+  await loadConfig();
+  const ns=await walkNotes(true);
+  const cfg=RC.cfg||SEED;
+
+  // ticker list = every primary ticker plus every associated ticker
+  const tset=new Set();
+  for(const n of ns){
+    if(n.ticker) tset.add(n.ticker);
+    for(const t of (Array.isArray(n.tickers)?n.tickers:[])) tset.add(t);
+  }
+  const dl=$("#alltkr"); dl.innerHTML="";
+  [...tset].sort().forEach(t=>{ const o=el("option"); o.value=t; dl.appendChild(o); });
+  $("#tkrsummary").textContent=tset.size+" tickers across "+ns.length+" records.";
+
+  const th=$("#q_theme"); th.innerHTML=""; th.appendChild(new Option("\u2014",""));
+  const inUse=new Set(ns.filter(n=>n.record_type==="Theme").map(n=>n.entity));
+  [...new Set([...(cfg.themes||[]),...inUse])].sort()
+    .forEach(t=>th.appendChild(new Option(t,t)));
+
+  for(const sel of ["#q_who","#q_revwho"]){
+    const s=$(sel);
+    (cfg.contributors||[]).forEach(c=>s.appendChild(new Option(c,c)));
+  }
+  const tg=$("#q_tag");
+  [...new Set(ns.flatMap(n=>Array.isArray(n.tags)?n.tags:[]))].sort()
+    .forEach(t=>tg.appendChild(new Option(t,t)));
+
+  const today=new Date().toISOString().slice(0,10);
+  const due=ns.filter(n=>n.review_date&&n.review_date<=today&&n.review_status!=="Done").length;
+  $("#duebadge").textContent = due?" ("+due+")":"";
+
+  banner("");
+  renderCompany();
+}
+
+document.addEventListener("rc-folder",boot);
+$("#q_ticker").addEventListener("input",e=>{
+  e.target.value=e.target.value.toUpperCase(); renderCompany(); });
+$("#q_theme").addEventListener("change",renderTheme);
+$("#q_revstatus").addEventListener("change",renderReview);
+$("#q_revwho").addEventListener("change",renderReview);
+$("#q_text").addEventListener("input",renderSearch);
+$("#q_tag").addEventListener("change",renderSearch);
+$("#q_who").addEventListener("change",renderSearch);
+$("#btn_reload").onclick=async()=>{ RC.notes=null; await boot(); };
+$("#btn_export").onclick=exportCSV;
+
+boot();
+</script>
+</body>
+</html>

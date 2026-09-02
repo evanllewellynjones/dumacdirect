@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Research Entry</title>
+<link rel="stylesheet" href="rc-style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home" href="../index.html">DUMAC</a>
+  <h1>Research Entry</h1>
+  <span class="sp"></span>
+  <a class="modelink cur" href="entry.html">Entry</a>
+  <a class="modelink" href="reports.html">Reports</a>
+  <a class="modelink" href="admin.html">Admin</a>
+  <span class="badge" id="folder">no folder</span>
+</div>
+
+<div class="wrap">
+
+<div class="banner" id="banner"></div>
+
+<!-- mode switch -->
+<div class="card">
+  <div class="row">
+    <button class="btn" id="m_company" style="flex:1">Company Record</button>
+    <button class="btn" id="m_theme" style="flex:1">Theme Record</button>
+  </div>
+  <div class="sub" id="modehint"></div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div><label for="f_date">Date</label><input type="date" id="f_date"></div>
+    <div><label for="f_contrib">Contributor</label><select id="f_contrib"></select></div>
+  </div>
+</div>
+
+<!-- COMPANY block -->
+<div class="card" id="blk_company">
+  <label for="f_entity">Company</label>
+  <div class="row">
+    <div style="flex:2">
+      <input type="text" id="f_entity" list="entlist" placeholder="Circle Internet" autocomplete="off">
+      <datalist id="entlist"></datalist>
+    </div>
+    <div style="flex:1">
+      <input type="text" id="f_ticker" list="tkrlist" placeholder="CRCL" autocomplete="off"
+             maxlength="12" class="mono" style="text-transform:uppercase">
+      <datalist id="tkrlist"></datalist>
+    </div>
+  </div>
+  <div style="margin-top:6px">
+    <label style="display:flex;align-items:center;gap:6px;text-transform:none;
+                  font-size:11.5px;letter-spacing:0;font-weight:400;color:var(--ink)">
+      <input type="checkbox" id="f_listed" checked style="width:auto">
+      Publicly listed &mdash; fetch price data for this ticker
+    </label>
+  </div>
+  <div class="sub" id="tickerhint"></div>
+</div>
+
+<!-- THEME block -->
+<div class="card hide" id="blk_theme">
+  <label for="f_theme">Theme</label>
+  <select id="f_theme"></select>
+  <div class="sub">Themes are defined in Admin. Ask EJ to add one if it is missing.</div>
+
+  <div style="margin-top:9px">
+    <label>Associated tickers <span class="tiny" id="tkrcount"></span></label>
+    <div class="chips" id="tkrchips"></div>
+    <div class="row" style="margin-top:6px">
+      <input type="text" id="tkradd" class="mono" placeholder="CRCL  or  P.SECURITIZE"
+             maxlength="12" style="text-transform:uppercase;flex:3">
+      <button class="btn" id="tkrbtn" style="flex:1">Add</button>
+    </div>
+    <div class="sub">Private companies use a <b>P.</b> prefix &mdash; <span class="mono">P.SECURITIZE</span>.
+      Enter or click Add. These become links on the theme page.</div>
+  </div>
+</div>
+
+<div class="card">
+  <label for="f_subject">Subject</label>
+  <input type="text" id="f_subject" placeholder="Q2 channel check" autocomplete="off">
+</div>
+
+<div class="card">
+  <label for="f_note">Note</label>
+  <textarea id="f_note" placeholder="Spoke with two wholesale accounts this morning&hellip;"></textarea>
+  <div class="sub">Markdown passes through. Paste an image with Ctrl+V to attach it at the cursor.</div>
+</div>
+
+<!-- numeric fields: company only -->
+<div class="card" id="blk_pt">
+  <label>Price targets</label>
+  <div class="row">
+    <div><input type="number" id="f_ptb" step="1" placeholder="Buy — whole number"></div>
+    <div><input type="number" id="f_pts" step="1" placeholder="Sell — whole number"></div>
+  </div>
+  <div class="sub">Leave blank if this note does not change your target. Blank is not zero,
+    and does not clear a previous target.</div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div>
+      <label for="f_conv">Conviction</label>
+      <select id="f_conv">
+        <option value="">&mdash;</option><option>High</option><option>Med</option><option>Low</option>
+      </select>
+    </div>
+    <div>
+      <label for="f_review">Review date</label>
+      <input type="date" id="f_review">
+    </div>
+  </div>
+  <div class="sub">A review date puts this record in the Review Queue on the Reports page.
+    Use it for catalysts &mdash; a rulemaking deadline, an expected disclosure.</div>
+</div>
+
+<div class="card">
+  <label>Tags <span class="tiny" id="tagcount"></span></label>
+  <div class="chips" id="chips"></div>
+  <details style="margin-top:7px">
+    <summary>Add a tag manually</summary>
+    <input type="text" id="tagsearch" placeholder="filter tags&hellip;" autocomplete="off" style="margin-top:6px">
+    <div class="picker" id="picker"></div>
+  </details>
+</div>
+
+<div class="card">
+  <label>Attachments</label>
+  <div id="drop">Drop files here, or click to browse</div>
+  <input type="file" id="filein" multiple hidden>
+  <div id="atts"></div>
+</div>
+
+</div>
+
+<div class="bar">
+  <div class="in">
+    <button class="btn pri" id="btn_save">Save note</button>
+    <button class="btn" id="btn_clear">Clear</button>
+  </div>
+  <div class="in"><div id="msg"></div></div>
+</div>
+
+<script src="rc-core.js"></script>
+<script>
+const S = { mode:"Company", atts:[], manual:new Set(), removed:new Set(),
+            tickers:[], imgN:0 };
+
+function flash(t,cls){ const m=$("#msg"); m.textContent=t; m.className=cls||""; }
+function banner(t,ok){
+  const b=$("#banner"); b.textContent=t||"";
+  b.className="banner"+(t?" show":"")+(ok?" ok":"");
+}
+
+/* ---------- mode ---------- */
+function setMode(m){
+  S.mode=m;
+  $("#m_company").className = "btn"+(m==="Company"?" pri":"");
+  $("#m_theme").className   = "btn"+(m==="Theme"?" pri":"");
+  $("#blk_company").classList.toggle("hide", m!=="Company");
+  $("#blk_theme").classList.toggle("hide",   m!=="Theme");
+  $("#blk_pt").classList.toggle("hide",      m!=="Company");
+  $("#modehint").textContent = m==="Company"
+    ? "A note about one company. Ticker required. Price targets and conviction attach to you."
+    : "A note about a theme or a catalyst. Lists the tickers the theme touches.";
+  $("#f_subject").placeholder = m==="Company"
+    ? "Q2 channel check" : "GENIUS Act rulemaking — rewards question";
+  localStorage.setItem("rc_mode",m);
+  renderTags();
+}
+
+/* ---------- tags ---------- */
+function allTags(){
+  const auto=matchTags($("#f_subject").value, $("#f_note").value)
+               .filter(h=>!S.removed.has(h.tag));
+  const out=[];
+  for(const t of S.manual) out.push({tag:t,src:"manual"});
+  for(const h of auto) if(!S.manual.has(h.tag)) out.push(h);
+  return out;
+}
+function maxTags(){ return (RC.cfg&&RC.cfg.maxTags)||8; }
+function currentTags(){ return allTags().slice(0,maxTags()); }
+function renderTags(){
+  const tags=currentTags(), c=$("#chips"); c.innerHTML="";
+  for(const h of tags){
+    const e=el("span","chip"); e.dataset.src=h.src;
+    e.appendChild(el("b","",h.tag));
+    const b=el("button","","\u00d7"); b.title="remove";
+    b.onclick=()=>{ S.manual.delete(h.tag); S.removed.add(h.tag); renderTags(); renderPicker(); };
+    e.appendChild(b); c.appendChild(e);
+  }
+  const over=allTags().length-tags.length;
+  $("#tagcount").textContent = tags.length+" of "+maxTags()
+    + (over>0 ? " \u2014 "+over+" more matched, not applied" : "");
+}
+function renderPicker(){
+  const q=$("#tagsearch").value.trim().toLowerCase(), p=$("#picker");
+  const chosen=new Set(currentTags().map(t=>t.tag));
+  const tax=(RC.cfg&&RC.cfg.taxonomy)||SEED.taxonomy;
+  p.innerHTML=""; let n=0;
+  for(const tag in tax){
+    if(chosen.has(tag)) continue;
+    if(q && !tag.toLowerCase().includes(q)) continue;
+    if(++n>60) break;
+    const d=el("div","",tag);
+    d.onclick=()=>{
+      if(currentTags().length>=maxTags()){
+        flash("Tag cap of "+maxTags()+" reached \u2014 remove one first.","err"); return; }
+      S.removed.delete(tag); S.manual.add(tag);
+      $("#tagsearch").value=""; renderTags(); renderPicker(); };
+    p.appendChild(d); }
+  if(!n) p.innerHTML="<div style='color:#6b7280;cursor:default'>no match</div>";
+}
+
+/* ---------- ticker chips (Theme mode) ---------- */
+const TKR_RE=/^[A-Z0-9.\-]{1,12}$/;
+function renderTkr(){
+  const c=$("#tkrchips"); c.innerHTML="";
+  S.tickers.forEach((t,i)=>{
+    const e=el("span","chip"); e.dataset.src="tkr";
+    e.appendChild(el("b","",t));
+    const b=el("button","","\u00d7");
+    b.onclick=()=>{ S.tickers.splice(i,1); renderTkr(); };
+    e.appendChild(b); c.appendChild(e);
+  });
+  $("#tkrcount").textContent = S.tickers.length ? S.tickers.length+" linked" : "";
+}
+function addTkr(){
+  const raw=$("#tkradd").value.trim().toUpperCase();
+  if(!raw) return;
+  if(!TKR_RE.test(raw)){
+    flash("Ticker must be 1-12 chars: letters, digits, dot or hyphen. "
+        + "Private names: P.SECURITIZE","err"); return; }
+  if(!S.tickers.includes(raw)) S.tickers.push(raw);
+  $("#tkradd").value=""; renderTkr(); flash("");
+}
+
+/* ---------- entity / ticker memory ---------- */
+function pairs(){ try{ return JSON.parse(localStorage.getItem("rc_pairs")||"[]"); }
+                  catch(e){ return []; } }
+function refreshLists(){
+  const p=pairs(), de=$("#entlist"), dt=$("#tkrlist");
+  de.innerHTML=""; dt.innerHTML="";
+  [...new Set(p.map(x=>x.e).filter(Boolean))].sort().forEach(v=>{
+    const o=el("option"); o.value=v; de.appendChild(o); });
+  [...new Set(p.map(x=>x.t).filter(Boolean))].sort().forEach(v=>{
+    const o=el("option"); o.value=v; dt.appendChild(o); });
+}
+function rememberPair(e,t){
+  const p=pairs();
+  if(p.some(x=>x.e===e && x.t===(t||""))) return;
+  p.push({e:e,t:t||""}); localStorage.setItem("rc_pairs",JSON.stringify(p));
+  refreshLists();
+}
+
+/* ---------- attachments ---------- */
+const sanitize = n => n.replace(/[^A-Za-z0-9._-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,80);
+function addFiles(files,atCursor){
+  for(const f of files){
+    let name=sanitize(f.name||"");
+    if(!name || /^image\.(png|jpe?g)$/i.test(name) || !f.name){
+      const ext=(String(f.type).split("/")[1]||"png").replace("jpeg","jpg");
+      name="image-"+String(++S.imgN).padStart(2,"0")+"."+ext;
+    }
+    if(S.atts.some(a=>a.name===name)){
+      const p=name.lastIndexOf("."); const b=p<0?name:name.slice(0,p);
+      const x=p<0?"":name.slice(p); let i=2;
+      while(S.atts.some(a=>a.name===b+"-"+i+x)) i++;
+      name=b+"-"+i+x;
+    }
+    S.atts.push({name,file:f});
+    if(atCursor && f.type.startsWith("image/")) insertAtCursor("\n![]("+name+")\n");
+  }
+  renderAtts();
+}
+function insertAtCursor(txt){
+  const t=$("#f_note"), s=t.selectionStart??t.value.length, e=t.selectionEnd??s;
+  t.value=t.value.slice(0,s)+txt+t.value.slice(e);
+  t.selectionStart=t.selectionEnd=s+txt.length; t.focus(); renderTags();
+}
+function renderAtts(){
+  const c=$("#atts"); c.innerHTML="";
+  S.atts.forEach((a,i)=>{
+    const d=el("div","att");
+    d.appendChild(el("span","nm",a.name));
+    d.appendChild(el("span","sz",(a.file.size/1024).toFixed(0)+" KB"));
+    const b=el("button","","\u00d7");
+    b.onclick=()=>{ S.atts.splice(i,1); renderAtts(); };
+    d.appendChild(b); c.appendChild(d);
+  });
+}
+
+/* ---------- save ---------- */
+async function save(){
+  if(!RC.dir){ flash("Choose a folder first.","err"); return; }
+  const subject=$("#f_subject").value.trim();
+  if(!subject){ flash("Subject is required.","err"); $("#f_subject").focus(); return; }
+
+  const rec={};
+  const contributor=$("#f_contrib").value;
+  const date=$("#f_date").value || new Date().toISOString().slice(0,10);
+
+  if(S.mode==="Company"){
+    const entity=$("#f_entity").value.trim();
+    const ticker=$("#f_ticker").value.trim().toUpperCase();
+    if(!entity){ flash("Company name is required.","err"); $("#f_entity").focus(); return; }
+    if(!ticker){ flash("Ticker is required on a company record. "
+        + "For a private company use a P. prefix \u2014 P.SECURITIZE.","err");
+        $("#f_ticker").focus(); return; }
+    if(!TKR_RE.test(ticker)){
+      flash("Ticker must be 1-12 chars: letters, digits, dot or hyphen.","err");
+      $("#f_ticker").focus(); return; }
+    rec.entity=entity; rec.ticker=ticker; rec.tickers=[];
+    rec.listed = $("#f_listed").checked;
+
+    for(const [id,sel] of [["price_target_buy","#f_ptb"],["price_target_sell","#f_pts"]]){
+      const raw=$(sel).value.trim();
+      if(raw===""){ rec[id]=null; continue; }
+      if(!/^-?\d+$/.test(raw)){ flash("Price targets must be whole numbers.","err"); return; }
+      rec[id]=parseInt(raw,10);
+    }
+  } else {
+    const theme=$("#f_theme").value;
+    if(!theme){ flash("Pick a theme.","err"); return; }
+    rec.entity=theme; rec.ticker=null; rec.listed=null;
+    rec.tickers=S.tickers.slice();
+    rec.price_target_buy=null; rec.price_target_sell=null;
+  }
+
+  const review=$("#f_review").value || null;
+  const tags=currentTags().map(t=>t.tag);
+  const now=new Date().toISOString();
+  const [yy,mm]=date.split("-");
+
+  let folder=date+"_"+initials(contributor)+"_"+slug(subject);
+  const root=await notesRoot(true);
+  const parent=await subdir(root,[yy,mm]);
+  if(await dirExists(parent,folder)){
+    let i=2; while(await dirExists(parent,folder+"-"+i)) i++;
+    folder=folder+"-"+i;
+  }
+
+  Object.assign(rec,{
+    note_id:folder, date:date, created:now, last_updated:now,
+    contributor:contributor, record_type:S.mode, subject:subject,
+    tags:tags, attachments:S.atts.map(a=>a.name),
+    conviction:$("#f_conv").value||null,
+    review_date:review, review_status:review?"Pending":null,
+    priority:null, revision:1
+  });
+
+  try{
+    const dir=await parent.getDirectoryHandle(folder,{create:true});
+    await writeFile(dir,"note.md",buildFM(rec,$("#f_note").value));
+    for(const a of S.atts) await writeFile(dir,a.name,a.file);
+    if(S.mode==="Company") rememberPair(rec.entity,rec.ticker);
+    RC.notes=null;
+    flash("Saved "+yy+"/"+mm+"/"+folder+" \u2014 "+tags.length+" tags, "
+        + S.atts.length+" attachment(s).","ok");
+    clearForm(true);
+  }catch(e){ flash("Save failed: "+e.message,"err"); }
+}
+
+function clearForm(keepMsg){
+  $("#f_subject").value=""; $("#f_entity").value=""; $("#f_ticker").value="";
+  $("#f_note").value=""; $("#f_ptb").value=""; $("#f_pts").value="";
+  $("#f_conv").value=""; $("#f_review").value=""; $("#f_listed").checked=true;
+  S.atts=[]; S.manual.clear(); S.removed.clear(); S.tickers=[]; S.imgN=0;
+  renderAtts(); renderTags(); renderPicker(); renderTkr();
+  $("#f_date").value=new Date().toISOString().slice(0,10);
+  if(!keepMsg) flash("");
+}
+
+/* ---------- boot ---------- */
+async function boot(){
+  await restoreFolder();
+  if(RC.dir) await loadConfig();
+  const cfg=RC.cfg||SEED;
+
+  const sel=$("#f_contrib"); sel.innerHTML="";
+  cfg.contributors.forEach(c=>{ const o=el("option","",c); o.value=c; sel.appendChild(o); });
+  sel.value=localStorage.getItem("rc_contributor")||cfg.contributors[0];
+  sel.onchange=()=>localStorage.setItem("rc_contributor",sel.value);
+
+  const th=$("#f_theme"); th.innerHTML="";
+  th.appendChild(new Option("\u2014",""));
+  (cfg.themes||[]).forEach(t=>th.appendChild(new Option(t,t)));
+
+  $("#f_date").value=new Date().toISOString().slice(0,10);
+  refreshLists();
+  setMode(localStorage.getItem("rc_mode")||"Company");
+  renderTags(); renderPicker(); renderTkr();
+
+  if(!RC.dir) banner("No folder connected. Click the badge, top right, and pick the "
+                   + "shared folder that contains NOTES.");
+  else banner("");
+}
+
+/* ---------- wiring ---------- */
+document.addEventListener("rc-folder", async()=>{ await boot(); });
+$("#m_company").onclick=()=>setMode("Company");
+$("#m_theme").onclick=()=>setMode("Theme");
+$("#f_subject").addEventListener("input",()=>{renderTags();renderPicker();});
+$("#f_note").addEventListener("input",()=>{renderTags();renderPicker();});
+$("#tagsearch").addEventListener("input",renderPicker);
+$("#f_ticker").addEventListener("input",e=>{
+  e.target.value=e.target.value.toUpperCase();
+  $("#tickerhint").textContent = e.target.value.startsWith("P.")
+    ? "Private company \u2014 no price data will be fetched." : "";
+  if(e.target.value.startsWith("P.")) $("#f_listed").checked=false;
+});
+$("#f_ticker").addEventListener("change",()=>{
+  const tk=$("#f_ticker").value.trim().toUpperCase();
+  if(!tk||$("#f_entity").value.trim()) return;
+  const hit=pairs().find(x=>x.t===tk); if(hit) $("#f_entity").value=hit.e;
+});
+$("#f_entity").addEventListener("change",()=>{
+  const e=$("#f_entity").value.trim();
+  if(!e||$("#f_ticker").value.trim()) return;
+  const hit=pairs().find(x=>x.e===e&&x.t); if(hit) $("#f_ticker").value=hit.t;
+});
+$("#tkrbtn").onclick=addTkr;
+$("#tkradd").addEventListener("input",e=>e.target.value=e.target.value.toUpperCase());
+$("#tkradd").addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault();addTkr();} });
+$("#btn_save").onclick=save;
+$("#btn_clear").onclick=()=>clearForm(false);
+
+const drop=$("#drop"), filein=$("#filein");
+drop.onclick=()=>filein.click();
+filein.onchange=e=>{ addFiles(e.target.files,false); filein.value=""; };
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{
+  e.preventDefault(); drop.classList.add("hot"); }));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{
+  e.preventDefault(); drop.classList.remove("hot"); }));
+drop.addEventListener("drop",e=>{ if(e.dataTransfer.files.length) addFiles(e.dataTransfer.files,false); });
+window.addEventListener("dragover",e=>e.preventDefault());
+window.addEventListener("drop",e=>{ e.preventDefault();
+  if(e.dataTransfer&&e.dataTransfer.files.length) addFiles(e.dataTransfer.files,false); });
+window.addEventListener("paste",e=>{
+  const fs=[...(e.clipboardData?.files||[])];
+  if(fs.length){ e.preventDefault(); addFiles(fs,true); } });
+window.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){ e.preventDefault(); save(); } });
+
+boot();
+</script>
+</body>
+</html>

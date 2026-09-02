@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin &amp; Maintenance</title>
+<link rel="stylesheet" href="rc-style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home" href="../index.html">DUMAC</a>
+  <h1>Admin &amp; Maintenance</h1>
+  <span class="sp"></span>
+  <a class="modelink" href="entry.html">Entry</a>
+  <a class="modelink" href="reports.html">Reports</a>
+  <a class="modelink cur" href="admin.html">Admin</a>
+  <span class="badge" id="folder">no folder</span>
+</div>
+
+<div class="wrap wide">
+
+<div class="banner" id="banner"></div>
+
+<div class="tabs">
+  <div class="tab cur" data-v="records">Records</div>
+  <div class="tab" data-v="themes">Themes</div>
+  <div class="tab" data-v="tags">Tags</div>
+  <div class="tab" data-v="config">Config</div>
+  <span style="flex:1"></span>
+  <span class="badge" id="lockbadge" style="cursor:pointer">read-only &mdash; unlock</span>
+</div>
+
+<!-- RECORDS -->
+<div id="v_records">
+  <div class="card">
+    <div class="row">
+      <div><label>Type</label><select id="q_type">
+        <option value="">All</option><option>Company</option><option>Theme</option>
+        <option value="__none">Unclassified</option></select></div>
+      <div><label>Contributor</label><select id="q_who"><option value="">Everyone</option></select></div>
+      <div><label>Priority</label><select id="q_pri">
+        <option value="">Any</option><option>1</option><option>2</option><option>3</option>
+        <option value="__none">Unset</option></select></div>
+      <div style="flex:2"><label>Text</label>
+        <input type="text" id="q_text" placeholder="subject or body&hellip;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="align-items:center;margin-bottom:7px">
+      <div style="flex:0 0 auto"><b id="selcount" class="tiny">0 selected</b></div>
+      <div style="flex:0 0 auto">
+        <label style="display:inline">Set priority</label>
+        <select id="bulk_pri" style="width:auto;display:inline-block">
+          <option value="">&mdash;</option><option>1</option><option>2</option><option>3</option>
+        </select>
+      </div>
+      <div style="flex:0 0 auto">
+        <label style="display:inline">Set type</label>
+        <select id="bulk_type" style="width:auto;display:inline-block">
+          <option value="">&mdash;</option><option>Company</option><option>Theme</option>
+        </select>
+      </div>
+      <div style="flex:0 0 auto"><button class="btn" id="btn_bulk">Apply to selected</button></div>
+      <div style="flex:1"></div>
+    </div>
+    <div style="max-height:520px;overflow:auto">
+      <table class="grid" id="rectbl">
+        <thead><tr>
+          <th style="width:22px"><input type="checkbox" id="selall" style="width:auto"></th>
+          <th>Date</th><th>Type</th><th>Ticker</th><th>Entity</th>
+          <th>Subject</th><th>Contributor</th><th>Pri</th><th>Rev</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- THEMES -->
+<div id="v_themes" class="hide">
+  <div class="card">
+    <div class="sect">Add a theme</div>
+    <div class="row">
+      <input type="text" id="newtheme" placeholder="Asset Tokenization" style="flex:3">
+      <button class="btn" id="btn_addtheme" style="flex:1">Add</button>
+    </div>
+    <div class="sub">New themes appear in the Theme Entry dropdown for everyone
+      after the folder syncs.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Themes in use</div>
+    <table class="grid" id="themetbl">
+      <thead><tr><th>Theme</th><th>Records</th><th>Tickers</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TAGS -->
+<div id="v_tags" class="hide">
+  <div class="card">
+    <div class="sect">Add a tag</div>
+    <div class="row">
+      <input type="text" id="newtag" placeholder="Tag name" style="flex:2">
+      <input type="text" id="newterms" placeholder="match terms, comma separated" style="flex:3">
+      <select id="newmode" style="flex:1">
+        <option value="n">normal</option><option value="s">strict (case-sensitive)</option>
+        <option value="a">ambiguous (subject only)</option>
+      </select>
+      <button class="btn" id="btn_addtag" style="flex:1">Add</button>
+    </div>
+    <div class="sub">Leave match terms blank to use the tag name itself.
+      <b>normal</b> matches subject or body, case-insensitive.
+      <b>strict</b> is case-sensitive &mdash; use for short acronyms like US, EV, RE.
+      <b>ambiguous</b> matches the subject only &mdash; use for ordinary English words
+      like Value, Growth, Power.</div>
+  </div>
+  <div class="card">
+    <div class="row" style="margin-bottom:7px">
+      <input type="text" id="tagfilter" placeholder="filter tags&hellip;" style="flex:3">
+      <div style="flex:2" class="tiny" id="tagsummary"></div>
+    </div>
+    <div style="max-height:520px;overflow:auto">
+      <table class="grid" id="tagtbl">
+        <thead><tr><th>Tag</th><th>Match terms</th><th>Notes</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div id="v_config" class="hide">
+  <div class="card">
+    <div class="sect">Config file</div>
+    <table class="grid"><tbody id="cfgmeta"></tbody></table>
+    <div class="sub">Stored as <span class="mono">_config.json</span> beside the
+      NOTES folder. It syncs to everyone through SharePoint. Only edit it from
+      this page, or by hand in Notepad when nobody else is editing.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Contributors</div>
+    <div class="row">
+      <input type="text" id="newcontrib" placeholder="Full Name" style="flex:3">
+      <button class="btn" id="btn_addcontrib" style="flex:1">Add</button>
+    </div>
+    <table class="grid" id="contribtbl" style="margin-top:7px">
+      <thead><tr><th>Name</th><th>Initials</th><th>Records</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="sub">Initials go into <span class="mono">note_id</span>, which is
+      what stops two people colliding on the same subject on the same day.
+      Two contributors with the same initials would collide &mdash; flagged below
+      if that happens.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Maintenance</div>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn" id="btn_reload" style="flex:0 0 auto">Reload notes</button>
+      <button class="btn" id="btn_history" style="flex:0 0 auto">View change log</button>
+      <div style="flex:1"></div>
+    </div>
+    <pre id="histout" class="tiny" style="display:none;max-height:240px;overflow:auto;
+      background:#f7f9fc;padding:9px;border-radius:4px;margin-top:8px"></pre>
+  </div>
+</div>
+
+</div>
+
+<!-- dry-run modal -->
+<div class="modal" id="dry">
+  <div class="box">
+    <div class="hd"><h3 id="dry_title"></h3>
+      <button class="btn" id="dry_cancel">Cancel</button>
+      <button class="btn pri" id="dry_go" style="flex:0 0 auto">Apply</button>
+    </div>
+    <div class="bd">
+      <div id="dry_summary" style="margin-bottom:10px"></div>
+      <pre id="dry_list"></pre>
+    </div>
+  </div>
+</div>
+
+<script src="rc-core.js"></script>
+<script>
+/* ==========================================================================
+   ADMIN UNLOCK
+   Convention, not security — the page source is visible. It stops accidents,
+   not a determined user. Anyone with folder access can edit _config.json in
+   Notepad regardless.
+
+   Default password:  dumacadmin
+   To change it, run this in the browser console and paste the result below:
+     crypto.subtle.digest('SHA-256', new TextEncoder().encode('NEWPASS'))
+       .then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16)
+       .padStart(2,'0')).join('')));
+   ========================================================================== */
+const ADMIN_HASH = "96403e5e12f144b1a4d2684d457bd8af69d003d3b1663e637cca2f40c6b97144";
+let UNLOCKED=false;
+
+async function sha(t){
+  const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function setLock(on){
+  UNLOCKED=on;
+  const b=$("#lockbadge");
+  b.textContent = on ? "unlocked \u2014 admin" : "read-only \u2014 unlock";
+  b.className = "badge "+(on?"on":"off");
+  $$(".adminonly").forEach(e=>e.disabled=!on);
+}
+$("#lockbadge").onclick=async()=>{
+  if(UNLOCKED){ setLock(false); return; }
+  const p=prompt("Admin password");
+  if(p===null) return;
+  if(await sha(p)===ADMIN_HASH){ setLock(true); banner("Admin unlocked.",true); }
+  else banner("Wrong password.");
+};
+function requireUnlock(){
+  if(!UNLOCKED){ banner("Unlock admin first \u2014 badge at the right of the tab bar."); return false; }
+  return true;
+}
+
+function banner(t,ok){ const b=$("#banner"); b.textContent=t||"";
+  b.className="banner"+(t?" show":"")+(ok?" ok":""); }
+function who(){ return localStorage.getItem("rc_contributor")||"unknown"; }
+
+/* ---------- usage counting ---------- */
+function tagUsage(ns){
+  const m=new Map();
+  for(const n of ns) for(const t of (Array.isArray(n.tags)?n.tags:[]))
+    m.set(t,(m.get(t)||0)+1);
+  return m;
+}
+function themeUsage(ns){
+  const m=new Map();
+  for(const n of ns) if(n.record_type==="Theme"&&n.entity)
+    m.set(n.entity,(m.get(n.entity)||0)+1);
+  return m;
+}
+
+/* ---------- dry-run confirm ---------- */
+function dryRun(title,summary,lines,apply){
+  $("#dry_title").textContent=title;
+  $("#dry_summary").innerHTML=summary;
+  $("#dry_list").textContent=lines.join("\n")||"(no notes affected)";
+  $("#dry").classList.add("show");
+  $("#dry_go").onclick=async()=>{
+    $("#dry_go").disabled=true;
+    try{ await apply(); $("#dry").classList.remove("show"); }
+    catch(e){ banner("Failed: "+e.message); }
+    $("#dry_go").disabled=false;
+  };
+}
+$("#dry_cancel").onclick=()=>$("#dry").classList.remove("show");
+
+/* ---------- TAGS ---------- */
+function renderTags(){
+  const ns=RC.notes||[], cfg=RC.cfg||SEED;
+  const use=tagUsage(ns);
+  const q=$("#tagfilter").value.trim().toLowerCase();
+  const tb=$("#tagtbl tbody"); tb.innerHTML="";
+  const names=Object.keys(cfg.taxonomy);
+  let shown=0;
+  for(const tag of names){
+    if(q && !tag.toLowerCase().includes(q)) continue;
+    shown++;
+    const terms=cfg.taxonomy[tag], n=use.get(tag)||0;
+    const tr=el("tr");
+    tr.appendChild(el("td","",tag));
+    tr.appendChild(el("td","tiny",
+      Object.keys(terms).map(t=>t+" ("+terms[t]+")").join(", ")));
+    tr.appendChild(el("td","num",String(n)));
+    const act=el("td");
+    if(n===0){
+      const d=el("button","btn adminonly danger","Delete"); d.disabled=!UNLOCKED;
+      d.onclick=()=>delTag(tag); act.appendChild(d);
+    }else{
+      const r=el("button","btn adminonly","Rename"); r.disabled=!UNLOCKED;
+      r.onclick=()=>renameTag(tag,n); act.appendChild(r);
+      const m=el("button","btn adminonly","Merge"); m.disabled=!UNLOCKED;
+      m.style.marginLeft="4px"; m.onclick=()=>mergeTag(tag,n); act.appendChild(m);
+    }
+    tr.appendChild(act); tb.appendChild(tr);
+  }
+  // tags present on notes but missing from the taxonomy
+  const orphan=[...use.keys()].filter(t=>!(t in cfg.taxonomy));
+  $("#tagsummary").textContent = shown+" of "+names.length+" tags shown"
+    + (orphan.length ? "  \u00b7  "+orphan.length+" tag(s) on notes are not in the taxonomy: "
+       +orphan.join(", ") : "");
+}
+async function delTag(tag){
+  if(!requireUnlock()) return;
+  if(!confirm("Delete tag \""+tag+"\"? It is on no notes, so nothing is rewritten."))
+    return;
+  const cfg=RC.cfg; delete cfg.taxonomy[tag];
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"tag_delete",tag:tag,notes:0});
+  banner("Deleted tag "+tag+".",true); renderTags();
+}
+function notesWithTag(tag){
+  return (RC.notes||[]).filter(n=>Array.isArray(n.tags)&&n.tags.includes(tag));
+}
+/* Rewrite the tags: line only. Body and every other key are untouched.
+   last_updated is deliberately NOT changed — this is a system edit, not
+   an authorship edit — but revision is bumped. */
+async function applyTagChange(list,map,opLabel,tag,to){
+  let done=0;
+  for(const n of list){
+    const next=[...new Set((n.tags||[]).map(map))];
+    await rewriteNote(n,txt=>{
+      txt=setFMLine(txt,"tags","["+next.map(x=>JSON.stringify(x)).join(", ")+"]");
+      return bumpRevision(txt);
+    });
+    n.tags=next; done++;
+  }
+  await appendHistory({at:new Date().toISOString(),by:who(),op:opLabel,
+                       from:tag,to:to,notes:done});
+  return done;
+}
+function renameTag(tag,n){
+  if(!requireUnlock()) return;
+  const to=prompt("Rename \""+tag+"\" to:",tag);
+  if(!to||to===tag) return;
+  const cfg=RC.cfg;
+  if(to in cfg.taxonomy){ banner("\""+to+"\" already exists \u2014 use Merge instead."); return; }
+  const list=notesWithTag(tag);
+  dryRun("Rename tag",
+    "<b>"+esc_html(tag)+"</b> \u2192 <b>"+esc_html(to)+"</b><br>"
+    + list.length+" note(s) will be rewritten. Body text is not touched; "
+    + "only the <span class='mono'>tags:</span> line changes and "
+    + "<span class='mono'>revision</span> is bumped.",
+    list.map(x=>x.note_id+"   ["+(x.tags||[]).join(", ")+"]"),
+    async()=>{
+      const c=await applyTagChange(list,t=>t===tag?to:t,"tag_rename",tag,to);
+      const tx=cfg.taxonomy, out={};
+      for(const k in tx) out[k===tag?to:k]=tx[k];
+      cfg.taxonomy=out;
+      await saveConfig(cfg,who());
+      banner("Renamed "+tag+" \u2192 "+to+" across "+c+" note(s).",true);
+      renderTags();
+    });
+}
+function mergeTag(tag){
+  if(!requireUnlock()) return;
+  const cfg=RC.cfg;
+  const to=prompt("Merge \""+tag+"\" INTO which tag?\n\n"
+    + "\""+tag+"\" disappears. Its notes get the target tag instead.");
+  if(!to||to===tag) return;
+  if(!(to in cfg.taxonomy)){ banner("\""+to+"\" is not an existing tag."); return; }
+  const list=notesWithTag(tag);
+  dryRun("Merge tag",
+    "<b>"+esc_html(tag)+"</b> is absorbed into <b>"+esc_html(to)+"</b>.<br>"
+    + list.length+" note(s) rewritten. <b>"+esc_html(tag)+"</b> is then removed "
+    + "from the taxonomy.",
+    list.map(x=>x.note_id+"   ["+(x.tags||[]).join(", ")+"]"),
+    async()=>{
+      const c=await applyTagChange(list,t=>t===tag?to:t,"tag_merge",tag,to);
+      // fold match terms across so nothing stops matching
+      const src=cfg.taxonomy[tag]||{};
+      cfg.taxonomy[to]=Object.assign({},cfg.taxonomy[to],src);
+      delete cfg.taxonomy[tag];
+      await saveConfig(cfg,who());
+      banner("Merged "+tag+" into "+to+" across "+c+" note(s).",true);
+      renderTags();
+    });
+}
+$("#btn_addtag").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const name=$("#newtag").value.trim();
+  if(!name){ banner("Tag name required."); return; }
+  const cfg=RC.cfg;
+  if(name in cfg.taxonomy){ banner("\""+name+"\" already exists."); return; }
+  const mode=$("#newmode").value;
+  const raw=$("#newterms").value.trim();
+  const terms={};
+  (raw?raw.split(",").map(s=>s.trim()).filter(Boolean):[name])
+    .forEach(t=>terms[t]=mode);
+  cfg.taxonomy[name]=terms;
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"tag_add",tag:name,terms:terms});
+  $("#newtag").value=""; $("#newterms").value="";
+  banner("Added tag "+name+".",true); renderTags();
+};
+
+/* ---------- THEMES ---------- */
+function renderThemes(){
+  const ns=RC.notes||[], cfg=RC.cfg||SEED;
+  const use=themeUsage(ns);
+  const tickers=new Map();
+  for(const n of ns) if(n.record_type==="Theme"&&n.entity){
+    if(!tickers.has(n.entity)) tickers.set(n.entity,new Set());
+    for(const t of (Array.isArray(n.tickers)?n.tickers:[])) tickers.get(n.entity).add(t);
+  }
+  const all=[...new Set([...(cfg.themes||[]),...use.keys()])].sort();
+  const tb=$("#themetbl tbody"); tb.innerHTML="";
+  for(const th of all){
+    const n=use.get(th)||0;
+    const tr=el("tr");
+    const nameCell=el("td","",th);
+    if(!(cfg.themes||[]).includes(th)){
+      nameCell.appendChild(el("span","pill due"," not in config"));
+    }
+    tr.appendChild(nameCell);
+    tr.appendChild(el("td","num",String(n)));
+    tr.appendChild(el("td","num",String((tickers.get(th)||new Set()).size)));
+    const act=el("td");
+    if(n===0){
+      const d=el("button","btn adminonly danger","Delete"); d.disabled=!UNLOCKED;
+      d.onclick=()=>delTheme(th); act.appendChild(d);
+    }else{
+      const r=el("button","btn adminonly","Rename"); r.disabled=!UNLOCKED;
+      r.onclick=()=>renameTheme(th); act.appendChild(r);
+    }
+    tr.appendChild(act); tb.appendChild(tr);
+  }
+}
+async function delTheme(th){
+  if(!requireUnlock()) return;
+  if(!confirm("Delete theme \""+th+"\"? No records use it, so nothing is rewritten.")) return;
+  const cfg=RC.cfg;
+  cfg.themes=(cfg.themes||[]).filter(x=>x!==th);
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"theme_delete",theme:th,notes:0});
+  banner("Deleted theme "+th+".",true); renderThemes();
+}
+function renameTheme(th){
+  if(!requireUnlock()) return;
+  const to=prompt("Rename theme \""+th+"\" to:",th);
+  if(!to||to===th) return;
+  const list=(RC.notes||[]).filter(n=>n.record_type==="Theme"&&n.entity===th);
+  dryRun("Rename theme",
+    "<b>"+esc_html(th)+"</b> \u2192 <b>"+esc_html(to)+"</b><br>"
+    + list.length+" theme record(s) rewritten. The "
+    + "<span class='mono'>entity:</span> line changes; body is untouched.",
+    list.map(x=>x.note_id),
+    async()=>{
+      for(const n of list){
+        await rewriteNote(n,txt=>bumpRevision(setFMLine(txt,"entity",yamlStr(to))));
+        n.entity=to;
+      }
+      const cfg=RC.cfg;
+      cfg.themes=[...new Set((cfg.themes||[]).map(x=>x===th?to:x))];
+      await saveConfig(cfg,who());
+      await appendHistory({at:new Date().toISOString(),by:who(),op:"theme_rename",
+                           from:th,to:to,notes:list.length});
+      banner("Renamed theme across "+list.length+" record(s).",true);
+      renderThemes();
+    });
+}
+$("#btn_addtheme").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const t=$("#newtheme").value.trim();
+  if(!t){ banner("Theme name required."); return; }
+  const cfg=RC.cfg;
+  if((cfg.themes||[]).includes(t)){ banner("Theme already exists."); return; }
+  cfg.themes=[...(cfg.themes||[]),t].sort();
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"theme_add",theme:t});
+  $("#newtheme").value=""; banner("Added theme "+t+".",true); renderThemes();
+};
+
+/* ---------- RECORDS ---------- */
+const SEL=new Set();
+function filtered(){
+  const ns=RC.notes||[];
+  const ty=$("#q_type").value, w=$("#q_who").value,
+        pr=$("#q_pri").value, q=$("#q_text").value.trim().toLowerCase();
+  return ns.filter(n=>{
+    if(ty==="__none"){ if(n.record_type) return false; }
+    else if(ty && n.record_type!==ty) return false;
+    if(w && n.contributor!==w) return false;
+    if(pr==="__none"){ if(n.priority) return false; }
+    else if(pr && String(n.priority)!==pr) return false;
+    if(q && !((n.subject||"")+" "+(n._body||"")).toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function renderRecords(){
+  const rows=filtered();
+  const tb=$("#rectbl tbody"); tb.innerHTML="";
+  for(const n of rows.slice(0,400)){
+    const tr=el("tr");
+    const cb=el("input"); cb.type="checkbox"; cb.style.width="auto";
+    cb.checked=SEL.has(n.note_id);
+    cb.onchange=()=>{ cb.checked?SEL.add(n.note_id):SEL.delete(n.note_id); updSel(); };
+    const td=el("td"); td.appendChild(cb); tr.appendChild(td);
+    tr.appendChild(el("td","tiny",fmtDate(n.date)));
+    const ty=el("td");
+    ty.appendChild(el("span","pill"+(n.record_type?"":" due"),n.record_type||"unclassified"));
+    tr.appendChild(ty);
+    tr.appendChild(el("td","mono",n.ticker||(Array.isArray(n.tickers)&&n.tickers.length
+      ? n.tickers.length+" linked" : "")));
+    tr.appendChild(el("td","",n.entity||""));
+    tr.appendChild(el("td","",n.subject||""));
+    tr.appendChild(el("td","tiny",n.contributor||""));
+    tr.appendChild(el("td","num",n.priority||""));
+    tr.appendChild(el("td","num",n.revision||""));
+    tb.appendChild(tr);
+  }
+  if(rows.length>400){
+    const tr=el("tr"); const td=el("td","tiny","Showing first 400 of "+rows.length+".");
+    td.colSpan=9; tr.appendChild(td); tb.appendChild(tr);
+  }
+  updSel();
+}
+function updSel(){ $("#selcount").textContent=SEL.size+" selected"; }
+$("#selall").onchange=e=>{
+  const rows=filtered().slice(0,400);
+  if(e.target.checked) rows.forEach(n=>SEL.add(n.note_id));
+  else rows.forEach(n=>SEL.delete(n.note_id));
+  renderRecords();
+};
+$("#btn_bulk").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const pri=$("#bulk_pri").value, ty=$("#bulk_type").value;
+  if(!pri&&!ty){ banner("Pick a priority or a type to set."); return; }
+  if(!SEL.size){ banner("Nothing selected."); return; }
+  const list=(RC.notes||[]).filter(n=>SEL.has(n.note_id));
+  dryRun("Bulk update",
+    list.length+" record(s)."
+    + (pri?"<br>priority \u2192 <b>"+pri+"</b>":"")
+    + (ty?"<br>record_type \u2192 <b>"+esc_html(ty)+"</b>":"")
+    + "<br><span class='tiny'>priority is a shared field \u2014 it overwrites whatever "
+    + "another contributor set. record_type should only be set on records that "
+    + "have none.</span>",
+    list.map(n=>n.note_id),
+    async()=>{
+      for(const n of list){
+        await rewriteNote(n,txt=>{
+          if(pri) txt=setFMLine(txt,"priority",pri);
+          if(ty)  txt=setFMLine(txt,"record_type",ty);
+          return bumpRevision(txt);
+        });
+        if(pri) n.priority=pri;
+        if(ty)  n.record_type=ty;
+      }
+      await appendHistory({at:new Date().toISOString(),by:who(),op:"bulk_update",
+                           priority:pri||null,record_type:ty||null,notes:list.length});
+      SEL.clear(); banner("Updated "+list.length+" record(s).",true); renderRecords();
+    });
+};
+
+/* ---------- CONFIG ---------- */
+function renderConfig(){
+  const cfg=RC.cfg||SEED, ns=RC.notes||[];
+  const rows=[["version",cfg.config_version],["last updated",cfg.config_updated||"\u2014"],
+              ["updated by",cfg.config_updated_by||"\u2014"],
+              ["tags",Object.keys(cfg.taxonomy).length],
+              ["themes",(cfg.themes||[]).length],
+              ["contributors",(cfg.contributors||[]).length],
+              ["records on disk",ns.length]];
+  const tb=$("#cfgmeta"); tb.innerHTML="";
+  rows.forEach(([k,v])=>{ const tr=el("tr");
+    tr.appendChild(el("td","tiny",k)); tr.appendChild(el("td","",String(v)));
+    tb.appendChild(tr); });
+
+  const cnt=new Map();
+  for(const n of ns) cnt.set(n.contributor,(cnt.get(n.contributor)||0)+1);
+  const seen=new Map();
+  const ctb=$("#contribtbl tbody"); ctb.innerHTML="";
+  for(const c of (cfg.contributors||[])){
+    const ini=initials(c);
+    const tr=el("tr");
+    tr.appendChild(el("td","",c));
+    const it=el("td","mono",ini);
+    if(seen.has(ini)) it.appendChild(el("span","pill overdue"," collides with "+seen.get(ini)));
+    seen.set(ini,c);
+    tr.appendChild(it);
+    tr.appendChild(el("td","num",String(cnt.get(c)||0)));
+    const act=el("td");
+    if(!(cnt.get(c))){
+      const d=el("button","btn adminonly danger","Remove"); d.disabled=!UNLOCKED;
+      d.onclick=async()=>{
+        if(!requireUnlock()) return;
+        if(!confirm("Remove contributor "+c+"?")) return;
+        const cf=RC.cfg; cf.contributors=cf.contributors.filter(x=>x!==c);
+        await saveConfig(cf,who()); renderConfig();
+      };
+      act.appendChild(d);
+    }
+    tr.appendChild(act); ctb.appendChild(tr);
+  }
+}
+$("#btn_addcontrib").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const n=$("#newcontrib").value.trim();
+  if(!n) return;
+  const cfg=RC.cfg;
+  if(cfg.contributors.includes(n)){ banner("Already listed."); return; }
+  cfg.contributors=[...cfg.contributors,n];
+  await saveConfig(cfg,who());
+  $("#newcontrib").value=""; banner("Added "+n+".",true); renderConfig();
+};
+$("#btn_history").onclick=async()=>{
+  const p=$("#histout");
+  if(p.style.display!=="none"){ p.style.display="none"; return; }
+  try{
+    const t=await readTextFile(RC.dir,"_config_history.jsonl");
+    p.textContent=t.trim().split("\n").reverse().join("\n")||"(empty)";
+  }catch(e){ p.textContent="(no change log yet)"; }
+  p.style.display="block";
+};
+$("#btn_reload").onclick=async()=>{ RC.notes=null; await boot(); };
+
+/* ---------- tabs ---------- */
+$$(".tab").forEach(t=>t.onclick=()=>{
+  const v=t.dataset.v;
+  $$(".tab").forEach(x=>x.classList.toggle("cur",x===t));
+  ["records","themes","tags","config"].forEach(x=>
+    $("#v_"+x).classList.toggle("hide",x!==v));
+  if(v==="tags") renderTags();
+  if(v==="themes") renderThemes();
+  if(v==="config") renderConfig();
+});
+
+/* ---------- boot ---------- */
+async function boot(){
+  await restoreFolder();
+  if(!RC.dir){ banner("No folder connected. Click the badge, top right."); return; }
+  banner("Loading\u2026");
+  await loadConfig();
+  await walkNotes(true);
+  const cfg=RC.cfg;
+  const s=$("#q_who"); s.innerHTML='<option value="">Everyone</option>';
+  (cfg.contributors||[]).forEach(c=>s.appendChild(new Option(c,c)));
+  setLock(UNLOCKED);
+  banner("");
+  renderRecords(); renderTags(); renderThemes(); renderConfig();
+}
+document.addEventListener("rc-folder",boot);
+["#q_type","#q_who","#q_pri"].forEach(s=>$(s).addEventListener("change",renderRecords));
+$("#q_text").addEventListener("input",renderRecords);
+$("#tagfilter").addEventListener("input",renderTags);
+boot();
+</script>
+</body>
+</html>
