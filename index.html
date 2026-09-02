@@ -53,6 +53,15 @@
     gap: 24px;
   }
   .grid.full { grid-template-columns: 1fr; }
+  .dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .dual .col { display: flex; flex-direction: column; }
+  .dual .col .section-label { margin-bottom: 24px; }
+  .dual .col .research-card { flex: 1; }
   .research-card {
     display: block;
     background: #fff;
@@ -119,6 +128,7 @@
     header h1 { font-size: 1.9rem; letter-spacing: 2px; }
     .container { padding: 32px 16px; }
     .research-card { padding: 22px; }
+    .dual { grid-template-columns: 1fr; gap: 32px; }
   }
 
   /* ===== Login gate ===== */
@@ -239,29 +249,27 @@
 
 <div class="container">
 
-  <div class="section-label">Knowledge Base</div>
+  <div class="dual">
 
-  <div class="grid full">
+    <div class="col">
+      <div class="section-label">Knowledge Base</div>
+      <a href="themes/" class="research-card">
+        <span class="card-tag">Knowledge Base</span>
+        <h2>Theme Knowledge Base</h2>
+        <p>A traversable map of macro themes and the securities they touch &mdash; winners, losers, and the mechanisms in between. Structured tear-sheets across Productivity, Physical AI, Financial, Energy Transition, and Future.</p>
+        <span class="arrow">&rarr;</span>
+      </a>
+    </div>
 
-    <a href="themes/" class="research-card">
-      <span class="card-tag">Knowledge Base</span>
-      <h2>Theme Knowledge Base</h2>
-      <p>A traversable map of macro themes and the securities they touch &mdash; winners, losers, and the mechanisms in between. Structured tear-sheets across Productivity, Physical AI, Financial, Energy Transition, and Future.</p>
-      <span class="arrow">&rarr;</span>
-    </a>
-
-  </div>
-
-  <div class="section-label" style="margin-top:52px">Learning</div>
-
-  <div class="grid full">
-
-    <a href="Understanding_AI/" class="research-card">
-      <span class="card-tag">Course</span>
-      <h2>Understanding AI</h2>
-      <p>AI explained for people who are numerate but have no machine-learning background. Seven chapters of card-based readers &mdash; how the technology arrived, what happens inside the model, the hardware and supply chain, building reliably on a probabilistic system, customization, cost drivers, and the capex map. Twenty to thirty minutes each.</p>
-      <span class="arrow">&rarr;</span>
-    </a>
+    <div class="col">
+      <div class="section-label">Learning</div>
+      <a href="Understanding_AI/" class="research-card">
+        <span class="card-tag">Course</span>
+        <h2>Understanding AI</h2>
+        <p>AI explained for people who are numerate but have no machine-learning background. Seven chapters of card-based readers &mdash; how the technology arrived, what happens inside the model, the hardware and supply chain, building reliably, customization, cost drivers, and the capex map.</p>
+        <span class="arrow">&rarr;</span>
+      </a>
+    </div>
 
   </div>
 
