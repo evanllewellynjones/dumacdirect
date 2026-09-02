@@ -62,14 +62,41 @@
 <div id="v_review" class="hide">
   <div class="card">
     <div class="frow">
-      <label for="q_revstatus" class="narrow">Show</label>
-      <div class="f md"><select id="q_revstatus">
+      <label for="q_rvfrom" class="narrow">From</label>
+      <div class="f sm"><input type="date" id="q_rvfrom"></div>
+      <label for="q_rvto" style="flex:0 0 auto">To</label>
+      <div class="f sm"><input type="date" id="q_rvto"></div>
+      <button class="btn" id="q_rvclear" style="flex:0 0 auto">All dates</button>
+      <label for="q_revstatus" style="flex:0 0 auto">Show</label>
+      <div class="f sm"><select id="q_revstatus">
         <option value="open">Open only</option>
-        <option value="all">All, including done</option>
+        <option value="done">Done only</option>
+        <option value="all">All</option>
       </select></div>
+      <div class="f"></div>
+    </div>
+    <div class="frow">
+      <label for="q_rvtype" class="narrow">Type</label>
+      <div class="f sm"><select id="q_rvtype">
+        <option value="">All</option><option>Company</option><option>Theme</option>
+      </select></div>
+      <label for="q_rvtheme" style="flex:0 0 auto">Theme</label>
+      <div class="f md"><select id="q_rvtheme"><option value="">All themes</option></select></div>
+      <label for="q_rvtkr" style="flex:0 0 auto">Ticker</label>
+      <div class="f sm"><select id="q_rvtkr"><option value="">All</option></select></div>
       <label for="q_revwho" style="flex:0 0 auto">Contributor</label>
       <div class="f md"><select id="q_revwho"><option value="">Everyone</option></select></div>
-      <div class="f"></div>
+    </div>
+    <div class="frow">
+      <label class="narrow" style="visibility:hidden">.</label>
+      <div class="f">
+        <label style="display:flex;align-items:center;gap:6px;text-transform:none;
+                      font-size:12.5px;letter-spacing:0;font-weight:400;color:var(--ink);margin:0">
+          <input type="checkbox" id="q_rvnone" style="width:auto">
+          Also show records with <b>no</b> review date &mdash; so you can schedule one
+        </label>
+      </div>
+      <div class="f tiny" id="rvcount" style="text-align:right"></div>
     </div>
   </div>
   <div id="review_out"></div>
@@ -355,54 +382,157 @@ async function renderTheme(){
 }
 
 /* ---------- REVIEW QUEUE ---------- */
+/* ---------- REVIEW QUEUE ----------
+   Company and Theme records both carry an optional review_date. Blank means
+   unscheduled, and unscheduled records are hidden unless you ask for them.
+   review_date and review_status are shared curation fields — anyone can move
+   a date, the same way anyone can set priority. Last write wins. */
+function reviewRows(){
+  const ns=RC.notes||[];
+  const from=$("#q_rvfrom").value, to=$("#q_rvto").value;
+  const st=$("#q_revstatus").value, ty=$("#q_rvtype").value;
+  const th=$("#q_rvtheme").value, tk=$("#q_rvtkr").value;
+  const wh=$("#q_revwho").value, incNone=$("#q_rvnone").checked;
+
+  return ns.filter(n=>{
+    const has=!!n.review_date;
+    if(!has && !incNone) return false;
+    if(has){
+      if(from && n.review_date<from) return false;
+      if(to   && n.review_date>to)   return false;
+      if(st==="open" && n.review_status==="Done") return false;
+      if(st==="done" && n.review_status!=="Done") return false;
+    }else if(st==="done") return false;      // unscheduled is never Done
+    if(ty && n.record_type!==ty) return false;
+    if(th && !(n.record_type==="Theme" && n.entity===th)) return false;
+    if(tk){
+      const own = n.ticker===tk;
+      const linked = Array.isArray(n.tickers) && n.tickers.includes(tk);
+      if(!own && !linked) return false;
+    }
+    if(wh && n.contributor!==wh) return false;
+    return true;
+  }).sort((a,b)=>{
+    // scheduled first, by date; unscheduled last, by entry date
+    if(!!a.review_date !== !!b.review_date) return a.review_date?-1:1;
+    if(a.review_date) return String(a.review_date).localeCompare(String(b.review_date));
+    return String(b.date).localeCompare(String(a.date));
+  });
+}
+
 async function renderReview(){
   const out=$("#review_out"); out.innerHTML="";
-  const ns=await walkNotes();
-  const mode=$("#q_revstatus").value, who=$("#q_revwho").value;
-  let rows=ns.filter(n=>n.review_date);
-  if(mode==="open") rows=rows.filter(n=>n.review_status!=="Done");
-  if(who) rows=rows.filter(n=>n.contributor===who);
-  rows.sort((a,b)=>String(a.review_date).localeCompare(String(b.review_date)));
-
-  if(!rows.length){ out.appendChild(emptyLine("Nothing scheduled.")); return; }
-
+  const rows=reviewRows();
   const today=new Date().toISOString().slice(0,10);
-  const overdue=rows.filter(n=>n.review_date<=today);
-  const later=rows.filter(n=>n.review_date>today);
+  $("#rvcount").textContent=rows.length+" record(s)";
 
-  if(overdue.length){
-    const c=section("Due now ("+overdue.length+")");
-    overdue.forEach(n=>c.appendChild(reviewRow(n))); out.appendChild(c);
-  }
-  if(later.length){
-    const c=section("Upcoming ("+later.length+")");
-    later.forEach(n=>c.appendChild(reviewRow(n))); out.appendChild(c);
+  if(!rows.length){ out.appendChild(el("div","card")).appendChild(
+    el("div","empty","Nothing matches. Widen the date range, or tick "
+      + "\u201calso show records with no review date\u201d.")); return; }
+
+  const groups=[
+    ["Overdue",   rows.filter(n=>n.review_date && n.review_date< today && n.review_status!=="Done")],
+    ["Due today", rows.filter(n=>n.review_date===today && n.review_status!=="Done")],
+    ["Upcoming",  rows.filter(n=>n.review_date && n.review_date> today && n.review_status!=="Done")],
+    ["Done",      rows.filter(n=>n.review_date && n.review_status==="Done")],
+    ["Unscheduled", rows.filter(n=>!n.review_date)]
+  ];
+  for(const [label,set] of groups){
+    if(!set.length) continue;
+    const c=el("div","card");
+    c.appendChild(el("div","sect",label+" ("+set.length+")"));
+    const t=el("table","grid rvtbl");
+    t.innerHTML="<thead><tr><th style='width:132px'>Review date</th>"
+               +"<th>Note</th><th style='width:150px'>Entered</th></tr></thead>";
+    const tb=el("tbody");
+    set.forEach(n=>tb.appendChild(reviewRow(n,today)));
+    t.appendChild(tb); c.appendChild(t); out.appendChild(c);
   }
 }
-function reviewRow(n){
-  const d=noteRow(n);
-  const tgt = n.ticker || (Array.isArray(n.tickers)&&n.tickers.length
-              ? n.tickers.join(" ") : n.entity);
-  const line=el("div","meta");
-  line.textContent="\u2192 "+(n.record_type||"")+"  \u00b7  "+tgt;
-  d.appendChild(line);
-  const me=localStorage.getItem("rc_contributor")||"";
-  const mine = !n.contributor || n.contributor===me;
-  const btn=el("button","btn",n.review_status==="Done"?"Reopen":"Mark done");
-  btn.style.marginTop="5px";
-  btn.disabled=!mine;
-  if(!mine) btn.title="Only "+n.contributor+" can close this review.";
-  btn.onclick=async()=>{
-    if(!mine) return;
-    btn.disabled=true;
-    const next=n.review_status==="Done"?"Pending":"Done";
+
+function reviewRow(n,today){
+  const tr=el("tr");
+
+  /* --- LEFT: the review date, editable in place --- */
+  const l=el("td","rvdate");
+  const inp=el("input"); inp.type="date"; inp.value=n.review_date||"";
+  inp.title="Change the review date, or clear it to unschedule.";
+  l.appendChild(inp);
+  if(n.review_date){
+    const overdue=n.review_date<today && n.review_status!=="Done";
+    const cls=n.review_status==="Done"?"pill done":(overdue?"pill overdue":"pill due");
+    const p=el("span",cls,n.review_status==="Done"?"Done"
+             :(overdue?"overdue "+Math.abs(ageDays(n.review_date))+"d":ageLabel(n.review_date)+" out"));
+    p.style.marginTop="4px"; p.style.display="inline-block";
+    l.appendChild(p);
+  }
+  const save=el("button","btn","Save date");
+  save.style.cssText="margin-top:5px;padding:3px 8px;font-size:12px";
+  save.disabled=true;
+  inp.onchange=()=>{ save.disabled = inp.value===(n.review_date||""); };
+  save.onclick=async()=>{
+    save.disabled=true;
+    const v=inp.value||"";
     try{
-      await rewriteNote(n,txt=>setFMLine(txt,"review_status",next));
-      n.review_status=next; renderReview();
-    }catch(e){ alert("Could not update: "+e.message); btn.disabled=false; }
+      await rewriteNote(n,txt=>{
+        txt=setFMLine(txt,"review_date",v);
+        return setFMLine(txt,"review_status",v?(n.review_status||"Pending"):"");
+      });
+      n.review_date=v||null;
+      n.review_status=v?(n.review_status||"Pending"):null;
+      renderReview();
+    }catch(e){ alert("Could not save: "+e.message); save.disabled=false; }
   };
-  d.appendChild(btn);
-  return d;
+  l.appendChild(save);
+  tr.appendChild(l);
+
+  /* --- MIDDLE: the note --- */
+  const m=el("td");
+  const subj=el("div","subj",n.subject||"(no subject)");
+  subj.onclick=()=>openReader(n);
+  m.appendChild(subj);
+  const tgt = n.ticker || (Array.isArray(n.tickers)&&n.tickers.length
+              ? n.tickers.join(" ") : "");
+  const meta=el("div","meta");
+  meta.textContent=[n.record_type||"unclassified",n.entity,tgt].filter(Boolean).join("  \u00b7  ");
+  m.appendChild(meta);
+  if(Array.isArray(n.tags)&&n.tags.length)
+    m.appendChild(el("div","meta",n.tags.join(" \u00b7 ")));
+  if(n._body) m.appendChild(el("div","body",excerpt(n._body)));
+  tr.appendChild(m);
+
+  /* --- RIGHT: entry date, contributor, status toggle --- */
+  const r=el("td","rvmeta");
+  r.appendChild(el("div","",fmtDate(n.date)));
+  r.appendChild(el("div","tiny",n.contributor||""));
+  if(n.review_date){
+    const btn=el("button","btn",n.review_status==="Done"?"Reopen":"Mark done");
+    btn.style.cssText="margin-top:5px;padding:3px 8px;font-size:12px";
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      const next=n.review_status==="Done"?"Pending":"Done";
+      try{
+        await rewriteNote(n,txt=>setFMLine(txt,"review_status",next));
+        n.review_status=next; renderReview();
+      }catch(e){ alert("Could not update: "+e.message); btn.disabled=false; }
+    };
+    r.appendChild(btn);
+  }
+  tr.appendChild(r);
+  return tr;
+}
+
+/* Strip markdown noise so the excerpt reads as prose, not as source. */
+function excerpt(b){
+  return String(b)
+    .replace(/^#{1,6}\s+/gm,"")
+    .replace(/^[-*+]\s+/gm,"")
+    .replace(/^>\s*/gm,"")
+    .replace(/\*\*([^*]+)\*\*/g,"$1")
+    .replace(/\*([^*]+)\*/g,"$1")
+    .replace(/`([^`]+)`/g,"$1")
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g,"$1")
+    .replace(/\s+/g," ").trim().slice(0,240);
 }
 
 /* ---------- SEARCH ---------- */
@@ -490,7 +620,9 @@ async function boot(){
   }
   const dl=$("#alltkr"); dl.innerHTML="";
   [...tset].sort().forEach(t=>{ const o=el("option"); o.value=t; dl.appendChild(o); });
-  $("#tkrsummary").textContent=tset.size+" tickers across "+ns.length+" records.";
+  $("#tkrsummary").textContent = ns.length
+    ? tset.size+" tickers across "+ns.length+" records in "+notesLocation()+"."
+    : "No notes found in "+notesLocation()+".";
 
   const th=$("#q_theme"); th.innerHTML=""; th.appendChild(new Option("\u2014",""));
   const inUse=new Set(ns.filter(n=>n.record_type==="Theme").map(n=>n.entity));
@@ -501,6 +633,12 @@ async function boot(){
     const s=$(sel);
     (cfg.contributors||[]).forEach(c=>s.appendChild(new Option(c,c)));
   }
+  // review queue: themes that actually have Theme records, and every ticker
+  const rvth=$("#q_rvtheme");
+  [...new Set(ns.filter(n=>n.record_type==="Theme"&&n.entity).map(n=>n.entity))].sort()
+    .forEach(t=>rvth.appendChild(new Option(t,t)));
+  const rvtk=$("#q_rvtkr");
+  [...tset].sort().forEach(t=>rvtk.appendChild(new Option(t,t)));
   const tg=$("#q_tag");
   [...new Set(ns.flatMap(n=>Array.isArray(n.tags)?n.tags:[]))].sort()
     .forEach(t=>tg.appendChild(new Option(t,t)));
@@ -517,8 +655,10 @@ document.addEventListener("rc-folder",boot);
 $("#q_ticker").addEventListener("input",e=>{
   e.target.value=e.target.value.toUpperCase(); renderCompany(); });
 $("#q_theme").addEventListener("change",renderTheme);
-$("#q_revstatus").addEventListener("change",renderReview);
-$("#q_revwho").addEventListener("change",renderReview);
+["#q_revstatus","#q_revwho","#q_rvtype","#q_rvtheme","#q_rvtkr",
+ "#q_rvfrom","#q_rvto"].forEach(x=>$(x).addEventListener("change",renderReview));
+$("#q_rvnone").addEventListener("change",renderReview);
+$("#q_rvclear").onclick=()=>{ $("#q_rvfrom").value=""; $("#q_rvto").value=""; renderReview(); };
 $("#q_text").addEventListener("input",renderSearch);
 $("#q_tag").addEventListener("change",renderSearch);
 $("#q_who").addEventListener("change",renderSearch);
