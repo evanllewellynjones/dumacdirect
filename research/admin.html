@@ -34,16 +34,19 @@
 <!-- RECORDS -->
 <div id="v_records">
   <div class="card">
-    <div class="row">
-      <div><label>Type</label><select id="q_type">
+    <div class="frow">
+      <label for="q_type" class="narrow">Type</label>
+      <div class="f sm"><select id="q_type">
         <option value="">All</option><option>Company</option><option>Theme</option>
         <option value="__none">Unclassified</option></select></div>
-      <div><label>Contributor</label><select id="q_who"><option value="">Everyone</option></select></div>
-      <div><label>Priority</label><select id="q_pri">
+      <label for="q_who" style="flex:0 0 auto">Contributor</label>
+      <div class="f md"><select id="q_who"><option value="">Everyone</option></select></div>
+      <label for="q_pri" style="flex:0 0 auto">Priority</label>
+      <div class="f sm"><select id="q_pri">
         <option value="">Any</option><option>1</option><option>2</option><option>3</option>
         <option value="__none">Unset</option></select></div>
-      <div style="flex:2"><label>Text</label>
-        <input type="text" id="q_text" placeholder="subject or body&hellip;"></div>
+      <label for="q_text" style="flex:0 0 auto">Text</label>
+      <div class="f"><input type="text" id="q_text" placeholder="Search"></div>
     </div>
   </div>
 
@@ -83,7 +86,7 @@
   <div class="card">
     <div class="sect">Add a theme</div>
     <div class="row">
-      <input type="text" id="newtheme" placeholder="Asset Tokenization" style="flex:3">
+      <input type="text" id="newtheme" placeholder="Theme name" style="flex:3">
       <button class="btn" id="btn_addtheme" style="flex:1">Add</button>
     </div>
     <div class="sub">New themes appear in the Theme Entry dropdown for everyone
@@ -104,7 +107,7 @@
     <div class="sect">Add a tag</div>
     <div class="row">
       <input type="text" id="newtag" placeholder="Tag name" style="flex:2">
-      <input type="text" id="newterms" placeholder="match terms, comma separated" style="flex:3">
+      <input type="text" id="newterms" placeholder="Match terms, comma separated" style="flex:3">
       <select id="newmode" style="flex:1">
         <option value="n">normal</option><option value="s">strict (case-sensitive)</option>
         <option value="a">ambiguous (subject only)</option>
@@ -119,7 +122,7 @@
   </div>
   <div class="card">
     <div class="row" style="margin-bottom:7px">
-      <input type="text" id="tagfilter" placeholder="filter tags&hellip;" style="flex:3">
+      <input type="text" id="tagfilter" placeholder="Filter tags" style="flex:3">
       <div style="flex:2" class="tiny" id="tagsummary"></div>
     </div>
     <div style="max-height:520px;overflow:auto">
@@ -143,7 +146,7 @@
   <div class="card">
     <div class="sect">Contributors</div>
     <div class="row">
-      <input type="text" id="newcontrib" placeholder="Full Name" style="flex:3">
+      <input type="text" id="newcontrib" placeholder="Contributor name" style="flex:3">
       <button class="btn" id="btn_addcontrib" style="flex:1">Add</button>
     </div>
     <table class="grid" id="contribtbl" style="margin-top:7px">

@@ -32,89 +32,92 @@
 </div>
 
 <div class="card">
-  <div class="row">
-    <div><label for="f_date">Date</label><input type="date" id="f_date"></div>
-    <div><label for="f_contrib">Contributor</label><select id="f_contrib"></select></div>
+  <div class="frow">
+    <label for="f_date" class="narrow">Date</label>
+    <div class="f sm"><input type="date" id="f_date"></div>
+    <label for="f_contrib" style="flex:0 0 auto">Contributor</label>
+    <div class="f md"><select id="f_contrib"></select></div>
   </div>
 </div>
 
 <!-- COMPANY block -->
 <div class="card" id="blk_company">
-  <label for="f_entity">Company</label>
-  <div class="row">
-    <div style="flex:2">
-      <input type="text" id="f_entity" list="entlist" placeholder="Circle Internet" autocomplete="off">
-      <datalist id="entlist"></datalist>
-    </div>
-    <div style="flex:1">
-      <input type="text" id="f_ticker" list="tkrlist" placeholder="CRCL" autocomplete="off"
-             maxlength="12" class="mono" style="text-transform:uppercase">
-      <datalist id="tkrlist"></datalist>
+  <div class="frow">
+    <label for="f_entity" class="narrow">Company</label>
+    <div class="f"><input type="text" id="f_entity" list="entlist" placeholder="Company" autocomplete="off">
+      <datalist id="entlist"></datalist></div>
+    <label for="f_ticker" style="flex:0 0 auto">Ticker</label>
+    <div class="f sm"><input type="text" id="f_ticker" list="tkrlist" placeholder="Ticker"
+        autocomplete="off" maxlength="12" class="mono" style="text-transform:uppercase">
+      <datalist id="tkrlist"></datalist></div>
+  </div>
+  <div class="frow">
+    <label class="narrow" style="visibility:hidden">.</label>
+    <div class="f">
+      <label style="display:flex;align-items:center;gap:6px;text-transform:none;
+                    font-size:12.5px;letter-spacing:0;font-weight:400;color:var(--ink);margin:0">
+        <input type="checkbox" id="f_listed" checked style="width:auto">
+        Publicly listed &mdash; fetch price data for this ticker
+      </label>
+      <div class="sub" id="tickerhint"></div>
     </div>
   </div>
-  <div style="margin-top:6px">
-    <label style="display:flex;align-items:center;gap:6px;text-transform:none;
-                  font-size:11.5px;letter-spacing:0;font-weight:400;color:var(--ink)">
-      <input type="checkbox" id="f_listed" checked style="width:auto">
-      Publicly listed &mdash; fetch price data for this ticker
-    </label>
-  </div>
-  <div class="sub" id="tickerhint"></div>
 </div>
 
 <!-- THEME block -->
 <div class="card hide" id="blk_theme">
-  <label for="f_theme">Theme</label>
-  <select id="f_theme"></select>
-  <div class="sub">Themes are defined in Admin. Ask EJ to add one if it is missing.</div>
-
-  <div style="margin-top:9px">
-    <label>Associated tickers <span class="tiny" id="tkrcount"></span></label>
-    <div class="chips" id="tkrchips"></div>
-    <div class="row" style="margin-top:6px">
-      <input type="text" id="tkradd" class="mono" placeholder="CRCL  or  P.SECURITIZE"
-             maxlength="12" style="text-transform:uppercase;flex:3">
-      <button class="btn" id="tkrbtn" style="flex:1">Add</button>
-    </div>
-    <div class="sub">Private companies use a <b>P.</b> prefix &mdash; <span class="mono">P.SECURITIZE</span>.
-      Enter or click Add. These become links on the theme page.</div>
+  <div class="frow">
+    <label for="f_theme" class="narrow">Theme</label>
+    <div class="f md"><select id="f_theme"></select></div>
+    <div class="f tiny">Defined in Admin. Ask EJ to add one if it is missing.</div>
+  </div>
+  <div class="frow">
+    <label for="tkradd" class="narrow">Tickers</label>
+    <div class="f sm"><input type="text" id="tkradd" class="mono" placeholder="Ticker"
+        maxlength="12" style="text-transform:uppercase"></div>
+    <button class="btn" id="tkrbtn" style="flex:0 0 auto">Add</button>
+    <div class="f chips" id="tkrchips"></div>
+    <span class="tiny" id="tkrcount" style="flex:0 0 auto"></span>
+  </div>
+  <div class="frow">
+    <label class="narrow" style="visibility:hidden">.</label>
+    <div class="f sub" style="margin-top:0">Private companies use a <b>P.</b> prefix &mdash;
+      <span class="mono">P.SECURITIZE</span>. These become links on the theme page.</div>
   </div>
 </div>
 
 <div class="card">
-  <label for="f_subject">Subject</label>
-  <input type="text" id="f_subject" placeholder="Q2 channel check" autocomplete="off">
+  <div class="frow">
+    <label for="f_subject" class="narrow">Subject</label>
+    <div class="f"><input type="text" id="f_subject" placeholder="Subject" autocomplete="off"></div>
+  </div>
 </div>
 
 <div class="card">
   <label for="f_note">Note</label>
-  <textarea id="f_note" placeholder="Spoke with two wholesale accounts this morning&hellip;"></textarea>
+  <textarea id="f_note" placeholder="Note"></textarea>
   <div class="sub">Markdown passes through. Paste an image with Ctrl+V to attach it at the cursor.</div>
 </div>
 
 <!-- numeric fields: company only -->
 <div class="card" id="blk_pt">
-  <label>Price targets</label>
-  <div class="row">
-    <div><input type="number" id="f_ptb" step="1" placeholder="Buy — whole number"></div>
-    <div><input type="number" id="f_pts" step="1" placeholder="Sell — whole number"></div>
+  <div class="frow">
+    <label class="narrow">Targets</label>
+    <div class="f sm"><input type="number" id="f_ptb" step="1" placeholder="Buy"></div>
+    <div class="f sm"><input type="number" id="f_pts" step="1" placeholder="Sell"></div>
   </div>
   <div class="sub">Leave blank if this note does not change your target. Blank is not zero,
     and does not clear a previous target.</div>
 </div>
 
 <div class="card">
-  <div class="row">
-    <div>
-      <label for="f_conv">Conviction</label>
-      <select id="f_conv">
-        <option value="">&mdash;</option><option>High</option><option>Med</option><option>Low</option>
-      </select>
-    </div>
-    <div>
-      <label for="f_review">Review date</label>
-      <input type="date" id="f_review">
-    </div>
+  <div class="frow">
+    <label for="f_conv" class="narrow">Conviction</label>
+    <div class="f sm"><select id="f_conv">
+      <option value="">&mdash;</option><option>High</option><option>Med</option><option>Low</option>
+    </select></div>
+    <label for="f_review" style="flex:0 0 auto">Review date</label>
+    <div class="f sm"><input type="date" id="f_review"></div>
   </div>
   <div class="sub">A review date puts this record in the Review Queue on the Reports page.
     Use it for catalysts &mdash; a rulemaking deadline, an expected disclosure.</div>
@@ -125,7 +128,7 @@
   <div class="chips" id="chips"></div>
   <details style="margin-top:7px">
     <summary>Add a tag manually</summary>
-    <input type="text" id="tagsearch" placeholder="filter tags&hellip;" autocomplete="off" style="margin-top:6px">
+    <input type="text" id="tagsearch" placeholder="Filter tags" autocomplete="off" style="margin-top:6px">
     <div class="picker" id="picker"></div>
   </details>
 </div>
@@ -169,8 +172,6 @@ function setMode(m){
   $("#modehint").textContent = m==="Company"
     ? "A note about one company. Ticker required. Price targets and conviction attach to you."
     : "A note about a theme or a catalyst. Lists the tickers the theme touches.";
-  $("#f_subject").placeholder = m==="Company"
-    ? "Q2 channel check" : "GENIUS Act rulemaking — rewards question";
   localStorage.setItem("rc_mode",m);
   renderTags();
 }

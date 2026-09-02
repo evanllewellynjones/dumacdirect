@@ -35,12 +35,13 @@
 <!-- COMPANY -->
 <div id="v_company">
   <div class="card">
-    <label for="q_ticker">Ticker</label>
-    <input type="text" id="q_ticker" list="alltkr" class="mono"
-           placeholder="start typing a ticker&hellip;" autocomplete="off"
-           style="text-transform:uppercase">
-    <datalist id="alltkr"></datalist>
-    <div class="sub" id="tkrsummary"></div>
+    <div class="frow">
+      <label for="q_ticker" class="narrow">Ticker</label>
+      <div class="f sm"><input type="text" id="q_ticker" list="alltkr" class="mono"
+             placeholder="Ticker" autocomplete="off" style="text-transform:uppercase">
+        <datalist id="alltkr"></datalist></div>
+      <div class="f tiny" id="tkrsummary"></div>
+    </div>
   </div>
   <div id="company_out"></div>
 </div>
@@ -48,8 +49,11 @@
 <!-- THEME -->
 <div id="v_theme" class="hide">
   <div class="card">
-    <label for="q_theme">Theme</label>
-    <select id="q_theme"></select>
+    <div class="frow">
+      <label for="q_theme" class="narrow">Theme</label>
+      <div class="f md"><select id="q_theme"></select></div>
+      <div class="f"></div>
+    </div>
   </div>
   <div id="theme_out"></div>
 </div>
@@ -57,18 +61,15 @@
 <!-- REVIEW -->
 <div id="v_review" class="hide">
   <div class="card">
-    <div class="row">
-      <div style="flex:2">
-        <label>Show</label>
-        <select id="q_revstatus">
-          <option value="open">Open only</option>
-          <option value="all">All, including done</option>
-        </select>
-      </div>
-      <div style="flex:3">
-        <label>Contributor</label>
-        <select id="q_revwho"><option value="">Everyone</option></select>
-      </div>
+    <div class="frow">
+      <label for="q_revstatus" class="narrow">Show</label>
+      <div class="f md"><select id="q_revstatus">
+        <option value="open">Open only</option>
+        <option value="all">All, including done</option>
+      </select></div>
+      <label for="q_revwho" style="flex:0 0 auto">Contributor</label>
+      <div class="f md"><select id="q_revwho"><option value="">Everyone</option></select></div>
+      <div class="f"></div>
     </div>
   </div>
   <div id="review_out"></div>
@@ -77,19 +78,13 @@
 <!-- SEARCH -->
 <div id="v_search" class="hide">
   <div class="card">
-    <div class="row">
-      <div style="flex:3">
-        <label for="q_text">Text</label>
-        <input type="text" id="q_text" placeholder="subject or note body&hellip;" autocomplete="off">
-      </div>
-      <div style="flex:2">
-        <label for="q_tag">Tag</label>
-        <select id="q_tag"><option value="">Any tag</option></select>
-      </div>
-      <div style="flex:2">
-        <label for="q_who">Contributor</label>
-        <select id="q_who"><option value="">Everyone</option></select>
-      </div>
+    <div class="frow">
+      <label for="q_text" class="narrow">Text</label>
+      <div class="f"><input type="text" id="q_text" placeholder="Search" autocomplete="off"></div>
+      <label for="q_tag" style="flex:0 0 auto">Tag</label>
+      <div class="f md"><select id="q_tag"><option value="">Any tag</option></select></div>
+      <label for="q_who" style="flex:0 0 auto">Contributor</label>
+      <div class="f md"><select id="q_who"><option value="">Everyone</option></select></div>
     </div>
   </div>
   <div id="search_out"></div>
@@ -391,9 +386,14 @@ function reviewRow(n){
   const line=el("div","meta");
   line.textContent="\u2192 "+(n.record_type||"")+"  \u00b7  "+tgt;
   d.appendChild(line);
+  const me=localStorage.getItem("rc_contributor")||"";
+  const mine = !n.contributor || n.contributor===me;
   const btn=el("button","btn",n.review_status==="Done"?"Reopen":"Mark done");
   btn.style.marginTop="5px";
+  btn.disabled=!mine;
+  if(!mine) btn.title="Only "+n.contributor+" can close this review.";
   btn.onclick=async()=>{
+    if(!mine) return;
     btn.disabled=true;
     const next=n.review_status==="Done"?"Pending":"Done";
     try{

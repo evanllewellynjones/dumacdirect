@@ -1,0 +1,639 @@
+{
+  "config_version": 2,
+  "config_updated": "2026-09-02T01:15:29.451Z",
+  "config_updated_by": "(seeded)",
+  "maxTags": 8,
+  "contributors": [
+    "Evan Jones",
+    "Ana Anderson",
+    "Brandon Gall",
+    "William Hockett",
+    "Ian Jennings"
+  ],
+  "themes": [
+    "Asset Tokenization",
+    "Crypto Asset Beneficiaries",
+    "Physical AI",
+    "PQC Migration",
+    "Cybersecurity Tailwind",
+    "Energy Transition"
+  ],
+  "taxonomy": {
+    "AQR": {
+      "AQR": "s"
+    },
+    "ASEAN": {
+      "ASEAN": "n"
+    },
+    "Aerospace & Defense": {
+      "Aerospace & Defense": "n",
+      "Aero": "n",
+      "Defense": "a",
+      "Aerospace": "n",
+      "A&D": "s"
+    },
+    "Africa": {
+      "Africa": "n"
+    },
+    "Analysts": {
+      "Analysts": "a"
+    },
+    "Artificial Intelligence": {
+      "Artificial Intelligence": "n",
+      "AI": "s",
+      "ArtificialIntelligence": "n"
+    },
+    "Asset Allocation": {
+      "Asset Allocation": "n",
+      "AA": "s",
+      "AssetAllocation": "n"
+    },
+    "BioTech": {
+      "BioTech": "n"
+    },
+    "Bitcoin": {
+      "Bitcoin": "n",
+      "BTC": "s"
+    },
+    "Blockchain": {
+      "Blockchain": "n"
+    },
+    "Books": {
+      "Books": "a"
+    },
+    "Brazil": {
+      "Brazil": "n",
+      "BR": "s"
+    },
+    "Bridgewater": {
+      "Bridgewater": "n"
+    },
+    "Bubbles & Manias": {
+      "Bubbles & Manias": "n",
+      "Bubbles": "n",
+      "Manias": "n"
+    },
+    "Cannabis": {
+      "Cannabis": "n"
+    },
+    "Carbon": {
+      "Carbon": "n"
+    },
+    "Carbon Allowances": {
+      "Carbon Allowances": "n",
+      "CarbonAllowances": "n",
+      "CCA": "s"
+    },
+    "Casinos & Gaming": {
+      "Casinos & Gaming": "n",
+      "Casinos": "n",
+      "Gaming": "n"
+    },
+    "Chile": {
+      "Chile": "n",
+      "CL": "s"
+    },
+    "China": {
+      "China": "n",
+      "CN": "s"
+    },
+    "Climate Change": {
+      "Climate Change": "n",
+      "Climate": "n",
+      "ClimateChange": "n"
+    },
+    "Colombia": {
+      "Colombia": "n"
+    },
+    "Commodities": {
+      "Commodities": "n"
+    },
+    "Commodity Futures": {
+      "Commodity Futures": "n",
+      "CmdtyFutures": "n",
+      "CommodityFutures": "n"
+    },
+    "Communication Services": {
+      "Communication Services": "n",
+      "CommServices": "n",
+      "CommunicationServices": "n"
+    },
+    "Company Research": {
+      "Company Research": "n",
+      "Research": "a",
+      "CompanyResearch": "n"
+    },
+    "Conference": {
+      "Conference": "a"
+    },
+    "Consumer": {
+      "Consumer": "n"
+    },
+    "Consumer Discretionary": {
+      "Consumer Discretionary": "n",
+      "ConsDisc": "n",
+      "ConsumerDiscretionary": "n",
+      "Discretionary": "n"
+    },
+    "Consumer Staples": {
+      "Consumer Staples": "n",
+      "Staples": "n",
+      "ConsumerStaples": "n"
+    },
+    "Copper": {
+      "Copper": "n"
+    },
+    "Corporate Profits": {
+      "Corporate Profits": "n",
+      "CorpProfits": "n",
+      "CorporateProfits": "n",
+      "Profits": "a"
+    },
+    "Crashes": {
+      "Crashes": "a"
+    },
+    "Crypto": {
+      "Crypto": "n"
+    },
+    "Cryptography": {
+      "Cryptography": "n"
+    },
+    "Currencies": {
+      "Currencies": "n",
+      "FX": "s"
+    },
+    "Cybersecurity": {
+      "Cybersecurity": "n",
+      "Cyber": "n"
+    },
+    "Daily Reports": {
+      "Daily Reports": "n",
+      "DailyReports": "n",
+      "DirectDaily": "n"
+    },
+    "Data Centers": {
+      "Data Centers": "n"
+    },
+    "De-Globalization": {
+      "De-Globalization": "n",
+      "Deglobalization": "n"
+    },
+    "Defense RV": {
+      "Defense RV": "n",
+      "DefenseRV": "n"
+    },
+    "Deflation": {
+      "Deflation": "n"
+    },
+    "Demographics": {
+      "Demographics": "n"
+    },
+    "Direct Process": {
+      "Direct Process": "n",
+      "Process": "a"
+    },
+    "Drones": {
+      "Drones": "n"
+    },
+    "E-Commerce": {
+      "E-Commerce": "n",
+      "Ecommerce": "n",
+      "Ecomm": "n"
+    },
+    "ESG": {
+      "ESG": "s"
+    },
+    "Edge Computing": {
+      "Edge Computing": "n"
+    },
+    "Egypt": {
+      "Egypt": "n"
+    },
+    "Electric Vehicles": {
+      "Electric Vehicles": "n",
+      "EV": "s",
+      "EVs": "n"
+    },
+    "Emerging Markets": {
+      "Emerging Markets": "n",
+      "EM": "s",
+      "EmergingMkts": "n"
+    },
+    "Endowments": {
+      "Endowments": "n",
+      "Peers": "a"
+    },
+    "Energy": {
+      "Energy": "n"
+    },
+    "Energy Equities": {
+      "Energy Equities": "n",
+      "EnergyEquities": "n"
+    },
+    "Environments": {
+      "Environments": "n",
+      "Macro": "a"
+    },
+    "Equity Valuation": {
+      "Equity Valuation": "n",
+      "EquityValuation": "n",
+      "Valuations": "a",
+      "Valuation": "a"
+    },
+    "Ethereum": {
+      "Ethereum": "n",
+      "ETH": "s"
+    },
+    "Europe": {
+      "Europe": "n",
+      "EU": "s"
+    },
+    "Europe RV": {
+      "Europe RV": "n",
+      "EuropeRV": "n"
+    },
+    "Factors": {
+      "Factors": "n"
+    },
+    "Financial Conditions": {
+      "Financial Conditions": "n",
+      "FinancialConditions": "n",
+      "FCI": "s"
+    },
+    "Financials": {
+      "Financials": "n",
+      "Banks": "n"
+    },
+    "Fintech": {
+      "Fintech": "n",
+      "Payments": "n"
+    },
+    "Frontier": {
+      "Frontier": "a",
+      "FrontierMkts": "a"
+    },
+    "Fundamental RV": {
+      "Fundamental RV": "n",
+      "FundaRV": "n",
+      "FundamentalRV": "n"
+    },
+    "Fundamentals": {
+      "Fundamentals": "a"
+    },
+    "GLP-1s": {
+      "GLP-1s": "n",
+      "GLP1": "n",
+      "GLP1s": "n",
+      "Weightloss": "n",
+      "Obesity": "n"
+    },
+    "GMO": {
+      "GMO": "s"
+    },
+    "Global Ideas": {
+      "Global Ideas": "n",
+      "GlobalIdeas": "n",
+      "DirectGlobalIdeas": "n"
+    },
+    "Gold": {
+      "Gold": "n"
+    },
+    "Gold Miners": {
+      "Gold Miners": "n",
+      "GoldMiners": "n"
+    },
+    "Greece": {
+      "Greece": "n"
+    },
+    "Growth": {
+      "Growth": "a"
+    },
+    "Hardware": {
+      "Hardware": "n"
+    },
+    "Health Care": {
+      "Health Care": "n",
+      "Healthcare": "n",
+      "HC": "s"
+    },
+    "High Yield Credit": {
+      "High Yield Credit": "n",
+      "HY": "s",
+      "HYCredit": "n",
+      "HighYield": "n"
+    },
+    "Highly Levered": {
+      "Highly Levered": "n",
+      "HighLeverage": "n",
+      "HighlyLevered": "n"
+    },
+    "Housing": {
+      "Housing": "n",
+      "Renovation": "n"
+    },
+    "Ideas": {
+      "Ideas": "a",
+      "Idea": "a"
+    },
+    "India": {
+      "India": "n"
+    },
+    "Indicators": {
+      "Indicators": "n"
+    },
+    "Industrial Metals": {
+      "Industrial Metals": "n",
+      "IndustrialMetals": "n"
+    },
+    "Industrials": {
+      "Industrials": "n"
+    },
+    "Inflation": {
+      "Inflation": "n",
+      "CPI": "s"
+    },
+    "Investment Approval": {
+      "Investment Approval": "n",
+      "Approval": "n"
+    },
+    "Japan": {
+      "Japan": "n"
+    },
+    "Korea": {
+      "Korea": "n",
+      "SouthKorea": "n"
+    },
+    "L1": {
+      "L1": "s"
+    },
+    "L2": {
+      "L2": "s"
+    },
+    "LatAm": {
+      "LatAm": "n",
+      "LatinAmerica": "n"
+    },
+    "Lodging": {
+      "Lodging": "n",
+      "Hotels": "n",
+      "Resorts": "n",
+      "Cruises": "n"
+    },
+    "Macro Actions": {
+      "Macro Actions": "n",
+      "MacroActions": "n"
+    },
+    "Manager Termination Exposures": {
+      "Manager Termination Exposures": "n",
+      "Termination": "a",
+      "Terminations": "a",
+      "Termination Exposures": "a",
+      "MgrTermination": "a"
+    },
+    "Managers": {
+      "Managers": "n"
+    },
+    "Market Bottoms": {
+      "Market Bottoms": "n",
+      "MktBottoms": "n",
+      "MarketBottoms": "n",
+      "Bottoms": "a"
+    },
+    "Materials": {
+      "Materials": "a"
+    },
+    "Metals & Mining": {
+      "Metals & Mining": "n",
+      "Metals": "n",
+      "Mining": "n",
+      "Miners": "n"
+    },
+    "Metaverse": {
+      "Metaverse": "n"
+    },
+    "Mexico": {
+      "Mexico": "n",
+      "MEX": "s",
+      "MX": "s"
+    },
+    "Momentum": {
+      "Momentum": "a",
+      "MOMO": "n"
+    },
+    "National Security": {
+      "National Security": "n"
+    },
+    "Natural Resources": {
+      "Natural Resources": "n",
+      "NR": "s",
+      "NatResources": "n",
+      "NaturalResources": "n"
+    },
+    "Office": {
+      "Office": "a"
+    },
+    "Oil & Gas": {
+      "Oil & Gas": "n",
+      "Oil": "n",
+      "Gas": "n"
+    },
+    "Performance Factsheet": {
+      "Performance Factsheet": "n",
+      "Factsheet": "n",
+      "Factsheets": "n"
+    },
+    "Peru": {
+      "Peru": "n"
+    },
+    "Pharma": {
+      "Pharma": "n"
+    },
+    "Power": {
+      "Power": "a",
+      "Electrification": "n",
+      "Electrify": "n"
+    },
+    "Precious Metals": {
+      "Precious Metals": "n"
+    },
+    "Private Credit": {
+      "Private Credit": "n",
+      "PrivateCredit": "n"
+    },
+    "Private Equity": {
+      "Private Equity": "n",
+      "PrivateEquity": "n",
+      "PE": "s",
+      "Buyout": "n",
+      "Privates": "n",
+      "Private": "n"
+    },
+    "Quality": {
+      "Quality": "a"
+    },
+    "Quality RV": {
+      "Quality RV": "n",
+      "QualityRV": "n"
+    },
+    "Quantum": {
+      "Quantum": "n"
+    },
+    "Quantum Computing": {
+      "Quantum Computing": "n",
+      "QuantumComputing": "n"
+    },
+    "REITs": {
+      "REITs": "n"
+    },
+    "RV": {
+      "RV": "s",
+      "EquityRV": "n"
+    },
+    "Real Estate": {
+      "Real Estate": "n",
+      "RE": "s",
+      "RealEstate": "n"
+    },
+    "Recession": {
+      "Recession": "n"
+    },
+    "Restaurants": {
+      "Restaurants": "n",
+      "FoodandBev": "n"
+    },
+    "Retail": {
+      "Retail": "n"
+    },
+    "Robotics": {
+      "Robotics": "n"
+    },
+    "Robotics Automation": {
+      "Robotics Automation": "n",
+      "Robots": "n",
+      "Automation": "n"
+    },
+    "SMR": {
+      "SMR": "s"
+    },
+    "SaaS": {
+      "SaaS": "n"
+    },
+    "Saudi Arabia": {
+      "Saudi Arabia": "n",
+      "Saudi": "n",
+      "SaudiArabia": "n",
+      "Saudis": "n"
+    },
+    "Sectors": {
+      "Sectors": "a"
+    },
+    "Sell-Side": {
+      "Sell-Side": "n",
+      "SellSide": "n"
+    },
+    "Semiconductors": {
+      "Semiconductors": "n",
+      "Semis": "n"
+    },
+    "Short Platform": {
+      "Short Platform": "n",
+      "Shorts": "a",
+      "ShortPlatform": "n"
+    },
+    "Software": {
+      "Software": "n"
+    },
+    "South Africa": {
+      "South Africa": "n",
+      "SouthAfrica": "n",
+      "ZA": "s"
+    },
+    "Space": {
+      "Space": "a"
+    },
+    "Swaps Financing": {
+      "Swaps Financing": "n",
+      "Financing": "a",
+      "FinancingCosts": "a"
+    },
+    "TCI": {
+      "TCI": "s"
+    },
+    "Taiwan": {
+      "Taiwan": "n"
+    },
+    "Technicals": {
+      "Technicals": "n"
+    },
+    "Technology": {
+      "Technology": "n",
+      "Tech": "n",
+      "InfoTech": "n"
+    },
+    "Themes": {
+      "Themes": "a"
+    },
+    "Tokens": {
+      "Tokens": "a",
+      "Tokenization": "n",
+      "Tokenized": "n",
+      "Tokenisation": "n",
+      "RWA": "s",
+      "Real World Assets": "n",
+      "RealWorldAssets": "n"
+    },
+    "Transportation": {
+      "Transportation": "n",
+      "Trucking": "n",
+      "Freight": "n",
+      "Rails": "n",
+      "Transport": "n"
+    },
+    "Turkey": {
+      "Turkey": "n"
+    },
+    "United States": {
+      "United States": "n",
+      "US": "s",
+      "USA": "s"
+    },
+    "Uranium": {
+      "Uranium": "n"
+    },
+    "Utilities": {
+      "Utilities": "n"
+    },
+    "VC Tech Hedge": {
+      "VC Tech Hedge": "n",
+      "VCHedge": "n",
+      "VCTechHedge": "n"
+    },
+    "VMQ RV": {
+      "VMQ RV": "n",
+      "VMQRV": "n"
+    },
+    "Value": {
+      "Value": "a"
+    },
+    "Value RV": {
+      "Value RV": "n",
+      "ValueRV": "n"
+    },
+    "Variant Perception": {
+      "Variant Perception": "n",
+      "VP": "s",
+      "VariantPerception": "n"
+    },
+    "Venture": {
+      "Venture": "n",
+      "VC": "s"
+    },
+    "Vietnam": {
+      "Vietnam": "n"
+    },
+    "Water": {
+      "Water": "a",
+      "PFAS": "n"
+    }
+  }
+}
