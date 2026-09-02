@@ -45,12 +45,17 @@
       <div class="f sm"><select id="q_pri">
         <option value="">Any</option><option>1</option><option>2</option><option>3</option>
         <option value="__none">Unset</option></select></div>
+      <label for="q_tag" style="flex:0 0 auto">Tag</label>
+      <div class="f md"><select id="q_tag"><option value="">Any tag</option></select></div>
       <label for="q_text" style="flex:0 0 auto">Text</label>
       <div class="f"><input type="text" id="q_text" placeholder="Search"></div>
     </div>
   </div>
 
   <div class="card">
+    <div class="frow" style="margin-bottom:6px">
+      <div class="f" id="recstatus" style="font-weight:600"></div>
+    </div>
     <div class="row" style="align-items:center;margin-bottom:7px">
       <div style="flex:0 0 auto"><b id="selcount" class="tiny">0 selected</b></div>
       <div style="flex:0 0 auto">
@@ -66,14 +71,15 @@
         </select>
       </div>
       <div style="flex:0 0 auto"><button class="btn" id="btn_bulk">Apply to selected</button></div>
-      <div style="flex:1"></div>
+      <div class="tiny" style="flex:1">Bulk edit only. Records below load automatically
+        and the filters apply as you type.</div>
     </div>
     <div style="max-height:520px;overflow:auto">
       <table class="grid" id="rectbl">
         <thead><tr>
           <th style="width:22px"><input type="checkbox" id="selall" style="width:auto"></th>
           <th>Date</th><th>Type</th><th>Ticker</th><th>Entity</th>
-          <th>Subject</th><th>Contributor</th><th>Pri</th><th>Rev</th>
+          <th>Subject</th><th>Tags</th><th>Contributor</th><th>Pri</th><th>Rev</th>
         </tr></thead>
         <tbody></tbody>
       </table>
@@ -469,14 +475,15 @@ $("#btn_addtheme").onclick=async()=>{
 const SEL=new Set();
 function filtered(){
   const ns=RC.notes||[];
-  const ty=$("#q_type").value, w=$("#q_who").value,
-        pr=$("#q_pri").value, q=$("#q_text").value.trim().toLowerCase();
+  const ty=$("#q_type").value, w=$("#q_who").value, pr=$("#q_pri").value,
+        tg=$("#q_tag").value, q=$("#q_text").value.trim().toLowerCase();
   return ns.filter(n=>{
     if(ty==="__none"){ if(n.record_type) return false; }
     else if(ty && n.record_type!==ty) return false;
     if(w && n.contributor!==w) return false;
     if(pr==="__none"){ if(n.priority) return false; }
     else if(pr && String(n.priority)!==pr) return false;
+    if(tg && !(Array.isArray(n.tags)&&n.tags.includes(tg))) return false;
     if(q && !((n.subject||"")+" "+(n._body||"")).toLowerCase().includes(q)) return false;
     return true;
   });
@@ -498,15 +505,45 @@ function renderRecords(){
       ? n.tickers.length+" linked" : "")));
     tr.appendChild(el("td","",n.entity||""));
     tr.appendChild(el("td","",n.subject||""));
+    // Tags — clicking one filters the table to it, which is the reason
+    // to have the column at all rather than just reading them.
+    const tg=el("td","tagcell");
+    const list=Array.isArray(n.tags)?n.tags:[];
+    if(!list.length) tg.appendChild(el("span","tiny","\u2014"));
+    list.forEach((t,i)=>{
+      const a=el("span","tagpick",t);
+      a.title="Filter to "+t;
+      a.onclick=()=>{ $("#q_tag").value=t; renderRecords(); };
+      tg.appendChild(a);
+      if(i<list.length-1) tg.appendChild(document.createTextNode(" "));
+    });
+    tr.appendChild(tg);
     tr.appendChild(el("td","tiny",n.contributor||""));
     tr.appendChild(el("td","num",n.priority||""));
     tr.appendChild(el("td","num",n.revision||""));
     tb.appendChild(tr);
   }
+  if(!rows.length){
+    const tr=el("tr"); const td=el("td","");
+    td.colSpan=10;
+    const total=(RC.notes||[]).length;
+    td.appendChild(el("div","empty", total
+      ? "No records match the filters above. "+total+" record(s) exist \u2014 reset the filters."
+      : "No records found in "+notesLocation()+"."));
+    if(!total){
+      td.appendChild(el("div","tiny",
+        "Expected layout:  <granted folder>\\NOTES\\2026\\05\\<note_id>\\note.md   \u2014 "
+      + "or grant the NOTES folder itself, which also works. "
+      + "If you just unzipped the records, click Reload notes on the Config tab."));
+    }
+    tr.appendChild(td); tb.appendChild(tr);
+  }
   if(rows.length>400){
     const tr=el("tr"); const td=el("td","tiny","Showing first 400 of "+rows.length+".");
-    td.colSpan=9; tr.appendChild(td); tb.appendChild(tr);
+    td.colSpan=10; tr.appendChild(td); tb.appendChild(tr);
   }
+  $("#recstatus").textContent = (RC.notes||[]).length+" record(s) on disk in "
+    + notesLocation() + "  \u00b7  "+rows.length+" shown";
   updSel();
 }
 function updSel(){ $("#selcount").textContent=SEL.size+" selected"; }
@@ -554,7 +591,8 @@ function renderConfig(){
               ["tags",Object.keys(cfg.taxonomy).length],
               ["themes",(cfg.themes||[]).length],
               ["contributors",(cfg.contributors||[]).length],
-              ["records on disk",ns.length]];
+              ["records on disk",ns.length],
+              ["notes read from",notesLocation()]];
   const tb=$("#cfgmeta"); tb.innerHTML="";
   rows.forEach(([k,v])=>{ const tr=el("tr");
     tr.appendChild(el("td","tiny",k)); tr.appendChild(el("td","",String(v)));
@@ -629,12 +667,19 @@ async function boot(){
   const cfg=RC.cfg;
   const s=$("#q_who"); s.innerHTML='<option value="">Everyone</option>';
   (cfg.contributors||[]).forEach(c=>s.appendChild(new Option(c,c)));
+  const tgSel=$("#q_tag"), keep=tgSel.value;
+  tgSel.innerHTML='<option value="">Any tag</option>';
+  [...new Set((RC.notes||[]).flatMap(n=>Array.isArray(n.tags)?n.tags:[]))].sort()
+    .forEach(t=>tgSel.appendChild(new Option(t,t)));
+  tgSel.value=keep;
   setLock(UNLOCKED);
-  banner("");
+  const total=(RC.notes||[]).length;
+  banner(total ? "" : "Connected to "+RC.dir.name+" but found no notes. Looked in "
+       + notesLocation()+". Check that NOTES\\2026\\05\\ exists there.");
   renderRecords(); renderTags(); renderThemes(); renderConfig();
 }
 document.addEventListener("rc-folder",boot);
-["#q_type","#q_who","#q_pri"].forEach(s=>$(s).addEventListener("change",renderRecords));
+["#q_type","#q_who","#q_pri","#q_tag"].forEach(s=>$(s).addEventListener("change",renderRecords));
 $("#q_text").addEventListener("input",renderRecords);
 $("#tagfilter").addEventListener("input",renderTags);
 boot();
