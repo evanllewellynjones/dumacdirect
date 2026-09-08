@@ -75,8 +75,8 @@ t("observation ok", V({action:"observation"}).ok);
 t("reference ok", V({action:"reference"}).ok);
 t("position action w/o ticker warns not blocks",
   V({action:"initiate"}).ok && V({action:"initiate"}).warnings.length > 0);
-t("position action w/ ticker no warn",
-  V({action:"initiate", ticker:"WOLF"}).warnings.length === 0);
+t("position action w/ ticker: no ticker warning",
+  V({action:"initiate", ticker:"WOLF"}).warnings.every(w=>w.indexOf("ticker")<0));
 
 /* ================= v1.4: why ============================================ */
 
@@ -96,7 +96,8 @@ t("app ok",           V({action:"pass", origin:"app"}).ok);
 t("note-skill ok",    V({action:"pass", origin:"note-skill"}).ok);
 t("ingest ok",        V({action:"reference", origin:"ingest"}).ok);
 t("position-diff reserved and valid",
-  V({action:"trim", origin:"position-diff", ticker:"WOLF"}).ok);
+  V({action:"trim", origin:"position-diff", ticker:"WOLF",
+     strategy:"Direct Global Ideas"}).ok);
 eq("origins seeded into config", cfg.origins, C.ORIGINS);
 eq("actions seeded into config", cfg.actions, C.ACTIONS);
 
@@ -268,6 +269,144 @@ eq("invented tag reported not created", r1.missing, ["Nonexistent Tag"]);
 const r2 = C.resolveTagNames(["Gold","gold"], cfg);
 eq("dedupes", r2.tags, ["Gold"]);
 eq("empty input safe", C.resolveTagNames(null, cfg).tags, []);
+}
+
+/* ================= v1.5: screen linkage on a note ======================= */
+{
+const N = o => C.validateRecord(Object.assign(
+  {date:"2026-09-07",subject:"S",entity:"E",origin:"screen",action:"pass",why:"w"}, o), cfg);
+t("screen origin valid", N({}).ok);
+t("screen_id + version ok", N({screen_id:"quality-no-debt", screen_version:3}).ok);
+t("screen_id without version ERRORS", !N({screen_id:"quality-no-debt"}).ok);
+t("version without screen_id errors", !N({screen_version:3}).ok);
+t("non-numeric version errors", !N({screen_id:"q", screen_version:"three"}).ok);
+t("uppercase screen_id errors", !N({screen_id:"Quality-No-Debt", screen_version:1}).ok);
+t("run_id without screen_id errors", !N({run_id:"q_v1_2026-09-05"}).ok);
+t("matching run_id ok",
+  N({screen_id:"quality-no-debt",screen_version:3,run_id:"quality-no-debt_v3_2026-09-05"}).ok);
+const mm = N({screen_id:"quality-no-debt",screen_version:3,run_id:"other-screen_v3_2026-09-05"});
+t("mismatched run_id warns not blocks", mm.ok && mm.warnings.length>0);
+t("plain note needs none of it",
+  C.validateRecord({date:"2026-09-07",subject:"S",entity:"E",origin:"app",
+                    action:"observation",why:"w"}, cfg).ok);
+}
+
+/* ================= v1.5: run_id helpers ================================= */
+eq("runId built", C.runId("quality-no-debt",3,"2026-09-05"), "quality-no-debt_v3_2026-09-05");
+eq("screenPath", C.screenPath("quality-no-debt",3), "SCREENS/quality-no-debt/v3.md");
+eq("parseRunId round-trip", C.parseRunId("quality-no-debt_v3_2026-09-05"),
+   {screen_id:"quality-no-debt", version:3, date:"2026-09-05"});
+eq("parseRunId rejects junk", C.parseRunId("quality-no-debt-2026-09-05"), null);
+eq("parseRunId rejects bad date", C.parseRunId("q_v1_09-05-2026"), null);
+
+/* ================= v1.5: screen definition ============================== */
+{
+const base = { screen_id:"quality-no-debt", version:1, name:"Quality, no leverage",
+  owner:"Brandon Gall", status:"draft", universe:"Russell 1000", source:"FMP",
+  criteria:"revenue_growth_ttm > 5; price > sma_200; total_debt = 0",
+  runner:"screens/quality-no-debt.py", created:"2026-09-07" };
+const S = o => C.validateScreen(Object.assign({}, base, o));
+
+t("v1 valid", S({}).ok);
+t("no owner errors", !S({owner:""}).ok);
+t("no criteria errors", !S({criteria:""}).ok);
+t("no name errors", !S({name:""}).ok);
+t("bad status errors", !S({status:"active"}).ok);
+t("all statuses valid", C.SCREEN_STATUSES.every(st => S({status:st}).ok));
+t("uppercase screen_id errors", !S({screen_id:"Quality"}).ok);
+t("v1 supersedes errors", !S({supersedes:0}).ok);
+t("v3 supersedes 2 ok", S({version:3, supersedes:2}).ok);
+t("v3 supersedes 3 errors", !S({version:3, supersedes:3}).ok);
+t("v3 supersedes 4 errors", !S({version:3, supersedes:4}).ok);
+const orphan = S({version:2});
+t("v2 with no supersedes warns not blocks", orphan.ok && orphan.warnings.length>0);
+t("missing universe warns", S({universe:""}).ok && S({universe:""}).warnings.length>0);
+t("missing runner warns", S({runner:""}).ok && S({runner:""}).warnings.length>0);
+t("bad created date errors", !S({created:"09/07/2026"}).ok);
+
+const md = C.buildScreen(Object.assign({}, base, {version:3, supersedes:2,
+  tags:["Quality","Factors"], last_run:"2026-09-05"}),
+  "v2 was catching banks where zero debt is a data artifact.");
+const back = C.parseFM(md);
+eq("screen round-trip id", back.screen_id, "quality-no-debt");
+eq("screen version", back.version, "3");
+eq("supersedes", back.supersedes, "2");
+eq("criteria survives semicolons", back.criteria, base.criteria);
+eq("screen tags array", back.tags, ["Quality","Factors"]);
+eq("screen body", back._body, "v2 was catching banks where zero debt is a data artifact.");
+const skeys = md.match(/^---\n([\s\S]*?)\n---/)[1].split("\n").map(l=>l.slice(0,l.indexOf(":")));
+eq("screen order starts screen_id/version", skeys.slice(0,2), ["screen_id","version"]);
+}
+
+/* ================= v1.5: run sidecar ==================================== */
+{
+const base = { run_id:"quality-no-debt_v3_2026-09-05", screen_id:"quality-no-debt",
+  screen_version:3, run_date:"2026-09-05", data_as_of:"2026-09-04",
+  universe:"Russell 1000", source:"FMP",
+  criteria:"revenue_growth_ttm > 8; price > sma_200; total_debt = 0",
+  rows:340, runner:"screens/quality-no-debt.py", runtime_seconds:41, origin:"screen" };
+const R = o => C.validateRun(Object.assign({}, base, o));
+
+t("sidecar valid", R({}).ok);
+t("bad run_id errors", !R({run_id:"quality-no-debt-2026-09-05"}).ok);
+t("run_id/screen_id mismatch errors", !R({screen_id:"other"}).ok);
+t("run_id/version mismatch errors", !R({screen_version:2}).ok);
+t("missing criteria errors", !R({criteria:""}).ok);
+t("non-numeric rows errors", !R({rows:"lots"}).ok);
+const z = R({rows:0});
+t("zero rows warns not blocks", z.ok && z.warnings.length>0);
+const nd = R({data_as_of:""});
+t("missing data_as_of warns", nd.ok && nd.warnings.length>0);
+t("one hit is fine", R({rows:1}).ok);
+t("500 hits is fine", R({rows:500}).ok);
+
+const sc = C.parseFM(C.buildRunSidecar(base, "Mostly Japanese small caps."));
+eq("sidecar rows", sc.rows, "340");
+eq("sidecar criteria copied", sc.criteria, base.criteria);
+eq("sidecar origin", sc.origin, "screen");
+eq("sidecar body", sc._body, "Mostly Japanese small caps.");
+}
+
+/* ================= v1.5: strategy ======================================= */
+{
+const P = o => C.validateRecord(Object.assign(
+  {date:"2026-09-07",subject:"S",entity:"E",ticker:"WOLF",origin:"position-diff",
+   action:"trim",why:"w"}, o), cfg);
+t("position-diff without strategy ERRORS", !P({}).ok);
+t("position-diff with strategy ok", P({strategy:"Direct Global Ideas"}).ok);
+t("off-vocabulary strategy errors", !P({strategy:"DirectUS"}).ok);
+eq("strategies seeded", cfg.strategies, ["Direct Global Ideas","Direct US"]);
+
+const A = o => C.validateRecord(Object.assign(
+  {date:"2026-09-07",subject:"S",entity:"E",ticker:"WOLF",origin:"app",why:"w"}, o), cfg);
+const w = A({action:"initiate"});
+t("app position action w/o strategy warns not blocks", w.ok && w.warnings.length>0);
+t("app observation w/o strategy is silent on strategy",
+  A({action:"observation"}).warnings.every(x=>x.indexOf("strategy")<0));
+t("app position action with strategy no strategy warning",
+  A({action:"initiate",strategy:"Direct US"}).warnings.every(x=>x.indexOf("strategy")<0));
+
+/* the collision this field exists to prevent */
+const a=C.positionNoteId("2026-09-07","Wolfspeed","Evan Jones","Direct Global Ideas");
+const b=C.positionNoteId("2026-09-07","Wolfspeed","Evan Jones","Direct US");
+t("same name, same day, two strategies -> two ids", a!==b);
+eq("id shape", a, "2026-09-07_ej_wolfspeed_direct-global-ideas");
+eq("no strategy falls back to the plain id",
+   C.positionNoteId("2026-09-07","Wolfspeed","Evan Jones",null),
+   "2026-09-07_ej_wolfspeed");
+
+/* round-trip */
+const rt=C.parseFM(C.buildFM({strategy:"Direct Global Ideas",action:"trim",
+  why:"sizing, not thesis",ticker:"WOLF"},"b"));
+eq("strategy round-trip", rt.strategy, "Direct Global Ideas");
+const keys=C.buildFM({strategy:"x",action:"y"},"b").match(/^---\n([\s\S]*?)\n---/)[1]
+  .split("\n").map(l=>l.slice(0,l.indexOf(":")));
+t("strategy immediately before action", keys.indexOf("strategy")===keys.indexOf("action")-1);
+
+/* email header */
+eq("STRATEGY email key",
+   C.parseEmailHeaders("STRATEGY: Direct US\nACTION: trim\n\nb").fields.strategy,
+   "Direct US");
 }
 
 console.log("\n" + pass + " passed, " + fail + " failed");

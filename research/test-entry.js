@@ -36,7 +36,7 @@ const IDS = ["msg","banner","m_company","m_theme","m_note","blk_company","blk_th
   "blk_note","blk_pt","modehint","f_date","f_contrib","f_entity","f_ticker","f_listed",
   "tickerhint","f_theme","tkradd","tkrbtn","tkrchips","tkrcount","f_topic","f_subject",
   "f_note","f_action","actionhint","f_why","whycount","row_source","f_source",
-  "row_outcome","f_outcome","f_ptb","f_pts","f_conv","f_review","tagcount","chips",
+  "row_outcome","f_outcome","f_strategy","strathint","f_ptb","f_pts","f_conv","f_review","tagcount","chips",
   "tagsearch","picker","drop","filein","atts","pastebox","btn_paste","pastemsg",
   "btn_save","btn_clear","folder","entlist","tkrlist"];
 IDS.forEach(i => DOM["#"+i] = makeEl(i));
@@ -102,7 +102,9 @@ vm.runInContext(`
   globalThis.parseFM=parseFM; globalThis.save=save; globalThis.setMode=setMode;
   globalThis.clearForm=clearForm; globalThis.onAction=onAction;
   globalThis.loadPasted=loadPasted; globalThis.buildActions=buildActions;
-  globalThis.buildRecord=buildRecord; globalThis.validateRecord=validateRecord;
+  globalThis.positionNoteId=positionNoteId;
+  globalThis.buildRecord=buildRecord;
+  globalThis.POSITION_ACTIONS=POSITION_ACTIONS; globalThis.validateRecord=validateRecord;
 `, sandbox);
 
 /* seed config + a fake connected folder */
@@ -287,6 +289,43 @@ sandbox.onAction();
   eq("outcome cleared", DOM["#f_outcome"].value, "");
   eq("topic cleared", DOM["#f_topic"].value, "");
   eq("pastebox cleared", DOM["#pastebox"].value, "");
+
+  /* ================= strategy ========================================== */
+  reset(); sandbox.setMode("Company");
+  set("f_date","2026-09-07"); set("f_subject","Wolfspeed trim");
+  set("f_entity","Wolfspeed Inc"); set("f_ticker","WOLF");
+  set("f_action","trim"); set("f_why","sizing, not thesis");
+  set("f_strategy","Direct Global Ideas");
+  await sandbox.save();
+  eq("strategy stored", lastNote().fm.strategy, "Direct Global Ideas");
+
+  /* off-vocabulary strategy is rejected */
+  reset(); sandbox.setMode("Company");
+  set("f_date","2026-09-07"); set("f_subject","Bad strategy");
+  set("f_entity","Wolfspeed Inc"); set("f_ticker","WOLF");
+  set("f_action","trim"); set("f_why","w"); set("f_strategy","DirectUS");
+  await sandbox.save();
+  eq("invented strategy blocks the write", Object.keys(FILES).length, 0);
+
+  /* position action with no strategy warns but saves */
+  reset(); sandbox.setMode("Company");
+  set("f_date","2026-09-07"); set("f_subject","No strategy");
+  set("f_entity","Wolfspeed Inc"); set("f_ticker","WOLF");
+  set("f_action","initiate"); set("f_why","w"); set("f_strategy","");
+  await sandbox.save();
+  eq("no strategy still saves", lastNote().fm.strategy, null);
+  t("warning surfaced", DOM["#banner"].textContent.indexOf("strategy") >= 0);
+
+  /* strategy survives clearForm — it is sticky on purpose */
+  set("f_strategy","Direct US"); sandbox.clearForm(true);
+  eq("strategy sticky across clear", DOM["#f_strategy"].value, "Direct US");
+
+  /* two strategies, same name, same day — distinct ids */
+  eq("positionNoteId separates strategies",
+     [sandbox.positionNoteId("2026-09-07","Wolfspeed","Evan Jones","Direct Global Ideas"),
+      sandbox.positionNoteId("2026-09-07","Wolfspeed","Evan Jones","Direct US")],
+     ["2026-09-07_ej_wolfspeed_direct-global-ideas",
+      "2026-09-07_ej_wolfspeed_direct-us"]);
 
   console.log("\n" + pass + " passed, " + fail + " failed");
   process.exit(fail ? 1 : 0);

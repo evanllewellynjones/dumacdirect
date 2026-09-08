@@ -251,12 +251,12 @@ accumulate. Accumulating is probably right.
 
 ## 10. Implementation status
 
-**`rc-core.js` — done, 123 assertions passing under Node.** Sites touched:
+**`rc-core.js` — done, 187 assertions passing under Node.** Sites touched:
 
 1. `ACTIONS` / `ORIGINS` constants and the `actions` / `origins` seed keys
 2. `loadConfig()` backfill list extended by two keys
 3. `matchTags()` longest-match-wins — `includes()` replaced with the
-   boundary-checked `termContains()` (§15)
+   boundary-checked `termContains()` (§17)
 4. `FM_ORDER` extended by five fields, none removed; `buildFM()` split out
    `fmLine()` and gained unknown-key passthrough
 5. `validateRecord()` added
@@ -265,6 +265,10 @@ accumulate. Accumulating is probably right.
 7. `email` added to `ORIGINS`; `parseEmailHeaders()`, `normKey()` and
    `resolveTagNames()` added (§12)
 8. `canSetWhy()` added for the write-once rule (§13.1)
+8a. `screen` added to `ORIGINS`; `screen_id` / `screen_version` / `run_id` added
+   to `FM_ORDER` and validated; `SCREEN_STATUSES`, `validateScreen()`,
+   `buildScreen()`, `validateRun()`, `buildRunSidecar()`, `runId()`,
+   `screenPath()`, `parseRunId()` added (§14)
 9. Node shim appended so `/note` and the email reader can `require()` the same
    file
 
@@ -273,7 +277,8 @@ accumulate. Accumulating is probably right.
 
 **Still to do:**
 
-- `entry.html` — third mode button for Note (§11); action dropdown above
+- **entry.html — done**, 70 assertions passing headless (`test-entry.js`)
+- `entry.html` (delivered) — third mode button for Note (§11); action dropdown above
   Subject (it's the first decision, not the last); `why` directly under it;
   `source` shown only when `action: observation`; `origin: app` on every save;
   call `validateRecord()` before writing; paste-note box (textarea →
@@ -284,6 +289,7 @@ accumulate. Accumulating is probably right.
 - `admin.html` — `action` / `why` / `origin` columns; `origin` filter (§6);
   `Note` in the record_type filter and bulk setter
 - email reader: Task Scheduler script (§12.3)
+- one screen end to end before `screens.html` (§14.6)
 - backfill script (§8.1)
 - ingestion writes `origin: ingest` / `action: reference` (§8.2)
 - `/note` SKILL.md
@@ -451,7 +457,249 @@ keeps "a changed view is a new record" intact while letting the queue work.
 
 ---
 
-## 14. Corrections to the first draft of this delta
+## 14. Screens and runs
+
+Three artifacts get bundled into the word "agent." Separating them decides the
+design:
+
+- **The screen definition** — thresholds, universe, source. Tuned over time.
+- **The run** — what it returned on a date. Immutable fact.
+- **The reaction** — what someone thought about a name it surfaced. A note.
+
+```
+Direct Team Library/
+  NOTES/                             ← immutable records (existing)
+  SCREENS/
+    quality-no-debt/
+      v1.md
+      v2.md
+      v3.md
+  RUNS/
+    2026/09/
+      quality-no-debt_v3_2026-09-05.csv     ← opens in Excel
+      quality-no-debt_v3_2026-09-05.md      ← sidecar
+      quality-no-debt_latest.csv            ← stable path for a workbook
+```
+
+**Screens do not live in `NOTES/`.** A note is immutable; a screen is not —
+thresholds get tuned, status moves `draft → live → retired`. Different
+lifecycle, different tree. Folder per screen rather than flat, because a screen
+is a durable entity with history and "show me all three versions" should be a
+directory listing.
+
+Same flat frontmatter throughout, so `parseFM()` reads all three file types
+unchanged and the index page walks `SCREENS/` with the same code shape as
+`walkNotes()`.
+
+### 14.1 Screen definition
+
+```yaml
+---
+screen_id: quality-no-debt
+version: 3
+name: Quality compounders, no leverage
+owner: Brandon Gall
+status: testing              # draft | testing | live | retired
+supersedes: 2
+universe: Russell 1000 ex-financials
+source: FMP
+criteria: "revenue_growth_ttm > 8; price > sma_200; total_debt = 0"
+runner: screens/quality-no-debt.py
+cadence: weekly
+created: 2026-09-07
+last_run: 2026-09-05
+tags: ["Quality", "Factors"]
+---
+
+v2 was catching banks where zero "debt" is a data artifact. Excluded financials.
+```
+
+**Criteria are immutable; everything else is not.** Changing a threshold from
+5% to 8% creates `v2.md`. It never edits `v1.md`, because v1's historical runs
+are meaningless if what produced them can be silently redefined. Same
+immutable/mutable split that governs notes, applied to a different object.
+
+`criteria` is a human-readable line. The executable logic lives in the runner
+script. Do not try to make the YAML executable — that is a config language you
+would then have to maintain.
+
+`supersedes` makes the chain explicit so the index renders v1 → v2 → v3 rather
+than inferring it from numbers. Missing on a v2+ is a warning, not an error.
+`owner` is required: a screen with no owner rots.
+
+### 14.2 Run sidecar
+
+Every run CSV gets an `.md` next to it. A CSV alone loses provenance — six
+months later the screen definition it points at may have been superseded twice,
+so the run cannot be reproduced or even read honestly.
+
+```yaml
+---
+run_id: quality-no-debt_v3_2026-09-05
+screen_id: quality-no-debt
+screen_version: 3
+run_date: 2026-09-05
+data_as_of: 2026-09-04
+universe: Russell 1000 ex-financials
+source: FMP
+criteria: "revenue_growth_ttm > 8; price > sma_200; total_debt = 0"
+rows: 340
+runner: screens/quality-no-debt.py
+runtime_seconds: 41
+origin: screen
+---
+
+Mostly Japanese small caps. Threshold is probably still too loose.
+```
+
+`criteria` is **copied in**, not referenced. That duplication is deliberate and
+is the whole point of the sidecar.
+
+`run_id` format is `<screen_id>_v<n>_<YYYY-MM-DD>`, parseable by
+`parseRunId()`, so a hand-typed run_id on a note can be checked rather than
+trusted.
+
+### 14.3 Linking analysis back
+
+Three optional fields on the note schema:
+
+```yaml
+screen_id: quality-no-debt
+screen_version: 3
+run_id: quality-no-debt_v3_2026-09-05
+```
+
+Which gives you:
+
+| Question | Filter |
+|---|---|
+| Everything ever written about this screen | `screen_id` |
+| What we thought of v2 versus v3 | group by `screen_version` |
+| What we said about this specific run | `run_id` |
+
+**`screen_version` is required whenever `screen_id` is set** — an error, not a
+warning. Without it, three years of notes on a screen whose criteria changed
+twice are one undifferentiated pile, and you cannot tell whether a note is
+praising v1's output or v3's. That is the single failure mode this whole
+section exists to prevent.
+
+`origin: screen` for anything the runner files automatically.
+
+### 14.4 One hit or five hundred
+
+Two different notes, and the schema should let you tell them apart:
+
+- **About the run** — "v3 returned 340, mostly Japanese small caps, threshold
+  too loose." `record_type: Note`, carries `run_id`, no ticker.
+- **About one name it surfaced** — "Looked at this one, passing on valuation."
+  `record_type: Company`, ticker set, `action: pass`, `why` filled, plus
+  `screen_id` / `screen_version` / `run_id`.
+
+The second is the point. It is how "screens we ran" becomes "screens that found
+things we acted on," which is the dataset the pattern-recognition work actually
+needs.
+
+### 14.5 Where the work happens
+
+Use the LLM to **write** the screen, not to execute it.
+
+A filter over a data table is deterministic. An agent evaluating it in-context
+is slower, more expensive, non-reproducible across runs, and will occasionally
+get a number wrong in a way that looks entirely plausible. At an investment
+office where someone may have to reconstruct why a name appeared on a list,
+that is a liability rather than a theoretical concern.
+
+| Task | Tool |
+|---|---|
+| Write and iterate the runner | Claude Code — write, run, inspect, fix |
+| Explore data while designing a screen | MCP, interactively |
+| Interpret a run, compare to last week | Claude chat reading `RUNS/` from disk |
+| Execute the scheduled run | Plain Python calling the API directly |
+
+**The scheduled runner does not go through MCP.** MCP is an interactive
+protocol with auth and rate limits; a scheduled job wants a direct API call, or
+it depends on a connector session staying alive. Task Scheduler fires the
+script — same shape as the email reader, no new infrastructure.
+
+Excel: CSV opens natively. The `_latest.csv` per screen gives a workbook a
+stable path to refresh against.
+
+### 14.6 Build order
+
+Do **not** start with the index page. Have one person take one screen end to
+end — definition file, runner script, CSV plus sidecar, and one note filed
+against a hit. The `SCREENS/` schema will be wrong in at least two places, and
+finding that out with one file costs nothing.
+
+`screens.html` as a fourth mode alongside Entry / Reports / Admin comes after
+that: walks `SCREENS/`, table of name / owner / status / cadence / last run /
+hits, each row linking to its latest run and to the notes carrying that
+`screen_id`. That last link is what makes it an index rather than a list, and
+it is the cheapest answer to "what are we actually running?" — the question
+that gets embarrassing at about eight screens.
+
+---
+
+## 15. `strategy`
+
+A position change is always scoped to a strategy. Direct Global Ideas trimming
+a name while Direct US adds to it is **two decisions with two reasons**, and a
+record that cannot say which one it belongs to is not answerable.
+
+```yaml
+strategy: Direct Global Ideas
+```
+
+Closed vocabulary in `_config.json` as `strategies`, Admin-edited, same shape
+as `themes`. Strategies change rarely, so a curated list costs nothing to
+maintain and keeps the field joinable — free text would produce `Direct US`,
+`DirectUS` and `Direct U.S.` inside a month and the grouping query would be
+worthless.
+
+Sits at the head of the decision block, immediately before `action`: it is the
+scope of the decision, not a label on it.
+
+### 15.1 Required where it matters, optional where it doesn't
+
+| Case | Rule |
+|---|---|
+| `origin: position-diff` | **error** if blank — the pipeline knows the strategy |
+| `initiate / add / trim / exit` from the app | warning if blank |
+| Anything else | silent |
+
+A hand-typed observation about a name is often not strategy-specific, so
+forcing it everywhere would train people to pick one at random, which is worse
+than blank.
+
+### 15.2 The collision this prevents
+
+Two strategies acting on the same ticker on the same day produce the same
+`note_id` under the existing scheme, and the dedupe suffix disambiguates them
+into `..._wolfspeed` and `..._wolfspeed-2` — which says nothing about which is
+which, and silently reverses if the runs happen in a different order.
+
+`positionNoteId()` puts the strategy in the id:
+
+```
+2026-09-07_ej_wolfspeed_direct-global-ideas
+2026-09-07_ej_wolfspeed_direct-us
+```
+
+Falls back to the plain id when no strategy is set, so nothing about existing
+records changes.
+
+### 15.3 Sticky in the form
+
+`entry.html` remembers the last strategy in `localStorage` and **does not clear
+it** between saves. Someone entering five records is almost always working in
+one strategy, and re-picking it each time is exactly the friction that gets
+skipped.
+
+`STRATEGY:` is also an email header key.
+
+---
+
+## 16. Corrections to the first draft of this delta
 
 | Claimed | Actual |
 |---|---|
@@ -462,7 +710,7 @@ keeps "a changed view is a new record" intact while letting the queue work.
 
 ---
 
-## 15. Bug fixed in passing
+## 17. Bugs fixed in passing
 
 `matchTags()` longest-match-wins compared raw substrings:
 
@@ -482,3 +730,11 @@ Any tag whose match term is a short acronym was exposed to this: `AI`, `EV`,
 `US`, `EM`, `PE`, `RV`, `HY`, `VP`, `BR`, `CL`, `CN`, `HC`, `FX`. **Records
 written before this fix have under-tagged frontmatter** and a re-tag pass over
 the corpus is worth running with the backfill in §8.1.
+
+
+### 17.1 Warning banner wiped on save
+
+`clearForm(true)` ran `banner("")` unconditionally, so a save that succeeded
+*with* warnings cleared them before they could be read — the one case where the
+warning is the entire point. Now the banner is only cleared on an explicit
+Clear, not after a save. Found by the strategy test, not by inspection.

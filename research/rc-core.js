@@ -132,7 +132,19 @@ async function readTextFile(dir,name){
    retroactive queries, which is why all four origins exist from the start.
    ========================================================================== */
 const ACTIONS = ["initiate","add","trim","exit","pass","observation","reference"];
-const ORIGINS = ["app","note-skill","ingest","email","position-diff"];
+const ORIGINS = ["app","note-skill","ingest","email","screen","position-diff"];
+
+/* Screen definition lifecycle. A screen is a durable entity with history,
+   unlike a note — hence SCREENS/<screen_id>/v<n>.md rather than a flat tree. */
+const SCREEN_STATUSES = ["draft","testing","live","retired"];
+
+/* Criteria are immutable. Changing a threshold makes v2; it never edits v1,
+   because v1's historical runs mean nothing if what produced them can be
+   silently redefined. Everything else on a screen is freely editable. */
+const SCREEN_IMMUTABLE = ["screen_id","version","criteria","universe","source","created"];
+
+const SCREEN_ORDER = ["screen_id","version","name","owner","status","supersedes",
+  "universe","source","criteria","runner","cadence","created","last_run","tags"];
 
 /* Company — one listed or private name, ticker required.
    Theme    — an Admin-curated theme from cfg.themes, carries a ticker list.
@@ -162,6 +174,11 @@ const SEED = {
   maxTags: 8,
   actions: ACTIONS.slice(),
   origins: ORIGINS.slice(),
+  /* Closed vocabulary, Admin-edited, same as themes. Strategies change rarely,
+     so a curated list costs nothing to maintain and keeps the field joinable —
+     free text here would produce "Direct US", "DirectUS" and "Direct U.S."
+     within a month and the grouping query would be worthless. */
+  strategies: ["Direct Global Ideas","Direct US"],
   contributors: ["Evan Jones","Ana Anderson","Brandon Gall","William Hockett","Ian Jennings"],
   themes: ["Asset Tokenization","Crypto Asset Beneficiaries","Physical AI",
            "PQC Migration","Cybersecurity Tailwind","Energy Transition"],
@@ -335,7 +352,8 @@ async function loadConfig(){
   // tolerate a hand-edited file, and a config written before v1.4, that is
   // missing keys. actions/origins backfill here so no _config.json edit is
   // needed on upgrade.
-  for(const k of ["contributors","themes","taxonomy","maxTags","actions","origins"])
+  for(const k of ["contributors","themes","taxonomy","maxTags","actions",
+                  "origins","strategies"])
     if(RC.cfg[k]===undefined) RC.cfg[k]=SEED[k];
   return RC.cfg;
 }
@@ -411,11 +429,17 @@ function parseFM(text){
 /* Field order is fixed so hand-inspection of note.md is predictable.
    v1.4 adds origin (after contributor, it is provenance) and the decision
    block action/why/source/outcome_check_date (after subject, before tags).
+   v1.5 adds strategy at the head of the decision block — a position change is
+   always scoped to a strategy, and the same name held in two strategies is two
+   separate decisions with two separate reasons — plus the screen linkage block
+   screen_id / screen_version / run_id, so a note can be traced to the exact
+   screen version that surfaced the name.
    Nothing was removed — listed, tickers, review_date and priority all stay
    exactly where they were. */
 const FM_ORDER = ["note_id","date","created","last_updated","contributor","origin",
   "record_type","entity","ticker","listed","tickers","subject",
-  "action","why","source","outcome_check_date","tags",
+  "strategy","action","why","source","outcome_check_date",
+  "screen_id","screen_version","run_id","tags",
   "attachments","price_target_buy","price_target_sell","conviction",
   "review_date","review_status","priority","revision"];
 
@@ -527,7 +551,53 @@ function validateRecord(rec, cfg){
   if(Array.isArray(rec.tags) && rec.tags.length>mx)
     errors.push("Tag cap of "+mx+" exceeded.");
 
+  /* --- screen linkage (v1.5) ---
+     screen_version is the field people forget. Without it, notes on a screen
+     whose criteria changed twice are one undifferentiated pile and you cannot
+     tell whether a note is praising v1's output or v3's. So a screen_id with
+     no version is an error, not a warning. */
+  const sid=s("screen_id"), sver=s("screen_version"), rid=s("run_id");
+  if(sid && !/^[a-z0-9][a-z0-9-]{0,59}$/.test(sid))
+    errors.push("screen_id must be lowercase letters, digits and hyphens.");
+  if(sid && !sver)
+    errors.push("screen_version is required when screen_id is set \u2014 "
+              + "criteria change between versions.");
+  if(sver && !/^\d+$/.test(sver))
+    errors.push("screen_version must be a whole number.");
+  if(sver && !sid) errors.push("screen_version without a screen_id.");
+  if(rid && !sid) errors.push("run_id without a screen_id.");
+  if(rid && sid && rid.indexOf(sid)!==0)
+    warnings.push("run_id does not start with the screen_id \u2014 check it "
+                + "refers to this screen.");
+
+  /* --- strategy (v1.5) ---
+     A position change is always scoped to a strategy. Direct Global Ideas
+     trimming a name while Direct US adds to it is two decisions with two
+     reasons, and a record that cannot say which one it belongs to is not
+     answerable. Required on anything the position-diff pipeline writes; a
+     warning elsewhere, because a hand-typed observation about a name is often
+     not strategy-specific. */
+  const strat = s("strategy");
+  const strategies = c.strategies || [];
+  if(strat && strategies.length && strategies.indexOf(strat)<0)
+    errors.push("strategy must be one of: "+strategies.join(", ")
+              + ". Add it in Admin if it is missing.");
+  if(origin==="position-diff" && !strat)
+    errors.push("strategy is required on a position change.");
+  else if(POSITION_ACTIONS.indexOf(action)>=0 && !strat)
+    warnings.push("Position action with no strategy \u2014 this record cannot be "
+                + "grouped by strategy later.");
+
   return { errors, warnings, ok: errors.length===0 };
+}
+
+/* A position record is unique per strategy, not per name: two strategies can
+   act on the same ticker on the same day for opposite reasons. Without the
+   strategy in the id they collide and get an opaque "-2" suffix that says
+   nothing about which is which. */
+function positionNoteId(date, subject, contributor, strategy){
+  const base = date + "_" + initials(contributor) + "_" + slug(subject);
+  return strategy ? base + "_" + slug(strategy) : base;
 }
 
 /* ---------- write-once `why` --------------------------------------------- */
@@ -569,6 +639,7 @@ const EMAIL_KEYS = {
   ticker:"ticker", company:"entity", entity:"entity", theme:"entity",
   type:"record_type", recordtype:"record_type",
   action:"action", why:"why", source:"source", date:"date",
+  strategy:"strategy",
   tags:"tags", subject:"subject",
   buytarget:"price_target_buy", pricetargetbuy:"price_target_buy",
   selltarget:"price_target_sell", pricetargetsell:"price_target_sell",
@@ -624,6 +695,114 @@ function resolveTagNames(names, cfg){
     else missing.push(n);
   }
   return { tags, missing };
+}
+
+/* ---------- screens and runs (v1.5) -------------------------------------- */
+/* SCREENS/<screen_id>/v<n>.md   — a definition, versioned.
+   RUNS/YYYY/MM/<run_id>.csv     — the output.
+   RUNS/YYYY/MM/<run_id>.md      — the sidecar that makes the CSV interpretable.
+
+   Screens deliberately do NOT live in NOTES/. A note is immutable; a screen is
+   not — thresholds get tuned and status moves draft -> live -> retired. Folder
+   per screen rather than a flat tree, because a screen is a durable entity
+   with history and "show me all three versions" should be a directory listing.
+   Same flat frontmatter, so parseFM() reads all three file types unchanged. */
+
+function runId(screenId, version, date){
+  return screenId + "_v" + version + "_" + String(date).slice(0,10);
+}
+function screenPath(screenId, version){
+  return "SCREENS/" + screenId + "/v" + version + ".md";
+}
+/* Parse a run_id back into its parts. null when it does not match, so a
+   hand-typed run_id on a note can be checked rather than trusted. */
+function parseRunId(id){
+  const m = String(id||"").match(/^([a-z0-9][a-z0-9-]*)_v(\d+)_(\d{4}-\d{2}-\d{2})$/);
+  return m ? { screen_id:m[1], version:parseInt(m[2],10), date:m[3] } : null;
+}
+
+function validateScreen(scr){
+  const errors=[], warnings=[];
+  const s = k => (scr[k]===null||scr[k]===undefined) ? "" : String(scr[k]).trim();
+
+  if(!/^[a-z0-9][a-z0-9-]{0,59}$/.test(s("screen_id")))
+    errors.push("screen_id is required: lowercase letters, digits and hyphens.");
+  if(!/^\d+$/.test(s("version"))) errors.push("version must be a whole number.");
+  if(!s("name"))     errors.push("name is required.");
+  if(!s("owner"))    errors.push("owner is required \u2014 a screen with no owner rots.");
+  if(!s("criteria")) errors.push("criteria is required \u2014 what the screen actually tests.");
+  if(!s("universe")) warnings.push("No universe set \u2014 hits are hard to interpret without it.");
+  if(!s("source"))   warnings.push("No data source set.");
+  if(!s("runner"))   warnings.push("No runner script \u2014 this screen cannot be re-run.");
+
+  const st=s("status");
+  if(!st) errors.push("status is required.");
+  else if(SCREEN_STATUSES.indexOf(st)<0)
+    errors.push("status must be one of: "+SCREEN_STATUSES.join(", ")+".");
+
+  const ver=parseInt(s("version"),10);
+  const sup=s("supersedes");
+  if(sup && !/^\d+$/.test(sup)) errors.push("supersedes must be a whole number.");
+  else if(sup && parseInt(sup,10)>=ver)
+    errors.push("supersedes must point at an earlier version.");
+  if(sup && ver===1) errors.push("v1 cannot supersede anything.");
+  if(!sup && ver>1)
+    warnings.push("v"+ver+" does not say what it supersedes \u2014 the version "
+                + "chain will not render.");
+
+  for(const k of ["created","last_run"]){
+    const d=s(k);
+    if(d && !/^\d{4}-\d{2}-\d{2}$/.test(d)) errors.push(k+" must be YYYY-MM-DD.");
+  }
+  return { errors, warnings, ok: errors.length===0 };
+}
+
+function buildScreen(scr, body){
+  const out=["---"];
+  for(const k of SCREEN_ORDER) out.push(fmLine(k,scr[k]));
+  for(const k of Object.keys(scr)){
+    if(SCREEN_ORDER.indexOf(k)>=0 || k.charAt(0)==="_") continue;
+    out.push(fmLine(k,scr[k]));
+  }
+  out.push("---");
+  return out.join("\n")+"\n\n"+String(body||"").trim()+"\n";
+}
+
+/* The .md sidecar written next to every run CSV. A CSV alone loses provenance:
+   without the criteria and the data-as-of date copied in, a run six months old
+   cannot be reproduced or even read honestly — the screen definition it points
+   at may have been superseded twice since. */
+const RUN_ORDER = ["run_id","screen_id","screen_version","run_date","data_as_of",
+  "universe","source","criteria","rows","runner","runtime_seconds","origin"];
+
+function buildRunSidecar(run, body){
+  const out=["---"];
+  for(const k of RUN_ORDER) out.push(fmLine(k,run[k]));
+  out.push("---");
+  return out.join("\n")+"\n\n"+String(body||"").trim()+"\n";
+}
+
+function validateRun(run){
+  const errors=[], warnings=[];
+  const s = k => (run[k]===null||run[k]===undefined) ? "" : String(run[k]).trim();
+  const parsed = parseRunId(s("run_id"));
+  if(!parsed) errors.push("run_id must be <screen_id>_v<n>_<YYYY-MM-DD>.");
+  else {
+    if(s("screen_id") && s("screen_id")!==parsed.screen_id)
+      errors.push("run_id does not match screen_id.");
+    if(s("screen_version") && parseInt(s("screen_version"),10)!==parsed.version)
+      errors.push("run_id does not match screen_version.");
+  }
+  if(!/^\d+$/.test(s("rows"))) errors.push("rows must be a whole number.");
+  if(!s("criteria"))
+    errors.push("criteria must be copied into the sidecar \u2014 the screen "
+              + "definition may be superseded before this run is read again.");
+  if(!s("data_as_of"))
+    warnings.push("No data_as_of \u2014 the run date is not the date the data "
+                + "was good to.");
+  if(s("rows")==="0")
+    warnings.push("Zero hits \u2014 worth keeping, but check the runner.");
+  return { errors, warnings, ok: errors.length===0 };
 }
 
 /* ---------- reading the corpus ------------------------------------------ */
@@ -720,10 +899,14 @@ if (typeof module === "object" && module.exports) {
   module.exports = {
     SEED, ACTIONS, ORIGINS, RECORD_TYPES, POSITION_ACTIONS, CHECKABLE_ACTIONS,
     WHY_EXEMPT_ACTIONS, WHY_SOFT_CAP, FM_ORDER, EMAIL_KEYS, RC,
+    SCREEN_STATUSES, SCREEN_IMMUTABLE, SCREEN_ORDER, RUN_ORDER,
+    positionNoteId,
     initials, slug, yamlStr, unq, esc,
     hasTerm, termContains, matchTags,
     parseFM, fmLine, buildFM, validateRecord, canSetWhy,
     normKey, parseEmailHeaders, resolveTagNames,
+    runId, screenPath, parseRunId, validateScreen, buildScreen,
+    buildRunSidecar, validateRun,
     fmtDate, ageDays, ageLabel
   };
 }

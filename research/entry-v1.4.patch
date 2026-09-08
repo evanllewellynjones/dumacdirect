@@ -1,5 +1,5 @@
 --- /mnt/user-data/uploads/entry.html	2026-09-08 01:30:18.245205000 +0000
-+++ entry.html	2026-09-08 01:57:43.351987144 +0000
++++ entry.html	2026-09-08 02:32:39.070873244 +0000
 @@ -27,6 +27,7 @@
    <div class="row">
      <button class="btn" id="m_company" style="flex:1">Company Record</button>
@@ -29,12 +29,17 @@
  <div class="card">
    <div class="frow">
      <label for="f_subject" class="narrow">Subject</label>
-@@ -93,6 +108,32 @@
+@@ -93,6 +108,37 @@
    </div>
  </div>
  
 +<!-- decision block -->
 +<div class="card">
++  <div class="frow">
++    <label for="f_strategy" class="narrow">Strategy</label>
++    <div class="f md"><select id="f_strategy"></select></div>
++    <div class="f tiny" id="strathint"></div>
++  </div>
 +  <div class="frow">
 +    <label for="f_action" class="narrow">Action</label>
 +    <div class="f md"><select id="f_action"></select></div>
@@ -62,7 +67,7 @@
  <div class="card">
    <label for="f_note">Note</label>
    <textarea id="f_note" placeholder="Note"></textarea>
-@@ -140,6 +181,20 @@
+@@ -140,6 +186,20 @@
    <div id="atts"></div>
  </div>
  
@@ -83,7 +88,7 @@
  </div>
  
  <div class="bar">
-@@ -162,20 +217,61 @@
+@@ -162,20 +222,63 @@
  }
  
  /* ---------- mode ---------- */
@@ -133,6 +138,8 @@
 +function onAction(){
 +  const a=$("#f_action").value;
 +  $("#actionhint").textContent = ACTION_HINT[a]||"";
++  $("#strathint").textContent = POSITION_ACTIONS.indexOf(a)>=0 && !$("#f_strategy").value
++    ? "Set this \u2014 a position change belongs to a strategy." : "";
 +  $("#row_source").classList.toggle("hide", a!=="observation");
 +  $("#row_outcome").classList.toggle("hide", CHECKABLE_ACTIONS.indexOf(a)<0);
 +  onWhy();
@@ -148,7 +155,7 @@
  /* ---------- tags ---------- */
  function allTags(){
    const auto=matchTags($("#f_subject").value, $("#f_note").value)
-@@ -298,63 +394,85 @@
+@@ -298,63 +401,86 @@
  }
  
  /* ---------- save ---------- */
@@ -216,6 +223,7 @@
 +  Object.assign(rec,{
 +    date:date, contributor:contributor, origin:"app",
 +    record_type:S.mode, subject:subject,
++    strategy:$("#f_strategy").value||null,
 +    action:$("#f_action").value||null,
 +    why:$("#f_why").value.trim()||null,
 +    source:$("#f_action").value==="observation"
@@ -230,7 +238,8 @@
 +  });
 +  return rec;
 +}
-+
+ 
+-  let folder=date+"_"+initials(contributor)+"_"+slug(subject);
 +async function save(){
 +  if(!RC.dir){ flash("Choose a folder first.","err"); return; }
 +
@@ -248,8 +257,7 @@
 +     validateRecord has passed. */
 +  for(const k of ["price_target_buy","price_target_sell"])
 +    rec[k] = (rec[k]===null||rec[k]==="") ? null : parseInt(rec[k],10);
- 
--  let folder=date+"_"+initials(contributor)+"_"+slug(subject);
++
 +  const now=new Date().toISOString();
 +  const [yy,mm]=rec.date.split("-");
 +  let folder=rec.date+"_"+initials(rec.contributor)+"_"+slug(rec.subject);
@@ -272,7 +280,7 @@
  
    try{
      const dir=await parent.getDirectoryHandle(folder,{create:true});
-@@ -362,19 +480,105 @@
+@@ -362,20 +488,112 @@
      for(const a of S.atts) await writeFile(dir,a.name,a.file);
      if(S.mode==="Company") rememberPair(rec.entity,rec.ticker);
      RC.notes=null;
@@ -338,6 +346,8 @@
 +    $("#f_topic").value = f.entity || "";
 +  }
 +
++  if(f.strategy && [...$("#f_strategy").options].some(o=>o.value===f.strategy))
++    $("#f_strategy").value=f.strategy;
 +  $("#f_action").value = actionsList().indexOf(f.action)>=0 ? f.action : "";
 +  $("#f_why").value = f.why || "";
 +  $("#f_source").value = f.source || "";
@@ -370,18 +380,34 @@
    $("#f_conv").value=""; $("#f_review").value=""; $("#f_listed").checked=true;
 +  $("#f_topic").value="";
 +  $("#f_action").value=""; $("#f_why").value=""; $("#f_source").value="";
++  /* strategy is deliberately NOT cleared — someone entering five records is
++     almost always in one strategy, and re-picking it each time is friction
++     that gets skipped. */
 +  $("#f_outcome").value="";
 +  $("#pastebox").value=""; $("#pastemsg").textContent="";
    S.atts=[]; S.manual.clear(); S.removed.clear(); S.tickers=[]; S.imgN=0;
 -  renderAtts(); renderTags(); renderPicker(); renderTkr();
 +  renderAtts(); renderTags(); renderPicker(); renderTkr(); onAction();
    $("#f_date").value=new Date().toISOString().slice(0,10);
-+  banner("");
-   if(!keepMsg) flash("");
+-  if(!keepMsg) flash("");
++  /* keepMsg is set after a successful save, and a save can succeed WITH
++     warnings. Clearing the banner here would wipe them before they were read. */
++  if(!keepMsg){ banner(""); flash(""); }
  }
  
-@@ -395,7 +599,9 @@
+ /* ---------- boot ---------- */
+@@ -393,9 +611,19 @@
+   th.appendChild(new Option("\u2014",""));
+   (cfg.themes||[]).forEach(t=>th.appendChild(new Option(t,t)));
  
++  /* Strategies are a closed, Admin-edited list — same shape as themes. Free
++     text would give us "Direct US", "DirectUS" and "Direct U.S." inside a
++     month and the grouping query would be worthless. */
++  const st=$("#f_strategy"); st.innerHTML="";
++  st.appendChild(new Option("\u2014",""));
++  (cfg.strategies||[]).forEach(x=>st.appendChild(new Option(x,x)));
++  st.value=localStorage.getItem("rc_strategy")||"";
++
    $("#f_date").value=new Date().toISOString().slice(0,10);
    refreshLists();
 +  buildActions();
@@ -390,12 +416,14 @@
    renderTags(); renderPicker(); renderTkr();
  
    if(!RC.dir) banner("No folder connected. Click the badge, top right, and pick the "
-@@ -407,6 +613,10 @@
+@@ -407,6 +635,12 @@
  document.addEventListener("rc-folder", async()=>{ await boot(); });
  $("#m_company").onclick=()=>setMode("Company");
  $("#m_theme").onclick=()=>setMode("Theme");
 +$("#m_note").onclick=()=>setMode("Note");
 +$("#f_action").addEventListener("change",onAction);
++$("#f_strategy").addEventListener("change",()=>{
++  localStorage.setItem("rc_strategy",$("#f_strategy").value); onAction(); });
 +$("#f_why").addEventListener("input",onWhy);
 +$("#btn_paste").onclick=loadPasted;
  $("#f_subject").addEventListener("input",()=>{renderTags();renderPicker();});

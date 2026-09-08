@@ -111,6 +111,11 @@
 <!-- decision block -->
 <div class="card">
   <div class="frow">
+    <label for="f_strategy" class="narrow">Strategy</label>
+    <div class="f md"><select id="f_strategy"></select></div>
+    <div class="f tiny" id="strathint"></div>
+  </div>
+  <div class="frow">
     <label for="f_action" class="narrow">Action</label>
     <div class="f md"><select id="f_action"></select></div>
     <div class="f tiny" id="actionhint"></div>
@@ -260,6 +265,8 @@ function buildActions(){
 function onAction(){
   const a=$("#f_action").value;
   $("#actionhint").textContent = ACTION_HINT[a]||"";
+  $("#strathint").textContent = POSITION_ACTIONS.indexOf(a)>=0 && !$("#f_strategy").value
+    ? "Set this \u2014 a position change belongs to a strategy." : "";
   $("#row_source").classList.toggle("hide", a!=="observation");
   $("#row_outcome").classList.toggle("hide", CHECKABLE_ACTIONS.indexOf(a)<0);
   onWhy();
@@ -430,6 +437,7 @@ function buildRecord(){
   Object.assign(rec,{
     date:date, contributor:contributor, origin:"app",
     record_type:S.mode, subject:subject,
+    strategy:$("#f_strategy").value||null,
     action:$("#f_action").value||null,
     why:$("#f_why").value.trim()||null,
     source:$("#f_action").value==="observation"
@@ -541,6 +549,8 @@ function loadPasted(){
     $("#f_topic").value = f.entity || "";
   }
 
+  if(f.strategy && [...$("#f_strategy").options].some(o=>o.value===f.strategy))
+    $("#f_strategy").value=f.strategy;
   $("#f_action").value = actionsList().indexOf(f.action)>=0 ? f.action : "";
   $("#f_why").value = f.why || "";
   $("#f_source").value = f.source || "";
@@ -573,13 +583,17 @@ function clearForm(keepMsg){
   $("#f_conv").value=""; $("#f_review").value=""; $("#f_listed").checked=true;
   $("#f_topic").value="";
   $("#f_action").value=""; $("#f_why").value=""; $("#f_source").value="";
+  /* strategy is deliberately NOT cleared — someone entering five records is
+     almost always in one strategy, and re-picking it each time is friction
+     that gets skipped. */
   $("#f_outcome").value="";
   $("#pastebox").value=""; $("#pastemsg").textContent="";
   S.atts=[]; S.manual.clear(); S.removed.clear(); S.tickers=[]; S.imgN=0;
   renderAtts(); renderTags(); renderPicker(); renderTkr(); onAction();
   $("#f_date").value=new Date().toISOString().slice(0,10);
-  banner("");
-  if(!keepMsg) flash("");
+  /* keepMsg is set after a successful save, and a save can succeed WITH
+     warnings. Clearing the banner here would wipe them before they were read. */
+  if(!keepMsg){ banner(""); flash(""); }
 }
 
 /* ---------- boot ---------- */
@@ -596,6 +610,14 @@ async function boot(){
   const th=$("#f_theme"); th.innerHTML="";
   th.appendChild(new Option("\u2014",""));
   (cfg.themes||[]).forEach(t=>th.appendChild(new Option(t,t)));
+
+  /* Strategies are a closed, Admin-edited list — same shape as themes. Free
+     text would give us "Direct US", "DirectUS" and "Direct U.S." inside a
+     month and the grouping query would be worthless. */
+  const st=$("#f_strategy"); st.innerHTML="";
+  st.appendChild(new Option("\u2014",""));
+  (cfg.strategies||[]).forEach(x=>st.appendChild(new Option(x,x)));
+  st.value=localStorage.getItem("rc_strategy")||"";
 
   $("#f_date").value=new Date().toISOString().slice(0,10);
   refreshLists();
@@ -615,6 +637,8 @@ $("#m_company").onclick=()=>setMode("Company");
 $("#m_theme").onclick=()=>setMode("Theme");
 $("#m_note").onclick=()=>setMode("Note");
 $("#f_action").addEventListener("change",onAction);
+$("#f_strategy").addEventListener("change",()=>{
+  localStorage.setItem("rc_strategy",$("#f_strategy").value); onAction(); });
 $("#f_why").addEventListener("input",onWhy);
 $("#btn_paste").onclick=loadPasted;
 $("#f_subject").addEventListener("input",()=>{renderTags();renderPicker();});
