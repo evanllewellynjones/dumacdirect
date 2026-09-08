@@ -1,0 +1,348 @@
+--- /mnt/user-data/uploads/rc-core.js	2026-09-08 01:30:18.267667000 +0000
++++ rc-core.js	2026-09-08 01:51:33.642253423 +0000
+@@ -122,6 +122,35 @@
+ }
+ 
+ /* ==========================================================================
++   v1.4 VOCABULARIES
++   action  — what was done about the name. The field that separates a view
++             from a decision, and makes "show me every pass" answerable.
++   origin  — which door the record came through. Set by the writer, never by
++             the user. This is what makes multiple entry paths auditable.
++   Both are seeded into _config.json so Admin can extend them without a code
++   change. Adding an enum VALUE is safe; adding a FIELD is what breaks
++   retroactive queries, which is why all four origins exist from the start.
++   ========================================================================== */
++const ACTIONS = ["initiate","add","trim","exit","pass","observation","reference"];
++const ORIGINS = ["app","note-skill","ingest","email","position-diff"];
++
++/* Company — one listed or private name, ticker required.
++   Theme    — an Admin-curated theme from cfg.themes, carries a ticker list.
++   Note     — everything else. A thought about Brazil is not a theme and not a
++              company; forcing it into either corrupts the theme vocabulary.
++              No ticker, no theme, no price targets. Tags do the retrieval. */
++const RECORD_TYPES = ["Company","Theme","Note"];
++
++/* Position changes: warn when there is no ticker, never block — private
++   names are legitimate. */
++const POSITION_ACTIONS = ["initiate","add","trim","exit"];
++/* outcome_check_date is only read for these. */
++const CHECKABLE_ACTIONS = ["initiate","exit","pass"];
++/* reference == a filed artifact, not a view. Exempt from `why`. */
++const WHY_EXEMPT_ACTIONS = ["reference"];
++const WHY_SOFT_CAP = 200;
++
++/* ==========================================================================
+    SEED CONFIG
+    Written to _config.json only if that file does not already exist.
+    After first run, edit from the Admin page — not here.
+@@ -131,6 +160,8 @@
+   config_updated: null,
+   config_updated_by: null,
+   maxTags: 8,
++  actions: ACTIONS.slice(),
++  origins: ORIGINS.slice(),
+   contributors: ["Evan Jones","Ana Anderson","Brandon Gall","William Hockett","Ian Jennings"],
+   themes: ["Asset Tokenization","Crypto Asset Beneficiaries","Physical AI",
+            "PQC Migration","Cybersecurity Tailwind","Energy Transition"],
+@@ -301,8 +332,10 @@
+     RC.cfg.config_updated = new Date().toISOString();
+     try{ await saveConfig(RC.cfg, "(seeded)"); }catch(e2){}
+   }
+-  // tolerate a hand-edited file that is missing keys
+-  for(const k of ["contributors","themes","taxonomy","maxTags"])
++  // tolerate a hand-edited file, and a config written before v1.4, that is
++  // missing keys. actions/origins backfill here so no _config.json edit is
++  // needed on upgrade.
++  for(const k of ["contributors","themes","taxonomy","maxTags","actions","origins"])
+     if(RC.cfg[k]===undefined) RC.cfg[k]=SEED[k];
+   return RC.cfg;
+ }
+@@ -328,6 +361,15 @@
+                         mode==="s" ? "" : "i");
+   return re.test(text);
+ }
++/* Longest-match-wins has to compare WHOLE terms, not raw substrings.
++   "Retail" contains the letters "ai", so a plain includes() silently dropped
++   the Artificial Intelligence hit on "Retail AI adoption". Boundary-checked
++   containment fixes that while still letting "Gold Miners" suppress "Gold"
++   and "Consumer Discretionary" suppress "Consumer". */
++function termContains(outer,inner){
++  if(outer.length<=inner.length) return false;
++  return new RegExp("(?<![A-Za-z0-9])"+esc(inner)+"(?![A-Za-z0-9])","i").test(outer);
++}
+ function matchTags(subject,body){
+   const tax = (RC.cfg&&RC.cfg.taxonomy) || SEED.taxonomy;
+   const hits=[];
+@@ -341,9 +383,7 @@
+     }
+     if(best) hits.push({tag,term:best.term,src:best.src});
+   }
+-  const keep = hits.filter(h => !hits.some(o =>
+-    o!==h && o.term.length>h.term.length &&
+-    o.term.toLowerCase().includes(h.term.toLowerCase())));
++  const keep = hits.filter(h => !hits.some(o => o!==h && termContains(o.term,h.term)));
+   keep.sort((a,b)=> a.src!==b.src ? (a.src==="subject"?-1:1)
+                                   : b.term.length-a.term.length);
+   return keep;
+@@ -368,25 +408,224 @@
+   return o;
+ }
+ 
+-/* Field order is fixed so hand-inspection of note.md is predictable. */
+-const FM_ORDER = ["note_id","date","created","last_updated","contributor",
+-  "record_type","entity","ticker","listed","tickers","subject","tags",
++/* Field order is fixed so hand-inspection of note.md is predictable.
++   v1.4 adds origin (after contributor, it is provenance) and the decision
++   block action/why/source/outcome_check_date (after subject, before tags).
++   Nothing was removed — listed, tickers, review_date and priority all stay
++   exactly where they were. */
++const FM_ORDER = ["note_id","date","created","last_updated","contributor","origin",
++  "record_type","entity","ticker","listed","tickers","subject",
++  "action","why","source","outcome_check_date","tags",
+   "attachments","price_target_buy","price_target_sell","conviction",
+   "review_date","review_status","priority","revision"];
+ 
++function fmLine(k,v){
++  if(Array.isArray(v))
++    return k+": ["+v.map(x=>JSON.stringify(String(x))).join(", ")+"]";
++  if(v===true||v===false) return k+": "+v;
++  return k+": "+(v===null||v===undefined?"":yamlStr(v));
++}
+ function buildFM(rec, body){
+   const out=["---"];
+-  for(const k of FM_ORDER){
+-    const v=rec[k];
+-    if(Array.isArray(v))
+-      out.push(k+": ["+v.map(x=>JSON.stringify(String(x))).join(", ")+"]");
+-    else if(v===true||v===false) out.push(k+": "+v);
+-    else out.push(k+": "+(v===null||v===undefined?"":yamlStr(v)));
++  for(const k of FM_ORDER) out.push(fmLine(k,rec[k]));
++  /* Anything the caller supplied that FM_ORDER does not know about is written
++     after the known keys rather than dropped, so a field added in a later
++     version never vanishes on a read-modify-write. */
++  for(const k of Object.keys(rec)){
++    if(FM_ORDER.indexOf(k)>=0 || k.charAt(0)==="_") continue;
++    out.push(fmLine(k,rec[k]));
+   }
+   out.push("---");
+   return out.join("\n")+"\n\n"+String(body||"").trim()+"\n";
+ }
+ 
++/* ---------- validation (v1.4) -------------------------------------------- */
++/* Returns { errors, warnings, ok }. Errors block a save; warnings are shown
++   and ignorable. entry.html calls this before writing; the /note skill calls
++   it and shows both to the user before it writes anything.
++
++   Deliberately does NOT touch review_status. That field is tied to
++   review_date — a record with no review date is not in the Review Queue
++   whatever its status says — so it is not an approval flag and is not
++   validated as one. Approval of Claude- and pipeline-written records happens
++   in the Admin records table, filtered on origin. */
++function validateRecord(rec, cfg){
++  const c = cfg || RC.cfg || SEED;
++  const errors=[], warnings=[];
++  const actions = c.actions || ACTIONS;
++  const origins = c.origins || ORIGINS;
++  const s = k => (rec[k]===null||rec[k]===undefined) ? "" : String(rec[k]).trim();
++
++  if(!s("subject")) errors.push("Subject is required.");
++  /* entity is required on Company and Theme, where it is the page key.
++     On a quick Note it defaults to the subject, so it is never blank on disk
++     but the caller need not supply it. */
++  if(!s("entity") && s("record_type")!=="Note")
++    errors.push("Entity is required \u2014 a company or a theme.");
++  if(!/^\d{4}-\d{2}-\d{2}$/.test(s("date"))) errors.push("Date must be YYYY-MM-DD.");
++
++  const type = s("record_type");
++  if(type && RECORD_TYPES.indexOf(type)<0)
++    errors.push("record_type must be one of: "+RECORD_TYPES.join(", ")+".");
++
++  const tk = s("ticker");
++  if(tk && !/^[A-Z0-9.\-]{1,12}$/.test(tk))
++    errors.push("Ticker must be 1-12 chars: letters, digits, dot or hyphen.");
++  if(type==="Company" && !tk)
++    errors.push("Ticker is required on a company record. "
++              + "For a private company use a P. prefix \u2014 P.SECURITIZE.");
++  if(type==="Note" && tk)
++    warnings.push("A quick note carries a ticker \u2014 consider making this a "
++                + "company record so it shows on the company page.");
++
++  const action = s("action");
++  if(!action) errors.push("Action is required.");
++  else if(actions.indexOf(action)<0)
++    errors.push("Action must be one of: "+actions.join(", ")+".");
++  if(POSITION_ACTIONS.indexOf(action)>=0 && !tk)
++    warnings.push("Position action with no ticker \u2014 fine for a private name, "
++                + "otherwise check it.");
++
++  const why = s("why");
++  if(!why && WHY_EXEMPT_ACTIONS.indexOf(action)<0)
++    errors.push("why is required \u2014 one line, the reason.");
++  if(why.length>WHY_SOFT_CAP)
++    warnings.push("why is a one-liner \u2014 the detail goes in the note body.");
++
++  const origin = s("origin");
++  if(!origin) errors.push("origin is missing \u2014 the writer must set it.");
++  else if(origins.indexOf(origin)<0)
++    errors.push("origin must be one of: "+origins.join(", ")+".");
++
++  const ocd = s("outcome_check_date");
++  if(ocd && !/^\d{4}-\d{2}-\d{2}$/.test(ocd))
++    errors.push("outcome_check_date must be YYYY-MM-DD.");
++  if(ocd && CHECKABLE_ACTIONS.indexOf(action)<0)
++    warnings.push("outcome_check_date is only read for "
++                + CHECKABLE_ACTIONS.join(" / ")+".");
++
++  for(const k of ["price_target_buy","price_target_sell"]){
++    const raw=s(k);
++    if(raw!=="" && !/^-?\d+$/.test(raw))
++      errors.push("Price targets must be whole numbers.");
++  }
++  const conv=s("conviction");
++  if(conv && ["High","Med","Low"].indexOf(conv)<0)
++    errors.push("Conviction must be High, Med or Low.");
++
++  const rd=s("review_date");
++  if(rd && !/^\d{4}-\d{2}-\d{2}$/.test(rd))
++    errors.push("review_date must be YYYY-MM-DD.");
++  const rs=s("review_status");
++  if(rs && rs!=="Pending" && rs!=="Done")
++    errors.push("review_status must be Pending or Done.");
++  if(rs && !rd)
++    warnings.push("review_status without a review_date \u2014 this record will not "
++                + "appear in the Review Queue.");
++
++  const mx=(c.maxTags)||8;
++  if(Array.isArray(rec.tags) && rec.tags.length>mx)
++    errors.push("Tag cap of "+mx+" exceeded.");
++
++  return { errors, warnings, ok: errors.length===0 };
++}
++
++/* ---------- write-once `why` --------------------------------------------- */
++/* `why` is a record field, so it is immutable — but the position-diff pipeline
++   writes it BLANK and a human fills it in later. Completing a blank field is
++   not revising a judgement, so the rule is write-once: settable while blank,
++   frozen once set. That keeps "a changed view is a new record" intact while
++   letting the Open Whys queue work.
++
++   Call before any edit that touches why. prior = the value currently on disk. */
++function canSetWhy(prior){
++  return prior===null || prior===undefined || String(prior).trim()==="";
++}
++
++/* ---------- email header block ------------------------------------------- */
++/* An email sent to the capture mailbox may lead with KEY: value lines,
++   terminated by the first blank line. Everything after that blank line is the
++   note body.
++
++   Bare KEY: value is deliberate. Outlook sends HTML by default and the reader
++   works from the plain-text conversion; asterisks and other markup survive
++   that inconsistently or arrive as tags, whereas a bare key line survives
++   every client intact and still reads naturally in a sent email.
++
++     TICKER: WOLF
++     ACTION: pass
++     BUY TARGET: 42
++     TAGS: Semiconductors, United States
++     WHY: capacity ramp isn't funded
++
++     Spoke with two accounts this morning...
++
++   Keys are case-insensitive and space-insensitive, so "Buy Target",
++   "BUY TARGET" and "buytarget" are the same key. A line that is not a known
++   key stops the header block — a note that opens "Note: saw this today" is not
++   silently eaten. Unknown keys are returned in .unknown so the caller can log
++   them rather than dropping them silently. */
++const EMAIL_KEYS = {
++  ticker:"ticker", company:"entity", entity:"entity", theme:"entity",
++  type:"record_type", recordtype:"record_type",
++  action:"action", why:"why", source:"source", date:"date",
++  tags:"tags", subject:"subject",
++  buytarget:"price_target_buy", pricetargetbuy:"price_target_buy",
++  selltarget:"price_target_sell", pricetargetsell:"price_target_sell",
++  conviction:"conviction",
++  reviewdate:"review_date", outcomecheck:"outcome_check_date",
++  outcomecheckdate:"outcome_check_date"
++};
++/* Digits are kept: "buytarget2" must NOT normalise onto "buytarget" and
++   silently overwrite a real value. */
++function normKey(k){ return String(k).toLowerCase().replace(/[^a-z0-9]/g,""); }
++
++function parseEmailHeaders(text){
++  const lines = String(text||"").replace(/\r\n/g,"\n").split("\n");
++  const fields = {}, unknown = [];
++  let i = 0, known = 0;
++  for(; i<lines.length; i++){
++    const line = lines[i];
++    if(line.trim()===""){ i++; break; }          // blank line ends the block
++    const c = line.indexOf(":");
++    if(c < 0) break;                              // not a key line at all
++    const rawKey = line.slice(0,c).trim();
++    if(!rawKey || rawKey.length > 24) break;      // prose with a colon in it
++    const nk = normKey(rawKey);
++    if(!nk) break;
++    const val = line.slice(c+1).trim();
++    if(EMAIL_KEYS[nk]){ fields[EMAIL_KEYS[nk]] = val; known++; continue; }
++    /* An unknown key AFTER a real one is almost certainly a typo inside a
++       header block: consume it and report it, so one bad line does not dump
++       the rest of the block into the body. An unknown key BEFORE any real one
++       means there is no header block — the mail just opens with prose that
++       happens to contain a colon ("Note: saw this today"). Stop and treat the
++       whole thing as body. */
++    if(known===0) break;
++    unknown.push(rawKey);
++  }
++  return { fields, unknown, body: lines.slice(i).join("\n").trim() };
++}
++
++/* Resolve free-text tag names against the taxonomy, case-insensitively.
++   Returns the canonical tag names that matched and the ones that did not, so
++   the caller can log the misses. A tag the sender invented is dropped, never
++   created — the closed vocabulary is the point. */
++function resolveTagNames(names, cfg){
++  const tax = (cfg && cfg.taxonomy) || (RC.cfg && RC.cfg.taxonomy) || SEED.taxonomy;
++  const lookup = {};
++  for(const t in tax) lookup[t.toLowerCase()] = t;
++  const tags = [], missing = [];
++  for(const raw of (names||[])){
++    const n = String(raw).trim();
++    if(!n) continue;
++    const hit = lookup[n.toLowerCase()];
++    if(hit){ if(tags.indexOf(hit)<0) tags.push(hit); }
++    else missing.push(n);
++  }
++  return { tags, missing };
++}
++
+ /* ---------- reading the corpus ------------------------------------------ */
+ /* Flat shared tree:  NOTES/YYYY/MM/<note_id>/note.md
+    note_id carries contributor initials so two people cannot collide. */
+@@ -465,3 +704,26 @@
+   return String(s==null?"":s).replace(/[&<>"']/g,
+     c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ }
++
++/* ==========================================================================
++   NODE SHIM
++   The /note skill runs this same file under Node so that a record written
++   from a Claude chat is serialised by exactly the code the app uses. Nothing
++   above executes at load time or touches the DOM, so a plain require() is
++   safe. In the browser this block is skipped and everything stays global,
++   as entry.html / reports.html / admin.html expect.
++
++   The skill must call buildFM() — it must never assemble frontmatter itself.
++   That is the whole contract between the two entry paths.
++   ========================================================================== */
++if (typeof module === "object" && module.exports) {
++  module.exports = {
++    SEED, ACTIONS, ORIGINS, RECORD_TYPES, POSITION_ACTIONS, CHECKABLE_ACTIONS,
++    WHY_EXEMPT_ACTIONS, WHY_SOFT_CAP, FM_ORDER, EMAIL_KEYS, RC,
++    initials, slug, yamlStr, unq, esc,
++    hasTerm, termContains, matchTags,
++    parseFM, fmLine, buildFM, validateRecord, canSetWhy,
++    normKey, parseEmailHeaders, resolveTagNames,
++    fmtDate, ageDays, ageLabel
++  };
++}
