@@ -26,6 +26,7 @@
   <div class="tab cur" data-v="records">Records</div>
   <div class="tab" data-v="themes">Themes</div>
   <div class="tab" data-v="tags">Tags</div>
+  <div class="tab" data-v="tickers">Tickers</div>
   <div class="tab" data-v="config">Config</div>
   <span style="flex:1"></span>
   <span class="badge" id="lockbadge" style="cursor:pointer">read-only &mdash; unlock</span>
@@ -38,7 +39,14 @@
       <label for="q_type" class="narrow">Type</label>
       <div class="f sm"><select id="q_type">
         <option value="">All</option><option>Company</option><option>Theme</option>
+        <option>Note</option><option>Trade</option>
         <option value="__none">Unclassified</option></select></div>
+      <label for="q_action" style="flex:0 0 auto">Action</label>
+      <div class="f sm"><select id="q_action"><option value="">Any</option>
+        <option value="__none">Unset</option></select></div>
+      <label for="q_origin" style="flex:0 0 auto">Origin</label>
+      <div class="f sm"><select id="q_origin"><option value="">Any</option>
+        <option value="__notapp">Not app</option></select></div>
       <label for="q_who" style="flex:0 0 auto">Contributor</label>
       <div class="f md"><select id="q_who"><option value="">Everyone</option></select></div>
       <label for="q_pri" style="flex:0 0 auto">Priority</label>
@@ -68,6 +76,7 @@
         <label style="display:inline">Set type</label>
         <select id="bulk_type" style="width:auto;display:inline-block">
           <option value="">&mdash;</option><option>Company</option><option>Theme</option>
+          <option>Note</option><option>Trade</option>
         </select>
       </div>
       <div style="flex:0 0 auto"><button class="btn" id="btn_bulk">Apply to selected</button></div>
@@ -78,7 +87,8 @@
       <table class="grid" id="rectbl">
         <thead><tr>
           <th style="width:22px"><input type="checkbox" id="selall" style="width:auto"></th>
-          <th>Date</th><th>Type</th><th>Ticker</th><th>Entity</th>
+          <th>Date</th><th>Type</th><th>Action</th><th>Origin</th>
+          <th>Ticker</th><th>Entity</th>
           <th>Subject</th><th>Tags</th><th>Contributor</th><th>Pri</th><th>Rev</th>
         </tr></thead>
         <tbody></tbody>
@@ -140,6 +150,80 @@
   </div>
 </div>
 
+<!-- TICKERS -->
+<div id="v_tickers" class="hide">
+  <div class="card">
+    <div class="sect">Load a ticker list</div>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn pri" id="btn_tkfile" style="flex:0 0 auto">Choose a CSV file</button>
+      <input type="file" id="tkfile" accept=".csv,.tsv,.txt" hidden>
+      <div class="tiny" style="flex:1" id="tkfilename">
+        Two columns: ticker and company name, in either order, with or without a
+        header row. Comma, tab or semicolon separated &mdash; a paste straight
+        out of Excel works.</div>
+    </div>
+    <details style="margin-top:8px">
+      <summary>Or paste the list</summary>
+      <textarea id="tkpaste" style="min-height:120px;margin-top:6px"
+        placeholder="MSFT,Microsoft Corporation&#10;AAPL,Apple Inc.&#10;P.SECURITIZE,Securitize"></textarea>
+      <button class="btn" id="btn_tkpaste" style="margin-top:6px">Read pasted list</button>
+    </details>
+    <div class="row" style="margin-top:9px;align-items:center">
+      <label style="display:flex;align-items:center;gap:6px;text-transform:none;
+                    font-size:12.5px;letter-spacing:0;font-weight:400;color:var(--ink);
+                    margin:0;flex:0 0 auto">
+        <input type="checkbox" id="tkreplace" style="width:auto">
+        Replace the whole list instead of merging into it
+      </label>
+      <div class="tiny" style="flex:1">Merge is the default: existing tickers not
+        in the upload are kept. Replace drops them, which is what you want after
+        fixing a bad load and nothing else.</div>
+    </div>
+  </div>
+
+  <div class="card hide" id="tkpreview">
+    <div class="sect">Preview</div>
+    <div id="tkstats" style="margin-bottom:8px"></div>
+    <pre id="tkproblems" class="tiny" style="display:none;max-height:200px;overflow:auto;
+      background:#f7f9fc;padding:9px;border-radius:4px;margin-bottom:8px"></pre>
+    <div class="row">
+      <button class="btn pri adminonly" id="btn_tkapply" style="flex:0 0 auto">Apply</button>
+      <button class="btn" id="btn_tkcancel" style="flex:0 0 auto">Cancel</button>
+      <div class="tiny" style="flex:1">Nothing is written until you press Apply.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="margin-bottom:7px">
+      <input type="text" id="tkfilter" placeholder="Filter by ticker or company" style="flex:3">
+      <div style="flex:2" class="tiny" id="tksummary"></div>
+      <button class="btn adminonly danger" id="btn_tkclear" style="flex:0 0 auto">Clear list</button>
+    </div>
+    <div style="max-height:460px;overflow:auto">
+      <table class="grid" id="tktbl">
+        <thead><tr><th style="width:110px">Ticker</th><th>Company</th>
+          <th style="width:80px">Records</th><th style="width:90px"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="sub">Stored as <span class="mono">_tickers.json</span> beside
+      <span class="mono">_config.json</span>, so it syncs to everyone through
+      SharePoint. It is a convenience for the Entry page, not a source of truth
+      &mdash; a ticker missing from it still saves fine, the company name just
+      stays blank until someone fills it in.</div>
+  </div>
+
+  <div class="card">
+    <div class="sect">Resolve blank company names</div>
+    <div class="row">
+      <button class="btn adminonly" id="btn_resolve" style="flex:0 0 auto">Find and fill</button>
+      <div class="tiny" style="flex:1" id="resolvehint">Records that carry a ticker
+        but no company name, where the ticker list knows the name. Rewrites
+        <span class="mono">entity</span> on those records and bumps the revision.</div>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIG -->
 <div id="v_config" class="hide">
   <div class="card">
@@ -163,6 +247,40 @@
       what stops two people colliding on the same subject on the same day.
       Two contributors with the same initials would collide &mdash; flagged below
       if that happens.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Actions</div>
+    <div class="row">
+      <input type="text" id="newaction" placeholder="Action value, lowercase" style="flex:3">
+      <button class="btn" id="btn_addaction" style="flex:1">Add</button>
+    </div>
+    <table class="grid" id="actiontbl" style="margin-top:7px">
+      <thead><tr><th>Action</th><th>Records</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="sub">Fills the Action dropdown on the Entry page for everyone.
+      Adding a value is cheap &mdash; records written before it stay valid.
+      <b>Removing one is not</b>: records already carrying it keep it on disk and
+      will read back as a value that is no longer in the list, so a value in use
+      cannot be removed here. Values are lowercase by convention;
+      <span class="mono">initiate add trim exit</span> are treated as position
+      changes elsewhere in the app, so renaming those breaks the strategy
+      warning.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Strategies</div>
+    <div class="row">
+      <input type="text" id="newstrategy" placeholder="Strategy name" style="flex:3">
+      <button class="btn" id="btn_addstrategy" style="flex:1">Add</button>
+    </div>
+    <table class="grid" id="strattbl" style="margin-top:7px">
+      <thead><tr><th>Strategy</th><th>Records</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="sub">Required on a Trading Log entry. Closed list on purpose
+      &mdash; free text gives you <span class="mono">Direct US</span>,
+      <span class="mono">DirectUS</span> and <span class="mono">Direct U.S.</span>
+      inside a month, and the grouping query is then worthless.</div>
   </div>
   <div class="card">
     <div class="sect">Maintenance</div>
@@ -476,10 +594,18 @@ const SEL=new Set();
 function filtered(){
   const ns=RC.notes||[];
   const ty=$("#q_type").value, w=$("#q_who").value, pr=$("#q_pri").value,
-        tg=$("#q_tag").value, q=$("#q_text").value.trim().toLowerCase();
+        tg=$("#q_tag").value, q=$("#q_text").value.trim().toLowerCase(),
+        ac=$("#q_action").value, og=$("#q_origin").value;
   return ns.filter(n=>{
     if(ty==="__none"){ if(n.record_type) return false; }
     else if(ty && n.record_type!==ty) return false;
+    if(ac==="__none"){ if(n.action) return false; }
+    else if(ac && n.action!==ac) return false;
+    /* origin is the approval surface for pipeline- and Claude-written records
+       (delta §6). "Not app" is the one that matters: everything that arrived
+       through a door other than someone typing it. */
+    if(og==="__notapp"){ if((n.origin||"app")==="app") return false; }
+    else if(og && n.origin!==og) return false;
     if(w && n.contributor!==w) return false;
     if(pr==="__none"){ if(n.priority) return false; }
     else if(pr && String(n.priority)!==pr) return false;
@@ -501,6 +627,10 @@ function renderRecords(){
     const ty=el("td");
     ty.appendChild(el("span","pill"+(n.record_type?"":" due"),n.record_type||"unclassified"));
     tr.appendChild(ty);
+    tr.appendChild(el("td","tiny",n.action||"\u2014"));
+    const og=el("td");
+    og.appendChild(el("span","pill"+((n.origin||"app")==="app"?"":" due"),n.origin||"app"));
+    tr.appendChild(og);
     tr.appendChild(el("td","mono",n.ticker||(Array.isArray(n.tickers)&&n.tickers.length
       ? n.tickers.length+" linked" : "")));
     tr.appendChild(el("td","",n.entity||""));
@@ -525,7 +655,7 @@ function renderRecords(){
   }
   if(!rows.length){
     const tr=el("tr"); const td=el("td","");
-    td.colSpan=10;
+    td.colSpan=12;
     const total=(RC.notes||[]).length;
     td.appendChild(el("div","empty", total
       ? "No records match the filters above. "+total+" record(s) exist \u2014 reset the filters."
@@ -540,7 +670,7 @@ function renderRecords(){
   }
   if(rows.length>400){
     const tr=el("tr"); const td=el("td","tiny","Showing first 400 of "+rows.length+".");
-    td.colSpan=10; tr.appendChild(td); tb.appendChild(tr);
+    td.colSpan=12; tr.appendChild(td); tb.appendChild(tr);
   }
   $("#recstatus").textContent = (RC.notes||[]).length+" record(s) on disk in "
     + notesLocation() + "  \u00b7  "+rows.length+" shown";
@@ -583,6 +713,196 @@ $("#btn_bulk").onclick=async()=>{
     });
 };
 
+/* ---------- TICKERS ----------
+   Bulk ticker -> company upload. The design point is that a thousand-row paste
+   is approved as a DIFF, not as a number: how many are new, how many change a
+   name you already had, and every row the parser refused, listed. A silent
+   1,000-row overwrite is unrecoverable in a shared folder. */
+let TKPEND=null;
+
+function tickerCounts(){
+  const c=new Map();
+  for(const n of (RC.notes||[])){
+    if(n.ticker) c.set(n.ticker,(c.get(n.ticker)||0)+1);
+    for(const t of (Array.isArray(n.tickers)?n.tickers:[])) c.set(t,(c.get(t)||0)+1);
+  }
+  return c;
+}
+
+function renderTickers(){
+  const map=RC.tickers||{}, cnt=tickerCounts();
+  const q=$("#tkfilter").value.trim().toLowerCase();
+  const keys=Object.keys(map).sort().filter(k=>
+    !q || k.toLowerCase().includes(q) || String(map[k]).toLowerCase().includes(q));
+  const tb=$("#tktbl tbody"); tb.innerHTML="";
+  for(const tk of keys.slice(0,500)){
+    const tr=el("tr");
+    tr.appendChild(el("td","mono",tk));
+    tr.appendChild(el("td","",map[tk]));
+    tr.appendChild(el("td","num",String(cnt.get(tk)||"")));
+    const act=el("td");
+    const d=el("button","btn adminonly danger","Remove"); d.disabled=!UNLOCKED;
+    d.onclick=async()=>{
+      if(!requireUnlock()) return;
+      const m=Object.assign({},RC.tickers); delete m[tk];
+      await saveTickers(m,who());
+      await appendHistory({at:new Date().toISOString(),by:who(),
+                           op:"ticker_remove",ticker:tk});
+      renderTickers();
+    };
+    act.appendChild(d); tr.appendChild(act);
+    tb.appendChild(tr);
+  }
+  const total=Object.keys(map).length;
+  $("#tksummary").textContent = total
+    ? total+" ticker(s)"+(keys.length!==total?"  \u00b7  "+keys.length+" shown":"")
+      +(keys.length>500?"  \u00b7  first 500 listed":"")
+    : "No ticker list loaded yet.";
+  const blanks=(RC.notes||[]).filter(n=>n.ticker && !n.entity
+                                    && (RC.tickers||{})[n.ticker]).length;
+  $("#resolvehint").innerHTML = blanks
+    ? "<b>"+blanks+" record(s)</b> carry a ticker with no company name that the "
+      + "ticker list can fill. Rewrites <span class='mono'>entity</span> on those "
+      + "records and bumps the revision."
+    : "Nothing to resolve \u2014 every record with a ticker either has a company "
+      + "name already or has one the ticker list does not know.";
+}
+
+function previewTickers(text,label){
+  const r=parseTickerCSV(text);
+  if(!r.count){
+    banner("Nothing readable in "+label+". "
+         + (r.skipped.length? r.skipped.length+" line(s) were rejected." : ""));
+    $("#tkpreview").classList.add("hide"); TKPEND=null;
+    if(r.skipped.length){
+      $("#tkpreview").classList.remove("hide");
+      $("#tkstats").innerHTML="<b>0 usable rows.</b>";
+      showProblems(r);
+      $("#btn_tkapply").disabled=true;
+    }
+    return;
+  }
+  const replace=$("#tkreplace").checked;
+  const cur=RC.tickers||{};
+  const d=diffTickers(cur,r.map);
+  TKPEND={parsed:r,replace:replace,raw:text,label:label};
+
+  const bits=[
+    "<b>"+r.count+"</b> ticker(s) read from "+label,
+    "<b>"+d.added.length+"</b> new",
+    "<b>"+d.changed.length+"</b> with a different company name",
+    "<b>"+d.same.length+"</b> unchanged"
+  ];
+  if(replace && d.missing.length)
+    bits.push("<b class='mono'>"+d.missing.length+"</b> existing ticker(s) will be "
+            + "<b>deleted</b> \u2014 replace mode");
+  else if(d.missing.length)
+    bits.push(d.missing.length+" existing ticker(s) not in this file are kept");
+  $("#tkstats").innerHTML=bits.join("<br>");
+  showProblems(r,d);
+  $("#btn_tkapply").disabled=!UNLOCKED;
+  $("#tkpreview").classList.remove("hide");
+  banner("");
+}
+
+function showProblems(r,d){
+  const lines=[];
+  if(d && d.changed.length){
+    lines.push("--- name changes ---");
+    d.changed.slice(0,40).forEach(c=>lines.push(c.ticker+"   "+c.from+"   \u2192   "+c.to));
+    if(d.changed.length>40) lines.push("... "+(d.changed.length-40)+" more");
+  }
+  if(r.dupes.length){
+    lines.push("--- duplicate tickers in the file, first kept ---");
+    r.dupes.slice(0,40).forEach(x=>lines.push("line "+x.line+"  "+x.ticker
+      +"  kept: "+x.kept+"   dropped: "+x.dropped));
+    if(r.dupes.length>40) lines.push("... "+(r.dupes.length-40)+" more");
+  }
+  if(r.skipped.length){
+    lines.push("--- rejected rows ---");
+    r.skipped.slice(0,40).forEach(x=>lines.push("line "+x.line+"  ["+x.why+"]  "+x.text));
+    if(r.skipped.length>40) lines.push("... "+(r.skipped.length-40)+" more");
+  }
+  const p=$("#tkproblems");
+  p.textContent=lines.join("\n");
+  p.style.display=lines.length?"block":"none";
+}
+
+$("#btn_tkfile").onclick=()=>$("#tkfile").click();
+$("#tkfile").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  $("#tkfilename").textContent=f.name+"  \u00b7  "+(f.size/1024).toFixed(0)+" KB";
+  previewTickers(await f.text(), f.name);
+  e.target.value="";
+};
+$("#btn_tkpaste").onclick=()=>previewTickers($("#tkpaste").value,"the pasted list");
+$("#btn_tkcancel").onclick=()=>{ TKPEND=null; $("#tkpreview").classList.add("hide"); };
+/* Toggling merge/replace re-runs the preview against the same text, so the
+   deletion count is visible BEFORE Apply rather than after. */
+$("#tkreplace").addEventListener("change",()=>{
+  if(TKPEND) previewTickers(TKPEND.raw, TKPEND.label);
+});
+$("#btn_tkapply").onclick=async()=>{
+  if(!requireUnlock()) return;
+  if(!TKPEND){ banner("Nothing to apply."); return; }
+  /* Re-read the file immediately before merging. RC.tickers was loaded at boot,
+     and a merge built on a stale copy would silently drop whatever someone else
+     uploaded in the meantime — the file is written whole, so last write wins
+     over the entire map, not per key. Re-reading costs one file read and turns
+     a silent data loss into a normal merge. */
+  let live={};
+  if(!TKPEND.replace){
+    try{ live=await loadTickers(); }catch(e){ live=RC.tickers||{}; }
+  }
+  const next = TKPEND.replace ? Object.assign({},TKPEND.parsed.map)
+                              : Object.assign({},live,TKPEND.parsed.map);
+  try{
+    await saveTickers(next,who());
+    await appendHistory({at:new Date().toISOString(),by:who(),
+      op:TKPEND.replace?"tickers_replace":"tickers_merge",
+      read:TKPEND.parsed.count, rejected:TKPEND.parsed.skipped.length,
+      total:Object.keys(next).length});
+    TKPEND=null; $("#tkpreview").classList.add("hide"); $("#tkpaste").value="";
+    banner("Ticker list saved \u2014 "+Object.keys(next).length+" entries.",true);
+    renderTickers();
+  }catch(e){ banner("Could not write _tickers.json: "+e.message); }
+};
+$("#btn_tkclear").onclick=async()=>{
+  if(!requireUnlock()) return;
+  if(!confirm("Delete the entire ticker list? Records are not touched.")) return;
+  await saveTickers({},who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"tickers_clear"});
+  banner("Ticker list cleared.",true); renderTickers();
+};
+$("#tkfilter").addEventListener("input",renderTickers);
+
+/* Fill entity on records that carry a ticker the list knows and no company
+   name. This is the "later" half of the ticker->company decision: Entry does
+   not force a name at write time, so something has to fill them in. */
+$("#btn_resolve").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const map=RC.tickers||{};
+  const list=(RC.notes||[]).filter(n=>n.ticker && !n.entity && map[n.ticker]);
+  if(!list.length){ banner("Nothing to resolve."); return; }
+  dryRun("Resolve company names",
+    list.length+" record(s) will get an <b>entity</b> written from the ticker list."
+    + "<br><span class='tiny'>entity is a record field, but these are blank rather "
+    + "than wrong \u2014 completing a blank is not revising a judgement, the same "
+    + "rule that governs why.</span>",
+    list.map(n=>n.note_id+"   "+n.ticker+"  \u2192  "+map[n.ticker]),
+    async()=>{
+      for(const n of list){
+        await rewriteNote(n,txt=>bumpRevision(setFMLine(txt,"entity",
+          yamlStr(map[n.ticker]))));
+        n.entity=map[n.ticker];
+      }
+      await appendHistory({at:new Date().toISOString(),by:who(),
+                           op:"resolve_entities",notes:list.length});
+      banner("Filled "+list.length+" company name(s).",true);
+      renderRecords(); renderTickers();
+    });
+};
+
 /* ---------- CONFIG ---------- */
 function renderConfig(){
   const cfg=RC.cfg||SEED, ns=RC.notes||[];
@@ -591,6 +911,8 @@ function renderConfig(){
               ["tags",Object.keys(cfg.taxonomy).length],
               ["themes",(cfg.themes||[]).length],
               ["contributors",(cfg.contributors||[]).length],
+              ["actions",(cfg.actions||[]).length],
+              ["strategies",(cfg.strategies||[]).length],
               ["records on disk",ns.length],
               ["notes read from",notesLocation()]];
   const tb=$("#cfgmeta"); tb.innerHTML="";
@@ -624,7 +946,74 @@ function renderConfig(){
     }
     tr.appendChild(act); ctb.appendChild(tr);
   }
+
+  renderList("#actiontbl tbody","actions",cfg.actions||ACTIONS,n=>n.action);
+  renderList("#strattbl tbody","strategies",cfg.strategies||[],n=>n.strategy);
 }
+
+/* One renderer for both closed vocabularies. They have the same shape and the
+   same rule: add freely, remove only what nothing on disk is using. A value
+   still present in a record but absent from the list reads back as an orphan
+   nothing can filter on. */
+function renderList(sel,key,values,pick){
+  const ns=RC.notes||[], tb=$(sel);
+  if(!tb) return;
+  const cnt=new Map();
+  for(const n of ns){ const v=pick(n); if(v) cnt.set(v,(cnt.get(v)||0)+1); }
+  tb.innerHTML="";
+  const all=[...new Set([...values,...cnt.keys()])];
+  for(const v of all){
+    const used=cnt.get(v)||0, known=values.includes(v);
+    const tr=el("tr");
+    const nm=el("td","",v);
+    if(!known) nm.appendChild(el("span","pill due"," in records, not in the list"));
+    tr.appendChild(nm);
+    tr.appendChild(el("td","num",String(used)));
+    const act=el("td");
+    if(!known){
+      const a=el("button","btn adminonly","Add to list"); a.disabled=!UNLOCKED;
+      a.onclick=async()=>{
+        if(!requireUnlock()) return;
+        const cf=RC.cfg; cf[key]=[...(cf[key]||[]),v];
+        await saveConfig(cf,who());
+        await appendHistory({at:new Date().toISOString(),by:who(),
+                             op:key+"_add",value:v});
+        banner("Added "+v+".",true); renderConfig();
+      };
+      act.appendChild(a);
+    } else if(!used){
+      const d=el("button","btn adminonly danger","Remove"); d.disabled=!UNLOCKED;
+      d.onclick=async()=>{
+        if(!requireUnlock()) return;
+        if(!confirm("Remove "+v+" from "+key+"?")) return;
+        const cf=RC.cfg; cf[key]=(cf[key]||[]).filter(x=>x!==v);
+        await saveConfig(cf,who());
+        await appendHistory({at:new Date().toISOString(),by:who(),
+                             op:key+"_remove",value:v});
+        banner("Removed "+v+".",true); renderConfig();
+      };
+      act.appendChild(d);
+    } else {
+      act.appendChild(el("span","tiny","in use"));
+    }
+    tr.appendChild(act); tb.appendChild(tr);
+  }
+}
+async function addToList(key,inputSel,transform){
+  if(!requireUnlock()) return;
+  const raw=$(inputSel).value.trim();
+  if(!raw) return;
+  const v=transform?transform(raw):raw;
+  const cfg=RC.cfg;
+  if((cfg[key]||[]).includes(v)){ banner("Already listed."); return; }
+  cfg[key]=[...(cfg[key]||[]),v];
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:key+"_add",value:v});
+  $(inputSel).value=""; banner("Added "+v+".",true); renderConfig();
+}
+$("#btn_addaction").onclick   = () => addToList("actions","#newaction",
+                                                s=>s.toLowerCase().replace(/\s+/g,"-"));
+$("#btn_addstrategy").onclick = () => addToList("strategies","#newstrategy");
 $("#btn_addcontrib").onclick=async()=>{
   if(!requireUnlock()) return;
   const n=$("#newcontrib").value.trim();
@@ -650,9 +1039,10 @@ $("#btn_reload").onclick=async()=>{ RC.notes=null; await boot(); };
 $$(".tab").forEach(t=>t.onclick=()=>{
   const v=t.dataset.v;
   $$(".tab").forEach(x=>x.classList.toggle("cur",x===t));
-  ["records","themes","tags","config"].forEach(x=>
+  ["records","themes","tags","tickers","config"].forEach(x=>
     $("#v_"+x).classList.toggle("hide",x!==v));
   if(v==="tags") renderTags();
+  if(v==="tickers") renderTickers();
   if(v==="themes") renderThemes();
   if(v==="config") renderConfig();
 });
@@ -663,6 +1053,7 @@ async function boot(){
   if(!RC.dir){ banner("No folder connected. Click the badge, top right."); return; }
   banner("Loading\u2026");
   await loadConfig();
+  await loadTickers();
   await walkNotes(true);
   const cfg=RC.cfg;
   const s=$("#q_who"); s.innerHTML='<option value="">Everyone</option>';
@@ -672,14 +1063,30 @@ async function boot(){
   [...new Set((RC.notes||[]).flatMap(n=>Array.isArray(n.tags)?n.tags:[]))].sort()
     .forEach(t=>tgSel.appendChild(new Option(t,t)));
   tgSel.value=keep;
+
+  const acSel=$("#q_action"), acKeep=acSel.value;
+  acSel.innerHTML='<option value="">Any</option><option value="__none">Unset</option>';
+  [...new Set([...(cfg.actions||ACTIONS),
+               ...(RC.notes||[]).map(n=>n.action).filter(Boolean)])]
+    .forEach(a=>acSel.appendChild(new Option(a,a)));
+  acSel.value=acKeep;
+
+  const ogSel=$("#q_origin"), ogKeep=ogSel.value;
+  ogSel.innerHTML='<option value="">Any</option><option value="__notapp">Not app</option>';
+  const seedOrigins = cfg.origins || (typeof ORIGINS!=="undefined" ? ORIGINS : []);
+  [...new Set([...seedOrigins,
+               ...(RC.notes||[]).map(n=>n.origin).filter(Boolean)])]
+    .forEach(o=>ogSel.appendChild(new Option(o,o)));
+  ogSel.value=ogKeep;
+
   setLock(UNLOCKED);
   const total=(RC.notes||[]).length;
   banner(total ? "" : "Connected to "+RC.dir.name+" but found no notes. Looked in "
        + notesLocation()+". Check that NOTES\\2026\\05\\ exists there.");
-  renderRecords(); renderTags(); renderThemes(); renderConfig();
+  renderRecords(); renderTags(); renderThemes(); renderTickers(); renderConfig();
 }
 document.addEventListener("rc-folder",boot);
-["#q_type","#q_who","#q_pri","#q_tag"].forEach(s=>$(s).addEventListener("change",renderRecords));
+["#q_type","#q_who","#q_pri","#q_tag","#q_action","#q_origin"].forEach(s=>$(s).addEventListener("change",renderRecords));
 $("#q_text").addEventListener("input",renderRecords);
 $("#tagfilter").addEventListener("input",renderTags);
 boot();

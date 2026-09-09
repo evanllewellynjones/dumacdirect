@@ -19,6 +19,7 @@ const RC = {
   dir: null,          // FileSystemDirectoryHandle for the parent folder
   pending: null,      // handle awaiting a permission re-grant
   cfg: null,          // parsed _config.json
+  tickers: null,      // parsed _tickers.json — ticker -> company name
   notes: null         // cache of walkNotes()
 };
 
@@ -146,12 +147,45 @@ const SCREEN_IMMUTABLE = ["screen_id","version","criteria","universe","source","
 const SCREEN_ORDER = ["screen_id","version","name","owner","status","supersedes",
   "universe","source","criteria","runner","cadence","created","last_run","tags"];
 
-/* Company — one listed or private name, ticker required.
+/* Company — one listed or private name, ticker required. The company NAME is
+              optional: it resolves from the ticker map, here or later, so
+              nobody types "Microsoft Corporation" a second time.
    Theme    — an Admin-curated theme from cfg.themes, carries a ticker list.
    Note     — everything else. A thought about Brazil is not a theme and not a
               company; forcing it into either corrupts the theme vocabulary.
-              No ticker, no theme, no price targets. Tags do the retrieval. */
-const RECORD_TYPES = ["Company","Theme","Note"];
+              No ticker, no theme, no price targets. Tags do the retrieval.
+   Trade    — a position change, or a reaction to one. Action, why and the body
+              are all required: this is the record that has to answer the
+              question later, and a trade with no reason on it is the exact
+              hole the project exists to close. Its own type rather than a
+              filtered view of Company because it gets analysed separately and
+              often. */
+const RECORD_TYPES = ["Company","Theme","Note","Trade"];
+
+/* Replaces conviction outright. High/Med/Low was a confidence scale nobody
+   filled in honestly; +/=/- is a direction, which is a thing a report can
+   group on. Blank is a legitimate answer everywhere it appears. */
+const BIAS_VALUES = ["+","=","-"];
+
+/* What each record type requires. One table, read by validateRecord() and
+   mirrored by entry.html's field visibility, so a fifth type is one entry here
+   rather than a hunt through three files.
+     req  = error when blank      opt  = accepted, never demanded
+     no   = not part of this type, ignored if supplied
+     auto = filled in by the writer when blank                              */
+const TYPE_RULES = {
+  Company:{ entity:"auto", ticker:"req", action:"opt", why:"opt",
+            strategy:"opt", targets:true,  bias:true,  body:"opt" },
+  Theme:  { entity:"req",  ticker:"no",  action:"no",  why:"no",
+            strategy:"no",  targets:false, bias:true,  body:"opt" },
+  Note:   { entity:"auto", ticker:"no",  action:"no",  why:"no",
+            strategy:"opt", targets:false, bias:true,  body:"opt" },
+  Trade:  { entity:"auto", ticker:"req", action:"req", why:"req",
+            strategy:"req", targets:false, bias:false, body:"req" }
+};
+const TYPE_RULES_DEFAULT = { entity:"auto", ticker:"opt", action:"opt",
+  why:"opt", strategy:"opt", targets:true, bias:true, body:"opt" };
+function typeRules(t){ return TYPE_RULES[t] || TYPE_RULES_DEFAULT; }
 
 /* Position changes: warn when there is no ticker, never block — private
    names are legitimate. */
@@ -371,6 +405,140 @@ async function appendHistory(entry){
                   prior + JSON.stringify(entry) + "\n");
 }
 
+/* ==========================================================================
+   TICKER -> COMPANY MAP
+   Lives in its own file, `_tickers.json`, beside _config.json — not inside it.
+   Reasons: a thousand-row map would dwarf everything else in _config.json,
+   which is hand-inspectable today and should stay that way; saveConfig() bumps
+   a version and appends to _config_history.jsonl on every write, and a bulk
+   ticker upload has no business in the config change log; and a corrupt paste
+   can be recovered by deleting one file rather than by rebuilding the
+   taxonomy.
+
+   The map is a convenience, not a source of truth. A ticker absent from it is
+   still a legal record — entity simply stays blank until someone resolves it.
+   ========================================================================== */
+async function loadTickers(){
+  if(!RC.dir) return (RC.tickers = {});
+  try{
+    const raw = JSON.parse(await readTextFile(RC.dir,"_tickers.json"));
+    RC.tickers = (raw && typeof raw==="object" && !Array.isArray(raw))
+      ? (raw.tickers && typeof raw.tickers==="object" ? raw.tickers : raw) : {};
+  }catch(e){ RC.tickers = {}; }
+  return RC.tickers;
+}
+async function saveTickers(map, who){
+  const payload = { updated:new Date().toISOString(), updated_by:who||"unknown",
+                    count:Object.keys(map).length, tickers:map };
+  await writeFile(RC.dir,"_tickers.json",JSON.stringify(payload,null,1));
+  RC.tickers = map;
+}
+/* Company name for a ticker: the uploaded map first, then any name already
+   written on a record. Returns "" when nothing knows. */
+function companyFor(tk, notes){
+  const k = String(tk||"").trim().toUpperCase();
+  if(!k) return "";
+  const m = (RC.tickers||{})[k];
+  if(m) return m;
+  for(const n of (notes||RC.notes||[]))
+    if(n.ticker===k && n.entity) return n.entity;
+  return "";
+}
+
+/* Split one CSV line, honouring double quotes and doubled "" escapes. Tabs and
+   semicolons are accepted as delimiters too, because a paste out of Excel is a
+   TSV and a European export is often semicolon-separated. */
+function splitDelimited(line){
+  const delim = line.indexOf("\t")>=0 ? "\t"
+              : (line.indexOf(",")>=0 ? "," : ";");
+  const out=[]; let cur="", q=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(q){
+      if(ch==='"'){ if(line[i+1]==='"'){ cur+='"'; i++; } else q=false; }
+      else cur+=ch;
+    } else if(ch==='"') q=true;
+    else if(ch===delim){ out.push(cur); cur=""; }
+    else cur+=ch;
+  }
+  out.push(cur);
+  return out.map(x=>x.trim());
+}
+
+/* Parse a two-column ticker/company list. Deliberately forgiving about layout
+   and strict about content: a row that does not yield a valid ticker is
+   REPORTED, never guessed at, because a silently mangled map is worse than a
+   short one.
+
+   Column order is decided ONCE for the whole file, by scoring both columns
+   across every row, rather than row by row. Per-row detection looks smarter
+   and is worse: on `Widget Industries Holdings,Thing` it would happily decide
+   "Thing" is the ticker, because in isolation it could be. Scoring the file
+   means one odd row is measured against the column its neighbours established,
+   and gets skipped instead of inverted. */
+function parseTickerCSV(text){
+  const rows = String(text||"").replace(/\r\n/g,"\n").split("\n")
+                 .map(l=>l.trim()).filter(Boolean);
+  const map={}, skipped=[], dupes=[];
+
+  /* Already upper-case and in the ticker charset. Case matters: it is what
+     separates MSFT from a one-word company name. */
+  const looksTicker = v => /^[A-Z0-9.\-]{1,12}$/.test(v);
+  /* Weaker test, used only when a file has no upper-case column at all. */
+  const couldTicker = v => /^[A-Za-z0-9.\-]{1,12}$/.test(v) && !/\s/.test(v);
+
+  const cells = rows.map(splitDelimited);
+  let header=null, start=0;
+  if(cells.length && cells[0].length>=2 &&
+     /^(ticker|symbol|ric|bloomberg|code)$/i.test(cells[0][0].trim()+"") ){
+    header=rows[0]; start=1;
+  } else if(cells.length && cells[0].length>=2 &&
+            /^(ticker|symbol|ric|bloomberg|code)$/i.test(cells[0][1].trim()+"")){
+    header=rows[0]; start=1;
+  }
+
+  let score=[0,0], soft=[0,0];
+  for(let i=start;i<cells.length;i++){
+    for(const col of [0,1]){
+      const v=(cells[i][col]||"").trim();
+      if(looksTicker(v)) score[col]++;
+      if(couldTicker(v)) soft[col]++;
+    }
+  }
+  const use = (score[0]||score[1]) ? (score[1]>score[0] ? 1 : 0)
+                                   : (soft[1]>soft[0] ? 1 : 0);
+  const nameCol = use===0 ? 1 : 0;
+
+  for(let i=start;i<cells.length;i++){
+    const row=cells[i];
+    if(row.length<2 || !row[nameCol]){
+      skipped.push({line:i+1,text:rows[i],why:"needs two columns"}); continue; }
+    const tk=(row[use]||"").trim().toUpperCase();
+    const nm=String(row[nameCol]||"").replace(/\s+/g," ").trim();
+    if(!looksTicker(tk)){
+      skipped.push({line:i+1,text:rows[i],
+        why:tk?("not a ticker: "+tk):"no ticker"}); continue; }
+    if(!nm){ skipped.push({line:i+1,text:rows[i],why:"no company name"}); continue; }
+    if(map[tk] && map[tk]!==nm) dupes.push({ticker:tk,kept:map[tk],dropped:nm,line:i+1});
+    else map[tk]=nm;
+  }
+  return { map, header, tickerColumn:use, count:Object.keys(map).length,
+           skipped, dupes };
+}
+
+/* Compare an upload against what is already stored, so the user approves a diff
+   rather than a number. */
+function diffTickers(current, incoming){
+  const added=[], changed=[], same=[];
+  for(const tk in incoming){
+    if(!(tk in current)) added.push(tk);
+    else if(current[tk]!==incoming[tk]) changed.push({ticker:tk,from:current[tk],to:incoming[tk]});
+    else same.push(tk);
+  }
+  return { added, changed, same,
+           missing:Object.keys(current).filter(tk=>!(tk in incoming)) };
+}
+
 /* ---------- tag matching ------------------------------------------------- */
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
 function hasTerm(term,mode,text){
@@ -440,7 +608,7 @@ const FM_ORDER = ["note_id","date","created","last_updated","contributor","origi
   "record_type","entity","ticker","listed","tickers","subject",
   "strategy","action","why","source","outcome_check_date",
   "screen_id","screen_version","run_id","tags",
-  "attachments","price_target_buy","price_target_sell","conviction",
+  "attachments","price_target_buy","price_target_sell","bias",
   "review_date","review_status","priority","revision"];
 
 function fmLine(k,v){
@@ -473,48 +641,70 @@ function buildFM(rec, body){
    whatever its status says — so it is not an approval flag and is not
    validated as one. Approval of Claude- and pipeline-written records happens
    in the Admin records table, filtered on origin. */
-function validateRecord(rec, cfg){
+function validateRecord(rec, cfg, body){
   const c = cfg || RC.cfg || SEED;
   const errors=[], warnings=[];
   const actions = c.actions || ACTIONS;
   const origins = c.origins || ORIGINS;
   const s = k => (rec[k]===null||rec[k]===undefined) ? "" : String(rec[k]).trim();
 
-  if(!s("subject")) errors.push("Subject is required.");
-  /* entity is required on Company and Theme, where it is the page key.
-     On a quick Note it defaults to the subject, so it is never blank on disk
-     but the caller need not supply it. */
-  if(!s("entity") && s("record_type")!=="Note")
-    errors.push("Entity is required \u2014 a company or a theme.");
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(s("date"))) errors.push("Date must be YYYY-MM-DD.");
-
   const type = s("record_type");
   if(type && RECORD_TYPES.indexOf(type)<0)
     errors.push("record_type must be one of: "+RECORD_TYPES.join(", ")+".");
+  const R = typeRules(type);
+
+  if(!s("subject")) errors.push("Subject is required.");
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s("date"))) errors.push("Date must be YYYY-MM-DD.");
 
   const tk = s("ticker");
+
+  /* entity is the page key on a Theme, so it is required there. On Company and
+     Trade it is now optional: the ticker identifies the name, and the company
+     NAME resolves from the ticker map — here at write time, or later in a
+     resolve pass. Requiring it made everyone retype something the app already
+     knows. On a quick Note it defaults to the subject. */
+  if(R.entity==="req" && !s("entity"))
+    errors.push("Entity is required \u2014 a theme.");
+  if(R.entity==="auto" && !s("entity") && !tk && !s("subject"))
+    errors.push("Entity is required \u2014 nothing identifies this record.");
+
   if(tk && !/^[A-Z0-9.\-]{1,12}$/.test(tk))
     errors.push("Ticker must be 1-12 chars: letters, digits, dot or hyphen.");
-  if(type==="Company" && !tk)
-    errors.push("Ticker is required on a company record. "
+  if(R.ticker==="req" && !tk)
+    errors.push("Ticker is required on a "+(type||"company")+" record. "
               + "For a private company use a P. prefix \u2014 P.SECURITIZE.");
-  if(type==="Note" && tk)
-    warnings.push("A quick note carries a ticker \u2014 consider making this a "
+  if(R.ticker==="no" && tk)
+    warnings.push("A "+type+" record carries a ticker \u2014 consider making this a "
                 + "company record so it shows on the company page.");
 
+  /* action is required only where the type makes a decision. A quick note and
+     a theme note are views, not dispositions; demanding an action there taught
+     people to pick "observation" at random, which is worse than blank. */
   const action = s("action");
-  if(!action) errors.push("Action is required.");
-  else if(actions.indexOf(action)<0)
+  if(R.action==="req" && !action)
+    errors.push("Action is required on a "+type+" record.");
+  if(action && actions.indexOf(action)<0)
     errors.push("Action must be one of: "+actions.join(", ")+".");
+  if(action && R.action==="no")
+    warnings.push("A "+type+" record carries an action \u2014 it will not show in "
+                + "the trading log.");
   if(POSITION_ACTIONS.indexOf(action)>=0 && !tk)
     warnings.push("Position action with no ticker \u2014 fine for a private name, "
                 + "otherwise check it.");
 
   const why = s("why");
-  if(!why && WHY_EXEMPT_ACTIONS.indexOf(action)<0)
-    errors.push("why is required \u2014 one line, the reason.");
+  if(R.why==="req" && !why)
+    errors.push("why is required on a "+type+" record \u2014 one line, the reason.");
   if(why.length>WHY_SOFT_CAP)
     warnings.push("why is a one-liner \u2014 the detail goes in the note body.");
+  if(R.why==="opt" && action && !why && WHY_EXEMPT_ACTIONS.indexOf(action)<0)
+    warnings.push("Action set with no why \u2014 this record cannot answer "
+                + "\u201cwhy did we do that?\u201d later.");
+
+  /* body is only checked when the caller passes it. entry.html does; a caller
+     that only has frontmatter is not forced to invent one. */
+  if(R.body==="req" && body!==undefined && !String(body||"").trim())
+    errors.push("The note is required on a "+type+" record.");
 
   const origin = s("origin");
   if(!origin) errors.push("origin is missing \u2014 the writer must set it.");
@@ -533,9 +723,16 @@ function validateRecord(rec, cfg){
     if(raw!=="" && !/^-?\d+$/.test(raw))
       errors.push("Price targets must be whole numbers.");
   }
-  const conv=s("conviction");
-  if(conv && ["High","Med","Low"].indexOf(conv)<0)
-    errors.push("Conviction must be High, Med or Low.");
+  const bias=s("bias");
+  if(bias && BIAS_VALUES.indexOf(bias)<0)
+    errors.push("bias must be one of: "+BIAS_VALUES.join(" ")+".");
+  if(bias && !R.bias)
+    warnings.push("A "+type+" record carries a bias \u2014 the action already says "
+                + "the direction.");
+  /* conviction was removed in v1.6. A record still carrying it is pre-v1.6 and
+     is left alone: buildFM()'s unknown-key passthrough preserves it on a
+     rewrite, and mapping High/Med/Low onto +/=/- would put a value nobody
+     chose into an immutable field. */
 
   const rd=s("review_date");
   if(rd && !/^\d{4}-\d{2}-\d{2}$/.test(rd))
@@ -582,7 +779,10 @@ function validateRecord(rec, cfg){
   if(strat && strategies.length && strategies.indexOf(strat)<0)
     errors.push("strategy must be one of: "+strategies.join(", ")
               + ". Add it in Admin if it is missing.");
-  if(origin==="position-diff" && !strat)
+  if(R.strategy==="req" && !strat)
+    errors.push("strategy is required on a "+type+" record \u2014 a position "
+              + "change belongs to a strategy.");
+  else if(origin==="position-diff" && !strat)
     errors.push("strategy is required on a position change.");
   else if(POSITION_ACTIONS.indexOf(action)>=0 && !strat)
     warnings.push("Position action with no strategy \u2014 this record cannot be "
@@ -643,7 +843,7 @@ const EMAIL_KEYS = {
   tags:"tags", subject:"subject",
   buytarget:"price_target_buy", pricetargetbuy:"price_target_buy",
   selltarget:"price_target_sell", pricetargetsell:"price_target_sell",
-  conviction:"conviction",
+  bias:"bias",
   reviewdate:"review_date", outcomecheck:"outcome_check_date",
   outcomecheckdate:"outcome_check_date"
 };
@@ -859,6 +1059,14 @@ function bumpRevision(text){
 }
 
 /* ---------- shared UI bits ---------------------------------------------- */
+/* Where notes are being read from, in words. admin.html and reports.html both
+   call this in their "found nothing" message, which is the one moment it
+   matters: the usual cause of an empty corpus is that the granted folder is
+   the NOTES folder itself, or its grandparent, rather than the parent. */
+function notesLocation(){
+  if(!RC.dir) return "no folder";
+  return RC.dir.name + "\\NOTES\\YYYY\\MM\\";
+}
 function fmtDate(d){ return d? String(d).slice(0,10) : ""; }
 function ageDays(d){
   if(!d) return null;
@@ -897,7 +1105,8 @@ function esc_html(s){
    ========================================================================== */
 if (typeof module === "object" && module.exports) {
   module.exports = {
-    SEED, ACTIONS, ORIGINS, RECORD_TYPES, POSITION_ACTIONS, CHECKABLE_ACTIONS,
+    SEED, ACTIONS, ORIGINS, RECORD_TYPES, BIAS_VALUES, TYPE_RULES, typeRules,
+    POSITION_ACTIONS, CHECKABLE_ACTIONS,
     WHY_EXEMPT_ACTIONS, WHY_SOFT_CAP, FM_ORDER, EMAIL_KEYS, RC,
     SCREEN_STATUSES, SCREEN_IMMUTABLE, SCREEN_ORDER, RUN_ORDER,
     positionNoteId,
@@ -907,6 +1116,7 @@ if (typeof module === "object" && module.exports) {
     normKey, parseEmailHeaders, resolveTagNames,
     runId, screenPath, parseRunId, validateScreen, buildScreen,
     buildRunSidecar, validateRun,
+    companyFor, splitDelimited, parseTickerCSV, diffTickers, notesLocation,
     fmtDate, ageDays, ageLabel
   };
 }

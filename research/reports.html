@@ -25,6 +25,8 @@
 <div class="tabs">
   <div class="tab cur" data-v="company">Company</div>
   <div class="tab" data-v="theme">Theme</div>
+  <div class="tab" data-v="trading">Trading Log</div>
+  <div class="tab" data-v="notes">Notes</div>
   <div class="tab" data-v="review">Review Queue <span id="duebadge"></span></div>
   <div class="tab" data-v="search">Search</div>
   <span class="sp" style="flex:1"></span>
@@ -58,6 +60,56 @@
   <div id="theme_out"></div>
 </div>
 
+<!-- TRADING LOG -->
+<div id="v_trading" class="hide">
+  <div class="card">
+    <div class="frow">
+      <label for="q_trstrat" class="narrow">Strategy</label>
+      <div class="f md"><select id="q_trstrat"><option value="">All</option></select></div>
+      <label for="q_traction" style="flex:0 0 auto">Action</label>
+      <div class="f sm"><select id="q_traction"><option value="">All</option></select></div>
+      <label for="q_trtkr" style="flex:0 0 auto">Ticker</label>
+      <div class="f sm"><input type="text" id="q_trtkr" class="mono" placeholder="All"
+             autocomplete="off" style="text-transform:uppercase"></div>
+      <label for="q_trwho" style="flex:0 0 auto">Contributor</label>
+      <div class="f md"><select id="q_trwho"><option value="">Everyone</option></select></div>
+    </div>
+    <div class="frow">
+      <label for="q_trfrom" class="narrow">From</label>
+      <div class="f sm"><input type="date" id="q_trfrom"></div>
+      <label for="q_trto" style="flex:0 0 auto">To</label>
+      <div class="f sm"><input type="date" id="q_trto"></div>
+      <label for="q_trgroup" style="flex:0 0 auto">Group by</label>
+      <div class="f sm"><select id="q_trgroup">
+        <option value="">Date</option><option value="strategy">Strategy</option>
+        <option value="action">Action</option><option value="ticker">Ticker</option>
+        <option value="contributor">Contributor</option>
+      </select></div>
+      <div class="f tiny" id="trcount" style="text-align:right"></div>
+    </div>
+  </div>
+  <div id="trading_out"></div>
+</div>
+
+<!-- QUICK NOTES -->
+<div id="v_notes" class="hide">
+  <div class="card">
+    <div class="frow">
+      <label for="q_ntag" class="narrow">Tag</label>
+      <div class="f md"><select id="q_ntag"><option value="">Any tag</option></select></div>
+      <label for="q_nwho" style="flex:0 0 auto">Contributor</label>
+      <div class="f md"><select id="q_nwho"><option value="">Everyone</option></select></div>
+      <label for="q_ntext" style="flex:0 0 auto">Text</label>
+      <div class="f"><input type="text" id="q_ntext" placeholder="Search" autocomplete="off"></div>
+      <div class="f tiny" id="ncount" style="text-align:right"></div>
+    </div>
+    <div class="sub">Quick notes are the records that are neither a company nor a
+      theme &mdash; a country, a conference, something you read. Tags do the
+      retrieval, which is why this view is a tag filter rather than a name list.</div>
+  </div>
+  <div id="notes_out"></div>
+</div>
+
 <!-- REVIEW -->
 <div id="v_review" class="hide">
   <div class="card">
@@ -79,6 +131,7 @@
       <label for="q_rvtype" class="narrow">Type</label>
       <div class="f sm"><select id="q_rvtype">
         <option value="">All</option><option>Company</option><option>Theme</option>
+        <option>Note</option><option>Trade</option>
       </select></div>
       <label for="q_rvtheme" style="flex:0 0 auto">Theme</label>
       <div class="f md"><select id="q_rvtheme"><option value="">All themes</option></select></div>
@@ -139,11 +192,21 @@ let VIEW="company";
 function banner(t,ok){ const b=$("#banner"); b.textContent=t||"";
   b.className="banner"+(t?" show":"")+(ok?" ok":""); }
 
-/* ---------- selectors over the corpus ---------- */
-const companies = ns => ns.filter(n=>n.record_type==="Company"
-                                 || (n.record_type==null && n.ticker));
-const themes    = ns => ns.filter(n=>n.record_type==="Theme"
-                                 || (n.record_type==null && !n.ticker));
+/* ---------- selectors over the corpus ----------
+   Four buckets, one per record_type. The null fallbacks are for records
+   written before record_type existed: a ticker meant a company, no ticker
+   meant a theme. Note and Trade have no such fallback because nothing
+   pre-dates them.
+
+   Every bucket has to be listed somewhere. A record_type that matches no
+   selector saves correctly and is invisible in Reports — which is exactly what
+   happened to Note between v1.4 and v1.6, silently, for a fortnight. */
+const companies  = ns => ns.filter(n=>n.record_type==="Company"
+                                  || (n.record_type==null && n.ticker));
+const themes     = ns => ns.filter(n=>n.record_type==="Theme"
+                                  || (n.record_type==null && !n.ticker));
+const quicknotes = ns => ns.filter(n=>n.record_type==="Note");
+const trades     = ns => ns.filter(n=>n.record_type==="Trade");
 
 /* Themes that reference a ticker in tickers[] — the reverse index. */
 function themesForTicker(ns,tk){
@@ -167,26 +230,29 @@ function targetGrid(recs){
   const asc=[...recs].sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   for(const n of asc){
     const who=n.contributor||"unknown";
-    if(!by.has(who)) by.set(who,{who,buy:null,buyDate:null,sell:null,sellDate:null,conv:null,convDate:null});
+    if(!by.has(who)) by.set(who,{who,buy:null,buyDate:null,sell:null,sellDate:null,bias:null,biasDate:null});
     const r=by.get(who);
     if(n.price_target_buy!==null&&n.price_target_buy!==undefined&&n.price_target_buy!==""){
       r.buy=n.price_target_buy; r.buyDate=n.date; }
     if(n.price_target_sell!==null&&n.price_target_sell!==undefined&&n.price_target_sell!==""){
       r.sell=n.price_target_sell; r.sellDate=n.date; }
-    if(n.conviction){ r.conv=n.conviction; r.convDate=n.date; }
+    if(n.bias){ r.bias=n.bias; r.biasDate=n.date; }
   }
   return [...by.values()].filter(r=>r.buy!==null||r.sell!==null);
 }
-function convGrid(recs){
+/* Latest bias per contributor. Same sparse rule as the targets: a note that
+   does not set a bias is not a reset, so the last one set carries forward. */
+function biasGrid(recs){
   const by=new Map();
   const asc=[...recs].sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   for(const n of asc){
-    if(!n.conviction) continue;
+    if(!n.bias) continue;
     by.set(n.contributor||"unknown",{who:n.contributor||"unknown",
-      conv:n.conviction,date:n.date});
+      bias:n.bias,date:n.date});
   }
   return [...by.values()];
 }
+const BIAS_LABEL={"+":"+  positive","=":"=  neutral","-":"\u2212  negative"};
 
 /* ---------- rendering helpers ---------- */
 function noteRow(n){
@@ -239,7 +305,7 @@ async function renderCompany(){
   const own=companies(ns).filter(n=>n.ticker===tk);
   const themeMap=themesForTicker(ns,tk);
 
-  if(!own.length && !themeMap.size){
+  if(!own.length && !themeMap.size && !trades(ns).some(n=>n.ticker===tk)){
     out.appendChild(emptyLine("No records for "+tk+".")); return; }
 
   const name=(own.find(n=>n.entity)||{}).entity||tk;
@@ -251,7 +317,9 @@ async function renderCompany(){
   const meta=el("div","tiny");
   meta.textContent=own.length+" record(s)"
     + (isPrivate||listed===false||listed==="false" ? "  \u00b7  private \u2014 no price data" : "")
-    + (themeMap.size ? "  \u00b7  "+themeMap.size+" theme(s)" : "");
+    + (themeMap.size ? "  \u00b7  "+themeMap.size+" theme(s)" : "")
+    + (trades(ns).filter(n=>n.ticker===tk).length
+       ? "  \u00b7  "+trades(ns).filter(n=>n.ticker===tk).length+" trade(s)" : "");
   h.appendChild(meta);
   out.appendChild(h);
 
@@ -282,17 +350,17 @@ async function renderCompany(){
     out.appendChild(c);
   }
 
-  // conviction — same sparse rule
-  const cg=convGrid(own);
-  if(cg.length){
-    const c=section("Conviction");
+  // bias — same sparse rule
+  const bg=biasGrid(own);
+  if(bg.length){
+    const c=section("Bias");
     const t=el("table","grid");
-    t.innerHTML="<thead><tr><th>Contributor</th><th>Conviction</th><th>As of</th></tr></thead>";
+    t.innerHTML="<thead><tr><th>Contributor</th><th>Bias</th><th>As of</th></tr></thead>";
     const tb=el("tbody");
-    for(const r of cg){
+    for(const r of bg){
       const tr=el("tr");
       tr.appendChild(el("td","",r.who));
-      tr.appendChild(el("td","",r.conv));
+      tr.appendChild(el("td","mono",BIAS_LABEL[r.bias]||r.bias));
       tr.appendChild(el("td","tiny",fmtDate(r.date)+"  ("+ageLabel(r.date)+")"));
       tb.appendChild(tr);
     }
@@ -319,6 +387,21 @@ async function renderCompany(){
     const c=section("Reviews due");
     due.sort((a,b)=>String(a.review_date).localeCompare(String(b.review_date)));
     due.forEach(n=>c.appendChild(noteRow(n)));
+    out.appendChild(c);
+  }
+
+  // trading log for this name — its own section, above the notes. A position
+  // change is a different kind of fact from a view, and reading them mixed
+  // together is what made the old log unusable.
+  const trs=trades(ns).filter(n=>n.ticker===tk);
+  if(trs.length){
+    const c=section("Trading log ("+trs.length+")");
+    trs.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    c.appendChild(tradeTable(trs));
+    const go=el("div","tiny linkish","Open the full trading log for this ticker");
+    go.style.marginTop="6px";
+    go.onclick=()=>{ setView("trading"); $("#q_trtkr").value=tk; renderTrading(); };
+    c.appendChild(go);
     out.appendChild(c);
   }
 
@@ -378,6 +461,116 @@ async function renderTheme(){
 
   const c=section("Notes ("+recs.length+")");
   recs.forEach(n=>c.appendChild(noteRow(n)));
+  out.appendChild(c);
+}
+
+/* ---------- TRADING LOG ----------
+   Its own view because it is the one bucket that gets read as a sequence
+   rather than as a pile: what did we do, in what strategy, and why. Action,
+   why and the body are all mandatory on these records, so unlike everything
+   else in the corpus this table has no blanks to apologise for. */
+function tradeRows(){
+  const ns=RC.notes||[];
+  const st=$("#q_trstrat").value, ac=$("#q_traction").value;
+  const tk=$("#q_trtkr").value.trim().toUpperCase();
+  const wh=$("#q_trwho").value;
+  const from=$("#q_trfrom").value, to=$("#q_trto").value;
+  return trades(ns).filter(n=>{
+    if(st && n.strategy!==st) return false;
+    if(ac && n.action!==ac) return false;
+    if(tk && n.ticker!==tk) return false;
+    if(wh && n.contributor!==wh) return false;
+    if(from && String(n.date)<from) return false;
+    if(to   && String(n.date)>to)   return false;
+    return true;
+  }).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+}
+
+function tradeTable(rows){
+  const t=el("table","grid");
+  t.innerHTML="<thead><tr><th style='width:92px'>Date</th>"
+             +"<th style='width:74px'>Ticker</th><th style='width:80px'>Action</th>"
+             +"<th>Subject</th><th>Why</th>"
+             +"<th style='width:130px'>Strategy</th>"
+             +"<th style='width:110px'>Contributor</th></tr></thead>";
+  const tb=el("tbody");
+  for(const n of rows){
+    const tr=el("tr");
+    tr.appendChild(el("td","tiny",fmtDate(n.date)));
+    tr.appendChild(el("td","mono",n.ticker||""));
+    const a=el("td");
+    a.appendChild(el("span","pill"+(POSITION_ACTIONS.indexOf(n.action)>=0?" due":""),
+                     n.action||"\u2014"));
+    tr.appendChild(a);
+    const s=el("td");
+    const link=el("div","subj",n.subject||"(no subject)");
+    link.onclick=()=>openReader(n);
+    s.appendChild(link);
+    tr.appendChild(s);
+    tr.appendChild(el("td","",n.why||""));
+    tr.appendChild(el("td","tiny",n.strategy||""));
+    tr.appendChild(el("td","tiny",n.contributor||""));
+    tb.appendChild(tr);
+  }
+  t.appendChild(tb);
+  return t;
+}
+
+async function renderTrading(){
+  const out=$("#trading_out"); out.innerHTML="";
+  await walkNotes();
+  const rows=tradeRows();
+  $("#trcount").textContent=rows.length+" entry(ies)";
+  if(!rows.length){
+    const c=el("div","card");
+    c.appendChild(el("div","empty",
+      (trades(RC.notes||[]).length)
+        ? "Nothing matches those filters."
+        : "No trading log entries yet. They come from the Trading Log type on "
+        + "the Entry page, and later from the Arcana position diff."));
+    out.appendChild(c); return;
+  }
+  const key=$("#q_trgroup").value;
+  if(!key){ const c=section("Entries ("+rows.length+")");
+            c.appendChild(tradeTable(rows)); out.appendChild(c); return; }
+
+  const groups=new Map();
+  for(const n of rows){
+    const k=n[key]||"(blank)";
+    if(!groups.has(k)) groups.set(k,[]);
+    groups.get(k).push(n);
+  }
+  [...groups.keys()].sort().forEach(k=>{
+    const set=groups.get(k);
+    const c=section(k+" ("+set.length+")");
+    c.appendChild(tradeTable(set));
+    out.appendChild(c);
+  });
+}
+
+/* ---------- QUICK NOTES ---------- */
+async function renderNotes(){
+  const out=$("#notes_out"); out.innerHTML="";
+  const ns=await walkNotes();
+  const tag=$("#q_ntag").value, who=$("#q_nwho").value;
+  const q=$("#q_ntext").value.trim().toLowerCase();
+  let rows=quicknotes(ns);
+  if(tag) rows=rows.filter(n=>Array.isArray(n.tags)&&n.tags.includes(tag));
+  if(who) rows=rows.filter(n=>n.contributor===who);
+  if(q) rows=rows.filter(n=>((n.subject||"")+" "+(n._body||"")).toLowerCase().includes(q));
+  rows.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  $("#ncount").textContent=rows.length+" note(s)";
+
+  if(!rows.length){
+    const c=el("div","card");
+    c.appendChild(el("div","empty", quicknotes(ns).length
+      ? "Nothing matches those filters."
+      : "No quick notes yet."));
+    out.appendChild(c); return;
+  }
+  const c=section("Quick notes ("+rows.length+")");
+  rows.slice(0,300).forEach(n=>c.appendChild(noteRow(n)));
+  if(rows.length>300) c.appendChild(el("div","tiny","Showing first 300."));
   out.appendChild(c);
 }
 
@@ -565,13 +758,15 @@ async function exportCSV(){
   banner("Reading notes\u2026");
   try{
     const ns=await walkNotes(true);
-    const wide=[["note_id","date","record_type","contributor","entity","ticker",
-      "listed","tickers","subject","tags","attachments","price_target_buy",
-      "price_target_sell","conviction","review_date","review_status","priority",
+    const wide=[["note_id","date","record_type","origin","contributor","entity","ticker",
+      "listed","tickers","subject","strategy","action","why","source",
+      "outcome_check_date","tags","attachments","price_target_buy",
+      "price_target_sell","bias","review_date","review_status","priority",
       "last_updated","revision"]];
-    for(const n of ns) wide.push([n.note_id,n.date,n.record_type,n.contributor,
-      n.entity,n.ticker,n.listed,n.tickers,n.subject,n.tags,n.attachments,
-      n.price_target_buy,n.price_target_sell,n.conviction,n.review_date,
+    for(const n of ns) wide.push([n.note_id,n.date,n.record_type,n.origin,n.contributor,
+      n.entity,n.ticker,n.listed,n.tickers,n.subject,n.strategy,n.action,n.why,
+      n.source,n.outcome_check_date,n.tags,n.attachments,
+      n.price_target_buy,n.price_target_sell,n.bias,n.review_date,
       n.review_status,n.priority,n.last_updated,n.revision]);
 
     // long: one row per note x ticker — the join table for ticker reporting
@@ -583,10 +778,20 @@ async function exportCSV(){
         link.push([n.note_id,n.date,n.record_type,n.contributor,n.entity,t,
                    "associated",n.subject,n.tags]);
     }
+    /* The trading log on its own, because it is the file that gets opened in
+       Excel and pivoted, and nobody wants to filter 4,000 rows down to it
+       first. */
+    const tl=[["note_id","date","strategy","ticker","entity","action","why",
+      "subject","contributor","origin","tags"]];
+    for(const n of trades(ns)) tl.push([n.note_id,n.date,n.strategy,n.ticker,
+      n.entity,n.action,n.why,n.subject,n.contributor,n.origin,n.tags]);
+
     await writeFile(RC.dir,"_export_notes.csv",csvRows(wide));
     await writeFile(RC.dir,"_export_links.csv",csvRows(link));
-    banner("Wrote _export_notes.csv ("+(wide.length-1)+" notes) and "
-         + "_export_links.csv ("+(link.length-1)+" links).",true);
+    await writeFile(RC.dir,"_export_trades.csv",csvRows(tl));
+    banner("Wrote _export_notes.csv ("+(wide.length-1)+" notes), "
+         + "_export_links.csv ("+(link.length-1)+" links) and "
+         + "_export_trades.csv ("+(tl.length-1)+" trades).",true);
   }catch(e){ banner("Export failed: "+e.message); }
 }
 
@@ -594,13 +799,18 @@ async function exportCSV(){
 function setView(v){
   VIEW=v;
   $$(".tab").forEach(t=>t.classList.toggle("cur",t.dataset.v===v));
-  ["company","theme","review","search"].forEach(x=>
+  ["company","theme","trading","notes","review","search"].forEach(x=>
     $("#v_"+x).classList.toggle("hide",x!==v));
 }
-$$(".tab").forEach(t=>t.onclick=()=>{
-  setView(t.dataset.v);
-  if(t.dataset.v==="review") renderReview();
-  if(t.dataset.v==="search") renderSearch();
+$$(".tab").forEach(t=>{
+  if(!t.dataset.v) return;
+  t.onclick=()=>{
+    setView(t.dataset.v);
+    if(t.dataset.v==="trading") renderTrading();
+    if(t.dataset.v==="notes")   renderNotes();
+    if(t.dataset.v==="review")  renderReview();
+    if(t.dataset.v==="search")  renderSearch();
+  };
 });
 
 /* ---------- boot ---------- */
@@ -639,9 +849,23 @@ async function boot(){
     .forEach(t=>rvth.appendChild(new Option(t,t)));
   const rvtk=$("#q_rvtkr");
   [...tset].sort().forEach(t=>rvtk.appendChild(new Option(t,t)));
-  const tg=$("#q_tag");
-  [...new Set(ns.flatMap(n=>Array.isArray(n.tags)?n.tags:[]))].sort()
-    .forEach(t=>tg.appendChild(new Option(t,t)));
+  const alltags=[...new Set(ns.flatMap(n=>Array.isArray(n.tags)?n.tags:[]))].sort();
+  for(const sel of ["#q_tag","#q_ntag"]){
+    const s2=$(sel); alltags.forEach(t=>s2.appendChild(new Option(t,t)));
+  }
+  for(const sel of ["#q_nwho","#q_trwho"]){
+    const s2=$(sel); (cfg.contributors||[]).forEach(c=>s2.appendChild(new Option(c,c)));
+  }
+  /* Trading log filters: the configured vocabularies, plus anything already on
+     disk that is not in them — a value removed from config still has records. */
+  const stSel=$("#q_trstrat");
+  [...new Set([...(cfg.strategies||[]),
+               ...trades(ns).map(n=>n.strategy).filter(Boolean)])].sort()
+    .forEach(x=>stSel.appendChild(new Option(x,x)));
+  const acSel=$("#q_traction");
+  [...new Set([...(cfg.actions||ACTIONS),
+               ...trades(ns).map(n=>n.action).filter(Boolean)])]
+    .forEach(x=>acSel.appendChild(new Option(x,x)));
 
   const today=new Date().toISOString().slice(0,10);
   const due=ns.filter(n=>n.review_date&&n.review_date<=today&&n.review_status!=="Done").length;
@@ -659,6 +883,13 @@ $("#q_theme").addEventListener("change",renderTheme);
  "#q_rvfrom","#q_rvto"].forEach(x=>$(x).addEventListener("change",renderReview));
 $("#q_rvnone").addEventListener("change",renderReview);
 $("#q_rvclear").onclick=()=>{ $("#q_rvfrom").value=""; $("#q_rvto").value=""; renderReview(); };
+["#q_trstrat","#q_traction","#q_trwho","#q_trfrom","#q_trto","#q_trgroup"]
+  .forEach(x=>$(x).addEventListener("change",renderTrading));
+$("#q_trtkr").addEventListener("input",e=>{
+  e.target.value=e.target.value.toUpperCase(); renderTrading(); });
+$("#q_ntag").addEventListener("change",renderNotes);
+$("#q_nwho").addEventListener("change",renderNotes);
+$("#q_ntext").addEventListener("input",renderNotes);
 $("#q_text").addEventListener("input",renderSearch);
 $("#q_tag").addEventListener("change",renderSearch);
 $("#q_who").addEventListener("change",renderSearch);
