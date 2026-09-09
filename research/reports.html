@@ -44,6 +44,18 @@
         <datalist id="alltkr"></datalist></div>
       <div class="f tiny" id="tkrsummary"></div>
     </div>
+    <div class="frow">
+      <label for="q_cfrom" class="narrow">From</label>
+      <div class="f sm"><input type="date" id="q_cfrom"></div>
+      <label for="q_cto" style="flex:0 0 auto">To</label>
+      <div class="f sm"><input type="date" id="q_cto"></div>
+      <div class="f" style="flex:0 0 auto">
+        <button class="btn rng" data-p="c" data-m="3">3 months</button>
+        <button class="btn rng" data-p="c" data-m="12">1 year</button>
+        <button class="btn rng" data-p="c" data-m="0">All dates</button>
+      </div>
+      <div class="f tiny" id="ccount" style="text-align:right"></div>
+    </div>
   </div>
   <div id="company_out"></div>
 </div>
@@ -55,6 +67,18 @@
       <label for="q_theme" class="narrow">Theme</label>
       <div class="f md"><select id="q_theme"></select></div>
       <div class="f"></div>
+    </div>
+    <div class="frow">
+      <label for="q_thfrom" class="narrow">From</label>
+      <div class="f sm"><input type="date" id="q_thfrom"></div>
+      <label for="q_thto" style="flex:0 0 auto">To</label>
+      <div class="f sm"><input type="date" id="q_thto"></div>
+      <div class="f" style="flex:0 0 auto">
+        <button class="btn rng" data-p="th" data-m="3">3 months</button>
+        <button class="btn rng" data-p="th" data-m="12">1 year</button>
+        <button class="btn rng" data-p="th" data-m="0">All dates</button>
+      </div>
+      <div class="f tiny" id="thcount" style="text-align:right"></div>
     </div>
   </div>
   <div id="theme_out"></div>
@@ -79,6 +103,11 @@
       <div class="f sm"><input type="date" id="q_trfrom"></div>
       <label for="q_trto" style="flex:0 0 auto">To</label>
       <div class="f sm"><input type="date" id="q_trto"></div>
+      <div class="f" style="flex:0 0 auto">
+        <button class="btn rng" data-p="tr" data-m="3">3 months</button>
+        <button class="btn rng" data-p="tr" data-m="12">1 year</button>
+        <button class="btn rng" data-p="tr" data-m="0">All dates</button>
+      </div>
       <label for="q_trgroup" style="flex:0 0 auto">Group by</label>
       <div class="f sm"><select id="q_trgroup">
         <option value="">Date</option><option value="strategy">Strategy</option>
@@ -103,6 +132,18 @@
       <div class="f"><input type="text" id="q_ntext" placeholder="Search" autocomplete="off"></div>
       <div class="f tiny" id="ncount" style="text-align:right"></div>
     </div>
+    <div class="frow">
+      <label for="q_nfrom" class="narrow">From</label>
+      <div class="f sm"><input type="date" id="q_nfrom"></div>
+      <label for="q_nto" style="flex:0 0 auto">To</label>
+      <div class="f sm"><input type="date" id="q_nto"></div>
+      <div class="f" style="flex:0 0 auto">
+        <button class="btn rng" data-p="n" data-m="3">3 months</button>
+        <button class="btn rng" data-p="n" data-m="12">1 year</button>
+        <button class="btn rng" data-p="n" data-m="0">All dates</button>
+      </div>
+      <div class="f"></div>
+    </div>
     <div class="sub">Quick notes are the records that are neither a company nor a
       theme &mdash; a country, a conference, something you read. Tags do the
       retrieval, which is why this view is a tag filter rather than a name list.</div>
@@ -118,6 +159,10 @@
       <div class="f sm"><input type="date" id="q_rvfrom"></div>
       <label for="q_rvto" style="flex:0 0 auto">To</label>
       <div class="f sm"><input type="date" id="q_rvto"></div>
+      <div class="f" style="flex:0 0 auto">
+        <button class="btn rng" data-p="rv" data-m="3" data-fwd="1">Next 3 months</button>
+        <button class="btn rng" data-p="rv" data-m="12" data-fwd="1">Next 12 months</button>
+      </div>
       <button class="btn" id="q_rvclear" style="flex:0 0 auto">All dates</button>
       <label for="q_revstatus" style="flex:0 0 auto">Show</label>
       <div class="f sm"><select id="q_revstatus">
@@ -208,6 +253,34 @@ const themes     = ns => ns.filter(n=>n.record_type==="Theme"
 const quicknotes = ns => ns.filter(n=>n.record_type==="Note");
 const trades     = ns => ns.filter(n=>n.record_type==="Trade");
 
+/* ---------- date ranges ----------
+   One helper per view, all reading n.date (the record date, not review_date).
+   Blank from / blank to = no bound, so the default state of every tab is the
+   whole corpus. The presets only ever write the two inputs — nothing else in
+   the code knows a preset was used, which keeps "3 months" and a hand-typed
+   range on exactly one path. */
+const RANGE={ c:["#q_cfrom","#q_cto"], th:["#q_thfrom","#q_thto"],
+              n:["#q_nfrom","#q_nto"], tr:["#q_trfrom","#q_trto"],
+              rv:["#q_rvfrom","#q_rvto"] };
+
+function range(p){ const [a,b]=RANGE[p]; return [$(a).value,$(b).value]; }
+function inRange(d,from,to){
+  const s=String(d||"");
+  if(from && s<from) return false;
+  if(to   && s>to)   return false;
+  return true;
+}
+const byRange = (rows,p) => { const [f,t]=range(p);
+  return (f||t) ? rows.filter(n=>inRange(n.date,f,t)) : rows; };
+function rangeLabel(p){ const [f,t]=range(p);
+  if(!f&&!t) return "all dates";
+  return (f?fmtDate(f):"earliest")+" \u2013 "+(t?fmtDate(t):"today"); }
+
+function monthsAgo(m){ const d=new Date(); d.setMonth(d.getMonth()-m);
+  return d.toISOString().slice(0,10); }
+function monthsAhead(m){ const d=new Date(); d.setMonth(d.getMonth()+m);
+  return d.toISOString().slice(0,10); }
+
 /* Themes that reference a ticker in tickers[] — the reverse index. */
 function themesForTicker(ns,tk){
   const seen=new Map();
@@ -296,17 +369,89 @@ $("#rd_close").onclick=()=>$("#reader").classList.remove("show");
 $("#reader").onclick=e=>{ if(e.target.id==="reader") $("#reader").classList.remove("show"); };
 
 /* ---------- COMPANY VIEW ---------- */
+/* ---------- COMPANY: the all-tickers roll-up ----------
+   The blank state of the tab. One row per primary ticker inside the date
+   range, drilling into the single-ticker view on click. Targets and bias use
+   the same sparse carry-forward rule as the detail page, over the same
+   filtered set, so a number here and a number there can never disagree. */
+function renderCompanyAll(out,ns){
+  const rows=new Map();
+  for(const n of companies(ns)){
+    if(!n.ticker) continue;
+    if(!rows.has(n.ticker)) rows.set(n.ticker,[]);
+    rows.get(n.ticker).push(n);
+  }
+  const today=new Date().toISOString().slice(0,10);
+  $("#ccount").textContent=rows.size+" ticker(s)  \u00b7  "+rangeLabel("c");
+
+  if(!rows.size){
+    out.appendChild(emptyLine("No company records in "+rangeLabel("c")
+      +". Widen the date range, or type a ticker above."));
+    return;
+  }
+
+  const c=section("All companies ("+rows.size+")");
+  c.appendChild(el("div","tiny","Click a row to open that name. "
+    + "Targets, bias and counts are computed inside "+rangeLabel("c")+"."));
+  const t=el("table","grid");
+  t.innerHTML="<thead><tr><th style='width:78px'>Ticker</th><th>Name</th>"
+    +"<th style='width:64px'>Recs</th><th style='width:96px'>Latest</th>"
+    +"<th style='width:70px'>Buy</th><th style='width:70px'>Sell</th>"
+    +"<th style='width:96px'>Bias</th><th style='width:96px'>Reviews</th></tr></thead>";
+  const tb=el("tbody");
+
+  const list=[...rows.entries()].map(([tk,recs])=>{
+    const latest=recs.map(n=>String(n.date||"")).sort().pop()||"";
+    const g=targetGrid(recs);
+    const buy=g.map(r=>r.buy).filter(v=>v!==null&&v!==undefined);
+    const sell=g.map(r=>r.sell).filter(v=>v!==null&&v!==undefined);
+    const bg=biasGrid(recs);
+    const open=recs.filter(n=>n.review_date&&n.review_status!=="Done").length;
+    const overdue=recs.filter(n=>n.review_date&&n.review_date<today
+                                &&n.review_status!=="Done").length;
+    return {tk,recs,latest,buy,sell,bg,open,overdue,
+            name:(recs.find(n=>n.entity)||{}).entity||tk};
+  }).sort((a,b)=>b.latest.localeCompare(a.latest));
+
+  for(const r of list){
+    const tr=el("tr"); tr.style.cursor="pointer";
+    tr.onclick=()=>{ $("#q_ticker").value=r.tk; renderCompany(); };
+    tr.appendChild(el("td","mono",r.tk));
+    tr.appendChild(el("td","",r.name));
+    tr.appendChild(el("td","num",String(r.recs.length)));
+    tr.appendChild(el("td","tiny",r.latest?fmtDate(r.latest):""));
+    /* Several contributors can hold different targets on one name. The
+       roll-up shows the range rather than picking a winner. */
+    const span=v=>!v.length?"\u2014"
+      :(Math.min(...v)===Math.max(...v)?String(Math.min(...v))
+        :Math.min(...v)+"\u2013"+Math.max(...v));
+    tr.appendChild(el("td","num",span(r.buy)));
+    tr.appendChild(el("td","num",span(r.sell)));
+    tr.appendChild(el("td","mono",r.bg.length
+      ? [...new Set(r.bg.map(x=>x.bias))].join(" ") : "\u2014"));
+    const rv=el("td");
+    if(r.overdue) rv.appendChild(el("span","pill overdue",r.overdue+" overdue"));
+    else if(r.open) rv.appendChild(el("span","pill due",r.open+" open"));
+    tr.appendChild(rv);
+    tb.appendChild(tr);
+  }
+  t.appendChild(tb); c.appendChild(t); out.appendChild(c);
+}
+
 async function renderCompany(){
   const out=$("#company_out"); out.innerHTML="";
   const tk=$("#q_ticker").value.trim().toUpperCase();
-  const ns=await walkNotes();
-  if(!tk){ out.appendChild(emptyLine("Enter a ticker above.")); return; }
+  const nsAll=await walkNotes();
+  const ns=byRange(nsAll,"c");
+  if(!tk){ renderCompanyAll(out,ns); return; }
+  $("#ccount").textContent="";
 
   const own=companies(ns).filter(n=>n.ticker===tk);
   const themeMap=themesForTicker(ns,tk);
 
   if(!own.length && !themeMap.size && !trades(ns).some(n=>n.ticker===tk)){
-    out.appendChild(emptyLine("No records for "+tk+".")); return; }
+    out.appendChild(emptyLine("No records for "+tk+" in "+rangeLabel("c")
+      +". Widen the date range if you expected some.")); return; }
 
   const name=(own.find(n=>n.entity)||{}).entity||tk;
   const isPrivate=tk.startsWith("P.");
@@ -315,7 +460,7 @@ async function renderCompany(){
   // header
   const h=section(name+"  \u00b7  "+tk);
   const meta=el("div","tiny");
-  meta.textContent=own.length+" record(s)"
+  meta.textContent=own.length+" record(s)  \u00b7  "+rangeLabel("c")
     + (isPrivate||listed===false||listed==="false" ? "  \u00b7  private \u2014 no price data" : "")
     + (themeMap.size ? "  \u00b7  "+themeMap.size+" theme(s)" : "")
     + (trades(ns).filter(n=>n.ticker===tk).length
@@ -346,7 +491,10 @@ async function renderCompany(){
       tb.appendChild(tr);
     }
     t.appendChild(tb); c.appendChild(t);
-    c.appendChild(el("div","tiny","Greyed values are more than six months old."));
+    c.appendChild(el("div","tiny","Greyed values are more than six months old."
+      + ((range("c")[0]||range("c")[1])
+         ? "  Targets are computed inside the date range \u2014 a target set before "
+           + rangeLabel("c")+" is not shown here." : "")));
     out.appendChild(c);
   }
 
@@ -413,17 +561,72 @@ async function renderCompany(){
 }
 
 /* ---------- THEME VIEW ---------- */
+/* Blank state: every theme that has records in range, plus every configured
+   theme that has none — an empty theme is a fact worth seeing, not a row to
+   hide. */
+function renderThemeAll(out,ns){
+  const today=new Date().toISOString().slice(0,10);
+  const by=new Map();
+  for(const n of themes(ns)){
+    const k=n.entity||"(no entity)";
+    if(!by.has(k)) by.set(k,[]);
+    by.get(k).push(n);
+  }
+  const configured=[...$("#q_theme").options].map(o=>o.value).filter(Boolean);
+  for(const k of configured) if(!by.has(k)) by.set(k,[]);
+
+  $("#thcount").textContent=by.size+" theme(s)  \u00b7  "+rangeLabel("th");
+  if(!by.size){ out.appendChild(emptyLine("No theme records in "
+    +rangeLabel("th")+".")); return; }
+
+  const c=section("All themes ("+by.size+")");
+  c.appendChild(el("div","tiny","Click a row to open that theme. "
+    + "Counts are inside "+rangeLabel("th")+"."));
+  const t=el("table","grid");
+  t.innerHTML="<thead><tr><th>Theme</th><th style='width:64px'>Recs</th>"
+    +"<th style='width:78px'>Tickers</th><th style='width:96px'>Latest</th>"
+    +"<th style='width:110px'>Catalysts</th><th>Contributors</th></tr></thead>";
+  const tb=el("tbody");
+
+  [...by.entries()].map(([name,recs])=>({
+    name, recs,
+    latest: recs.map(n=>String(n.date||"")).sort().pop()||"",
+    tkrs: new Set(recs.flatMap(n=>Array.isArray(n.tickers)?n.tickers:[])),
+    open: recs.filter(n=>n.review_date&&n.review_status!=="Done").length,
+    overdue: recs.filter(n=>n.review_date&&n.review_date<today
+                           &&n.review_status!=="Done").length,
+    who: [...new Set(recs.map(n=>n.contributor).filter(Boolean))]
+  })).sort((a,b)=>b.latest.localeCompare(a.latest)||a.name.localeCompare(b.name))
+    .forEach(r=>{
+      const tr=el("tr"); tr.style.cursor="pointer";
+      tr.onclick=()=>{ $("#q_theme").value=r.name; renderTheme(); };
+      tr.appendChild(el("td","",r.name));
+      tr.appendChild(el("td","num",String(r.recs.length)));
+      tr.appendChild(el("td","num",String(r.tkrs.size)));
+      tr.appendChild(el("td","tiny",r.latest?fmtDate(r.latest):"\u2014"));
+      const cat=el("td");
+      if(r.overdue) cat.appendChild(el("span","pill overdue",r.overdue+" overdue"));
+      else if(r.open) cat.appendChild(el("span","pill due",r.open+" open"));
+      tr.appendChild(cat);
+      tr.appendChild(el("td","tiny",r.who.join(", ")));
+      tb.appendChild(tr);
+    });
+  t.appendChild(tb); c.appendChild(t); out.appendChild(c);
+}
+
 async function renderTheme(){
   const out=$("#theme_out"); out.innerHTML="";
   const th=$("#q_theme").value;
-  const ns=await walkNotes();
-  if(!th){ out.appendChild(emptyLine("Pick a theme above.")); return; }
+  const ns=byRange(await walkNotes(),"th");
+  if(!th){ renderThemeAll(out,ns); return; }
+  $("#thcount").textContent="";
 
   const recs=themes(ns).filter(n=>n.entity===th);
-  if(!recs.length){ out.appendChild(emptyLine("No records for "+th+".")); return; }
+  if(!recs.length){ out.appendChild(emptyLine("No records for "+th+" in "
+    +rangeLabel("th")+".")); return; }
 
   const h=section(th);
-  h.appendChild(el("div","tiny",recs.length+" record(s)"));
+  h.appendChild(el("div","tiny",recs.length+" record(s)  \u00b7  "+rangeLabel("th")));
   out.appendChild(h);
 
   // catalysts = anything with a review date
@@ -554,12 +757,12 @@ async function renderNotes(){
   const ns=await walkNotes();
   const tag=$("#q_ntag").value, who=$("#q_nwho").value;
   const q=$("#q_ntext").value.trim().toLowerCase();
-  let rows=quicknotes(ns);
+  let rows=byRange(quicknotes(ns),"n");
   if(tag) rows=rows.filter(n=>Array.isArray(n.tags)&&n.tags.includes(tag));
   if(who) rows=rows.filter(n=>n.contributor===who);
   if(q) rows=rows.filter(n=>((n.subject||"")+" "+(n._body||"")).toLowerCase().includes(q));
   rows.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  $("#ncount").textContent=rows.length+" note(s)";
+  $("#ncount").textContent=rows.length+" note(s)  \u00b7  "+rangeLabel("n");
 
   if(!rows.length){
     const c=el("div","card");
@@ -654,12 +857,19 @@ function reviewRow(n,today){
   if(n.review_date){
     const overdue=n.review_date<today && n.review_status!=="Done";
     const cls=n.review_status==="Done"?"pill done":(overdue?"pill overdue":"pill due");
+    /* "today out" was ageLabel() + " out" and read as nonsense on the day a
+       review came due. Spelled out instead: overdue Nd / due today / in Nd. */
+    const days=Math.round((Date.parse(n.review_date+"T00:00:00")
+                          -Date.parse(today+"T00:00:00"))/86400000);
     const p=el("span",cls,n.review_status==="Done"?"Done"
-             :(overdue?"overdue "+Math.abs(ageDays(n.review_date))+"d":ageLabel(n.review_date)+" out"));
+             :(overdue?"overdue "+Math.abs(days)+"d"
+              :(days===0?"due today":"in "+days+"d")));
     p.style.marginTop="4px"; p.style.display="inline-block";
     l.appendChild(p);
   }
   const save=el("button","btn","Save date");
+  save.title="Write the review date above back to the record. "
+           + "Enabled once you change it.";
   save.style.cssText="margin-top:5px;padding:3px 8px;font-size:12px";
   save.disabled=true;
   inp.onchange=()=>{ save.disabled = inp.value===(n.review_date||""); };
@@ -806,6 +1016,12 @@ $$(".tab").forEach(t=>{
   if(!t.dataset.v) return;
   t.onclick=()=>{
     setView(t.dataset.v);
+    /* Every tab renders on click. Company and Theme used to render only on
+       boot or on a keystroke, so switching to them showed a stale pane or a
+       "type something" line — which is the whole reason the blank state now
+       means "everything". */
+    if(t.dataset.v==="company") renderCompany();
+    if(t.dataset.v==="theme")   renderTheme();
     if(t.dataset.v==="trading") renderTrading();
     if(t.dataset.v==="notes")   renderNotes();
     if(t.dataset.v==="review")  renderReview();
@@ -879,11 +1095,10 @@ document.addEventListener("rc-folder",boot);
 $("#q_ticker").addEventListener("input",e=>{
   e.target.value=e.target.value.toUpperCase(); renderCompany(); });
 $("#q_theme").addEventListener("change",renderTheme);
-["#q_revstatus","#q_revwho","#q_rvtype","#q_rvtheme","#q_rvtkr",
- "#q_rvfrom","#q_rvto"].forEach(x=>$(x).addEventListener("change",renderReview));
+["#q_revstatus","#q_revwho","#q_rvtype","#q_rvtheme","#q_rvtkr"].forEach(x=>$(x).addEventListener("change",renderReview));
 $("#q_rvnone").addEventListener("change",renderReview);
 $("#q_rvclear").onclick=()=>{ $("#q_rvfrom").value=""; $("#q_rvto").value=""; renderReview(); };
-["#q_trstrat","#q_traction","#q_trwho","#q_trfrom","#q_trto","#q_trgroup"]
+["#q_trstrat","#q_traction","#q_trwho","#q_trgroup"]
   .forEach(x=>$(x).addEventListener("change",renderTrading));
 $("#q_trtkr").addEventListener("input",e=>{
   e.target.value=e.target.value.toUpperCase(); renderTrading(); });
@@ -893,6 +1108,26 @@ $("#q_ntext").addEventListener("input",renderNotes);
 $("#q_text").addEventListener("input",renderSearch);
 $("#q_tag").addEventListener("change",renderSearch);
 $("#q_who").addEventListener("change",renderSearch);
+/* Date range: the inputs re-render their own view, and the presets are just a
+   shortcut that writes those same two inputs. data-m="0" clears both, which is
+   the All-dates default every tab boots into. */
+const RANGE_RENDER={ c:renderCompany, th:renderTheme, n:renderNotes,
+                     tr:renderTrading, rv:renderReview };
+Object.entries(RANGE).forEach(([p,ids])=>ids.forEach(id=>{
+  const e=$(id); if(e) e.addEventListener("change",()=>RANGE_RENDER[p]());
+}));
+$$("button.rng").forEach(b=>{
+  b.onclick=()=>{
+    const p=b.dataset.p, m=+b.dataset.m, [fa,ta]=RANGE[p];
+    if(!m){ $(fa).value=""; $(ta).value=""; }
+    else if(b.dataset.fwd){                       // review dates look forward
+      $(fa).value=new Date().toISOString().slice(0,10);
+      $(ta).value=monthsAhead(m);
+    }else{ $(fa).value=monthsAgo(m); $(ta).value=""; }
+    RANGE_RENDER[p]();
+  };
+});
+
 $("#btn_reload").onclick=async()=>{ RC.notes=null; await boot(); };
 $("#btn_export").onclick=exportCSV;
 
