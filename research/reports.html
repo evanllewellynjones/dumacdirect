@@ -226,6 +226,7 @@
     </div>
     <div class="bd">
       <div class="tiny" id="rd_meta" style="margin-bottom:10px"></div>
+      <div id="rd_edit"></div>
       <pre id="rd_body"></pre>
     </div>
   </div>
@@ -356,12 +357,186 @@ function section(title){
 }
 function emptyLine(t){ return el("div","empty",t); }
 
+/* ---------- the reader, with an edit strip ----------
+   One modal, opened from every view — Search, Company, Theme, Notes, the
+   Trading Log and the Review Queue all call openReader(). Editing lives here
+   rather than in a per-tab surface, so "search generally, then fix it" works
+   without a second editor to keep in sync.
+
+   What is editable is decided by the record/curation split, not by whether a
+   field is optional. Curation fields are free to change; record fields are
+   frozen at write time and a changed view is a new record. `why` is the one
+   exception, write-once, gated by canSetWhy().
+
+   Every save goes through rewriteNote → setFMLine, then stamps last_updated
+   and bumpRevision(), which rewriteNote does not do for you. */
+const RD_CURATION=["review_date","review_status","priority","outcome_check_date"];
+
+function rdRender(v){                    // scalar → the text setFMLine writes
+  return (v===null||v===undefined||v==="") ? "" : yamlStr(v);
+}
+function rdRenderList(a){                // same rule fmLine() uses for arrays
+  return "["+a.map(x=>JSON.stringify(String(x))).join(", ")+"]";
+}
+
+async function rdSave(n,pairs,status){
+  status.textContent="saving\u2026"; status.className="tiny";
+  try{
+    await rewriteNote(n,txt=>{
+      for(const [k,rendered] of pairs) txt=setFMLine(txt,k,rendered);
+      txt=setFMLine(txt,"last_updated",rdRender(new Date().toISOString()));
+      return bumpRevision(txt);
+    });
+    n.revision=(parseInt(n.revision,10)||0)+1;
+    n.last_updated=new Date().toISOString();
+    status.textContent="saved";
+    if(VIEW==="review") renderReview();
+    if(VIEW==="notes")  renderNotes();
+  }catch(e){ status.textContent="not saved: "+e.message; }
+}
+
+/* Tags: multi-select over the taxonomy only. Typing is a filter, never a way
+   to mint a tag — the closed vocabulary is the point, and resolveTagNames()
+   exists precisely because invented tags must be droppable. */
+function rdTagEditor(n,status){
+  const box=el("div");
+  const chips=el("div","chips");
+  const cap=(RC.cfg&&RC.cfg.maxTags)||SEED.maxTags||8;
+  let cur=Array.isArray(n.tags)?n.tags.slice():[];
+
+  const commit=()=>{ n.tags=cur.slice();
+    rdSave(n,[["tags",rdRenderList(cur)]],status); draw(); };
+
+  const det=el("details"); det.style.marginTop="6px";
+  det.appendChild(el("summary","","Add a tag"));
+  const search=el("input"); search.placeholder="Filter tags"; search.autocomplete="off";
+  search.style.marginTop="6px";
+  const picker=el("div","picker");
+  det.appendChild(search); det.appendChild(picker);
+
+  function drawPicker(){
+    const q=search.value.trim().toLowerCase();
+    const tax=(RC.cfg&&RC.cfg.taxonomy)||SEED.taxonomy||{};
+    picker.innerHTML=""; let shown=0;
+    for(const tag in tax){
+      if(cur.indexOf(tag)>=0) continue;
+      if(q && tag.toLowerCase().indexOf(q)<0) continue;
+      if(++shown>60) break;
+      const d=el("div","",tag);
+      d.onclick=()=>{
+        if(cur.length>=cap){ status.textContent="tag cap of "+cap+" reached"; return; }
+        cur.push(tag); search.value=""; commit(); };
+      picker.appendChild(d);
+    }
+    if(!shown) picker.innerHTML="<div style='color:#6b7280;cursor:default'>no match</div>";
+  }
+  search.addEventListener("input",drawPicker);
+
+  function draw(){
+    chips.innerHTML="";
+    if(!cur.length) chips.appendChild(el("span","tiny","no tags"));
+    cur.forEach(t=>{
+      const e=el("span","chip"); e.appendChild(el("b","",t));
+      const b=el("button","","\u00d7"); b.title="remove";
+      b.onclick=()=>{ cur=cur.filter(x=>x!==t); commit(); };
+      e.appendChild(b); chips.appendChild(e);
+    });
+    drawPicker();
+  }
+  draw();
+  box.appendChild(chips); box.appendChild(det);
+  return box;
+}
+
+function rdField(label,control,hint){
+  const w=el("div"); w.style.cssText="display:flex;gap:8px;align-items:center;margin:4px 0";
+  const l=el("label","",label);
+  l.style.cssText="flex:0 0 132px;margin:0";
+  w.appendChild(l); w.appendChild(control);
+  if(hint){ const h=el("span","tiny",hint); h.style.marginLeft="6px"; w.appendChild(h); }
+  return w;
+}
+
+function rdEditor(n){
+  const c=el("div","card");
+  c.appendChild(el("div","sect","Edit"));
+  const status=el("div","tiny"); status.style.cssText="text-align:right;min-height:14px";
+
+  /* review_date + review_status move together: clearing the date unschedules
+     the record, and a status with no date is invisible in the queue — the
+     combination validateRecord() warns about. */
+  const rdate=el("input"); rdate.type="date"; rdate.value=n.review_date||"";
+  rdate.onchange=()=>{
+    const v=rdate.value||"";
+    n.review_date=v||null;
+    n.review_status=v?(n.review_status||"Pending"):null;
+    rstat.value=n.review_status||"";
+    rdSave(n,[["review_date",rdRender(v)],
+              ["review_status",rdRender(n.review_status)]],status);
+  };
+  c.appendChild(rdField("Review date",rdate,"blank = unscheduled"));
+
+  const rstat=el("select");
+  [["",""],["Pending","Pending"],["Done","Done"]].forEach(([v,t])=>
+    rstat.appendChild(new Option(t,v)));
+  rstat.value=n.review_status||"";
+  rstat.onchange=()=>{ n.review_status=rstat.value||null;
+    rdSave(n,[["review_status",rdRender(rstat.value)]],status); };
+  c.appendChild(rdField("Review status",rstat,
+    n.review_date?"":"no review date \u2014 this will not show in the queue"));
+
+  /* priority has no configured vocabulary, so the list is whatever config
+     holds, plus whatever is already on disk, plus the obvious three. */
+  const prio=el("select");
+  const seen=[...new Set([...(((RC.cfg||{}).priorities)||[]),
+    ...(RC.notes||[]).map(x=>x.priority).filter(Boolean),
+    "High","Medium","Low"])];
+  prio.appendChild(new Option("",""));
+  seen.forEach(p=>prio.appendChild(new Option(p,p)));
+  prio.value=n.priority||"";
+  prio.onchange=()=>{ n.priority=prio.value||null;
+    rdSave(n,[["priority",rdRender(prio.value)]],status); };
+  c.appendChild(rdField("Priority",prio));
+
+  const oc=el("input"); oc.type="date"; oc.value=n.outcome_check_date||"";
+  oc.onchange=()=>{ n.outcome_check_date=oc.value||null;
+    rdSave(n,[["outcome_check_date",rdRender(oc.value)]],status); };
+  c.appendChild(rdField("Outcome check",oc,"was this call right? \u2014 not the review queue"));
+
+  /* why: settable while blank, frozen once set. canSetWhy() is the same gate
+     the Open Whys queue will use. */
+  if(canSetWhy(n.why)){
+    const why=el("input"); why.type="text"; why.value="";
+    why.placeholder="one line \u2014 the reason, compressed";
+    why.onchange=()=>{
+      const v=why.value.trim(); if(!v) return;
+      n.why=v; rdSave(n,[["why",rdRender(v)]],status);
+      why.disabled=true;
+    };
+    c.appendChild(rdField("Why",why,"write-once \u2014 frozen after this"));
+  }else{
+    const ro=el("div","",n.why); ro.style.flex="1";
+    c.appendChild(rdField("Why",ro,"set \u2014 a changed reason is a new record"));
+  }
+
+  c.appendChild(rdField("Tags",rdTagEditor(n,status)));
+  c.appendChild(status);
+  c.appendChild(el("div","tiny","Date, subject, ticker, action, strategy, "
+    + "targets, bias, source and the note body are record fields \u2014 frozen at "
+    + "write time. Changing one of those means a new record."));
+  return c;
+}
+
 function openReader(n){
   $("#rd_title").textContent=n.subject||"(no subject)";
   $("#rd_meta").textContent=
     [n.note_id, n.record_type||"unclassified", n.contributor, fmtDate(n.date),
-     n.ticker?("ticker "+n.ticker):"", (n.tags||[]).join(", ")]
+     n.ticker?("ticker "+n.ticker):"", n.action?("action "+n.action):"",
+     n.strategy||""]
     .filter(Boolean).join("  \u00b7  ");
+  const ed=$("#rd_edit"); ed.innerHTML="";
+  if(n._path) ed.appendChild(rdEditor(n));
+  else ed.appendChild(el("div","tiny","This record has no file path \u2014 not editable."));
   $("#rd_body").textContent=n._body||"(empty)";
   $("#reader").classList.add("show");
 }
