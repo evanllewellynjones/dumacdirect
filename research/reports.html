@@ -370,7 +370,7 @@ function emptyLine(t){ return el("div","empty",t); }
 
    Every save goes through rewriteNote → setFMLine, then stamps last_updated
    and bumpRevision(), which rewriteNote does not do for you. */
-const RD_CURATION=["review_date","review_status","priority","outcome_check_date"];
+const RD_CURATION=["review_date","review_status","outcome_check_date"];
 
 function rdRender(v){                    // scalar → the text setFMLine writes
   return (v===null||v===undefined||v==="") ? "" : yamlStr(v);
@@ -484,19 +484,6 @@ function rdEditor(n){
     rdSave(n,[["review_status",rdRender(rstat.value)]],status); };
   c.appendChild(rdField("Review status",rstat,
     n.review_date?"":"no review date \u2014 this will not show in the queue"));
-
-  /* priority has no configured vocabulary, so the list is whatever config
-     holds, plus whatever is already on disk, plus the obvious three. */
-  const prio=el("select");
-  const seen=[...new Set([...(((RC.cfg||{}).priorities)||[]),
-    ...(RC.notes||[]).map(x=>x.priority).filter(Boolean),
-    "High","Medium","Low"])];
-  prio.appendChild(new Option("",""));
-  seen.forEach(p=>prio.appendChild(new Option(p,p)));
-  prio.value=n.priority||"";
-  prio.onchange=()=>{ n.priority=prio.value||null;
-    rdSave(n,[["priority",rdRender(prio.value)]],status); };
-  c.appendChild(rdField("Priority",prio));
 
   const oc=el("input"); oc.type="date"; oc.value=n.outcome_check_date||"";
   oc.onchange=()=>{ n.outcome_check_date=oc.value||null;
@@ -957,7 +944,7 @@ async function renderNotes(){
    Company and Theme records both carry an optional review_date. Blank means
    unscheduled, and unscheduled records are hidden unless you ask for them.
    review_date and review_status are shared curation fields — anyone can move
-   a date, the same way anyone can set priority. Last write wins. */
+   a date or flip a status. Last write wins. */
 function reviewRows(){
   const ns=RC.notes||[];
   const from=$("#q_rvfrom").value, to=$("#q_rvto").value;
