@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reports &amp; Search</title>
 <link rel="stylesheet" href="rc-style.css">
+<style>
+/* Review Queue — compact 3-line row. Scoped so nothing else shifts. */
+.rvtbl td{vertical-align:top;padding-top:6px;padding-bottom:6px}
+.rvtbl .rvdate input[type=date]{width:100%;box-sizing:border-box}
+.rvtbl .rvline{display:flex;align-items:center;gap:6px;margin-top:3px}
+.rvtbl .iconbtn{padding:1px 6px;font-size:13px;line-height:1.2;cursor:pointer}
+.rvtbl .iconbtn:disabled{opacity:.35;cursor:default}
+.rvtbl .subj{display:inline;cursor:pointer}
+.rvtbl .rvhead{line-height:1.35}
+.rvtbl .rvhead b{margin-right:6px}
+.rvtbl .body{margin-top:2px;max-height:2.8em;overflow:hidden}
+.rvtbl .rvmeta{white-space:nowrap}
+</style>
 </head>
 <body>
 
@@ -370,7 +383,7 @@ function emptyLine(t){ return el("div","empty",t); }
 
    Every save goes through rewriteNote → setFMLine, then stamps last_updated
    and bumpRevision(), which rewriteNote does not do for you. */
-const RD_CURATION=["review_date","review_status","outcome_check_date"];
+const RD_CURATION=["review_date","review_status"];
 
 function rdRender(v){                    // scalar → the text setFMLine writes
   return (v===null||v===undefined||v==="") ? "" : yamlStr(v);
@@ -484,11 +497,6 @@ function rdEditor(n){
     rdSave(n,[["review_status",rdRender(rstat.value)]],status); };
   c.appendChild(rdField("Review status",rstat,
     n.review_date?"":"no review date \u2014 this will not show in the queue"));
-
-  const oc=el("input"); oc.type="date"; oc.value=n.outcome_check_date||"";
-  oc.onchange=()=>{ n.outcome_check_date=oc.value||null;
-    rdSave(n,[["outcome_check_date",rdRender(oc.value)]],status); };
-  c.appendChild(rdField("Outcome check",oc,"was this call right? \u2014 not the review queue"));
 
   /* why: settable while blank, frozen once set. canSetWhy() is the same gate
      the Open Whys queue will use. */
@@ -1000,7 +1008,7 @@ async function renderReview(){
     const c=el("div","card");
     c.appendChild(el("div","sect",label+" ("+set.length+")"));
     const t=el("table","grid rvtbl");
-    t.innerHTML="<thead><tr><th style='width:132px'>Review date</th>"
+    t.innerHTML="<thead><tr><th style='width:150px'>Review date</th>"
                +"<th>Note</th><th style='width:150px'>Entered</th></tr></thead>";
     const tb=el("tbody");
     set.forEach(n=>tb.appendChild(reviewRow(n,today)));
@@ -1011,28 +1019,27 @@ async function renderReview(){
 function reviewRow(n,today){
   const tr=el("tr");
 
-  /* --- LEFT: the review date, editable in place --- */
+  /* --- LEFT: review date, with the due pill and a save icon on one line
+         underneath it. Three lines per row is the whole point of this
+         layout, so nothing here gets its own row. --- */
   const l=el("td","rvdate");
   const inp=el("input"); inp.type="date"; inp.value=n.review_date||"";
   inp.title="Change the review date, or clear it to unschedule.";
   l.appendChild(inp);
+
+  const line=el("div","rvline");
   if(n.review_date){
     const overdue=n.review_date<today && n.review_status!=="Done";
     const cls=n.review_status==="Done"?"pill done":(overdue?"pill overdue":"pill due");
-    /* "today out" was ageLabel() + " out" and read as nonsense on the day a
-       review came due. Spelled out instead: overdue Nd / due today / in Nd. */
     const days=Math.round((Date.parse(n.review_date+"T00:00:00")
                           -Date.parse(today+"T00:00:00"))/86400000);
-    const p=el("span",cls,n.review_status==="Done"?"Done"
+    line.appendChild(el("span",cls,n.review_status==="Done"?"Done"
              :(overdue?"overdue "+Math.abs(days)+"d"
-              :(days===0?"due today":"in "+days+"d")));
-    p.style.marginTop="4px"; p.style.display="inline-block";
-    l.appendChild(p);
+              :(days===0?"due today":"in "+days+"d"))));
   }
-  const save=el("button","btn","Save date");
-  save.title="Write the review date above back to the record. "
-           + "Enabled once you change it.";
-  save.style.cssText="margin-top:5px;padding:3px 8px;font-size:12px";
+  const save=el("button","btn iconbtn","\uD83D\uDCBE");
+  save.title="Save the review date. Enabled once you change it.";
+  save.setAttribute("aria-label","Save review date");
   save.disabled=true;
   inp.onchange=()=>{ save.disabled = inp.value===(n.review_date||""); };
   save.onclick=async()=>{
@@ -1048,31 +1055,34 @@ function reviewRow(n,today){
       renderReview();
     }catch(e){ alert("Could not save: "+e.message); save.disabled=false; }
   };
-  l.appendChild(save);
+  line.appendChild(save);
+  l.appendChild(line);
   tr.appendChild(l);
 
-  /* --- MIDDLE: the note --- */
+  /* --- MIDDLE: one head line — the name in bold, then the subject — and one
+         excerpt line. The record_type word is dropped: a ticker or a theme
+         name reads as what it is. Tags moved to the reader. --- */
   const m=el("td");
-  const subj=el("div","subj",n.subject||"(no subject)");
+  const head=el("div","rvhead");
+  const name = n.record_type==="Theme" ? (n.entity||"")
+             : (n.ticker || n.entity
+                || (Array.isArray(n.tickers)&&n.tickers.length?n.tickers[0]:""));
+  if(name) head.appendChild(el("b","",name));
+  const subj=el("span","subj",n.subject||"(no subject)");
   subj.onclick=()=>openReader(n);
-  m.appendChild(subj);
-  const tgt = n.ticker || (Array.isArray(n.tickers)&&n.tickers.length
-              ? n.tickers.join(" ") : "");
-  const meta=el("div","meta");
-  meta.textContent=[n.record_type||"unclassified",n.entity,tgt].filter(Boolean).join("  \u00b7  ");
-  m.appendChild(meta);
-  if(Array.isArray(n.tags)&&n.tags.length)
-    m.appendChild(el("div","meta",n.tags.join(" \u00b7 ")));
+  head.appendChild(subj);
+  m.appendChild(head);
   if(n._body) m.appendChild(el("div","body",excerpt(n._body)));
   tr.appendChild(m);
 
-  /* --- RIGHT: entry date, contributor, status toggle --- */
+  /* --- RIGHT: entered date and contributor on one line, the status toggle
+         under it. Mark done is the only disposition the queue needs. --- */
   const r=el("td","rvmeta");
-  r.appendChild(el("div","",fmtDate(n.date)));
-  r.appendChild(el("div","tiny",n.contributor||""));
+  r.appendChild(el("div","tiny",
+    [fmtDate(n.date),n.contributor].filter(Boolean).join("  \u00b7  ")));
   if(n.review_date){
     const btn=el("button","btn",n.review_status==="Done"?"Reopen":"Mark done");
-    btn.style.cssText="margin-top:5px;padding:3px 8px;font-size:12px";
+    btn.style.cssText="margin-top:3px;padding:2px 8px;font-size:12px";
     btn.onclick=async()=>{
       btn.disabled=true;
       const next=n.review_status==="Done"?"Pending":"Done";
