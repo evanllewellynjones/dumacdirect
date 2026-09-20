@@ -1055,6 +1055,19 @@ async function rewriteNote(n, mutate){
   text=mutate(text);
   await writeFile(nd,"note.md",text);
 }
+/* One attachment out of a record's folder, as a File. Kept in rc-core because
+   the note folder layout is this file's business, not the reader's. */
+async function readAttachment(n,name){
+  if(!n || !Array.isArray(n._path) || n._path.length!==3)
+    throw new Error("No folder path on this record.");
+  const root=await notesRoot(false);
+  const yh=await root.getDirectoryHandle(n._path[0]);
+  const mh=await yh.getDirectoryHandle(n._path[1]);
+  const nd=await mh.getDirectoryHandle(n._path[2]);
+  const fh=await nd.getFileHandle(name);
+  return await fh.getFile();
+}
+
 /* Permanently remove one record's folder and everything in it.
    Deliberately single-record and deliberately loud. A note folder holds
    note.md plus attachments, so the only honest delete is recursive — and a
@@ -1161,7 +1174,7 @@ if (typeof module === "object" && module.exports) {
     normKey, parseEmailHeaders, resolveTagNames,
     runId, screenPath, parseRunId, validateScreen, buildScreen,
     buildRunSidecar, validateRun,
-    companyFor, splitDelimited, parseTickerCSV, diffTickers, notesLocation, deleteNote,
+    companyFor, splitDelimited, parseTickerCSV, diffTickers, notesLocation, deleteNote, readAttachment,
     fmtDate, ageDays, ageLabel
   };
 }

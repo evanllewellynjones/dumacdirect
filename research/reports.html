@@ -34,11 +34,33 @@ table.grid.cpg-tgt td.pct.up{color:var(--ok)} table.grid.cpg-tgt td.pct.dn{color
 table.grid.cpg-tgt td.bias{font-family:"Cascadia Mono",Consolas,monospace;font-weight:700;
   text-align:center}
 .cpg .noterow .hd{align-items:baseline}
-.cpg .noterow .bias{font-family:"Cascadia Mono",Consolas,monospace;font-weight:700;
-  font-size:13px;padding:0 4px}
 .cpg .noterow .tags{margin-left:auto;font-size:11.5px;color:var(--mut);text-align:right}
 .cpg .noterow .body{max-height:none;display:-webkit-box;-webkit-line-clamp:2;
   -webkit-box-orient:vertical;overflow:hidden}
+
+/* Attachments in the reader. Images render inline; anything else is a chip
+   that opens in a new tab. Both go through a blob URL, because the file lives
+   in a granted folder the browser will not link to directly. */
+#rd_atts{margin:10px 0 4px}
+#rd_atts .lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--navy);font-weight:700;margin-bottom:5px}
+.attrow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.attchip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;
+  background:var(--accent-sub);color:var(--accent);border:1px solid #b9cee6;
+  border-radius:4px;padding:3px 9px;cursor:pointer;font-weight:500}
+.attchip:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.attchip .sz{font-size:11px;opacity:.75;font-family:"Cascadia Mono",Consolas,monospace}
+.attchip.bad{background:var(--warn-sub);color:var(--warn);border-color:#e0bf9e;cursor:default}
+.attimg{margin-bottom:8px}
+.attimg img{max-width:100%;border:1px solid var(--line);border-radius:3px;
+  display:block;cursor:zoom-in}
+.attimg .cap{font-size:11.5px;color:var(--mut);margin-top:2px}
+
+/* Bias leads the note line — it is the first thing you want off the row. */
+.noterow .bias,.rvtbl .bias{font-family:"Cascadia Mono",Consolas,monospace;
+  font-weight:700;font-size:17px;line-height:1;width:18px;display:inline-block;
+  text-align:center;flex:0 0 auto}
+.bias.up{color:var(--ok)} .bias.dn{color:#942323} .bias.flat{color:var(--mut)}
 
 /* Price Targets view + the thesis line on the company page. */
 .pt-thesis{font-size:12.5px;color:#2f3846;display:-webkit-box;-webkit-line-clamp:2;
@@ -323,6 +345,7 @@ table.grid.pttbl td.chg.up{color:var(--ok)} table.grid.pttbl td.chg.dn{color:#94
     <div class="bd">
       <div class="tiny" id="rd_meta" style="margin-bottom:10px"></div>
       <div id="rd_edit"></div>
+      <div id="rd_atts"></div>
       <pre id="rd_body"></pre>
     </div>
   </div>
@@ -431,12 +454,24 @@ function biasGrid(recs){
 const BIAS_LABEL={"+":"+  positive","=":"=  neutral","-":"\u2212  negative"};
 
 /* ---------- rendering helpers ---------- */
+/* One bias glyph, sized and coloured. Returns null when the record has none,
+   so callers can simply skip it rather than render an empty slot. */
+function biasEl(b){
+  if(!b) return null;
+  const e=el("span","bias "+(b==="+"?"up":b==="-"?"dn":"flat"),
+            b==="-"?"\u2212":b);
+  e.title=BIAS_LABEL[b]||b;
+  return e;
+}
+
 function noteRow(n){
   const d=el("div","noterow");
   const hd=el("div","hd");
+  const b=biasEl(n.bias); if(b) hd.appendChild(b);
   const s=el("span","subj",n.subject||"(no subject)");
   s.onclick=()=>openReader(n);
   hd.appendChild(s);
+  if(attsOf(n).length) hd.appendChild(clipEl(n));
   if(n.review_date){
     const days=ageDays(n.review_date);
     const cls = n.review_status==="Done" ? "pill done"
@@ -611,21 +646,86 @@ function rdEditor(n){
   return c;
 }
 
+/* ---------- attachments in the reader ----------
+   The files sit in the record's own folder, which the browser will not link to
+   directly, so each one is read through the granted handle and turned into a
+   blob URL. Those URLs are revoked when the reader closes or moves to another
+   record; leaving them alive pins the file bytes in memory for the life of the
+   tab, which at PDF sizes is not free. */
+const IMG_RE=/\.(png|jpe?g|gif|webp|svg|bmp)$/i;
+const attsOf = n => (Array.isArray(n.attachments)?n.attachments:[]).filter(Boolean);
+let RD_URLS=[];
+function revokeAtts(){ RD_URLS.forEach(u=>{ try{ URL.revokeObjectURL(u); }catch(e){} });
+                       RD_URLS=[]; }
+function fmtSize(b){
+  if(!(b>=0)) return "";
+  return b<1024 ? b+" B"
+       : b<1048576 ? (b/1024).toFixed(0)+" KB"
+       : (b/1048576).toFixed(1)+" MB";
+}
+/* A paperclip on the note line, so you can see a record carries a file
+   without opening it. */
+function clipEl(n){
+  const c=el("span","meta","\uD83D\uDCCE "+attsOf(n).length);
+  c.title=attsOf(n).join(", ");
+  c.style.cursor="pointer";
+  c.onclick=e=>{ e.stopPropagation(); openReader(n); };
+  return c;
+}
+async function renderAtts(n){
+  const box=$("#rd_atts"); box.innerHTML=""; revokeAtts();
+  const names=attsOf(n);
+  if(!names.length) return;
+  box.appendChild(el("div","lbl","Attachments ("+names.length+")"));
+  const imgs=el("div"), rest=el("div","attrow");
+  box.appendChild(imgs); box.appendChild(rest);
+  for(const name of names){
+    let f=null;
+    try{ f=await readAttachment(n,name); }catch(e){}
+    if(!f){
+      const bad=el("span","attchip bad",name+" \u2014 not found in the record folder");
+      rest.appendChild(bad); continue;
+    }
+    const url=URL.createObjectURL(f); RD_URLS.push(url);
+    if(IMG_RE.test(name)){
+      const w=el("div","attimg");
+      const im=document.createElement("img"); im.src=url; im.alt=name;
+      im.title="Open full size in a new tab";
+      im.onclick=()=>window.open(url,"_blank");
+      w.appendChild(im);
+      w.appendChild(el("div","cap",name+"  \u00b7  "+fmtSize(f.size)));
+      imgs.appendChild(w);
+    } else {
+      const a=el("span","attchip",name);
+      a.appendChild(el("span","sz",fmtSize(f.size)));
+      a.title="Open in a new tab";
+      a.onclick=()=>window.open(url,"_blank");
+      rest.appendChild(a);
+    }
+  }
+}
+
 function openReader(n){
   $("#rd_title").textContent=n.subject||"(no subject)";
   $("#rd_meta").textContent=
     [n.note_id, n.record_type||"unclassified", n.contributor, fmtDate(n.date),
      n.ticker?("ticker "+n.ticker):"", n.action?("action "+n.action):"",
-     n.strategy||""]
+     n.strategy||"",
+     attsOf(n).length ? attsOf(n).length+" attachment(s)" : ""]
     .filter(Boolean).join("  \u00b7  ");
   const ed=$("#rd_edit"); ed.innerHTML="";
   if(n._path) ed.appendChild(rdEditor(n));
   else ed.appendChild(el("div","tiny","This record has no file path \u2014 not editable."));
   $("#rd_body").textContent=n._body||"(empty)";
   $("#reader").classList.add("show");
+  renderAtts(n);
 }
-$("#rd_close").onclick=()=>$("#reader").classList.remove("show");
-$("#reader").onclick=e=>{ if(e.target.id==="reader") $("#reader").classList.remove("show"); };
+function closeReader(){ $("#reader").classList.remove("show");
+                        $("#rd_atts").innerHTML=""; revokeAtts(); }
+$("#rd_close").onclick=closeReader;
+$("#reader").onclick=e=>{ if(e.target.id==="reader") closeReader(); };
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && $("#reader").classList.contains("show")) closeReader(); });
 
 /* ---------- COMPANY VIEW ---------- */
 /* ---------- COMPANY: the all-tickers roll-up ----------
@@ -776,9 +876,11 @@ function recordsForTicker(ns,tk){
 function companyNoteRow(n){
   const d=el("div","noterow");
   const hd=el("div","hd");
+  const b=biasEl(n.bias); if(b) hd.appendChild(b);
   const s=el("span","subj",n.subject||"(no subject)");
   s.onclick=()=>openReader(n);
   hd.appendChild(s);
+  if(attsOf(n).length) hd.appendChild(clipEl(n));
   if(n.record_type==="Theme" && n.entity){
     const p=el("span","pill linkish",n.entity); p.title="Open theme report";
     p.onclick=()=>{ setView("theme"); $("#q_theme").value=n.entity; renderTheme(); };
@@ -787,8 +889,6 @@ function companyNoteRow(n){
     hd.appendChild(el("span","pill","quick note"));
   }
   hd.appendChild(el("span","meta",fmtDate(n.date)+" \u00b7 "+(n.contributor||"")));
-  if(n.bias){ const b=el("span","bias",n.bias==="-"?"\u2212":n.bias);
-    b.title=BIAS_LABEL[n.bias]||n.bias; hd.appendChild(b); }
   if(n.review_date){
     const days=ageDays(n.review_date);
     const cls = n.review_status==="Done" ? "pill done"
@@ -1431,10 +1531,12 @@ function reviewRow(n,today){
   const name = n.record_type==="Theme" ? (n.entity||"")
              : (n.ticker || n.entity
                 || (Array.isArray(n.tickers)&&n.tickers.length?n.tickers[0]:""));
+  const rb=biasEl(n.bias); if(rb) head.appendChild(rb);
   if(name) head.appendChild(el("b","",name));
   const subj=el("span","subj",n.subject||"(no subject)");
   subj.onclick=()=>openReader(n);
   head.appendChild(subj);
+  if(attsOf(n).length) head.appendChild(clipEl(n));
   m.appendChild(head);
   if(n._body) m.appendChild(el("div","body",excerpt(n._body)));
   tr.appendChild(m);
