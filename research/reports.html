@@ -24,7 +24,10 @@
 .cpg-themes{display:inline-flex;gap:5px;flex-wrap:wrap;align-items:baseline}
 .cpg-themes .chip{cursor:pointer;padding:1px 9px}
 .cpg-themes .chip:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-.cpg-top .back{margin-left:auto;font-size:12px}
+.cpg-top .back{font-size:12px}
+.cpg-jump{margin-left:auto;display:flex;align-items:center;gap:8px}
+.cpg-jump input{width:110px;font-family:"Cascadia Mono",Consolas,monospace;
+  text-transform:uppercase;padding:3px 6px;font-size:13px}
 table.grid.cpg-tgt td.pct{text-align:right;font-family:"Cascadia Mono",Consolas,monospace;
   color:var(--mut)}
 table.grid.cpg-tgt td.pct.up{color:var(--ok)} table.grid.cpg-tgt td.pct.dn{color:#942323}
@@ -630,25 +633,42 @@ $("#reader").onclick=e=>{ if(e.target.id==="reader") $("#reader").classList.remo
    range, drilling into the single-ticker view on click. Targets and bias use
    the same sparse carry-forward rule as the detail page, over the same
    filtered set, so a number here and a number there can never disagree. */
-function renderCompanyAll(out,ns){
+function renderCompanyAll(out,ns,pfx){
   const rows=new Map();
   for(const n of companies(ns)){
     if(!n.ticker) continue;
-    if(!rows.has(n.ticker)) rows.set(n.ticker,[]);
-    rows.get(n.ticker).push(n);
+    const k=normTk(n.ticker);
+    if(pfx && !k.startsWith(pfx)) continue;
+    if(!rows.has(k)) rows.set(k,[]);
+    rows.get(k).push(n);
   }
   const today=new Date().toISOString().slice(0,10);
   $("#ccount").textContent=rows.size+" ticker(s)  \u00b7  "+rangeLabel("c");
 
   if(!rows.size){
-    out.appendChild(emptyLine("No company records in "+rangeLabel("c")
-      +". Widen the date range, or type a ticker above."));
+    const c=el("div","card");
+    if(pfx){
+      c.appendChild(el("div","empty","No notes on a ticker starting with "+pfx+"."));
+      const d=el("div","tiny");
+      d.appendChild(document.createTextNode("Press Enter to open "));
+      const a=el("span","linkish mono",pfx);
+      a.onclick=()=>renderCompany(true); d.appendChild(a);
+      d.appendChild(document.createTextNode(" anyway."));
+      c.appendChild(d);
+    } else {
+      c.appendChild(el("div","empty","No company records in "+rangeLabel("c")
+        +". Widen the date range, or type a ticker above."));
+    }
+    out.appendChild(c);
     return;
   }
 
-  const c=section("All companies ("+rows.size+")");
-  c.appendChild(el("div","tiny","Click a row to open that name. "
-    + "Targets, bias and counts are computed inside "+rangeLabel("c")+"."));
+  const c=section(pfx ? "Companies matching "+pfx+" ("+rows.size+")"
+                     : "All companies ("+rows.size+")");
+  c.appendChild(el("div","tiny", pfx
+    ? "Click a row, or press Enter to open "+pfx+" directly."
+    : "Click a row to open that name. "
+      + "Targets, bias and counts are computed inside "+rangeLabel("c")+"."));
   const t=el("table","grid");
   t.innerHTML="<thead><tr><th style='width:78px'>Ticker</th><th>Name</th>"
     +"<th style='width:64px'>Recs</th><th style='width:96px'>Latest</th>"
@@ -671,7 +691,7 @@ function renderCompanyAll(out,ns){
 
   for(const r of list){
     const tr=el("tr"); tr.style.cursor="pointer";
-    tr.onclick=()=>{ $("#q_ticker").value=r.tk; renderCompany(); };
+    tr.onclick=()=>{ $("#q_ticker").value=r.tk; renderCompany(true); };
     tr.appendChild(el("td","mono",r.tk));
     tr.appendChild(el("td","",r.name));
     tr.appendChild(el("td","num",String(r.recs.length)));
@@ -737,9 +757,16 @@ function pctCell(target,px){
   return td;
 }
 
+/* Ticker match is normalized, not ===. A record written before the entry form
+   uppercased, or one whose frontmatter picked up a trailing space, is the same
+   company and has to answer the same search — otherwise it shows on the Price
+   Targets tab (which groups on the raw string) and is unreachable here. */
+const normTk = v => String(v==null?"":v).trim().toUpperCase();
 function recordsForTicker(ns,tk){
+  const t=normTk(tk);
   return ns.filter(n=>n.record_type!=="Trade" &&
-    (n.ticker===tk || (Array.isArray(n.tickers)&&n.tickers.includes(tk))));
+    (normTk(n.ticker)===t ||
+     (Array.isArray(n.tickers)&&n.tickers.some(x=>normTk(x)===t))));
 }
 
 /* One note line on the company page. Subject · type/theme pill · date · person
@@ -775,26 +802,104 @@ function companyNoteRow(n){
   return d;
 }
 
+/* A compact ticker box in the company header. The filter card is hidden on a
+   single name, so without this every lookup costs a trip back to the listing.
+   It writes into the same #q_ticker the listing uses, so there is still one
+   piece of state — this is a second door onto it, not a second copy. */
+function jumpBox(cur){
+  const w=el("span","cpg-jump");
+  const i=document.createElement("input");
+  i.type="text"; i.className="mono"; i.setAttribute("list","alltkr");
+  i.placeholder="Ticker\u2026"; i.autocomplete="off"; i.title="Type a ticker and press Enter";
+  let last=null;
+  const go=commit=>{
+    const v=i.value.trim().toUpperCase();
+    /* Enter fires keydown AND change on a datalist input, so the same value
+       arrives twice. Without this the two async renders race and both append. */
+    if(!v||v===last) return;
+    last=v;
+    $("#q_ticker").value=v; renderCompany(commit);
+  };
+  i.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); go(true); } });
+  /* A datalist pick fires change with no Enter behind it. */
+  i.addEventListener("change",()=>go(true));
+  w.appendChild(i);
+  const back=el("span","linkish back","\u2190 All companies");
+  back.onclick=()=>{ $("#q_ticker").value=""; renderCompany(); };
+  w.appendChild(back);
+  /* Focus lands here on every company page, so ticker \u2192 Enter \u2192 ticker works
+     without touching the mouse. Deferred so it does not fight the render. */
+  setTimeout(()=>{ try{ i.focus(); }catch(e){} },0);
+  return w;
+}
+
 function companyMode(tk){
   $("#c_filter").classList.toggle("hide",!!tk);
   $("#tb_return").classList.toggle("hide",!tk || VIEW!=="company");
 }
 
-async function renderCompany(){
+/* `force` means the user committed to this ticker — clicked a row, pressed
+   Enter, picked from the datalist, or followed a link. Typing does not commit:
+   mid-word the box holds "L", which is a prefix, not a name, and drilling in
+   on it would answer a question nobody asked. Uncommitted text filters the
+   listing instead. */
+let CPG_GEN=0;
+async function renderCompany(force){
+  const gen=++CPG_GEN;
   const out=$("#company_out"); out.innerHTML="";
   const tk=$("#q_ticker").value.trim().toUpperCase();
   const nsAll=await walkNotes();
-  companyMode(tk);
-  if(!tk){ renderCompanyAll(out,byRange(nsAll,"c")); return; }
+  /* Two renders can be in flight — a debounced keystroke and a committed
+     Enter. Only the newest may write, or both append to the same node. */
+  if(gen!==CPG_GEN) return;
+  out.innerHTML="";
+  const ns=nsAll;                           // all dates on a single name
+  const all=tk ? recordsForTicker(ns,tk).sort((a,b)=>String(b.date).localeCompare(String(a.date))) : [];
+  const detail = !!tk && (all.length>0 || force===true);
+  companyMode(detail?tk:"");
+  if(!detail){ renderCompanyAll(out,byRange(nsAll,"c"),tk); return; }
   $("#ccount").textContent="";
 
-  const ns=nsAll;                           // all dates on a single name
-  const own=companies(ns).filter(n=>n.ticker===tk);
-  const all=recordsForTicker(ns,tk).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  const own=companies(ns).filter(n=>normTk(n.ticker)===tk);
   const themeMap=themesForTicker(ns,tk);
 
   if(!all.length){
-    out.appendChild(emptyLine("No records for "+tk+"."));
+    /* A ticker with no notes is the normal case now that the list carries
+       ~4,400 names. Say so in a card rather than a bare line, and say whether
+       the name is one we know at all — "no notes yet" and "not a ticker we
+       carry" are different problems. */
+    const c=el("div","card cpg");
+    const top=el("div","cpg-top");
+    top.appendChild(el("span","cpg-tk mono",tk));
+    const known=companyFor(tk,ns)||"";
+    if(known) top.appendChild(el("span","cpg-name",known));
+    top.appendChild(jumpBox(tk));
+    c.appendChild(top);
+    c.appendChild(el("div","empty", known
+      ? "No notes on this company yet."
+      : "No notes on this company, and "+tk+" is not in the ticker list \u2014 "
+        + "check the spelling, or add it in Admin \u203a Tickers."));
+    /* Near-miss help. With 4,400 tickers a transposition (LCRX for LRCX) is the
+       most likely cause of an empty page, so offer what we do have notes on. */
+    const have=new Set();
+    for(const n of ns){
+      if(n.ticker) have.add(normTk(n.ticker));
+      for(const x of (Array.isArray(n.tickers)?n.tickers:[])) have.add(normTk(x));
+    }
+    const sorted=[...tk].sort().join("");
+    const near=[...have].filter(h=>h!==tk &&
+      (h.startsWith(tk.slice(0,2)) || [...h].sort().join("")===sorted)).slice(0,8);
+    if(near.length){
+      const d=el("div","tiny"); d.appendChild(document.createTextNode("Notes exist on: "));
+      near.forEach((h,i)=>{
+        if(i) d.appendChild(document.createTextNode("  "));
+        const a=el("span","linkish mono",h);
+        a.onclick=()=>{ $("#q_ticker").value=h; renderCompany(true); };
+        d.appendChild(a);
+      });
+      c.appendChild(d);
+    }
+    out.appendChild(c);
     return;
   }
 
@@ -820,9 +925,7 @@ async function renderCompany(){
     }
     top.appendChild(th);
   }
-  const back=el("span","linkish back","\u2190 All companies");
-  back.onclick=()=>{ $("#q_ticker").value=""; renderCompany(); };
-  top.appendChild(back);
+  top.appendChild(jumpBox(tk));
   h.appendChild(top);
 
   // ---- targets: everyone who has entered one, with % vs current price ----
@@ -891,7 +994,7 @@ async function renderCompany(){
   if(!noPrice){
     const q=await fetchQuote(tk);
     if(!q) return;
-    if($("#q_ticker").value.trim().toUpperCase()!==tk) return;   // user moved on
+    if(gen!==CPG_GEN) return;                                     // user moved on
     px.textContent=fmtPx(q.p);
     if(q.chg!==null){
       const ch=el("span",q.chg>=0?"up":"dn",(q.chg>=0?" +":" \u2212")+fmtPx(Math.abs(q.chg)));
@@ -999,7 +1102,7 @@ async function renderTheme(){
       const nm=byName.get(t);
       if(nm) e.appendChild(el("span","tiny"," "+nm));
       e.style.cursor="pointer";
-      e.onclick=()=>{ setView("company"); $("#q_ticker").value=t; renderCompany(); };
+      e.onclick=()=>{ setView("company"); $("#q_ticker").value=t; renderCompany(true); };
       wrapd.appendChild(e);
     });
     c.appendChild(wrapd);
@@ -1113,10 +1216,11 @@ async function renderTargets(){
   const ns=await walkNotes();
   const tk=$("#q_pttkr").value.trim().toUpperCase(), who=$("#q_ptwho").value;
   let rows=byRange(targetNotes(ns),"pt");
-  if(tk)  rows=rows.filter(n=>n.ticker===tk);
+  if(tk)  rows=rows.filter(n=>normTk(n.ticker)===tk);
   if(who) rows=rows.filter(n=>n.contributor===who);
   const byTk=new Map();
-  for(const n of rows){ if(!byTk.has(n.ticker)) byTk.set(n.ticker,[]); byTk.get(n.ticker).push(n); }
+  for(const n of rows){ const k=normTk(n.ticker);
+    if(!byTk.has(k)) byTk.set(k,[]); byTk.get(k).push(n); }
   $("#ptcount").textContent=rows.length+" target note(s) on "+byTk.size+" name(s)  \u00b7  "+rangeLabel("pt");
 
   if(!rows.length){
@@ -1130,7 +1234,7 @@ async function renderTargets(){
   const prevOf=new Map(), lastSeen=new Map();
   const asc=[...targetNotes(ns)].sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   for(const n of asc){
-    const k=n.ticker+"|"+(n.contributor||"");
+    const k=normTk(n.ticker)+"|"+(n.contributor||"");
     prevOf.set(n.note_id,lastSeen.get(k)||null);
     lastSeen.set(k,n);
   }
@@ -1142,7 +1246,7 @@ async function renderTargets(){
     const c=el("div","card");
     const hd=el("div","pt-hd");
     const t=el("span","tk mono",ticker); t.title="Open company page";
-    t.onclick=()=>{ setView("company"); $("#q_ticker").value=ticker; renderCompany(); };
+    t.onclick=()=>{ setView("company"); $("#q_ticker").value=ticker; renderCompany(true); };
     hd.appendChild(t);
     const nm=(recs.find(n=>n.entity)||{}).entity||companyFor(ticker,ns)||"";
     if(nm&&nm!==ticker) hd.appendChild(el("span","nm",nm));
@@ -1478,8 +1582,8 @@ async function boot(){
   // ticker list = every primary ticker plus every associated ticker
   const tset=new Set();
   for(const n of ns){
-    if(n.ticker) tset.add(n.ticker);
-    for(const t of (Array.isArray(n.tickers)?n.tickers:[])) tset.add(t);
+    if(n.ticker) tset.add(normTk(n.ticker));
+    for(const t of (Array.isArray(n.tickers)?n.tickers:[])) tset.add(normTk(t));
   }
   const dl=$("#alltkr"); dl.innerHTML="";
   [...tset].sort().forEach(t=>{ const o=el("option"); o.value=t; dl.appendChild(o); });
@@ -1529,8 +1633,19 @@ async function boot(){
 }
 
 document.addEventListener("rc-folder",boot);
+/* Debounced. Typing a 4-letter ticker fired walkNotes() four times, and at
+   ~4,400 names the intermediate renders were both wasted and wrong. */
+let TK_T=null;
 $("#q_ticker").addEventListener("input",e=>{
-  e.target.value=e.target.value.toUpperCase(); renderCompany(); });
+  e.target.value=e.target.value.toUpperCase();
+  clearTimeout(TK_T);
+  /* A datalist pick arrives as an input event with no keystroke behind it,
+     so an exact hit commits immediately rather than waiting. */
+  TK_T=setTimeout(()=>renderCompany(),180);
+});
+$("#q_ticker").addEventListener("change",()=>{ clearTimeout(TK_T); renderCompany(true); });
+$("#q_ticker").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){ e.preventDefault(); clearTimeout(TK_T); renderCompany(true); } });
 $("#q_theme").addEventListener("change",renderTheme);
 ["#q_revstatus","#q_revwho","#q_rvtype","#q_rvtheme","#q_rvtkr"].forEach(x=>$(x).addEventListener("change",renderReview));
 $("#q_rvnone").addEventListener("change",renderReview);
