@@ -497,11 +497,24 @@ function rememberPair(e,t){
   p.push({e:e,t:t||""}); localStorage.setItem("rc_pairs",JSON.stringify(p));
   refreshLists();
 }
+/* True while the name in the box was put there by us, not typed. Resolution
+   runs per keystroke, so "LRCX" arrives as L, LR, LRC, LRCX — and L is Loews.
+   The old rule ("never overwrite a non-blank name") froze that first partial
+   hit in place, so every ticker beginning with a letter that is itself a
+   listed ticker resolved to the wrong company. A name we filled is ours to
+   replace; a name the user typed is not. */
+let ENTITY_AUTO=false;
 function resolveEntity(){
   const tk=$("#f_ticker").value.trim().toUpperCase();
-  if(!tk || $("#f_entity").value.trim()) return;
+  const cur=$("#f_entity").value.trim();
+  if(cur && !ENTITY_AUTO) return;              // hand-typed name wins
+  if(!tk){
+    if(ENTITY_AUTO){ $("#f_entity").value=""; ENTITY_AUTO=false; }
+    $("#tickerhint").textContent=""; return;
+  }
   const hit = companyFor(tk) || (pairs().find(x=>x.t===tk)||{}).e || "";
-  if(hit) $("#f_entity").value=hit;
+  if(hit){ $("#f_entity").value=hit; ENTITY_AUTO=true; }
+  else if(ENTITY_AUTO){ $("#f_entity").value=""; ENTITY_AUTO=false; }
   $("#tickerhint").textContent = hit
     ? hit
     : (tk.startsWith("P.") ? "Private company \u2014 no price data will be fetched."
@@ -686,7 +699,7 @@ function loadPasted(){
   $("#f_note").value = body;
 
   if(type==="Company" || type==="Trade"){
-    $("#f_entity").value = f.entity || "";
+    $("#f_entity").value = f.entity || ""; ENTITY_AUTO=false;
     $("#f_ticker").value = (f.ticker||"").toUpperCase();
     if(f.listed!==undefined) $("#f_listed").checked = !(f.listed===false||f.listed==="false");
     $("#f_ptb").value = f.price_target_buy ?? "";
@@ -731,6 +744,7 @@ function loadPasted(){
 
 function clearForm(keepMsg){
   $("#f_subject").value=""; $("#f_entity").value=""; $("#f_ticker").value="";
+  ENTITY_AUTO=false;
   $("#f_note").value=""; $("#f_ptb").value=""; $("#f_pts").value="";
   $("#f_review").value=""; $("#f_listed").checked=true;
   $("#f_action").value=""; $("#f_why").value=""; $("#f_source").value="";
@@ -798,6 +812,7 @@ $("#f_ticker").addEventListener("input",e=>{
   resolveEntity();
 });
 $("#f_ticker").addEventListener("change",resolveEntity);
+$("#f_entity").addEventListener("input",()=>{ ENTITY_AUTO=false; });
 $("#f_entity").addEventListener("change",()=>{
   const e=$("#f_entity").value.trim();
   if(!e||$("#f_ticker").value.trim()) return;
