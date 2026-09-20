@@ -1055,6 +1055,38 @@ async function rewriteNote(n, mutate){
   text=mutate(text);
   await writeFile(nd,"note.md",text);
 }
+/* Permanently remove one record's folder and everything in it.
+   Deliberately single-record and deliberately loud. A note folder holds
+   note.md plus attachments, so the only honest delete is recursive — and a
+   recursive removeEntry against a OneDrive-synced folder someone else may
+   have open has no undo. The caller is expected to have logged the manifest
+   to _config_history.jsonl BEFORE calling, so a partial failure still leaves
+   a record of what was there.
+
+   Returns the list of files that were inside, for the log. Throws with the
+   note_id in the message when the folder is gone or the handle is stale. */
+async function deleteNote(n){
+  if(!n || !Array.isArray(n._path) || n._path.length!==3)
+    throw new Error("No folder path on this record \u2014 reload notes and retry.");
+  const [y,m,id]=n._path;
+  const root=await notesRoot(false);
+  let yh,mh,nd;
+  try{
+    yh=await root.getDirectoryHandle(y);
+    mh=await yh.getDirectoryHandle(m);
+    nd=await mh.getDirectoryHandle(id);
+  }catch(e){ throw new Error("Folder NOTES/"+y+"/"+m+"/"+id+" not found \u2014 "
+                           + "it may already be deleted. Reload notes."); }
+  const files=[];
+  for await (const [fn,fh] of nd.entries()) files.push(fn+(fh.kind==="directory"?"/":""));
+  await mh.removeEntry(id,{recursive:true});
+  /* The month and year folders are left in place. They are shared by every
+     record written that month, and an empty one costs nothing. */
+  if(Array.isArray(RC.notes))
+    RC.notes=RC.notes.filter(x=>x.note_id!==n.note_id);
+  return files;
+}
+
 /* Replace a single frontmatter line by key, leaving body and other keys alone. */
 function setFMLine(text,key,rendered){
   const re=new RegExp("^"+esc(key)+":.*$","m");
@@ -1129,7 +1161,7 @@ if (typeof module === "object" && module.exports) {
     normKey, parseEmailHeaders, resolveTagNames,
     runId, screenPath, parseRunId, validateScreen, buildScreen,
     buildRunSidecar, validateRun,
-    companyFor, splitDelimited, parseTickerCSV, diffTickers, notesLocation,
+    companyFor, splitDelimited, parseTickerCSV, diffTickers, notesLocation, deleteNote,
     fmtDate, ageDays, ageLabel
   };
 }
