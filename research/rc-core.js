@@ -728,6 +728,14 @@ function validateRecord(rec, cfg, body){
     if(raw!=="" && !/^-?\d+$/.test(raw))
       errors.push("Price targets must be whole numbers.");
   }
+  /* A target without a thesis is a number nobody can defend later. The
+     Price Targets report shows the note beside every target, so an empty body
+     there is an empty row. Warning, not error. Only checked when the caller
+     passes a body. */
+  if((s("price_target_buy")!=="" || s("price_target_sell")!=="")
+     && body!==undefined && !String(body||"").trim())
+    warnings.push("Price target set with no note \u2014 write the thesis behind it; "
+                + "it shows next to the target on the company page.");
   const bias=s("bias");
   if(bias && BIAS_VALUES.indexOf(bias)<0)
     errors.push("bias must be one of: "+BIAS_VALUES.join(" ")+".");
