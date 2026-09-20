@@ -96,6 +96,12 @@
     <div class="f md"><select id="f_theme"></select></div>
     <div class="f tiny">Defined in Admin. Ask EJ to add one if it is missing.</div>
   </div>
+</div>
+
+<!-- TICKERS block — Theme and Quick Note. A note that mentions names should
+     surface on each of those company pages; tickers[] is the reverse index
+     reports.html walks for that. -->
+<div class="card hide" id="blk_tkrs">
   <div class="frow">
     <label for="tkradd" class="narrow">Tickers</label>
     <div class="f sm"><input type="text" id="tkradd" class="mono" placeholder="Ticker"
@@ -106,9 +112,9 @@
   </div>
   <div class="frow">
     <label class="narrow" style="visibility:hidden">.</label>
-    <div class="f sub" style="margin-top:0">Optional. Private companies use a
-      <b>P.</b> prefix &mdash; <span class="mono">P.SECURITIZE</span>. These become
-      links on the theme page.</div>
+    <div class="f sub" style="margin-top:0">Optional. Names this note touches &mdash; it
+      then shows on each company&rsquo;s page. Private companies use a
+      <b>P.</b> prefix &mdash; <span class="mono">P.SECURITIZE</span>.</div>
   </div>
 </div>
 
@@ -281,28 +287,29 @@ const MODE_FIELDS = {
   Note:{
     label:"Quick Note", btn:"#m_note", accent:"#6b7280",
     hint:"A thought that is neither a company nor a theme \u2014 Brazil, a "
-        +"conference, something you read. Tags do the retrieval.",
-    ticker:false, theme:false, pt:false, bias:true,
+        +"conference, something you read. Tags do the retrieval; list any "
+        +"tickers it touches so it shows on their pages.",
+    ticker:false, tickers:true, theme:false, pt:false, bias:true,
     strategy:"opt", action:false, why:false, note:"opt"
   },
   Theme:{
     label:"Theme Note", btn:"#m_theme", accent:"#0f6e56",
     hint:"A note about a theme or a catalyst. Lists the tickers it touches.",
-    ticker:false, theme:true, pt:false, bias:true,
+    ticker:false, tickers:true, theme:true, pt:false, bias:true,
     strategy:false, action:false, why:false, note:"opt"
   },
   Company:{
     label:"Company Note", btn:"#m_company", accent:"#534ab7",
     hint:"A note about one company. Ticker required \u2014 the company name "
         +"resolves from it.",
-    ticker:true, theme:false, pt:true, bias:true,
+    ticker:true, tickers:false, theme:false, pt:true, bias:true,
     strategy:false, action:false, why:false, note:"opt"
   },
   Trade:{
     label:"Trading Log", btn:"#m_trade", accent:"#ba7517",
     hint:"A position change, or a reaction to one. Action, why and the note are "
         +"all required \u2014 this is the record that has to answer later.",
-    ticker:true, theme:false, pt:false, bias:false,
+    ticker:true, tickers:false, theme:false, pt:false, bias:false,
     strategy:"req", action:"req", why:"req", note:"req"
   }
 };
@@ -319,6 +326,7 @@ function setMode(m){
 
   show("#blk_ticker", f.ticker);
   show("#blk_theme",  f.theme);
+  show("#blk_tkrs",   !!f.tickers);
   show("#blk_pt",     f.pt);
   show("#blk_bias",   f.bias);
   show("#subjecthint", m==="Trade");
@@ -560,9 +568,12 @@ function buildRecord(){
     rec.tickers=S.tickers.slice();
   } else {
     /* Quick note. There is no Topic input any more; entity is the subject so it
-       is never blank on disk, but nobody is asked for it. */
+       is never blank on disk, but nobody is asked for it. tickers[] is the same
+       reverse index a Theme note carries, so a quick note about three names
+       shows on all three company pages. `ticker` (singular) stays null — a
+       quick note is not about one company, or it would be a Company note. */
     rec.entity=subject;
-    rec.ticker=null; rec.listed=null; rec.tickers=[];
+    rec.ticker=null; rec.listed=null; rec.tickers=S.tickers.slice();
   }
 
   if(f.pt){

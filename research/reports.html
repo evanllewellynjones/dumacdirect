@@ -6,6 +6,37 @@
 <title>Reports &amp; Search</title>
 <link rel="stylesheet" href="rc-style.css">
 <style>
+/* Reports run full width. Entry is deliberately narrow so it fits beside a
+   PDF; a report is read on its own and gets the whole screen. Overrides the
+   shared .wrap.wide cap without touching rc-style.css, which entry/admin use. */
+.wrap.wide{max-width:none}
+
+/* Company page (single ticker). Scoped under .cpg so the listing, Theme,
+   Notes and Review views are untouched. */
+.cpg-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  border-bottom:2px solid var(--gold);padding-bottom:7px;margin-bottom:8px}
+.cpg-tk{font-size:22px;font-weight:700;color:var(--navy-deep);letter-spacing:.02em}
+.cpg-name{font-size:14px;color:var(--mut)}
+.cpg-px{font-family:"Cascadia Mono",Consolas,monospace;font-size:16px;font-weight:600}
+.cpg-px .asof{font-family:"Segoe UI",system-ui,sans-serif;font-size:11px;
+  font-weight:400;color:var(--mut);margin-left:5px}
+.cpg-px .up{color:var(--ok)} .cpg-px .dn{color:#942323}
+.cpg-themes{display:inline-flex;gap:5px;flex-wrap:wrap;align-items:baseline}
+.cpg-themes .chip{cursor:pointer;padding:1px 9px}
+.cpg-themes .chip:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cpg-top .back{margin-left:auto;font-size:12px}
+table.grid.cpg-tgt td.pct{text-align:right;font-family:"Cascadia Mono",Consolas,monospace;
+  color:var(--mut)}
+table.grid.cpg-tgt td.pct.up{color:var(--ok)} table.grid.cpg-tgt td.pct.dn{color:#942323}
+table.grid.cpg-tgt td.bias{font-family:"Cascadia Mono",Consolas,monospace;font-weight:700;
+  text-align:center}
+.cpg .noterow .hd{align-items:baseline}
+.cpg .noterow .bias{font-family:"Cascadia Mono",Consolas,monospace;font-weight:700;
+  font-size:13px;padding:0 4px}
+.cpg .noterow .tags{margin-left:auto;font-size:11.5px;color:var(--mut);text-align:right}
+.cpg .noterow .body{max-height:none;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden}
+
 /* Review Queue — compact 3-line row. Scoped so nothing else shifts. */
 .rvtbl td{vertical-align:top;padding-top:6px;padding-bottom:6px}
 .rvtbl .rvdate input[type=date]{width:100%;box-sizing:border-box}
@@ -28,6 +59,7 @@
   <a class="modelink" href="entry.html">Entry</a>
   <a class="modelink cur" href="reports.html">Reports</a>
   <a class="modelink" href="admin.html">Admin</a>
+  <a class="modelink hide" id="tb_return" href="#" title="Back to the all-companies listing">&larr; Company Listing</a>
   <span class="badge" id="folder">no folder</span>
 </div>
 
@@ -49,7 +81,7 @@
 
 <!-- COMPANY -->
 <div id="v_company">
-  <div class="card">
+  <div class="card" id="c_filter">
     <div class="frow">
       <label for="q_ticker" class="narrow">Ticker</label>
       <div class="f sm"><input type="text" id="q_ticker" list="alltkr" class="mono"
@@ -608,126 +640,197 @@ function renderCompanyAll(out,ns){
   t.appendChild(tb); c.appendChild(t); out.appendChild(c);
 }
 
+/* ---------- COMPANY: the single-ticker report ----------
+   Everything about one name, all dates. The date range on the filter card
+   applies to the listing only — once you are on a ticker you want the whole
+   record, so the filter card is hidden and nsAll is used, not byRange().
+
+   Notes here are every non-Trade record that touches the ticker: Company
+   records by `ticker`, Theme and Quick Note records by `tickers[]`. Trades
+   have their own tab and are deliberately not mixed in. */
+const PX_TTL_MS = 15*60*1000;
+
+/* Current price from FMP, or null. Never throws, never blocks render, never
+   written to a record. Key comes from _config.json (fmp_api_key); blank key
+   means no call is made at all. sessionStorage cache per ticker, 15 minutes,
+   so flipping between two names does not burn the daily quota. */
+async function fetchQuote(tk){
+  const key=(RC.cfg&&RC.cfg.fmp_api_key)||"";
+  if(!key) return null;
+  const ck="rc_px_"+tk;
+  try{ const c=JSON.parse(sessionStorage.getItem(ck)||"null");
+       if(c && (Date.now()-c.t)<PX_TTL_MS) return c; }catch(e){}
+  try{
+    const r=await fetch("https://financialmodelingprep.com/stable/quote-short?symbol="
+      +encodeURIComponent(tk)+"&apikey="+encodeURIComponent(key));
+    if(!r.ok) return null;
+    const j=await r.json();
+    const q=Array.isArray(j)?j[0]:null;
+    if(!q||typeof q.price!=="number") return null;
+    const out={p:q.price, chg:(typeof q.change==="number"?q.change:null), t:Date.now()};
+    try{ sessionStorage.setItem(ck,JSON.stringify(out)); }catch(e){}
+    return out;
+  }catch(e){ return null; }
+}
+const fmtPx  = v => v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const pctAway = (target,px) => (target===null||target===undefined||!px) ? null
+                              : (Number(target)-px)/px*100;
+function pctCell(target,px){
+  const v=pctAway(target,px);
+  const td=el("td","pct", v===null ? (target===null||target===undefined?"":"\u2014")
+                        : (v>=0?"+":"\u2212")+Math.abs(v).toFixed(1)+"%");
+  if(v!==null) td.classList.add(v>=0?"up":"dn");
+  return td;
+}
+
+function recordsForTicker(ns,tk){
+  return ns.filter(n=>n.record_type!=="Trade" &&
+    (n.ticker===tk || (Array.isArray(n.tickers)&&n.tickers.includes(tk))));
+}
+
+/* One note line on the company page. Subject · type/theme pill · date · person
+   · bias · review pill, tags pushed to the right, then two lines of body. A
+   separate function rather than a flag on noteRow(), which five other views
+   share. */
+function companyNoteRow(n){
+  const d=el("div","noterow");
+  const hd=el("div","hd");
+  const s=el("span","subj",n.subject||"(no subject)");
+  s.onclick=()=>openReader(n);
+  hd.appendChild(s);
+  if(n.record_type==="Theme" && n.entity){
+    const p=el("span","pill linkish",n.entity); p.title="Open theme report";
+    p.onclick=()=>{ setView("theme"); $("#q_theme").value=n.entity; renderTheme(); };
+    hd.appendChild(p);
+  } else if(n.record_type==="Note"){
+    hd.appendChild(el("span","pill","quick note"));
+  }
+  hd.appendChild(el("span","meta",fmtDate(n.date)+" \u00b7 "+(n.contributor||"")));
+  if(n.bias){ const b=el("span","bias",n.bias==="-"?"\u2212":n.bias);
+    b.title=BIAS_LABEL[n.bias]||n.bias; hd.appendChild(b); }
+  if(n.review_date){
+    const days=ageDays(n.review_date);
+    const cls = n.review_status==="Done" ? "pill done"
+              : (days!==null&&days>=0) ? "pill overdue" : "pill due";
+    hd.appendChild(el("span",cls,"review "+fmtDate(n.review_date)));
+  }
+  if(Array.isArray(n.tags)&&n.tags.length)
+    hd.appendChild(el("span","tags",n.tags.join(" \u00b7 ")));
+  d.appendChild(hd);
+  if(n._body) d.appendChild(el("div","body",n._body.replace(/[#*`>]/g,"").slice(0,400)));
+  return d;
+}
+
+function companyMode(tk){
+  $("#c_filter").classList.toggle("hide",!!tk);
+  $("#tb_return").classList.toggle("hide",!tk || VIEW!=="company");
+}
+
 async function renderCompany(){
   const out=$("#company_out"); out.innerHTML="";
   const tk=$("#q_ticker").value.trim().toUpperCase();
   const nsAll=await walkNotes();
-  const ns=byRange(nsAll,"c");
-  if(!tk){ renderCompanyAll(out,ns); return; }
+  companyMode(tk);
+  if(!tk){ renderCompanyAll(out,byRange(nsAll,"c")); return; }
   $("#ccount").textContent="";
 
+  const ns=nsAll;                           // all dates on a single name
   const own=companies(ns).filter(n=>n.ticker===tk);
+  const all=recordsForTicker(ns,tk).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   const themeMap=themesForTicker(ns,tk);
 
-  if(!own.length && !themeMap.size && !trades(ns).some(n=>n.ticker===tk)){
-    out.appendChild(emptyLine("No records for "+tk+" in "+rangeLabel("c")
-      +". Widen the date range if you expected some.")); return; }
+  if(!all.length){
+    out.appendChild(emptyLine("No records for "+tk+"."));
+    return;
+  }
 
-  const name=(own.find(n=>n.entity)||{}).entity||tk;
+  const name=(own.find(n=>n.entity)||{}).entity||companyFor(tk,ns)||"";
   const isPrivate=tk.startsWith("P.");
   const listed=own.length ? own[own.length-1].listed : null;
+  const noPrice=isPrivate||listed===false||listed==="false";
 
-  // header
-  const h=section(name+"  \u00b7  "+tk);
-  const meta=el("div","tiny");
-  meta.textContent=own.length+" record(s)  \u00b7  "+rangeLabel("c")
-    + (isPrivate||listed===false||listed==="false" ? "  \u00b7  private \u2014 no price data" : "")
-    + (themeMap.size ? "  \u00b7  "+themeMap.size+" theme(s)" : "")
-    + (trades(ns).filter(n=>n.ticker===tk).length
-       ? "  \u00b7  "+trades(ns).filter(n=>n.ticker===tk).length+" trade(s)" : "");
-  h.appendChild(meta);
+  // ---- header card: ticker · name · price · theme chips · back ----
+  const h=el("div","card cpg");
+  const top=el("div","cpg-top");
+  top.appendChild(el("span","cpg-tk mono",tk));
+  if(name && name!==tk) top.appendChild(el("span","cpg-name",name));
+  const px=el("span","cpg-px", noPrice ? "" : "\u2014");
+  if(noPrice) px.appendChild(el("span","asof","private \u2014 no price data"));
+  top.appendChild(px);
+  if(themeMap.size){
+    const th=el("span","cpg-themes");
+    for(const [theme,recs] of themeMap){
+      const c=el("span","chip",theme); c.title=recs.length+" theme note(s) \u2014 open theme report";
+      c.onclick=()=>{ setView("theme"); $("#q_theme").value=theme; renderTheme(); };
+      th.appendChild(c);
+    }
+    top.appendChild(th);
+  }
+  const back=el("span","linkish back","\u2190 All companies");
+  back.onclick=()=>{ $("#q_ticker").value=""; renderCompany(); };
+  top.appendChild(back);
+  h.appendChild(top);
+
+  // ---- targets: everyone who has entered one, with % vs current price ----
+  const grid=targetGrid(own);
+  const tgt=el("table","grid cpg-tgt");
+  tgt.innerHTML="<thead><tr><th>Contributor</th><th style='width:54px;text-align:center'>Bias</th>"
+    +"<th style='width:80px;text-align:right'>Buy</th><th style='width:84px;text-align:right'>vs price</th>"
+    +"<th style='width:80px;text-align:right'>Sell</th><th style='width:84px;text-align:right'>vs price</th>"
+    +"<th style='width:150px'>Last updated</th></tr></thead>";
+  const tb=el("tbody");
+  const pctCells=[];                        // filled in once the quote arrives
+  if(!grid.length){
+    const tr=el("tr"); const td=el("td","empty","No price targets entered."); td.colSpan=7;
+    tr.appendChild(td); tb.appendChild(tr);
+  }
+  for(const r of grid){
+    const tr=el("tr");
+    tr.appendChild(el("td","",r.who));
+    const bc=el("td","bias",r.bias?(r.bias==="-"?"\u2212":r.bias):"");
+    if(r.bias) bc.title=BIAS_LABEL[r.bias]||r.bias;
+    tr.appendChild(bc);
+    const bd=ageDays(r.buyDate), sd=ageDays(r.sellDate);
+    const cb=el("td","num",r.buy===null?"\u2014":String(r.buy));
+    if(bd!==null&&bd>180) cb.classList.add("stale");
+    tr.appendChild(cb);
+    const pb=pctCell(r.buy,null); pctCells.push([pb,r.buy]); tr.appendChild(pb);
+    const cs=el("td","num",r.sell===null?"\u2014":String(r.sell));
+    if(sd!==null&&sd>180) cs.classList.add("stale");
+    tr.appendChild(cs);
+    const ps=pctCell(r.sell,null); pctCells.push([ps,r.sell]); tr.appendChild(ps);
+    const last=[r.buyDate,r.sellDate,r.biasDate].filter(Boolean).sort().pop()||"";
+    tr.appendChild(el("td","tiny",last?fmtDate(last)+"  ("+ageLabel(last)+")":""));
+    tb.appendChild(tr);
+  }
+  tgt.appendChild(tb); h.appendChild(tgt);
+  if(grid.length) h.appendChild(el("div","tiny",
+    "Greyed targets are more than six months old. "
+    +"\u201cvs price\u201d is the target\u2019s distance from the current price."));
   out.appendChild(h);
 
-  // price targets — only contributors who have one
-  const grid=targetGrid(own);
-  if(grid.length){
-    const c=section("Price targets");
-    const t=el("table","grid");
-    t.innerHTML="<thead><tr><th>Contributor</th><th>Buy</th><th>As of</th>"
-               +"<th>Sell</th><th>As of</th></tr></thead>";
-    const tb=el("tbody");
-    for(const r of grid){
-      const tr=el("tr");
-      tr.appendChild(el("td","",r.who));
-      const bd=ageDays(r.buyDate), sd=ageDays(r.sellDate);
-      const cb=el("td","num",r.buy===null?"\u2014":String(r.buy));
-      if(bd!==null&&bd>180) cb.classList.add("stale");
-      tr.appendChild(cb);
-      tr.appendChild(el("td","tiny",r.buyDate?fmtDate(r.buyDate)+"  ("+ageLabel(r.buyDate)+")":""));
-      const cs=el("td","num",r.sell===null?"\u2014":String(r.sell));
-      if(sd!==null&&sd>180) cs.classList.add("stale");
-      tr.appendChild(cs);
-      tr.appendChild(el("td","tiny",r.sellDate?fmtDate(r.sellDate)+"  ("+ageLabel(r.sellDate)+")":""));
-      tb.appendChild(tr);
-    }
-    t.appendChild(tb); c.appendChild(t);
-    c.appendChild(el("div","tiny","Greyed values are more than six months old."
-      + ((range("c")[0]||range("c")[1])
-         ? "  Targets are computed inside the date range \u2014 a target set before "
-           + rangeLabel("c")+" is not shown here." : "")));
-    out.appendChild(c);
-  }
-
-  // bias — same sparse rule
-  const bg=biasGrid(own);
-  if(bg.length){
-    const c=section("Bias");
-    const t=el("table","grid");
-    t.innerHTML="<thead><tr><th>Contributor</th><th>Bias</th><th>As of</th></tr></thead>";
-    const tb=el("tbody");
-    for(const r of bg){
-      const tr=el("tr");
-      tr.appendChild(el("td","",r.who));
-      tr.appendChild(el("td","mono",BIAS_LABEL[r.bias]||r.bias));
-      tr.appendChild(el("td","tiny",fmtDate(r.date)+"  ("+ageLabel(r.date)+")"));
-      tb.appendChild(tr);
-    }
-    t.appendChild(tb); c.appendChild(t); out.appendChild(c);
-  }
-
-  // themes — names and links only, not the theme notes
-  if(themeMap.size){
-    const c=section("Themes");
-    for(const [theme,recs] of themeMap){
-      const d=el("div","noterow");
-      const a=el("span","linkish",theme);
-      a.onclick=()=>{ setView("theme"); $("#q_theme").value=theme; renderTheme(); };
-      d.appendChild(a);
-      d.appendChild(el("span","meta","   "+recs.length+" theme note(s)"));
-      c.appendChild(d);
-    }
-    out.appendChild(c);
-  }
-
-  // reviews on this name
-  const due=own.filter(n=>n.review_date && n.review_status!=="Done");
-  if(due.length){
-    const c=section("Reviews due");
-    due.sort((a,b)=>String(a.review_date).localeCompare(String(b.review_date)));
-    due.forEach(n=>c.appendChild(noteRow(n)));
-    out.appendChild(c);
-  }
-
-  // trading log for this name — its own section, above the notes. A position
-  // change is a different kind of fact from a view, and reading them mixed
-  // together is what made the old log unusable.
-  const trs=trades(ns).filter(n=>n.ticker===tk);
-  if(trs.length){
-    const c=section("Trading log ("+trs.length+")");
-    trs.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-    c.appendChild(tradeTable(trs));
-    const go=el("div","tiny linkish","Open the full trading log for this ticker");
-    go.style.marginTop="6px";
-    go.onclick=()=>{ setView("trading"); $("#q_trtkr").value=tk; renderTrading(); };
-    c.appendChild(go);
-    out.appendChild(c);
-  }
-
-  // notes
-  const c=section("Notes ("+own.length+")");
-  if(!own.length) c.appendChild(emptyLine("No company records \u2014 this ticker appears only in theme records."));
-  own.forEach(n=>c.appendChild(noteRow(n)));
+  // ---- notes: every record that touches the ticker ----
+  const c=section("Notes ("+all.length+")"); c.classList.add("cpg");
+  all.forEach(n=>c.appendChild(companyNoteRow(n)));
   out.appendChild(c);
+
+  // ---- price, after the page is on screen. A failed fetch leaves the dash. ----
+  if(!noPrice){
+    const q=await fetchQuote(tk);
+    if(!q) return;
+    if($("#q_ticker").value.trim().toUpperCase()!==tk) return;   // user moved on
+    px.textContent=fmtPx(q.p);
+    if(q.chg!==null){
+      const ch=el("span",q.chg>=0?"up":"dn",(q.chg>=0?" +":" \u2212")+fmtPx(Math.abs(q.chg)));
+      ch.style.fontSize="13px"; px.appendChild(ch);
+    }
+    px.appendChild(el("span","asof","FMP \u00b7 "
+      +new Date(q.t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})));
+    for(const [td,target] of pctCells){
+      const fresh=pctCell(target,q.p);
+      td.textContent=fresh.textContent; td.className=fresh.className;
+    }
+  }
 }
 
 /* ---------- THEME VIEW ---------- */
@@ -1183,7 +1286,11 @@ function setView(v){
   $$(".tab").forEach(t=>t.classList.toggle("cur",t.dataset.v===v));
   ["company","theme","trading","notes","review","search"].forEach(x=>
     $("#v_"+x).classList.toggle("hide",x!==v));
+  $("#tb_return").classList.toggle("hide",
+    v!=="company" || !$("#q_ticker").value.trim());
 }
+$("#tb_return").onclick=e=>{ e.preventDefault(); setView("company");
+  $("#q_ticker").value=""; renderCompany(); };
 $$(".tab").forEach(t=>{
   if(!t.dataset.v) return;
   t.onclick=()=>{

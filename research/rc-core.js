@@ -213,6 +213,11 @@ const SEED = {
      free text here would produce "Direct US", "DirectUS" and "Direct U.S."
      within a month and the grouping query would be worthless. */
   strategies: ["Direct Global Ideas","Direct US"],
+  /* FMP key for the current-price line on the company page. Lives here rather
+     than in the HTML so it is not in git; the shared NOTES folder is already
+     the trust boundary for everything else. Blank = no price fetched, page
+     still renders. Paste the key into _config.json by hand or via Admin. */
+  fmp_api_key: "",
   contributors: ["Evan Jones","Ana Anderson","Brandon Gall","William Hockett","Ian Jennings"],
   themes: ["Asset Tokenization","Crypto Asset Beneficiaries","Physical AI",
            "PQC Migration","Cybersecurity Tailwind","Energy Transition"],
@@ -387,7 +392,7 @@ async function loadConfig(){
   // missing keys. actions/origins backfill here so no _config.json edit is
   // needed on upgrade.
   for(const k of ["contributors","themes","taxonomy","maxTags","actions",
-                  "origins","strategies"])
+                  "origins","strategies","fmp_api_key"])
     if(RC.cfg[k]===undefined) RC.cfg[k]=SEED[k];
   return RC.cfg;
 }
