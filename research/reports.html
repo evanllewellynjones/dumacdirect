@@ -62,6 +62,27 @@ table.grid.cpg-tgt td.bias{font-family:"Cascadia Mono",Consolas,monospace;font-w
   text-align:center;flex:0 0 auto}
 .bias.up{color:var(--ok)} .bias.dn{color:#942323} .bias.flat{color:var(--mut)}
 
+/* Theme page: header box, then Catalysts and Notes side by side. Two columns
+   only while there is room for them — a 500px column of note excerpts is
+   worse than one full-width list. */
+.thcols{display:flex;gap:6px;align-items:flex-start}
+.thcols>*{flex:1 1 0;min-width:0;margin-bottom:6px}
+@media (max-width:980px){ .thcols{display:block} }
+.thcols .card{height:100%}
+.thhd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  border-bottom:2px solid var(--gold);padding-bottom:7px;margin-bottom:8px}
+.thhd .nm{font-size:20px;font-weight:700;color:var(--navy-deep)}
+.thhd .ct{font-size:12.5px;color:var(--mut)}
+.thhd .edit{margin-left:auto;font-size:12px}
+.thtkr{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:24px}
+.thtkr .chip{cursor:pointer}
+.thtkr .chip:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.thtkr .chip button{cursor:pointer}
+.thedit{border:1px solid var(--line);border-radius:4px;padding:7px 9px;
+  margin-top:7px;background:#fbfcfd}
+.thedit .row{align-items:center}
+.thedit input{text-transform:uppercase;font-family:"Cascadia Mono",Consolas,monospace}
+
 /* Price Targets view + the thesis line on the company page. */
 .pt-thesis{font-size:12.5px;color:#2f3846;display:-webkit-box;-webkit-line-clamp:2;
   -webkit-box-orient:vertical;overflow:hidden}
@@ -1163,6 +1184,148 @@ function renderThemeAll(out,ns){
   t.appendChild(tb); c.appendChild(t); out.appendChild(c);
 }
 
+/* ---------- THEME: one theme ----------
+   Header box carries the name, the record count and the associated tickers,
+   which are editable here. Catalysts and Notes then sit side by side, because
+   a theme page is read as "what is coming up" beside "what do we think" and
+   stacking them buried the second one below the fold.
+
+   On editing tickers: `tickers[]` is a retrieval index, the same shape and
+   purpose as `tags` — it says which names a theme touches, not what anyone
+   concluded. So it is curation-class and mutable, like tags, and unlike
+   `ticker` (singular) on a Company record, which is the record's subject and
+   stays frozen.
+
+   The list shown is the union across every record in the theme, so a write
+   needs a rule:
+     adding    -> written to the newest theme record only
+     removing  -> removed from EVERY record that carries it
+   Anything else produces a union that does not match what you just edited. */
+function themeRecords(ns,th){ return themes(ns).filter(n=>n.entity===th); }
+function tickerUnion(recs){
+  const u=new Map();
+  for(const n of recs) for(const t of (Array.isArray(n.tickers)?n.tickers:[]))
+    u.set(normTk(t),(u.get(normTk(t))||0)+1);
+  return u;
+}
+
+function thTickerBox(th,recs,ns,rerender){
+  const box=el("div");
+  const chips=el("div","thtkr");
+  const status=el("span","tiny"); status.style.marginLeft="8px";
+  box.appendChild(chips);
+
+  let editing=false;
+  const panel=el("div","thedit hide");
+  const inp=document.createElement("input");
+  inp.type="text"; inp.className="mono"; inp.setAttribute("list","alltkr");
+  inp.placeholder="Ticker to add"; inp.maxLength=12; inp.autocomplete="off";
+  const add=el("button","btn","Add");
+  const hint=el("div","tiny");
+  const r1=el("div","row");
+  const c1=el("div"); c1.style.flex="0 0 150px"; c1.appendChild(inp);
+  const c2=el("div"); c2.style.flex="0 0 auto"; c2.appendChild(add);
+  const c3=el("div"); c3.appendChild(status);
+  r1.appendChild(c1); r1.appendChild(c2); r1.appendChild(c3);
+  panel.appendChild(r1); panel.appendChild(hint);
+
+  /* Newest record wins an addition. Sorting by date then note_id makes that
+     deterministic rather than dependent on walk order. */
+  const newest=()=>recs.slice().sort((x,y)=>
+    String(x.date).localeCompare(String(y.date)) ||
+    String(x.note_id).localeCompare(String(y.note_id))).pop();
+
+  async function writeOne(n,list){
+    await rewriteNote(n,txt=>{
+      txt=setFMLine(txt,"tickers",rdRenderList(list));
+      txt=setFMLine(txt,"last_updated",rdRender(new Date().toISOString()));
+      return bumpRevision(txt);
+    });
+    n.tickers=list.slice();
+    n.revision=(parseInt(n.revision,10)||0)+1;
+    n.last_updated=new Date().toISOString();
+  }
+
+  async function addTicker(){
+    const t=normTk(inp.value);
+    if(!t){ return; }
+    if(tickerUnion(recs).has(t)){ status.textContent=t+" is already on this theme";
+                                  status.className="tiny"; return; }
+    const n=newest();
+    if(!n){ status.textContent="no record to write to"; return; }
+    if(!n._path){ status.textContent="that record has no file path \u2014 reload notes"; return; }
+    status.textContent="saving\u2026";
+    try{
+      const list=(Array.isArray(n.tickers)?n.tickers.slice():[]).concat([t]);
+      await writeOne(n,list);
+      inp.value="";
+      status.textContent="added to "+(n.subject||n.note_id);
+      rerender();
+    }catch(e){ status.textContent="not saved: "+e.message; }
+  }
+  add.onclick=addTicker;
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); addTicker(); } });
+
+  async function removeTicker(t){
+    const carriers=recs.filter(n=>Array.isArray(n.tickers)
+                              && n.tickers.some(x=>normTk(x)===t));
+    if(!carriers.length) return;
+    const bad=carriers.filter(n=>!n._path);
+    if(bad.length){ status.textContent="some records have no file path \u2014 reload notes"; return; }
+    if(!confirm("Remove "+t+" from this theme?\n\nIt is on "+carriers.length
+      +" record(s):\n"+carriers.map(n=>"  \u00b7 "+(n.subject||n.note_id)).join("\n")
+      +"\n\nEach one is rewritten and its revision bumped.")) return;
+    status.textContent="saving\u2026";
+    try{
+      for(const n of carriers)
+        await writeOne(n,n.tickers.filter(x=>normTk(x)!==t));
+      status.textContent="removed from "+carriers.length+" record(s)";
+      rerender();
+    }catch(e){ status.textContent="not saved: "+e.message; }
+  }
+
+  function draw(){
+    const u=tickerUnion(recs);
+    chips.innerHTML="";
+    if(!u.size) chips.appendChild(el("span","tiny","No tickers associated with this theme yet."));
+    const byName=new Map();
+    for(const n of companies(ns)) if(n.ticker&&n.entity) byName.set(normTk(n.ticker),n.entity);
+    [...u.keys()].sort().forEach(t=>{
+      const e=el("span","chip"); e.dataset.src="tkr";
+      const bEl=el("b","",t); e.appendChild(bEl);
+      const nm=byName.get(t)||companyFor(t,ns);
+      if(nm) e.appendChild(el("span","tiny"," "+nm));
+      e.title=u.get(t)+" record(s) on this theme carry "+t
+            + (editing?"" : "  \u2014 click to open its company page");
+      if(editing){
+        const x=el("button","","\u00d7"); x.title="Remove "+t+" from this theme";
+        x.onclick=ev=>{ ev.stopPropagation(); removeTicker(t); };
+        e.appendChild(x);
+      } else {
+        e.onclick=()=>{ setView("company"); $("#q_ticker").value=t; renderCompany(true); };
+      }
+      chips.appendChild(e);
+    });
+    hint.textContent="Adding writes to the newest record on this theme ("
+      + ((newest()||{}).subject || "\u2014") + "). Removing rewrites every record "
+      + "that carries the ticker. Both bump the revision.";
+  }
+
+  const toggle=el("span","linkish edit","Edit tickers");
+  toggle.onclick=()=>{
+    editing=!editing;
+    toggle.textContent = editing ? "Done" : "Edit tickers";
+    panel.classList.toggle("hide",!editing);
+    status.textContent="";
+    draw();
+    if(editing) setTimeout(()=>{ try{ inp.focus(); }catch(e){} },0);
+  };
+
+  box.appendChild(panel);
+  draw();
+  return {box:box, toggle:toggle};
+}
+
 async function renderTheme(){
   const out=$("#theme_out"); out.innerHTML="";
   const th=$("#q_theme").value;
@@ -1170,50 +1333,45 @@ async function renderTheme(){
   if(!th){ renderThemeAll(out,ns); return; }
   $("#thcount").textContent="";
 
-  const recs=themes(ns).filter(n=>n.entity===th);
+  const recs=themeRecords(ns,th);
   if(!recs.length){ out.appendChild(emptyLine("No records for "+th+" in "
     +rangeLabel("th")+".")); return; }
 
-  const h=section(th);
-  h.appendChild(el("div","tiny",recs.length+" record(s)  \u00b7  "+rangeLabel("th")));
+  // ---- header box: name, count, associated tickers ----
+  const h=el("div","card");
+  const hd=el("div","thhd");
+  hd.appendChild(el("span","nm",th));
+  const cat=recs.filter(n=>n.review_date);
+  hd.appendChild(el("span","ct",recs.length+" record(s)"
+    + (cat.length? "  \u00b7  "+cat.length+" catalyst(s)" : "")
+    + "  \u00b7  "+rangeLabel("th")));
+  const tk=thTickerBox(th,recs,ns,()=>renderTheme());
+  hd.appendChild(tk.toggle);
+  h.appendChild(hd);
+  h.appendChild(el("div","sect","Associated tickers ("+tickerUnion(recs).size+")"));
+  h.appendChild(tk.box);
   out.appendChild(h);
 
-  // catalysts = anything with a review date
-  const cat=recs.filter(n=>n.review_date);
+  // ---- two columns: catalysts | notes ----
+  const cols=el("div","thcols");
+
+  const cc=section("Catalysts \u2014 dated reviews ("+cat.length+")");
   if(cat.length){
-    const c=section("Catalysts \u2014 dated reviews");
     cat.sort((a,b)=>String(a.review_date).localeCompare(String(b.review_date)));
-    cat.forEach(n=>c.appendChild(noteRow(n)));
-    out.appendChild(c);
+    cat.forEach(n=>cc.appendChild(noteRow(n)));
+  } else {
+    cc.appendChild(el("div","empty","Nothing on this theme carries a review date."));
+    cc.appendChild(el("div","tiny","A review date is a dated catalyst \u2014 a "
+      + "rulemaking deadline, an expected disclosure. Set one in the reader."));
   }
+  cols.appendChild(cc);
 
-  // members: union of tickers[] across the theme's records
-  const union=new Map();
-  for(const n of recs) for(const t of (Array.isArray(n.tickers)?n.tickers:[]))
-    union.set(t,(union.get(t)||0)+1);
-  if(union.size){
-    const c=section("Associated tickers ("+union.size+")");
-    const byName=new Map();
-    for(const n of companies(ns)) if(n.ticker&&n.entity) byName.set(n.ticker,n.entity);
-    const wrapd=el("div","chips");
-    [...union.keys()].sort().forEach(t=>{
-      const e=el("span","chip"); e.dataset.src="tkr";
-      const b=el("b","",t); e.appendChild(b);
-      const nm=byName.get(t);
-      if(nm) e.appendChild(el("span","tiny"," "+nm));
-      e.style.cursor="pointer";
-      e.onclick=()=>{ setView("company"); $("#q_ticker").value=t; renderCompany(true); };
-      wrapd.appendChild(e);
-    });
-    c.appendChild(wrapd);
-    c.appendChild(el("div","tiny","Click a ticker to open its company page. "
-      + "P. prefix marks a private company."));
-    out.appendChild(c);
-  }
+  const nc=section("Notes ("+recs.length+")");
+  recs.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)))
+      .forEach(n=>nc.appendChild(noteRow(n)));
+  cols.appendChild(nc);
 
-  const c=section("Notes ("+recs.length+")");
-  recs.forEach(n=>c.appendChild(noteRow(n)));
-  out.appendChild(c);
+  out.appendChild(cols);
 }
 
 /* ---------- TRADING LOG ----------
