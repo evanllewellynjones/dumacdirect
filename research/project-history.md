@@ -431,240 +431,268 @@ ships to the team before this.
 
 ---
 
-# Session: 2026-09-08 — v1.6
+# Session: 2026-09-20
 
 **Participants:** Evan Jones (DUMAC) with Claude
-**Files changed:** `rc-core.js`, `entry.html`, `admin.html`, `reports.html`
-**Test state at end of session:** 34 assertions passing against the new
-rc-core surface (type rules, bias, ticker parser). `test-rc-core.js` and
-`test-entry.js` have **not** been updated and will fail against v1.6 — see §20.
+**Files changed:** `reports.html`, `entry.html`, `rc-core.js`, `admin.html`
+**Files created:** `research-capture-spec-v1.5-delta.md`
+**Test state at end of session:** `test-rc-core.js` and `test-entry.js` are
+**stale** — they predate v1.4 §10 onward and all of v1.5. Every change this
+session was verified by headless Chrome smoke tests against real File System
+Access trees, not by the committed suite.
 
 ---
 
-## 13. Where the session started
+## 13. Where this session started
 
-`entry.html` had grown into one long form showing every field to every entry
-type. The complaint was crowding, but the real cost was a different one:
-someone starts typing, realises halfway down that this is a theme note and not
-a company note, and the switch feels expensive. That fear is what stops records
-being written at all.
+Reports existed but was not yet a place you would sit and read. The company
+view was a stack of six cards inside a date filter, price targets had no
+thesis attached, attachments were invisible, and a 4,400-row ticker upload had
+just landed — which broke three things that had been fine at 40 rows.
 
-Two decisions came out of it:
-
-1. **Fields are per-type, not global.** A `TYPE_RULES` table in `rc-core.js` is
-   now the single source of truth for what each record type requires, read by
-   `validateRecord()` and mirrored by `entry.html`'s visibility toggles.
-2. **Date and Contributor move to the end of the form.** They are automatic;
-   they were occupying the top of the screen for no reason.
+Nothing in this session changed the shape of a record. `action`, `why`,
+`origin`, `strategy` and the immutability rule are exactly as v1.4 left them.
 
 ---
 
-## 14. Four entry types
+## 14. FMP current price — the first network dependency
 
-`record_type` gains a fourth value: `Trade`.
+Recorded in full in the v1.5 delta §2. The decision worth keeping here is
+*why it was allowed at all*, in a system whose premise is no dependencies.
 
-| | Quick Note | Theme Note | Company Note | Trading Log |
-|---|---|---|---|---|
-| Ticker | — | opt (chips) | **req, first field** | **req** |
-| Theme | — | **req** | — | — |
-| Company name | — | = theme | optional, resolves from ticker | resolves |
-| Subject | **req** | **req** | **req** | **req**, explicit |
-| Strategy | opt | — | opt | **req** |
-| Action | — | — | opt | **req** |
-| Why | — | — | opt | **req** |
-| Note body | opt | opt | opt | **req** |
-| Targets | — | — | opt | — |
-| Bias | opt | opt | opt | — |
-| Review date | opt | opt | opt | — |
-| Tags / Attachments | opt | opt | opt | opt |
-| Date / Contributor | auto, footer | auto, footer | auto, footer | auto, footer |
+Three rules made it acceptable:
 
-**`Trade` is its own record type, not a filtered view of `Company`.** The
-alternative was tempting — a position record is already definable as
-`record_type: Company` with `action ∈ initiate|add|trim|exit`, which is exactly
-how §9 and §15 of the v1.4 delta describe it. It was rejected because the
-trading log gets read and analysed as its own thing, frequently, and a view
-that exists only as a filter is one someone will forget to apply.
+1. A blank `fmp_api_key` means **no call is made** — not a failed call.
+2. Failure is invisible and non-blocking. Network error, bad key, rate limit
+   and unknown ticker all render the same em dash, after the page is already
+   on screen.
+3. **The price is never written to a record.** It is decoration on a report.
+   Writing it would violate "never type a number you can look up" and would
+   rot immediately.
 
-The cost was stated and accepted: **a fourth bucket in `reports.html` and
-`admin.html`.** A record type that matches no selector saves correctly and is
-invisible in Reports — precisely what happened to `Note` between v1.4 and now.
-Both buckets landed in the same change as the type, which closes the §12
-blocker at the same time.
+The key lives in `_config.json`, not in the HTML, so it is not in git. The
+shared NOTES folder is already the trust boundary for every record in the
+system; the key does not lower it. No proxy — that means IT, and the exposure
+does not justify it.
 
-**`Trade` requires a body.** It is the only type that does. `validateRecord()`
-gained an optional third argument for it: a caller that only has frontmatter is
-not forced to invent one, but `entry.html` passes the textarea and a trading
-log entry cannot be saved empty. A trade with no reasoning attached is the
-exact hole this project exists to close.
+The Bloomberg → FMP suffix table is in the delta §2.1 rather than in one
+person's head. **Open:** whether the app's record key becomes the FMP symbol
+(`7203.T`) or stays whatever the team types with `_tickers.json` carrying a
+third column. Only US names are affected today, which is why it is not yet
+forced.
 
 ---
 
-## 15. `conviction` → `bias`
+## 15. Price targets: derived, not a fifth record type
 
-`conviction: High | Med | Low` is **removed**. Replaced by
-`bias: + | = | -`.
+Asked whether a price-target note should be its own entry type, so the thesis
+reads next to the number and the history of a thesis can be followed.
 
-High/Med/Low was a confidence scale, and confidence scales get filled in
-optimistically or not at all. `+ / = / -` is a direction, which is a thing a
-report can group on and a thing a person will actually pick. Blank stays a
-legitimate answer everywhere — clicking the selected value clears it, so
-"no view" needs no fourth button.
+**No — it is a Company record where `price_target_buy` or `price_target_sell`
+is set.** One filter, `targetNotes()`.
 
-Not a rename: `conviction` came out of `FM_ORDER` and `bias` went in.
+The reasoning is the same shape as the `action` argument in §2, run backwards:
 
-**Records written before v1.6 keep their `conviction` on disk.** Nothing reads
-it, nothing writes it, and it is no longer exported. `buildFM()`'s unknown-key
-passthrough preserves it through a read-modify-write, so it survives as
-archaeology. It was deliberately **not** mapped onto `bias`: High and `+` are
-answers to different questions, and guessing would put a value nobody chose
-into an immutable field.
+- Immutability *already* makes each target its own record. The history is on
+  disk and `targetGrid()` has always walked it. A new type would re-label what
+  field presence says.
+- Every target ever written qualifies instantly. A new type means all prior
+  targets are in the wrong bucket forever — the exact "adding a field later"
+  failure v1.4 exists to avoid.
+- No wrong door. With a separate type, a target typed on a Company note
+  silently misses the target report.
 
-`bias` values need quoting in YAML — a bare `-` is a block-sequence indicator.
-`yamlStr()` already quotes anything not starting `[A-Za-z0-9]`, so `+`, `=` and
-`-` all serialise as `bias: "-"` with no parser change. Confirmed by test.
+**The split that matters is where each is shown**, decided explicitly:
 
----
+| Surface | Shows | Because |
+|---|---|---|
+| Company page | latest target per contributor, with its thesis | answers "where do we stand" |
+| Price Targets tab | every target, grouped by ticker, with the change vs that contributor's previous | answers "how did we get here" |
 
-## 16. `entity` becomes optional on Company
-
-Previously an error. Now: required on `Theme` only, where it is the page key.
-
-The company NAME is derivable from the ticker, so requiring it made everyone
-retype something the app already knew. Three fill paths were considered:
-
-| Path | Verdict |
-|---|---|
-| (a) Resolve at write time from a stored ticker map | **Built.** Instant, offline, no network in the save path |
-| (b) Fill blanks later in an Admin pass | **Built.** One button over records with a ticker and no entity |
-| (c) Call FMP at write time | Rejected — puts a network call in the save path and breaks offline entry |
-
-A blank entity is legal on disk. Filling one later is treated the same way as
-filling a blank `why`: completing a blank is not revising a judgement, so it
-does not violate immutability.
+A name with five revisions would bury the company page under its own history.
+The change column is computed over the **unfiltered** corpus, so a date range
+cannot fake a "first" target.
 
 ---
 
-## 17. The ticker → company map
+## 16. `tickers[]` is curation, not a record field
 
-Bulk upload in Admin, new **Tickers** tab. 1,000+ rows in one paste or one CSV.
+**The classification decision of this session.**
 
-**Stored in `_tickers.json`, beside `_config.json` — not inside it.** Three
-reasons: a thousand-row map would dwarf everything else in `_config.json`,
-which is hand-inspectable today; `saveConfig()` bumps a version and appends to
-`_config_history.jsonl` on every write, and a bulk upload has no business in
-the config change log; and a bad paste is recovered by deleting one file rather
-than by rebuilding the taxonomy.
+`tickers[]` is a retrieval index — the same shape and the same job as `tags`,
+which has been mutable since v1. It says which names a note *touches*, not
+what anyone concluded. Discovering later that a theme also touches a name is
+not revising a judgement.
 
-`parseTickerCSV()` takes comma, tab or semicolon separated text — a paste
-straight out of Excel is a TSV — with or without a header, in either column
-order.
+`ticker` singular is different and stays frozen: it is the record's subject,
+and changing it makes it a different record.
 
-**Column order is decided once for the whole file, by scoring both columns
-across every row, not row by row.** Per-row detection looks smarter and is
-worse: on `Widget Industries Holdings,Thing` it would happily conclude "Thing"
-is the ticker, because in isolation it could be. Scoring the file measures the
-odd row against the column its neighbours established, and skips it instead of
-inverting it.
+This was arguably already the intent. The reader's own immutability footer
+lists date, subject, ticker, action, strategy, targets, bias, source and body
+as frozen — `tickers` is not among them.
 
-**The upload is approved as a diff, not as a number.** Before anything is
-written: how many are new, how many change a name already stored, how many are
-unchanged, every duplicate inside the file, and every rejected row with its
-line number and the reason. Merge is the default; replace is explicit and shows
-the deletion count before Apply, not after. A silent 1,000-row overwrite in a
-shared folder is unrecoverable.
+**Editing the union needs a rule.** The theme page shows the union across
+every record on the theme, so:
 
-The map is a convenience, not a source of truth. A ticker absent from it still
-saves fine.
+- **Adding** → the newest record on the theme only, and the UI names which one
+- **Removing** → every record that carries it, after a confirm listing them
 
----
+Anything else leaves a union that does not match what was just typed. Both
+paths run `setFMLine` → `last_updated` → `bumpRevision()`.
 
-## 18. What each file gained
-
-**`rc-core.js`**
-
-- `RECORD_TYPES` gains `Trade`; `BIAS_VALUES`; `TYPE_RULES` + `typeRules()`
-- `validateRecord(rec, cfg, body)` rewritten to read `TYPE_RULES` — `action`,
-  `why`, `strategy`, `entity`, `ticker` and the body are all now required per
-  type rather than globally. `action` and `why` were previously required on
-  every record, which forced a quick note about Brazil to carry a disposition.
-- `FM_ORDER`: `conviction` → `bias`
-- `RC.tickers`, `loadTickers()`, `saveTickers()`, `companyFor()`
-- `splitDelimited()`, `parseTickerCSV()`, `diffTickers()`
-- `EMAIL_KEYS`: `CONVICTION` → `BIAS`
-- **`notesLocation()` added.** It was called by `admin.html` and
-  `reports.html` and defined nowhere — a live `ReferenceError` in both pages'
-  empty-corpus path. Found by an id/reference sweep, not by use.
-
-**`entry.html`** — rebuilt. Four-type selector with a per-type accent colour
-carried into every card rule and the Save button label; "switching keeps what
-you typed" stated on screen, because it was already true and nobody knew;
-Date/Contributor footer strip; bias button group; Topic input removed from
-Quick Note (`entity` still defaults to the subject on disk); ticker-first
-Company block with live name resolution; "Paste a note written elsewhere"
-renamed **Import a drafted note** and moved to the end, with text saying
-outright that it takes text and not files.
-
-**`admin.html`** — Tickers tab (upload, paste, diff preview, table, resolve
-pass); Actions and Strategies list editors in Config; `Note` and `Trade` in the
-type filter and bulk setter; `action` and `origin` filters and columns, with
-`origin ≠ app` as the approval surface from delta §6.
-
-**`reports.html`** — four buckets; **Trading Log** tab with strategy / action /
-ticker / contributor / date filters and group-by; **Notes** tab for quick
-notes; trading log section on the company page; bias grid replacing the
-conviction grid; `Note` and `Trade` in the Review Queue type filter;
-`_export_trades.csv` as a third export.
+**Quick Notes gained `tickers[]`.** v1.4 §11 said a Note has no ticker; that
+remains true of `ticker` singular. But it left a quick note about three names
+unable to surface on any of their company pages, which was the point of the
+company page. `MODE_FIELDS` gained a `tickers` flag and the block now shows for
+Theme and Quick Note.
 
 ---
 
-## 19. On removing values from a closed list
+## 17. Deleting a record
 
-The Actions and Strategies editors add freely and remove only what nothing on
-disk uses. A value still present in a record but absent from the list reads
-back as an orphan no filter can reach, so a value in use shows "in use" with no
-button. The reverse case — a value found in records but missing from the list,
-which is what a hand-edited `_config.json` produces — shows a red pill and an
-"Add to list" button.
+v1.4 had no delete anywhere and `rc-core.js` had no `removeEntry` call at all.
+Soft delete (`status: void`) was proposed and **rejected in favour of a real
+delete**, deliberately narrow: one record at a time, never bulk; the `note_id`
+typed back to confirm; admin unlock; and the full manifest logged to
+`_config_history.jsonl` *before* the folder is touched, so a delete that fails
+halfway still says what was there.
+
+The §5 argument against moving folders — no move operation, recursive delete,
+partial-failure risk on attachments — is why this is single-record and loud
+rather than a checkbox sweep.
+
+**Recovery is OneDrive version history, not the app.** Nothing restores a
+record, and the deletion propagates on sync. That needs saying to the team
+once before rollout.
 
 ---
 
-## 20. State at end of session
+## 18. Attachments were unreachable
 
-**Done:**
+`openReader()` never read the `attachments` field. Files were on disk and
+there was **nowhere to click** — the largest gap between what the schema
+recorded and what the app could show.
 
-- `rc-core.js` — type rules, bias, ticker map, `notesLocation()`
-- `entry.html` — four types, per-type fields, bias, footer strip
-- `admin.html` — Tickers tab, Actions/Strategies editors, Note/Trade buckets
-- `reports.html` — four buckets, Trading Log, Notes, bias, trades export
-- The §12 immediate blocker (`Note` invisible in Reports) is **closed**
+`readAttachment()` in `rc-core.js` returns a `File` from the record's folder;
+the reader turns each into a blob URL. Images inline, everything else a chip
+that opens in a new tab, and a file listed in frontmatter but missing on disk
+gets an amber chip saying so rather than failing silently. Blob URLs are
+revoked on close — leaving them alive pins the bytes for the life of the tab.
+
+**Still broken:** `![](chart.png)` inline in a body, which is §10 of this
+document and unchanged. The blob-URL plumbing added here is exactly what that
+fix needs, so it is now a small job.
+
+---
+
+## 19. What 4,400 tickers broke
+
+Three bugs that were invisible at 40 rows. All three were silent.
+
+**Partial-ticker entity freeze.** `resolveEntity()` ran per keystroke and
+bailed on a non-blank name. `LRCX` fires as `L` → `LR` → `LRC` → `LRCX`, and
+`L` is Loews Corp's real NYSE ticker — so the name filled on keystroke one and
+froze there. Every ticker starting with a letter that is itself a listed
+ticker resolved to the wrong company: `LUV`, `LLY`, `LIN`, `LOW`, and the same
+for `F`, `T`, `C`, `V`, `X`, `K`, `O`, `D`.
+
+Fixed with an `ENTITY_AUTO` flag separating a name the app filled from one a
+human typed. *Retroactive consequence:* **records saved in that window carry
+the wrong `entity`.** `ticker` is correct so grouping is unaffected; it is the
+displayed name that is wrong.
+
+**Ticker case and whitespace.** Price Targets grouped on the raw string;
+Company matched `===`. A record carrying `"LRCX "` or `"lrcx"` therefore
+displayed in one view and was unreachable from the other. Every comparison now
+goes through `normTk()`. **This patches the reader, not the data** — dirty
+values are still on disk.
+
+**Typing was drilling in.** Every keystroke in the ticker box rendered a full
+company page, so `"L"` produced "No records for L". Typing now filters the
+listing; the detail page opens on an exact match with records behind it, on
+Enter, on a datalist pick, or on a click. Debounced at 180ms — `NVDA` was four
+`walkNotes()` passes over 4,400 names.
+
+That last fix surfaced a **render race**: Enter on a datalist input fires both
+`keydown` and `change`, and two async renders both appended. Fixed with a
+generation counter — each render takes a number on entry and only the newest
+may write after its `await`. Latent before the jump box existed.
+
+---
+
+## 20. Report layout
+
+Reports now run **full width** with 48px gutters. Entry stays narrow on
+purpose: it is sized to sit beside a PDF, and that constraint was never about
+reading.
+
+**Company page** — one name, all dates. The date filter applies to the listing
+only; once you are on a ticker you want the whole record. Header carries
+ticker, name, price, theme chips and a ticker jump box that takes focus on
+load, so the loop is keyboard-only: type, Enter, read, type. Targets table is
+one row per contributor with the thesis under it. Notes are every non-Trade
+record touching the ticker — Company by `ticker`, Theme and Quick Note by
+`tickers[]`. Trades stay in their own tab; a position change is a different
+kind of fact from a view.
+
+**Empty states distinguish two cases** — "no notes yet" versus "not in the
+ticker list" — and offer near misses. At 4,400 names a transposition is the
+likeliest reason a page comes up blank, and `LCRX` for `LRCX` was the actual
+report that led here.
+
+**Theme page** — header box with name, counts and the editable ticker list,
+then **Catalysts and Notes side by side**, stacking under 980px. Stacked, the
+notes list sat below the fold on any theme with more than two catalysts.
+
+**Bias leads every note line**, 17px and coloured. It is the first thing you
+want off a row and was previously buried mid-line at body size.
+
+---
+
+## 21. Method note
+
+Every change this session was verified in headless Chrome against a real
+OPFS tree — actual `removeEntry`, actual `getFile`, actual frontmatter read
+back after the write — rather than against mocks. Three bugs were found that
+way and would not have been found by reading the diff: the bias CSS
+specificity conflict, the double-render race, and the duplicate empty-state
+card.
+
+The committed suites were not run, because they are stale. That is now the
+top of the queue.
+
+---
+
+## 22. State at end of session
 
 **Immediate:**
 
-1. **`test-rc-core.js` and `test-entry.js` are stale.** They assert `action`
-   and `why` are required on every record and that `conviction` is High/Med/Low
-   — all three now false. Rewrite against `TYPE_RULES` before trusting either.
-2. Load the real ticker list and run the resolve pass.
-3. Backfill script for pre-v1.4 records, bundled with the re-tag pass.
+1. **Stale test suites.** `test-rc-core.js` and `test-entry.js` predate v1.4
+   §10 onward and all of v1.5. Claude Code, first.
+2. **One backfill pass, four jobs.** Pre-v1.4 `action`/`why`/`origin`, the
+   re-tag pass for acronym suppression, dirty `ticker` values, and wrong
+   `entity` values from §19. All four rewrite the same files; doing them
+   separately means four passes over the corpus and four revision bumps.
 
 **Then, roughly in order:**
 
-4. Image path rewriting in `rc-core.js` (§10) — still blocks charts on any page
+3. Image path rewriting so `![](chart.png)` renders (§10, §18)
+4. `admin.html` — `action` / `why` / `origin` / `strategy` columns and the
+   `origin` filter as the approval surface. Still not built; it is the
+   approval surface the whole multi-path design depends on.
 5. SharePoint page + image extractor — **hard deadline at Egnyte cutover**
-6. Run the 63-file ingestion as the scale test
-7. `/note` SKILL.md — must call `buildFM()` and `validateRecord()` with a body
+6. The 63-file ingestion as the scale test it was scoped to be
+7. `/note` SKILL.md
 8. Email reader on Task Scheduler
 9. One screen end to end, then `screens.html`
-10. Arcana position-diff log — writes `record_type: Trade`, `origin:
-    position-diff`, blank `why`; still needs no schema change
+10. Arcana position-diff log — still needs no schema change
 
-**Undecided, carried forward:**
+**Undecided:**
 
-- Whether `pin` goes into the note schema now (§10)
-- Whether a revised Theme framing supersedes or edits in place (leaning
-  supersede)
-- Whether unanswered position-diff `why` entries expire or accumulate (leaning
-  accumulate)
-- Whether to strip `conviction` lines off pre-v1.6 records. Leaning no: it
-  would bump the revision on every old record for a cosmetic gain, and nothing
-  reads the field.
+- Whether the record key becomes the FMP symbol or `_tickers.json` carries a
+  third column mapping to it
+- Whether `pin` goes into the note schema (§10)
+- Whether a revised Theme framing supersedes as a new record or edits in place
+  (still leaning supersede)
+- Whether unanswered position-diff `why` entries expire or accumulate
+  (still leaning accumulate)
