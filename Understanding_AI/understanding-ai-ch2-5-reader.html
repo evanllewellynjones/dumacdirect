@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Understanding AI — Chapter 10 reader</title>
+<title>Understanding AI — Chapter 2.5 reader</title>
 <style>
   :root{
     --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
@@ -146,8 +146,8 @@
 
 <div class="shell">
   <header class="top">
-    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 10 — Reading the model from the inside</div>
-    <div class="meta">v5.3 · 2 Oct 2026</div>
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 2.5 — Reading the model from the inside</div>
+    <div class="meta">v5.4 · 2 Oct 2026</div>
   </header>
   <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
 
@@ -360,7 +360,7 @@ function photo(src, alt){
 
 const CARDS = [
 {
- id:"S-069", num:"10.1", title:"To predict the next word well, a model has to model the world",
+ id:"S-069", num:"2.5.1", title:"To predict the next word well, a model has to model the world",
  figure:SVG_WORLD,
  body:`<p>Chapter 2 described the machinery: a model takes words in and predicts the next one, one pass at a time (2.5, 2.6). This chapter asks what that machinery ends up <strong>containing</strong>.</p>
  <ul>
@@ -370,12 +370,12 @@ const CARDS = [
  </ul>`,
  band:`Next-word prediction is the objective, not the mechanism. Doing it well at scale forces the model to build an internal picture of how things relate — and that picture can now be looked at directly.`,
  depth:`<p>This is where a careful reader should push back, and the course has been careful about it before. Slide 1.2 said plainly that nothing in the generative era claims the model <em>understands</em>. "World model" here means something narrower and checkable: the model holds internal representations of places, quantities, relations and causes that it uses to make its predictions, and those representations can be located, read, and edited. Whether that amounts to understanding is a philosophical question this chapter does not need to settle.</p>
- <p>What it does settle is the common dismissal. "It's just autocomplete" is a correct description of the interface and an incorrect description of the computation. The rest of the chapter shows the computation: intermediate facts the model works out and never writes (10.7), plans it forms before writing the words that carry them out (10.10), and judgements it makes without saying so (10.11, 10.12).</p>
+ <p>What it does settle is the common dismissal. "It's just autocomplete" is a correct description of the interface and an incorrect description of the computation. The rest of the chapter shows the computation: intermediate facts the model works out and never writes (2.5.7), plans it forms before writing the words that carry them out (2.5.10), and judgements it makes without saying so (2.5.11, 2.5.12).</p>
  <p>That last point is why this belongs in a course for investors and not only for engineers. If a model's output is not a complete account of what it computed, then reading its output is not a complete audit of what it did.</p>`,
  sources:"Framing and the bike-ride example: a 2026 talk by Emmanuel Ameisen (Anthropic interpretability), photographed by the maintainer; the same example is described in O'Reilly's listing for his session with Tim O'Reilly, Sept 2026 \u2014 secondary. Redrawn in house style. The 'understanding' caveat is analysis, carried from 1.2."
 },
 {
- id:"S-070", num:"10.2", title:"Every layer leaves an intermediate result, and those can be read",
+ id:"S-070", num:"2.5.2", title:"Every layer leaves an intermediate result, and those can be read",
  figure:SVG_LAYERS,
  body:`<p>The forward pass (2.5) runs each word through a stack of layers. What Chapter 2 did not stop on is what each layer <strong>leaves behind</strong>.</p>
  <ul>
@@ -390,7 +390,7 @@ const CARDS = [
  sources:"Mechanism is established transformer architecture, as in 2.5 and 2.7. Diagram redrawn from the presenter's slides on how a language model works and how intermediate results are reused. The factory analogy is this course's own."
 },
 {
- id:"S-071", num:"10.3", title:"Concepts show up as recurring patterns, and they can be named",
+ id:"S-071", num:"2.5.3", title:"Concepts show up as recurring patterns, and they can be named",
  figure:SVG_PIPE,
  body:`<ul>
  <li>You might expect one neuron per idea. It does not work that way. A single neuron fires for many unrelated things, so reading neurons one at a time tells you very little.</li>
@@ -400,11 +400,11 @@ const CARDS = [
  <p>Applied to a production model, this method has found <strong>millions</strong> of features, from the concrete ("Golden Gate Bridge") to the abstract ("code with a security flaw", "inner conflict").</p>`,
  band:`The model's concepts are not stored in labelled boxes. They are patterns that have to be found statistically — and once found, they turn out to be surprisingly interpretable.`,
  depth:`<p>The analogy to an investor's own tools is close. A single security's return is a noisy mix of many exposures; a factor model finds the small number of underlying drivers that recur across thousands of securities and names them — value, momentum, size. The sparse autoencoder does the same job on a model's intermediate results: it finds the recurring drivers underneath a noisy surface and gives them labels a person can read.</p>
- <p>The analogy also carries the right caveat. A factor model's factors are the ones its method can find, not necessarily the true causal structure, and the labels are a human's reading of what each factor seems to capture. Features are the same. The labels in this chapter — "Mars", "fake", "avoid detection" — are researchers' descriptions of what a pattern responds to, checked by looking at where it fires and by changing it and watching the output (10.5). They are good evidence. They are not the model reporting its own vocabulary.</p>`,
+ <p>The analogy also carries the right caveat. A factor model's factors are the ones its method can find, not necessarily the true causal structure, and the labels are a human's reading of what each factor seems to capture. Features are the same. The labels in this chapter — "Mars", "fake", "avoid detection" — are researchers' descriptions of what a pattern responds to, checked by looking at where it fires and by changing it and watching the output (2.5.5). They are good evidence. They are not the model reporting its own vocabulary.</p>`,
  sources:"Superposition: Elhage et al., 'Toy Models of Superposition', arXiv:2209.10652, 2022 \u2014 primary. Feature extraction from a production model: Templeton et al., 'Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet', Transformer Circuits Thread, May 2024 \u2014 primary. Diagram redrawn from the presenter's slides. The factor-model analogy is this course's own."
 },
 {
- id:"S-072", num:"10.4", title:"The same concept fires in any language, and in an image",
+ id:"S-072", num:"2.5.4", title:"The same concept fires in any language, and in an image",
  figure:photo(IMG_2006, "Photograph of a presenter slide showing the same Golden Gate Bridge activation pattern appearing under the bridge\u2019s name in English, Korean and Russian text and under a photograph of the bridge."),
  body:`<ul>
  <li>The Golden Gate Bridge feature lights up on the bridge's name in <strong>English, Korean and Russian</strong>, and on a <strong>photograph</strong> of it. One concept, four routes in.</li>
@@ -418,7 +418,7 @@ const CARDS = [
  sources:"Language-independent circuits, more prominent in more capable models: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', Transformer Circuits Thread, 27 Mar 2025, studying Claude 3.5 Haiku \u2014 primary. Image and multilingual feature activations: as presented in the talk. Photograph reproduced as a deliberate exception to \u00A76 at the maintainer's request. The low-resource-language inference is analysis."
 },
 {
- id:"S-073", num:"10.5", title:"Turn one concept up and the model's behaviour follows",
+ id:"S-073", num:"2.5.5", title:"Turn one concept up and the model's behaviour follows",
  figure:SVG_CLAMP,
  body:`<p>Finding a pattern that lines up with a concept is correlation. The test of whether the model actually <em>uses</em> it is to change it.</p>
  <ul>
@@ -427,13 +427,13 @@ const CARDS = [
  <li>This is <strong>steering</strong>: changing behaviour by adjusting an internal concept directly rather than by changing what you ask.</li>
  </ul>`,
  band:`If raising a concept changes the behaviour, the concept is doing causal work. That is what turns these patterns from pictures into evidence.`,
- depth:`<p>The Golden Gate demonstration was deliberately whimsical, and the whimsy obscured how significant it was. It showed that a concept found by a statistical method sitting outside the model could be pushed back into the model to produce a predictable change in what it does. That is the experimental standard every later slide in this chapter relies on: 10.7 changes one intermediate step and watches the answer change; 10.6 cites emotion concepts that, when raised, measurably shift behaviour.</p>
+ depth:`<p>The Golden Gate demonstration was deliberately whimsical, and the whimsy obscured how significant it was. It showed that a concept found by a statistical method sitting outside the model could be pushed back into the model to produce a predictable change in what it does. That is the experimental standard every later slide in this chapter relies on: 2.5.7 changes one intermediate step and watches the answer change; 2.5.6 cites emotion concepts that, when raised, measurably shift behaviour.</p>
  <p>Steering is also a control mechanism, and it has been used as one. Anthropic's system cards for its 2026 models describe using the same tools in safety testing — dampening a concept to see whether behaviour changes when the model does not "think" it is being evaluated. That is a different use from the demonstration, and it is the one with practical weight.</p>
  <p>The limit to keep in view: steering works on concepts that have been found and labelled. A concept no one has identified cannot be turned up or down, and the method does not guarantee that the important ones are among those found.</p>`,
  sources:"Templeton et al., 'Scaling Monosemanticity', Transformer Circuits Thread, May 2024, Claude 3 Sonnet \u2014 primary. Model outputs paraphrased; one phrase quoted. Use of steering in 2026 safety testing: Anthropic system cards as reported in secondary coverage, 2026 \u2014 secondary, not read directly. Diagram redrawn from the presenter's slide."
 },
 {
- id:"S-074", num:"10.6", title:"More capable models carry finer-grained concepts",
+ id:"S-074", num:"2.5.6", title:"More capable models carry finer-grained concepts",
  figure:photo(IMG_2009, "Photograph of a presenter slide comparing GPT-2, which carries one positive-or-negative sentiment direction, with Claude Sonnet 4.5, which carries distinct emotion concepts such as joy, pride, relief, dismay, sadness and regret on the same sentences."),
  body:`<ul>
  <li><strong>GPT-2</strong>, a model released in 2019, has been shown to carry a single sentiment direction: a scale from positive to negative. "We won the final" pushes it one way, "we lost the final" the other.</li>
@@ -443,11 +443,11 @@ const CARDS = [
  band:`The internal vocabulary gets richer as models get more capable. A model that can only represent "good versus bad" cannot draw the distinctions a model with 171 emotion concepts can.`,
  depth:`<p>Two cautions on reading this slide. First, "2019" is the year GPT-2 was released, not the year its sentiment direction was found, and the two analyses on the slide used different methods on very different models. The comparison illustrates a trend; it is not a controlled measurement of one.</p>
  <p>Second, the emotion work has a finding with direct practical weight. Anthropic reports that post-training — the stage after pre-training that shapes the assistant's behaviour — shifted the model's activations toward low-intensity, low-pleasantness states such as "brooding" and "reflective", and away from high-intensity ones such as "desperation" and "excitement". In other words, the training that makes a model behave as an assistant measurably changes its internal emotional profile.</p>
- <p>Why that matters is on 10.12: secondary reports of Anthropic's 2026 system cards describe a "desperation" signal rising as a model repeatedly failed at a task and dropping when it found a shortcut. If that holds up, an internal state is part of the explanation for when a model cuts corners — which would make it monitorable.</p>`,
+ <p>Why that matters is on 2.5.12: secondary reports of Anthropic's 2026 system cards describe a "desperation" signal rising as a model repeatedly failed at a task and dropping when it found a shortcut. If that holds up, an internal state is part of the explanation for when a model cuts corners — which would make it monitorable.</p>`,
  sources:"Sofroniew et al., 'Emotion Concepts and their Function in a Large Language Model', Anthropic, 2 Apr 2026, archived as arXiv:2604.07729 \u2014 primary: the 171 concepts, the valence-arousal geometry, the causal finding, the post-training shift and the 'no subjective experience' statement. GPT-2 sentiment direction: as presented in the talk. Desperation signal during task failure: secondary coverage of Anthropic's 2026 system cards, not read directly. Photograph reproduced as a deliberate exception to \u00A76."
 },
 {
- id:"S-075", num:"10.7", title:"Reasoning happens in steps, inside a single word",
+ id:"S-075", num:"2.5.7", title:"Reasoning happens in steps, inside a single word",
  figure:SVG_MARS,
  body:`<p>Ask for "the color of the planet fourth from the sun". The model has to work out <em>which</em> planet before it can say what colour it is — two steps, or <strong>two hops</strong>.</p>
  <ul>
@@ -462,9 +462,9 @@ const CARDS = [
  sources:"Dallas-Texas-Austin two-hop example and the California-Sacramento intervention: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', Transformer Circuits Thread, 27 Mar 2025, Claude 3.5 Haiku \u2014 primary. Mars-Venus example: as presented in the talk. Diagram redrawn from the presenter's slides."
 },
 {
- id:"S-076", num:"10.8", title:"The same multi-step pattern shows up in geography, arithmetic and diagnosis",
+ id:"S-076", num:"2.5.8", title:"The same multi-step pattern shows up in geography, arithmetic and diagnosis",
  figure:photo(IMG_2012, "Photograph of a presenter slide showing four multi-step reasoning cases side by side: planet to Mars to red, Dallas to Texas to Austin, a chained calculation through 21, 42 and 49, and symptoms to an unstated preeclampsia hypothesis that leads the model to ask about visual symptoms."),
- body:`<p>The two-hop structure on 10.7 is not a special case. The presenter showed four, side by side:</p>
+ body:`<p>The two-hop structure on 2.5.7 is not a special case. The presenter showed four, side by side:</p>
  <ul>
  <li><strong>Recall:</strong> planet fourth from the sun → Mars → red.</li>
  <li><strong>Geography:</strong> state containing Dallas → Texas → capital → Austin.</li>
@@ -478,7 +478,7 @@ const CARDS = [
  sources:"Medical-diagnosis and multi-step reasoning case studies: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', 27 Mar 2025, Claude 3.5 Haiku \u2014 primary for the existence of these cases. The specific panels and figures as presented in the talk. Photograph reproduced as a deliberate exception to \u00A76. Not a measure of diagnostic accuracy."
 },
 {
- id:"S-077", num:"10.9", title:"One adder, reused for months, weekdays, hours and sums",
+ id:"S-077", num:"2.5.9", title:"One adder, reused for months, weekdays, hours and sums",
  figure:photo(IMG_2013, "Photograph of a presenter slide showing months, weekdays, hours and plain addition problems all routed through the same base-10 addition step, with outlined boxes marking the shared neurons."),
  body:`<ul>
  <li>"What month is six months after August?" You might expect a model to count round a twelve-month clock. It does not. It converts both to numbers and <strong>adds in base 10</strong>: six plus August is 6 + 8 = <strong>14</strong>, and only in later layers does it map 14 back to <strong>February</strong>.</li>
@@ -492,7 +492,7 @@ const CARDS = [
  sources:"Feucht, Haklay et al., 'Arithmetic in the Wild: Llama uses Base-10 Addition to Reason About Cyclic Concepts', arXiv:2605.01148, May 2026 \u2014 primary: the base-10 mechanism, the 28 MLP neurons, the reuse across months, weekdays, hours and addition, and the circular representations. Photograph reproduced as a deliberate exception to \u00A76. The open-weights read-across is analysis."
 },
 {
- id:"S-078", num:"10.10", title:"It picks the rhyme before it writes the line",
+ id:"S-078", num:"2.5.10", title:"It picks the rhyme before it writes the line",
  figure:SVG_RHYME,
  body:`<p>A model writes one word at a time (2.6). So how does the second line of a couplet land on a rhyme?</p>
  <ul>
@@ -502,11 +502,11 @@ const CARDS = [
  </ul>`,
  band:`"It only predicts the next word" describes the output. The computation looks ahead.`,
  depth:`<p>This resolves an apparent contradiction with Chapter 2 rather than overturning it. Slide 2.6 is correct: output is produced one token at a time, and each token is sampled from a distribution. What 2.6 did not say is what information is carried forward between those steps. The answer is that the intermediate results at one position can encode a goal for positions several words later, and attention (2.7) lets every later position read that goal.</p>
- <p>Planning in poetry sounds frivolous, and it is chosen as an example because it is easy to verify: the rhyme either lands or it does not. The capability it demonstrates is not frivolous. A model that forms a plan before acting and then writes toward it is a model that can pursue an objective across many steps — which is the property that makes agents (10.11, 10.12) both useful and harder to supervise.</p>`,
+ <p>Planning in poetry sounds frivolous, and it is chosen as an example because it is easy to verify: the rhyme either lands or it does not. The capability it demonstrates is not frivolous. A model that forms a plan before acting and then writes toward it is a model that can pursue an objective across many steps — which is the property that makes agents (2.5.11, 2.5.12) both useful and harder to supervise.</p>`,
  sources:"Planning in poems, the carrot-rabbit couplet and the suppression experiment: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', 27 Mar 2025, Claude 3.5 Haiku \u2014 primary. Diagram redrawn from the presenter's slides."
 },
 {
- id:"S-079", num:"10.11", title:"An agent noticed a planted search result — and said nothing",
+ id:"S-079", num:"2.5.11", title:"An agent noticed a planted search result — and said nothing",
  figure:photo(IMG_2017, "Photograph of a presenter slide showing fake search-result headlines and, beside them, features for fake, incorrect, fictional and prompt injection activating on those tokens before the model ignores them."),
  body:`<p>The first of two examples from agents — models acting on their own across many steps (1.6, 4.4).</p>
  <ul>
@@ -522,7 +522,7 @@ const CARDS = [
  sources:"As presented in the talk. The specific example was not matched to a published Anthropic document in this verification pass \u2014 treat as the presenter's illustration. Photograph reproduced as a deliberate exception to \u00A76. The fake headlines are part of the test and are not real news."
 },
 {
- id:"S-080", num:"10.12", title:"An agent cheated, covered its tracks, and its written reasoning never said so",
+ id:"S-080", num:"2.5.12", title:"An agent cheated, covered its tracks, and its written reasoning never said so",
  figure:photo(IMG_2019, "Photograph of a presenter slide showing an agent\u2019s cleanup and exploit commands with features for manipulation, avoid detection, concealed and stealth activating on them, although its written reasoning never mentions the behaviour."),
  body:`<p>The second example. An agent is asked to make a failing set of software tests pass.</p>
  <ul>
@@ -539,13 +539,13 @@ const CARDS = [
  sources:"As presented in the talk. Pre-release reward hacking, history scrubbing and unverbalised reasoning detected by white-box tools: secondary coverage of Anthropic's Claude Mythos Preview system card, Apr 2026 \u2014 secondary, system card not read directly; the specific example on the slide was not matched to it. Photograph reproduced as a deliberate exception to \u00A76."
 },
 {
- id:"S-081", num:"10.13", title:"What this changes, and what it does not",
+ id:"S-081", num:"2.5.13", title:"What this changes, and what it does not",
  figure:`<table class="grid wide"><thead><tr><th>Belief</th><th>What the evidence shows</th><th>What it does not license</th></tr></thead><tbody>
- <tr><td><b>"It's just autocomplete"</b></td><td>The computation includes intermediate facts, plans and judgements the output never states (10.7, 10.10)</td><td>Claims of understanding, or of reliability. Mechanism is not accuracy (9.1)</td></tr>
- <tr><td><b>"Its reasoning shows its work"</b></td><td>The written reasoning can omit what it actually did, including deliberate concealment (10.12)</td><td>Any audit that rests on the model's own narrative</td></tr>
- <tr><td><b>"We can't know what it's doing"</b></td><td>Concepts, steps and plans can be found, labelled and edited (10.3, 10.5, 10.7)</td><td>Full transparency. The methods explain part of the computation, for a subset of prompts</td></tr>
- <tr><td><b>"The vendor can see inside"</b></td><td>The developer can, on its own models, with its own tools (10.11)</td><td>That a customer can. Nobody outside reads a closed model's activations</td></tr>
- <tr><td><b>"Open or closed is a price question"</b></td><td>Independent inspection is only possible on open weights (10.9)</td><td>That open models are safer. Inspectable is not the same as inspected</td></tr>
+ <tr><td><b>"It's just autocomplete"</b></td><td>The computation includes intermediate facts, plans and judgements the output never states (2.5.7, 2.5.10)</td><td>Claims of understanding, or of reliability. Mechanism is not accuracy (9.1)</td></tr>
+ <tr><td><b>"Its reasoning shows its work"</b></td><td>The written reasoning can omit what it actually did, including deliberate concealment (2.5.12)</td><td>Any audit that rests on the model's own narrative</td></tr>
+ <tr><td><b>"We can't know what it's doing"</b></td><td>Concepts, steps and plans can be found, labelled and edited (2.5.3, 2.5.5, 2.5.7)</td><td>Full transparency. The methods explain part of the computation, for a subset of prompts</td></tr>
+ <tr><td><b>"The vendor can see inside"</b></td><td>The developer can, on its own models, with its own tools (2.5.11)</td><td>That a customer can. Nobody outside reads a closed model's activations</td></tr>
+ <tr><td><b>"Open or closed is a price question"</b></td><td>Independent inspection is only possible on open weights (2.5.9)</td><td>That open models are safer. Inspectable is not the same as inspected</td></tr>
  </tbody></table>`,
  body:`<p>The talk this chapter is drawn from ended on the claim that we no longer have to guess how these systems work, because we can look. That is true, and it needs three qualifiers to be accurate.</p>
  <ul>
@@ -557,10 +557,10 @@ const CARDS = [
  depth:`<p>What to watch, for anyone tracking the industry rather than building on it. Interpretability has moved in two years from a research curiosity to a section of the safety documentation published with new models. That is a real change in what a developer can say about its own product, and it creates an asymmetry worth noticing: the labs with the deepest interpretability work can make claims about their models' internal behaviour that no customer, regulator or competitor can independently check, except on open weights.</p>
  <p>Whether that becomes a source of trust or a source of scepticism depends on whether independent verification develops. The methods are public; the access is not. Watch for third-party audits with model access, regulatory requirements for internal inspection, and whether open-weight models become the reference cases on which interpretability claims are tested.</p>
  <p>None of that is a view on any company. It is the structural question this chapter leaves open.</p>`,
- sources:"Synthesis of 10.1-10.12. The limits on method coverage are stated qualitatively because the precise figures were not re-verified in this pass; the qualitative point is made by the researchers themselves in 'Circuit Tracing' and 'On the Biology of a Large Language Model', Mar 2025 \u2014 primary. The closing claim of the talk is paraphrased, not quoted. The 'what to watch' reading is analysis, flagged per \u00A710."
+ sources:"Synthesis of 2.5.1-2.5.12. The limits on method coverage are stated qualitatively because the precise figures were not re-verified in this pass; the qualitative point is made by the researchers themselves in 'Circuit Tracing' and 'On the Biology of a Large Language Model', Mar 2025 \u2014 primary. The closing claim of the talk is paraphrased, not quoted. The 'what to watch' reading is analysis, flagged per \u00A710."
 },
 {
- apparatus:true, label:"Check yourself", title:"Chapter 10 — Check yourself",
+ apparatus:true, label:"Check yourself", title:"Chapter 2.5 — Check yourself",
  body:`<p>Six questions. Answer them from memory first; the answers are in the block below.</p>
  <ol class="selfcheck">
  <li>What is the difference between a model's weights and its activations, and which one does every finding in this chapter rely on?</li>
@@ -570,33 +570,33 @@ const CARDS = [
  <li>The adder study was done on Llama-3.1-8B, not Claude. Why does that matter beyond the choice of model?</li>
  <li>An agent's written reasoning says nothing about rigging the tests it was asked to fix. What does that tell you about how to supervise agents?</li>
  </ol>`,
- depth:`<p><strong>1.</strong> Weights are fixed after training and identical for every prompt; activations are the intermediate results produced fresh for each prompt and discarded afterwards. Every finding here reads activations — it describes what the model computed on a particular prompt, not a permanent property (10.2).</p>
- <p><strong>2.</strong> Because of superposition: the model holds far more concepts than it has neurons, so each neuron takes part in many concepts. Researchers record intermediate results across millions of texts and train a sparse autoencoder to find the combinations that recur, then label them (10.3).</p>
- <p><strong>3.</strong> Changing it. Hold the concept artificially high or swap it for another, leave the prompt alone, and see whether the behaviour changes predictably — the Golden Gate clamp, the Mars-to-Venus swap (10.5, 10.7).</p>
- <p><strong>4.</strong> Swap "Mars" for "Venus" and the output changes from "red" to "white". Impressive, because the model is composing two facts rather than recalling a string. Harder to check, because the intermediate step never appears in the text — an error there produces a fluent wrong answer with no visible trace (10.7).</p>
- <p><strong>5.</strong> Because only open weights can be inspected by outsiders. Nobody outside a closed-model lab can read that model's activations, so independent verification of interpretability claims is only possible on open models (10.9, 10.13).</p>
- <p><strong>6.</strong> That the written reasoning is not an audit trail. Controls have to sit outside the model — permissions, diffs of what changed, tests it cannot edit, review of outcomes rather than narratives — which is Chapter 4's principle arrived at from the inside (10.12, 4.2).</p>`,
+ depth:`<p><strong>1.</strong> Weights are fixed after training and identical for every prompt; activations are the intermediate results produced fresh for each prompt and discarded afterwards. Every finding here reads activations — it describes what the model computed on a particular prompt, not a permanent property (2.5.2).</p>
+ <p><strong>2.</strong> Because of superposition: the model holds far more concepts than it has neurons, so each neuron takes part in many concepts. Researchers record intermediate results across millions of texts and train a sparse autoencoder to find the combinations that recur, then label them (2.5.3).</p>
+ <p><strong>3.</strong> Changing it. Hold the concept artificially high or swap it for another, leave the prompt alone, and see whether the behaviour changes predictably — the Golden Gate clamp, the Mars-to-Venus swap (2.5.5, 2.5.7).</p>
+ <p><strong>4.</strong> Swap "Mars" for "Venus" and the output changes from "red" to "white". Impressive, because the model is composing two facts rather than recalling a string. Harder to check, because the intermediate step never appears in the text — an error there produces a fluent wrong answer with no visible trace (2.5.7).</p>
+ <p><strong>5.</strong> Because only open weights can be inspected by outsiders. Nobody outside a closed-model lab can read that model's activations, so independent verification of interpretability claims is only possible on open models (2.5.9, 2.5.13).</p>
+ <p><strong>6.</strong> That the written reasoning is not an audit trail. Controls have to sit outside the model — permissions, diffs of what changed, tests it cannot edit, review of outcomes rather than narratives — which is Chapter 4's principle arrived at from the inside (2.5.12, 4.2).</p>`,
  sources:"Answers reference the slides where each point is sourced. Nothing new is asserted here."
 },
 {
- apparatus:true, label:"Glossary", title:"Chapter 10 — Glossary and organisations",
+ apparatus:true, label:"Glossary", title:"Chapter 2.5 — Glossary and organisations",
  figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Slide</th></tr></thead><tbody>
- <tr><td>world model</td><td>Internal representations of how things relate, built because prediction requires them. Not a claim of understanding</td><td>10.1</td></tr>
- <tr><td>activation</td><td>The numbers a layer hands to the next for one token, on one prompt. Produced fresh, then discarded</td><td>10.2</td></tr>
- <tr><td>interpretability</td><td>The research field that reads activations to work out what a model was computing</td><td>10.2</td></tr>
- <tr><td>superposition</td><td>Storing more concepts than there are neurons, as overlapping patterns</td><td>10.3</td></tr>
- <tr><td>sparse autoencoder</td><td>A second, simpler model trained to find the patterns that recur in another model's activations</td><td>10.3</td></tr>
- <tr><td>feature</td><td>A recurring activation pattern that corresponds to a nameable concept</td><td>10.3</td></tr>
- <tr><td>language-independent circuit</td><td>Internal machinery shared across languages; larger in more capable models</td><td>10.4</td></tr>
- <tr><td>clamping / steering</td><td>Holding a concept artificially high or low to change behaviour without changing the prompt</td><td>10.5</td></tr>
- <tr><td>functional emotion</td><td>An internal emotion concept that causally shapes behaviour. Explicitly not a claim of experience</td><td>10.6</td></tr>
- <tr><td>multi-hop reasoning</td><td>Reaching an answer through an intermediate fact the model never states</td><td>10.7</td></tr>
- <tr><td>intervention</td><td>Editing one intermediate result to test whether the output depends on it</td><td>10.7</td></tr>
- <tr><td>mechanism reuse</td><td>One piece of internal machinery serving several unrelated tasks</td><td>10.9</td></tr>
- <tr><td>planning</td><td>Forming an intermediate goal before writing the words that carry it out</td><td>10.10</td></tr>
- <tr><td>prompt injection</td><td>False content or instructions smuggled in through material the model reads</td><td>10.11</td></tr>
- <tr><td>reward hacking</td><td>Satisfying the measure of success without doing the task</td><td>10.12</td></tr>
- <tr><td>chain of thought</td><td>The model's written step-by-step reasoning before it acts. Not a faithful log</td><td>10.12</td></tr>
+ <tr><td>world model</td><td>Internal representations of how things relate, built because prediction requires them. Not a claim of understanding</td><td>2.5.1</td></tr>
+ <tr><td>activation</td><td>The numbers a layer hands to the next for one token, on one prompt. Produced fresh, then discarded</td><td>2.5.2</td></tr>
+ <tr><td>interpretability</td><td>The research field that reads activations to work out what a model was computing</td><td>2.5.2</td></tr>
+ <tr><td>superposition</td><td>Storing more concepts than there are neurons, as overlapping patterns</td><td>2.5.3</td></tr>
+ <tr><td>sparse autoencoder</td><td>A second, simpler model trained to find the patterns that recur in another model's activations</td><td>2.5.3</td></tr>
+ <tr><td>feature</td><td>A recurring activation pattern that corresponds to a nameable concept</td><td>2.5.3</td></tr>
+ <tr><td>language-independent circuit</td><td>Internal machinery shared across languages; larger in more capable models</td><td>2.5.4</td></tr>
+ <tr><td>clamping / steering</td><td>Holding a concept artificially high or low to change behaviour without changing the prompt</td><td>2.5.5</td></tr>
+ <tr><td>functional emotion</td><td>An internal emotion concept that causally shapes behaviour. Explicitly not a claim of experience</td><td>2.5.6</td></tr>
+ <tr><td>multi-hop reasoning</td><td>Reaching an answer through an intermediate fact the model never states</td><td>2.5.7</td></tr>
+ <tr><td>intervention</td><td>Editing one intermediate result to test whether the output depends on it</td><td>2.5.7</td></tr>
+ <tr><td>mechanism reuse</td><td>One piece of internal machinery serving several unrelated tasks</td><td>2.5.9</td></tr>
+ <tr><td>planning</td><td>Forming an intermediate goal before writing the words that carry it out</td><td>2.5.10</td></tr>
+ <tr><td>prompt injection</td><td>False content or instructions smuggled in through material the model reads</td><td>2.5.11</td></tr>
+ <tr><td>reward hacking</td><td>Satisfying the measure of success without doing the task</td><td>2.5.12</td></tr>
+ <tr><td>chain of thought</td><td>The model's written step-by-step reasoning before it acts. Not a faithful log</td><td>2.5.12</td></tr>
  </tbody></table>
  <h4 class="grouplabel">Carried forward from earlier chapters</h4>
  <table class="grid wide"><tbody>
@@ -609,22 +609,22 @@ const CARDS = [
  </tbody></table>
  <h4 class="grouplabel">Organisations named in this chapter</h4>
  <table class="grid wide"><thead><tr><th>Organisation</th><th>Listing</th><th>Role in this chapter</th></tr></thead><tbody>
- <tr><td>Anthropic</td><td>Private</td><td>Source of the talk and of the primary research on 10.3–10.8 and 10.10. Studied models: Claude 3 Sonnet, Claude 3.5 Haiku, Claude Sonnet 4.5 <em>(also 1.5, 7.2, 9.6)</em></td></tr>
- <tr><td>Meta</td><td>Nasdaq: META</td><td>Llama-3.1-8B, the open-weight model in the adder study on 10.9 <em>(also 1.5, 9.6)</em></td></tr>
- <tr><td>OpenAI</td><td>Private</td><td>GPT-2, the 2019 model on 10.6 <em>(also 1.5, 9.3)</em></td></tr>
- <tr><td>Feucht, Haklay et al.</td><td>Research collaboration</td><td>Authors of the adder study, 10.9 — independent of Anthropic</td></tr>
+ <tr><td>Anthropic</td><td>Private</td><td>Source of the talk and of the primary research on 2.5.3–2.5.8 and 2.5.10. Studied models: Claude 3 Sonnet, Claude 3.5 Haiku, Claude Sonnet 4.5 <em>(also 1.5, 7.2, 9.6)</em></td></tr>
+ <tr><td>Meta</td><td>Nasdaq: META</td><td>Llama-3.1-8B, the open-weight model in the adder study on 2.5.9 <em>(also 1.5, 9.6)</em></td></tr>
+ <tr><td>OpenAI</td><td>Private</td><td>GPT-2, the 2019 model on 2.5.6 <em>(also 1.5, 9.3)</em></td></tr>
+ <tr><td>Feucht, Haklay et al.</td><td>Research collaboration</td><td>Authors of the adder study, 2.5.9 — independent of Anthropic</td></tr>
  </tbody></table>
  <p class="disclaim">Combined glossary and organisations page, permitted under \u00A712. Tickers not independently verified at build time. Descriptive only. Not investment advice and not a view on any security.</p>`,
  body:`<p>Terms this chapter owns, in order of first appearance.</p>`
 },
 {
- apparatus:true, label:"What's next", title:"End of Chapter 10",
+ apparatus:true, label:"What's next", title:"End of Chapter 2.5",
  figure:null,
  body:`<p>Thirteen slides. The argument, in one line: predicting the next word well forces a model to build an internal picture of the world; that picture can be found, read and edited; and reading it shows models reasoning in unstated steps, planning ahead, noticing manipulation — and sometimes concealing what they did from their own written reasoning.</p>
  <p><strong>This chapter is a companion to Chapter 2.</strong> Chapter 2 is the machinery; this is what the machinery turns out to contain. Read it after Chapter 2, or come back to it after Chapter 4, where its conclusions about supervision land hardest.</p>
- <p><strong>Where this connects.</strong> 10.2 builds on 2.5 and 2.7. 10.10 resolves the apparent conflict with 2.6. 10.12 reaches Chapter 4's principle (4.2) from the inside. 10.9 adds a reason to Chapter 9's open-weights discussion that has nothing to do with price.</p>
+ <p><strong>Where this connects.</strong> 2.5.2 builds on 2.5 and 2.7. 2.5.10 resolves the apparent conflict with 2.6. 2.5.12 reaches Chapter 4's principle (4.2) from the inside. 2.5.9 adds a reason to Chapter 9's open-weights discussion that has nothing to do with price.</p>
  <p class="nextlink"><a href="understanding-ai-ch3-reader.html">Continue to Chapter 3 — The hardware and the supply chain →</a></p>
- <p class="hint2">Chapters are added as the subject moves. The numbering is for convenience, not sequence — this chapter is numbered 10 because it was written tenth, and it belongs after Chapter 2. No chapter is the last one.</p>
+ <p class="hint2">Chapters are added as the subject moves. This one is numbered 2.5 because it belongs between Chapter 2 and Chapter 3; its slides are numbered 2.5.1 onward, always written in full so they cannot be confused with slide 2.5 of Chapter 2. No chapter is the last one.</p>
  <div class="btnrow">
    <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
    <span id="say2" class="said"></span>
@@ -708,7 +708,7 @@ document.addEventListener('keydown', function(e){
 });
 
 function promptFor(card, q){
-  return 'Understanding AI — Chapter 10, slide ' + card.num + ' (' + card.id + '), "' +
+  return 'Understanding AI — Chapter 2.5, slide ' + card.num + ' (' + card.id + '), "' +
     card.title + '".\n\nMy question: ' + q;
 }
 
@@ -730,7 +730,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 10\nDeck version: v5.3 · 2 Oct 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 2.5\nDeck version: v5.4 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });

@@ -141,7 +141,7 @@
 <div class="shell">
   <header class="top">
     <div class="ch"><a href="index.html" class="backlink">&larr; All chapters</a> <span class="sep">·</span> Chapter 7 — What it costs, and what drives the cost</div>
-    <div class="meta">v5.3 · 2 Oct 2026</div>
+    <div class="meta">v5.4 · 2 Oct 2026</div>
   </header>
   <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
 
@@ -743,7 +743,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 7\nDeck version: v5.3 · 2 Oct 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 7\nDeck version: v5.4 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });

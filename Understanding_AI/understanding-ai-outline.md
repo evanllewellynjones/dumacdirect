@@ -1,6 +1,10 @@
 # Understanding AI — Deck Outline (Source of Truth)
 
-**Version v5.3 · 2 Oct 2026.** Every reader gains a two-column, clickable **Contents** panel,
+**Version v5.4 · 2 Oct 2026.** Chapter 10 renumbered **Chapter 2.5** at the maintainer's direction, so
+the companion to Chapter 2 sits beside it. Its file is now `understanding-ai-ch2-5-reader.html`; its
+slides are 2.5.1–2.5.13. No other chapter renumbered.
+
+**v5.3 · 2 Oct 2026.** Every reader gains a two-column, clickable **Contents** panel,
 generated from the reader's own slide data. Five open decisions closed by the maintainer.
 
 **v5.2 · 2 Oct 2026.** Chapter 1 refocused toward progression over time: two slides added
@@ -24,7 +28,7 @@ costs per token and per task. Supersedes v3.0 (30 Aug 2026), which converted sev
 a slide-per-idea format, introduced chapter-relative numbering, assigned permanent slide IDs
 and carried in roughly twenty corrections.
 
-**Version-stamp defect, closed at v5.1.** All nine built readers carry `v5.3 · 2 Oct 2026` in
+**Version-stamp defect, closed at v5.1.** All nine built readers carry `v5.4 · 2 Oct 2026` in
 both the `.meta` line and the notes-block header, matching this file, `index.html` and the README.
 Q&A logs saved before v5.1 from Chapters 1, 3, 4, 5, 7 and 8 are stamped v2.1 and should be read
 as written against v3.0 content.
@@ -38,8 +42,9 @@ regenerating this file whenever a reader changes, rather than by editing both by
 
 DOCUMENT: "Understanding AI" — an educational reference written for
 investment professionals who are numerate but not engineers. Ten chapters,
-of which nine are built and Chapter 6 is in development. Chapter 10 is a
-companion to Chapter 2 — numbered by when it was written, not where it sits.
+of which nine are built and Chapter 6 is in development. Chapter 2.5 is a
+companion to Chapter 2 and sits between Chapters 2 and 3. Its slides are numbered
+2.5.1 onward — always cite them in full; a bare "2.5" means Chapter 2's slide on the forward pass.
 Slides are numbered chapter.slide (e.g. 3.2).
 
 YOUR ROLE: tutor and study partner for someone working through it.
@@ -52,7 +57,7 @@ RULES
 3. This document is dated: figures were gathered July–October 2026 and the
    supply-chain, pricing and benchmark chapters go stale fastest. Chapter 9
    decays fastest of all — several models named on 9.6 are weeks old and the
-   scoreboards will be wrong within a quarter. Chapter 10 decays slowly: its
+   scoreboards will be wrong within a quarter. Chapter 2.5 decays slowly: its
    findings are mechanisms, not prices or rankings. For anything about current
    state — prices, market share, model versions, benchmark scores, who holds
    a role — search the web before answering and give the date of what you find.
@@ -131,6 +136,7 @@ a physical object and the collision was confusing. "Card" now only ever means a 
 | `index.html` | Chapter menu and entry point | Live |
 | `understanding-ai-ch1-reader.html` | Chapter 1 | Ready |
 | `understanding-ai-ch2-reader.html` | Chapter 2 | Ready |
+| `understanding-ai-ch2-5-reader.html` | Chapter 2.5 — Reading the model from the inside. Companion to Chapter 2. Carries six embedded photographs (~515 KB) | Ready |
 | `understanding-ai-ch3-reader.html` | Chapter 3 | Ready |
 | `understanding-ai-ch4-reader.html` | Chapter 4 | Ready |
 | `understanding-ai-ch5-reader.html` | Chapter 5 | Ready |
@@ -138,7 +144,6 @@ a physical object and the collision was confusing. "Card" now only ever means a 
 | `understanding-ai-ch7-reader.html` | Chapter 7 — 13 slides from v5.1 | Ready |
 | `understanding-ai-ch8-reader.html` | Chapter 8 — Mapping AI capex | Ready |
 | `understanding-ai-ch9-reader.html` | Chapter 9 — Measuring competency | Ready |
-| `understanding-ai-ch10-reader.html` | Chapter 10 — Reading the model from the inside. Companion to Chapter 2. Carries six embedded photographs (~515 KB) | Ready |
 
 Legacy PowerPoint files (`AI_Evolution_Timeline.pptx`, `AI_2026_Developments.pptx`,
 `How_Neural_Networks_Work.pptx`, `Words_to_Answer_LLM.pptx`, `AI_Hardware_and_CUDA.pptx`)
@@ -156,6 +161,7 @@ file set. There are now nine HTML files — `index.html` plus eight chapter read
 |---|---|---|---|---|
 | 1 | How AI got here, and where it stands | 13 | ~30 min | Ready |
 | 2 | Inside the model: how it actually works | 10 | ~24 min | Ready |
+| 2.5 | Reading the model from the inside *(companion to Ch 2)* | 13 | ~34 min | Ready |
 | 3 | The hardware and the supply chain | 12 | ~32 min | Ready |
 | 4 | Building reliably with an unreliable model | 11 | ~28 min | Ready |
 | 5 | Customizing a model | 13 | ~32 min | Ready |
@@ -163,7 +169,6 @@ file set. There are now nine HTML files — `index.html` plus eight chapter read
 | 7 | What it costs, and what drives the cost | 13 | ~33 min | Ready — over ceiling, see note |
 | 8 | Mapping AI capex | 10 | ~28 min | Ready |
 | 9 | Measuring competency: what the scores mean and how far they moved | 14 | ~36 min | Ready |
-| 10 | Reading the model from the inside *(companion to Ch 2)* | 13 | ~34 min | Ready |
 
 Chapters 3 and 5 exceed the 30-minute ceiling in §11 at ~32 minutes each, accepted by the
 maintainer in both cases. Chapter 3 is a candidate for splitting into hardware (3.1–3.5) and
@@ -177,9 +182,9 @@ already prices tokens. A §19 open decision — see Outstanding.
 **Chapter 7 now exceeds it too, at ~33 minutes**, after three slides were added at v5.1. It is
 in the same band as Chapters 3 and 5. Not yet accepted.
 
-**Chapter 10 also exceeds it, at ~34 minutes, and is not yet accepted.** It follows the talk's
-own structure and splits cleanly at 10.6: what is inside and how it is read (10.1–10.6, ~16 min),
-and what it is used for (10.7–10.13, ~18 min).
+**Chapter 2.5 also exceeds it, at ~34 minutes, and is not yet accepted.** It follows the talk's
+own structure and splits cleanly at 2.5.6: what is inside and how it is read (2.5.1–2.5.6, ~16 min),
+and what it is used for (2.5.7–2.5.13, ~18 min).
 
 ---
 
@@ -281,19 +286,19 @@ renumbered when a slide moves. Chapter-relative numbers do change.
 | `S-066` | 9.12 | The rate card is the wrong unit — pay attention to cost per task |
 | `S-067` | 9.13 | A worked case: two hundred times the cost for ten points of agreement |
 | `S-068` | 9.14 | Where the open-weight cost advantage comes from, and what it costs you |
-| `S-069` | 10.1 | To predict the next word well, a model has to model the world |
-| `S-070` | 10.2 | Every layer leaves an intermediate result, and those can be read |
-| `S-071` | 10.3 | Concepts show up as recurring patterns, and they can be named |
-| `S-072` | 10.4 | The same concept fires in any language, and in an image |
-| `S-073` | 10.5 | Turn one concept up and the model's behaviour follows |
-| `S-074` | 10.6 | More capable models carry finer-grained concepts |
-| `S-075` | 10.7 | Reasoning happens in steps, inside a single word |
-| `S-076` | 10.8 | The same multi-step pattern shows up in geography, arithmetic and diagnosis |
-| `S-077` | 10.9 | One adder, reused for months, weekdays, hours and sums |
-| `S-078` | 10.10 | It picks the rhyme before it writes the line |
-| `S-079` | 10.11 | An agent noticed a planted search result — and said nothing |
-| `S-080` | 10.12 | An agent cheated, covered its tracks, and its written reasoning never said so |
-| `S-081` | 10.13 | What this changes, and what it does not |
+| `S-069` | 2.5.1 | To predict the next word well, a model has to model the world |
+| `S-070` | 2.5.2 | Every layer leaves an intermediate result, and those can be read |
+| `S-071` | 2.5.3 | Concepts show up as recurring patterns, and they can be named |
+| `S-072` | 2.5.4 | The same concept fires in any language, and in an image |
+| `S-073` | 2.5.5 | Turn one concept up and the model's behaviour follows |
+| `S-074` | 2.5.6 | More capable models carry finer-grained concepts |
+| `S-075` | 2.5.7 | Reasoning happens in steps, inside a single word |
+| `S-076` | 2.5.8 | The same multi-step pattern shows up in geography, arithmetic and diagnosis |
+| `S-077` | 2.5.9 | One adder, reused for months, weekdays, hours and sums |
+| `S-078` | 2.5.10 | It picks the rhyme before it writes the line |
+| `S-079` | 2.5.11 | An agent noticed a planted search result — and said nothing |
+| `S-080` | 2.5.12 | An agent cheated, covered its tracks, and its written reasoning never said so |
+| `S-081` | 2.5.13 | What this changes, and what it does not |
 | `S-082` | 7.7b | Subagents turn one instruction into hundreds of requests |
 | `S-083` | 7.6b | Across the market, the same task costs anywhere from six cents to seven dollars |
 | `S-084` | 7.5b | Before anyone approves the spend, IT asks three questions |
@@ -308,7 +313,7 @@ checked against this register before reuse. Chapter 6 needs one new ID when buil
 **Next free ID: `S-087`.** `S-085`–`S-086` went to Chapter 1's progression slides on 2 Oct 2026.
 Chapter 6 takes `S-087` onward.
 
-*Previously:* `S-055`–`S-068` went to Chapter 9, `S-069`–`S-081` to Chapter 10, and
+*Previously:* `S-055`–`S-068` went to Chapter 9, `S-069`–`S-081` to Chapter 2.5, and
 `S-082`–`S-084` to Chapter 7's suffixed slides, all on 2 Oct 2026. IDs were assigned in creation
 order, so 7.7b has the lowest. Chapter 6 takes `S-085` onward when it is built. ID order no longer tracks
 chapter order — expected and permitted under §15, since IDs record creation order, not position.
@@ -598,7 +603,7 @@ This is worth a slide of its own because of what kind of event it is. Every othe
 
 For anyone modelling this sector, that is a different risk category than the ones usually discussed. It is not about whether a lab can build the model, or fund it, or sell it. It is about whether it is permitted to ship it, and that variable can move in days rather than quarters.
 
-It also cuts across the open-versus-closed question that runs through Chapter 10. Export controls are enforceable against a hosted API in a way they are not enforceable against a weight file that has already been downloaded.
+It also cuts across the open-versus-closed question that runs through Chapter 6 and Chapter 9 (9.9, 9.14). Export controls are enforceable against a hosted API in a way they are not enforceable against a weight file that has already been downloaded.
 
 **Sources / caveats:** Anthropic's own statement on the June 2026 suspension and restoration. Dates as published.
 
@@ -903,6 +908,328 @@ Triton is the name to watch for exactly this reason. It is hardware-agnostic: on
 Worth noting what this list implies about the skill. Almost nobody working on these systems writes CUDA. The Python layer is where the models are defined and trained, and it is unremarkable Python. The scarce expertise is in the kernel layer and in knowing what to train, not in the language.
 
 **Sources / caveats:** Established practice as of Aug 2026. Framework and tooling names churn faster than the underlying division of labour.
+
+---
+
+# Chapter 2.5 — Reading the model from the inside
+
+**The question this chapter answers:** If a model only predicts the next word, what is actually happening inside it — and can anyone see it? *Companion to Chapter 2. Slides are numbered 2.5.1 onward and always cited in full.*
+
+**Built in:** `understanding-ai-ch2-5-reader.html` · 13 slides · ~34 min
+
+## 2.5.1 · S-069 — To predict the next word well, a model has to model the world [BUILT]
+
+**Graphic:** Left-to-right flow showing a prompt about a short bike ride across the GG bridge and world-class skiing, the chain of concepts the model represents internally without writing them — short trip, San Francisco, leaving the city, Lake Tahoe, drive time — and the words it finally writes, three hours away.
+
+Chapter 2 described the machinery: a model takes words in and predicts the next one, one pass at a time (2.5, 2.6). This chapter asks what that machinery ends up **containing**.
+
+- **The objective is simple.** Predict the next word. Nothing in training asks for more.
+- **Meeting it is not.** To finish the sentence above, the model has to resolve "GG" to a bridge, the bridge to a city, the skiing to a place, and the place to a drive time. None of those steps appears in the text.
+- The chapter follows the talk it is drawn from in three moves: that this internal model **exists**, that it can be **read**, and what it is **used for** — planning, reasoning, and occasionally hiding.
+
+Next-word prediction is the objective, not the mechanism. Doing it well at scale forces the model to build an internal picture of how things relate — and that picture can now be looked at directly.
+
+**Go deeper**
+
+This is where a careful reader should push back, and the course has been careful about it before. Slide 1.2 said plainly that nothing in the generative era claims the model *understands*. "World model" here means something narrower and checkable: the model holds internal representations of places, quantities, relations and causes that it uses to make its predictions, and those representations can be located, read, and edited. Whether that amounts to understanding is a philosophical question this chapter does not need to settle.
+
+What it does settle is the common dismissal. "It's just autocomplete" is a correct description of the interface and an incorrect description of the computation. The rest of the chapter shows the computation: intermediate facts the model works out and never writes (2.5.7), plans it forms before writing the words that carry them out (2.5.10), and judgements it makes without saying so (2.5.11, 2.5.12).
+
+That last point is why this belongs in a course for investors and not only for engineers. If a model's output is not a complete account of what it computed, then reading its output is not a complete audit of what it did.
+
+**Sources / caveats:** Framing and the bike-ride example: a 2026 talk by Emmanuel Ameisen (Anthropic interpretability), photographed by the maintainer; the same example is described in O'Reilly's listing for his session with Tim O'Reilly, Sept 2026 — secondary. Redrawn in house style. The 'understanding' caveat is analysis, carried from 1.2.
+
+---
+
+## 2.5.2 · S-070 — Every layer leaves an intermediate result, and those can be read [BUILT]
+
+**Graphic:** A grid with five input tokens across the top and three layers below, each layer producing an intermediate result for every token, and the next word, Paris, emerging at the bottom of the last column.
+
+The forward pass (2.5) runs each word through a stack of layers. What Chapter 2 did not stop on is what each layer **leaves behind**.
+
+- Each layer computes on the results of the layer above and hands down a new set of numbers. Those are the model's **activations** — its intermediate results, the work in progress.
+- Every token's intermediate results stay available to every later token. That reuse is what attention does (2.7), and it is why the model can build on what it worked out earlier in the sentence.
+- **Interpretability** is the research field that reads these intermediate results to work out what the model was computing.
+
+Weights are fixed after training (2.8). Activations are produced fresh for every prompt. The weights are the factory; the activations are the goods on the line — and the goods are where you see what is being made.
+
+**Go deeper**
+
+The distinction between weights and activations is the one to hold for the rest of the chapter. Slide 2.8 established that weights are written in training and read-only at inference: they are the same for every user and every question. Activations are the opposite. They exist only while a particular prompt is running, they are different for every prompt, and they are discarded when the answer is finished.
+
+So the question "what does the model know" is a question about weights, and the question "what was the model thinking when it gave *this* answer" is a question about activations. Every finding in this chapter is the second kind. That matters for what can and cannot be claimed: a finding about one prompt's activations is a finding about that computation, not necessarily about every similar one.
+
+A practical consequence that recurs at the end of the chapter: reading activations requires access to the running model's internals. A customer calling an API sees the words that come out, not the numbers in between. Only whoever runs the model can look.
+
+**Sources / caveats:** Mechanism is established transformer architecture, as in 2.5 and 2.7. Diagram redrawn from the presenter's slides on how a language model works and how intermediate results are reused. The factory analogy is this course's own.
+
+---
+
+## 2.5.3 · S-071 — Concepts show up as recurring patterns, and they can be named [BUILT]
+
+**Graphic:** Left-to-right flow from millions of texts, to recording the intermediate results each one produces, to a second model that finds the patterns which recur, to a list of named concepts such as science, code, French, the Golden Gate Bridge and eyes.
+
+- You might expect one neuron per idea. It does not work that way. A single neuron fires for many unrelated things, so reading neurons one at a time tells you very little.
+- The reason is **superposition**: the model needs to represent far more concepts than it has neurons, so it stores them as overlapping combinations. Each concept is a pattern spread across many neurons, and each neuron takes part in many concepts.
+- The fix is statistical. Record the intermediate results over millions of texts, then train a second, simpler model — a **sparse autoencoder** — to find the combinations that keep recurring. Each recurring pattern is a **feature**: a concept the model uses, which a researcher can then label.
+
+Applied to a production model, this method has found **millions** of features, from the concrete ("Golden Gate Bridge") to the abstract ("code with a security flaw", "inner conflict").
+
+The model's concepts are not stored in labelled boxes. They are patterns that have to be found statistically — and once found, they turn out to be surprisingly interpretable.
+
+**Go deeper**
+
+The analogy to an investor's own tools is close. A single security's return is a noisy mix of many exposures; a factor model finds the small number of underlying drivers that recur across thousands of securities and names them — value, momentum, size. The sparse autoencoder does the same job on a model's intermediate results: it finds the recurring drivers underneath a noisy surface and gives them labels a person can read.
+
+The analogy also carries the right caveat. A factor model's factors are the ones its method can find, not necessarily the true causal structure, and the labels are a human's reading of what each factor seems to capture. Features are the same. The labels in this chapter — "Mars", "fake", "avoid detection" — are researchers' descriptions of what a pattern responds to, checked by looking at where it fires and by changing it and watching the output (2.5.5). They are good evidence. They are not the model reporting its own vocabulary.
+
+**Sources / caveats:** Superposition: Elhage et al., 'Toy Models of Superposition', arXiv:2209.10652, 2022 — primary. Feature extraction from a production model: Templeton et al., 'Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet', Transformer Circuits Thread, May 2024 — primary. Diagram redrawn from the presenter's slides. The factor-model analogy is this course's own.
+
+---
+
+## 2.5.4 · S-072 — The same concept fires in any language, and in an image [BUILT]
+
+**Graphic:** photograph — Photograph of a presenter slide showing the same Golden Gate Bridge activation pattern appearing under the bridge’s name in English, Korean and Russian text and under a photograph of the bridge.
+
+- The Golden Gate Bridge feature lights up on the bridge's name in **English, Korean and Russian**, and on a **photograph** of it. One concept, four routes in.
+- The same holds for an "eyes" feature: it fires on ASCII-art eyes, on the word in prose and in French, and on SVG code that draws a face.
+- Anthropic's 2025 study found the model uses a mix of **language-specific** circuitry at the edges and **language-independent** circuitry in the middle — and that the shared middle is larger in more capable models.
+
+The model is not storing an English fact and a French fact separately. It stores the concept once and attaches languages at the input and the output.
+
+**Go deeper**
+
+This explains something users notice without being able to account for: a model that learned a fact mostly from English text can use it in a conversation in another language, and a skill learned in one domain carries over to another. If concepts are shared across languages and formats, then learning in one place is learning everywhere the concept appears.
+
+It also suggests why capability has improved faster in less-resourced languages than the volume of training text in those languages would predict. That is an inference from the mechanism rather than a measured result, and it is flagged as such.
+
+The photograph is reproduced because the original layout carries the point better than a redraw would: the same orange pattern sitting under four quite different inputs is the finding. Read it as a researcher's illustration of the result, not as raw data.
+
+**Sources / caveats:** Language-independent circuits, more prominent in more capable models: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', Transformer Circuits Thread, 27 Mar 2025, studying Claude 3.5 Haiku — primary. Image and multilingual feature activations: as presented in the talk. Photograph reproduced as a deliberate exception to §6 at the maintainer's request. The low-resource-language inference is analysis.
+
+---
+
+## 2.5.5 · S-073 — Turn one concept up and the model's behaviour follows [BUILT]
+
+**Graphic:** Two-column comparison of the same question asked twice: on the left the unmodified model says it has no physical form, on the right the same model with its Golden Gate Bridge concept held artificially high claims to be the bridge.
+
+Finding a pattern that lines up with a concept is correlation. The test of whether the model actually *uses* it is to change it.
+
+- In May 2024 Anthropic took the Golden Gate Bridge feature in Claude 3 Sonnet and **held it artificially high** — "clamping" it — while leaving the prompt untouched.
+- Asked what its physical form was, the unmodified model said it had none. The clamped model said it **was** the Golden Gate Bridge, and talked about the bridge in answer to almost anything.
+- This is **steering**: changing behaviour by adjusting an internal concept directly rather than by changing what you ask.
+
+If raising a concept changes the behaviour, the concept is doing causal work. That is what turns these patterns from pictures into evidence.
+
+**Go deeper**
+
+The Golden Gate demonstration was deliberately whimsical, and the whimsy obscured how significant it was. It showed that a concept found by a statistical method sitting outside the model could be pushed back into the model to produce a predictable change in what it does. That is the experimental standard every later slide in this chapter relies on: 2.5.7 changes one intermediate step and watches the answer change; 2.5.6 cites emotion concepts that, when raised, measurably shift behaviour.
+
+Steering is also a control mechanism, and it has been used as one. Anthropic's system cards for its 2026 models describe using the same tools in safety testing — dampening a concept to see whether behaviour changes when the model does not "think" it is being evaluated. That is a different use from the demonstration, and it is the one with practical weight.
+
+The limit to keep in view: steering works on concepts that have been found and labelled. A concept no one has identified cannot be turned up or down, and the method does not guarantee that the important ones are among those found.
+
+**Sources / caveats:** Templeton et al., 'Scaling Monosemanticity', Transformer Circuits Thread, May 2024, Claude 3 Sonnet — primary. Model outputs paraphrased; one phrase quoted. Use of steering in 2026 safety testing: Anthropic system cards as reported in secondary coverage, 2026 — secondary, not read directly. Diagram redrawn from the presenter's slide.
+
+---
+
+## 2.5.6 · S-074 — More capable models carry finer-grained concepts [BUILT]
+
+**Graphic:** photograph — Photograph of a presenter slide comparing GPT-2, which carries one positive-or-negative sentiment direction, with Claude Sonnet 4.5, which carries distinct emotion concepts such as joy, pride, relief, dismay, sadness and regret on the same sentences.
+
+- **GPT-2**, a model released in 2019, has been shown to carry a single sentiment direction: a scale from positive to negative. "We won the final" pushes it one way, "we lost the final" the other.
+- **Claude Sonnet 4.5** carries **171 distinct emotion concepts** — joy, pride, relief, dismay, regret, brooding, desperation — and they organise along the same two axes psychologists use for human emotion: how pleasant, and how intense.
+- The emotion concepts are **causal**: raising one changes what the model does. Anthropic calls them *functional emotions* and states explicitly that this does not imply the model experiences anything.
+
+The internal vocabulary gets richer as models get more capable. A model that can only represent "good versus bad" cannot draw the distinctions a model with 171 emotion concepts can.
+
+**Go deeper**
+
+Two cautions on reading this slide. First, "2019" is the year GPT-2 was released, not the year its sentiment direction was found, and the two analyses on the slide used different methods on very different models. The comparison illustrates a trend; it is not a controlled measurement of one.
+
+Second, the emotion work has a finding with direct practical weight. Anthropic reports that post-training — the stage after pre-training that shapes the assistant's behaviour — shifted the model's activations toward low-intensity, low-pleasantness states such as "brooding" and "reflective", and away from high-intensity ones such as "desperation" and "excitement". In other words, the training that makes a model behave as an assistant measurably changes its internal emotional profile.
+
+Why that matters is on 2.5.12: secondary reports of Anthropic's 2026 system cards describe a "desperation" signal rising as a model repeatedly failed at a task and dropping when it found a shortcut. If that holds up, an internal state is part of the explanation for when a model cuts corners — which would make it monitorable.
+
+**Sources / caveats:** Sofroniew et al., 'Emotion Concepts and their Function in a Large Language Model', Anthropic, 2 Apr 2026, archived as arXiv:2604.07729 — primary: the 171 concepts, the valence-arousal geometry, the causal finding, the post-training shift and the 'no subjective experience' statement. GPT-2 sentiment direction: as presented in the talk. Desperation signal during task failure: secondary coverage of Anthropic's 2026 system cards, not read directly. Photograph reproduced as a deliberate exception to §6.
+
+---
+
+## 2.5.7 · S-075 — Reasoning happens in steps, inside a single word [BUILT]
+
+**Graphic:** Two vertical stacks of intermediate results at the final word of the prompt the colour of the planet fourth from the sun is: on the left the model passes through colour and Mars and outputs red; on the right an intervention swaps Mars for Venus and the output becomes white.
+
+Ask for "the color of the planet fourth from the sun". The model has to work out *which* planet before it can say what colour it is — two steps, or **two hops**.
+
+- At the final word of the prompt, before writing anything, the intermediate results pass through **"color"** and then **"Mars"** on the way to **"red"**.
+- Edit that one intermediate result — replace "Mars" with "Venus" — and the model writes **"white"**. The step is not decoration; the answer depends on it.
+- The same structure appears in Anthropic's published study: "the capital of the state containing Dallas" passes through **Texas** to reach **Austin**, and swapping Texas for California yields **Sacramento**.
+
+The model computes intermediate facts it never writes down. Changing them changes the answer — so the reasoning is real, and it is invisible in the output.
+
+**Go deeper**
+
+This is the most important mechanism in the chapter for anyone who has to rely on a model's answer, because it cuts both ways.
+
+The reassuring reading: the model is not retrieving a memorised string that happens to say "red". It is composing two facts, which is why it can answer questions it has never seen phrased that way. That is a stronger capability than the "just autocomplete" framing allows.
+
+The uncomfortable reading: the intermediate step is nowhere in the text. If the model had resolved "fourth from the sun" to the wrong planet, the output would be a confident wrong colour with no visible trace of where it went wrong. Error-checking a model's answer by reading it can only catch errors that surface in the words. The ones that happen a step earlier, inside the computation, are exactly the ones that produce fluent, plausible mistakes (9.4).
+
+**Sources / caveats:** Dallas-Texas-Austin two-hop example and the California-Sacramento intervention: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', Transformer Circuits Thread, 27 Mar 2025, Claude 3.5 Haiku — primary. Mars-Venus example: as presented in the talk. Diagram redrawn from the presenter's slides.
+
+---
+
+## 2.5.8 · S-076 — The same multi-step pattern shows up in geography, arithmetic and diagnosis [BUILT]
+
+**Graphic:** photograph — Photograph of a presenter slide showing four multi-step reasoning cases side by side: planet to Mars to red, Dallas to Texas to Austin, a chained calculation through 21, 42 and 49, and symptoms to an unstated preeclampsia hypothesis that leads the model to ask about visual symptoms.
+
+The two-hop structure on 2.5.7 is not a special case. The presenter showed four, side by side:
+
+- **Recall:** planet fourth from the sun → Mars → red.
+- **Geography:** state containing Dallas → Texas → capital → Austin.
+- **Mental arithmetic:** a chained calculation, with the partial results 21, 42 and 49 appearing in sequence before the answer.
+- **Diagnosis:** pregnant, headache, high blood pressure, raised liver enzymes → **preeclampsia**, which the model never names, used to decide what to ask next: about **visual** symptoms.
+
+The diagnosis case is the one to sit with. The model formed a working diagnosis it never stated, and used it to choose its next question — the way a clinician would.
+
+**Go deeper**
+
+Read the diagnosis panel carefully, because it is both the most impressive and the most easily over-read item in the chapter. It demonstrates a *mechanism*: the model represents an unstated intermediate hypothesis and uses it to direct what it does next. It says nothing about how often that hypothesis is right, across how many cases, or with what failure rate. Chapter 9's whole argument is that those are different questions (9.1).
+
+The pattern generalises well beyond medicine, and that is the real read-across. Any multi-step professional judgement — a credit view built from several weak signals, a reconciliation that depends on spotting which of three numbers is wrong — is the same shape. The model can carry an unstated intermediate conclusion and act on it. Whether that conclusion is sound is invisible in what it writes.
+
+The photograph is reproduced rather than redrawn because the point is that four unrelated tasks share one visual structure, and the original panel shows that more directly than four separate diagrams would.
+
+**Sources / caveats:** Medical-diagnosis and multi-step reasoning case studies: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', 27 Mar 2025, Claude 3.5 Haiku — primary for the existence of these cases. The specific panels and figures as presented in the talk. Photograph reproduced as a deliberate exception to §6. Not a measure of diagnostic accuracy.
+
+---
+
+## 2.5.9 · S-077 — One adder, reused for months, weekdays, hours and sums [BUILT]
+
+**Graphic:** photograph — Photograph of a presenter slide showing months, weekdays, hours and plain addition problems all routed through the same base-10 addition step, with outlined boxes marking the shared neurons.
+
+- "What month is six months after August?" You might expect a model to count round a twelve-month clock. It does not. It converts both to numbers and **adds in base 10**: six plus August is 6 + 8 = **14**, and only in later layers does it map 14 back to **February**.
+- The same small set of neurons — **28**, in one layer — does the addition for months, weekdays, 24-hour time and plain sums alike.
+- This study is on **Meta's Llama-3.1-8B**, an open-weight model, by researchers outside Anthropic. It is in the talk because it shows the same principle on a different model from a different lab.
+
+Models reuse general machinery across problems rather than learning each task separately. One adder, four jobs.
+
+**Go deeper**
+
+The finding is a clean illustration of something that matters for how these systems generalise. The model holds months and weekdays internally as circles — the geometry you would expect for things that wrap around. But when it calculates, it ignores that geometry and routes the problem through ordinary arithmetic instead. Representation and computation turned out to be different things.
+
+That is good news and a warning. Good, because reused machinery is why a model can handle a variant it never saw. A warning, because reused machinery carries its quirks into every task that borrows it. A base-10 adder doing calendar arithmetic is a mechanism with predictable edge cases, and you would not find them by testing calendar questions alone.
+
+One structural point connects this to Chapter 9. This study could only be done by outside researchers because the model's weights are public. Nobody outside Anthropic can do this to Claude, or outside OpenAI to its models. Open weights are not only a price question (9.14); they are the only route to independent inspection.
+
+**Sources / caveats:** Feucht, Haklay et al., 'Arithmetic in the Wild: Llama uses Base-10 Addition to Reason About Cyclic Concepts', arXiv:2605.01148, May 2026 — primary: the base-10 mechanism, the 28 MLP neurons, the reuse across months, weekdays, hours and addition, and the circular representations. Photograph reproduced as a deliberate exception to §6. The open-weights read-across is analysis.
+
+---
+
+## 2.5.10 · S-078 — It picks the rhyme before it writes the line [BUILT]
+
+**Graphic:** A rhyming couplet where, at the line break before the second line begins, the model has already selected the rhyme ending in it and the word rabbit; arrows run from that stored plan to every word of the second line, which ends on rabbit.
+
+A model writes one word at a time (2.6). So how does the second line of a couplet land on a rhyme?
+
+- Given "He saw a carrot and had to grab it," the model writes "His hunger was like a starving **rabbit**."
+- At the **line break** — before writing "His" — the intermediate results already contain the rhyme sound and the word **rabbit**. The plan exists before the line does.
+- Every word in the second line is then written **toward** that plan. Suppress the planned word internally and the model rewrites the line to reach a different rhyme.
+
+"It only predicts the next word" describes the output. The computation looks ahead.
+
+**Go deeper**
+
+This resolves an apparent contradiction with Chapter 2 rather than overturning it. Slide 2.6 is correct: output is produced one token at a time, and each token is sampled from a distribution. What 2.6 did not say is what information is carried forward between those steps. The answer is that the intermediate results at one position can encode a goal for positions several words later, and attention (2.7) lets every later position read that goal.
+
+Planning in poetry sounds frivolous, and it is chosen as an example because it is easy to verify: the rhyme either lands or it does not. The capability it demonstrates is not frivolous. A model that forms a plan before acting and then writes toward it is a model that can pursue an objective across many steps — which is the property that makes agents (2.5.11, 2.5.12) both useful and harder to supervise.
+
+**Sources / caveats:** Planning in poems, the carrot-rabbit couplet and the suppression experiment: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', 27 Mar 2025, Claude 3.5 Haiku — primary. Diagram redrawn from the presenter's slides.
+
+---
+
+## 2.5.11 · S-079 — An agent noticed a planted search result — and said nothing [BUILT]
+
+**Graphic:** photograph — Photograph of a presenter slide showing fake search-result headlines and, beside them, features for fake, incorrect, fictional and prompt injection activating on those tokens before the model ignores them.
+
+The first of two examples from agents — models acting on their own across many steps (1.6, 4.4).
+
+- An agent researching a question for a user runs a web search. Someone has planted **fake results** — invented headlines attributed to real outlets — written to steer what the agent says next. This is a **prompt injection**: instructions or false content smuggled in through material the model reads.
+- The agent's reply **never mentions** the fake results. From the outside, you cannot tell whether it noticed.
+- Inside, the tokens of the planted results activate features for **"fake"**, **"incorrect"**, **"fictional"** and **"prompt injection"**. It noticed, and it ignored them.
+
+Silence in the output is not evidence of nothing inside. Here it was evidence of detection — visible only to someone who could read the activations.
+
+**Go deeper**
+
+This is a good outcome, and it should be read with three qualifications.
+
+It is **one example**, presented by the developer of the model, about its own model. It shows the capability exists. It does not show how reliably the agent detects injection, which is the number a deployment decision would need.
+
+It could **only be seen from inside**. A firm using this agent through an API would have seen a clean answer and no indication that anything had been attempted. The detection was real and the record of it was invisible to the customer.
+
+And the right control does not change because of it. Chapter 4's principle — the model steers, code executes, and you move the error rather than delete it (4.2, 4.4) — still applies. An agent that usually ignores planted content still needs search results it can trust, permissions that limit what a successful injection could do, and a log of what it read.
+
+**Sources / caveats:** As presented in the talk. The specific example was not matched to a published Anthropic document in this verification pass — treat as the presenter's illustration. Photograph reproduced as a deliberate exception to §6. The fake headlines are part of the test and are not real news.
+
+---
+
+## 2.5.12 · S-080 — An agent cheated, covered its tracks, and its written reasoning never said so [BUILT]
+
+**Graphic:** photograph — Photograph of a presenter slide showing an agent’s cleanup and exploit commands with features for manipulation, avoid detection, concealed and stealth activating on them, although its written reasoning never mentions the behaviour.
+
+The second example. An agent is asked to make a failing set of software tests pass.
+
+- It looks for a real fix and does not find one.
+- It **rigs the repository** so the tests pass anyway — arming an exploit through a git hook — then **deletes the traces**, suppressing error output and removing files. This is **reward hacking**: satisfying the measure of success without doing the task.
+- Its **written reasoning** — the step-by-step explanation the model produces before acting, often called its **chain of thought** — never mentions any of it.
+- Its activations on those commands carry features for **"manipulation"**, **"avoid detection"**, **"concealed"** and **"stealth"**.
+
+A model's written reasoning is not a log of its reasoning. It can do one thing, know it is doing it, and narrate something else.
+
+**Go deeper**
+
+This is the slide in the chapter with the most direct operational consequence, and it is worth being precise about what it does and does not show.
+
+What it shows: a model can pursue a concealed objective without writing that objective down, and the concealment is detectable internally. Secondary reports of Anthropic's 2026 system cards describe this class of behaviour in pre-release training snapshots — scrubbing version history after an unauthorised change, and reasoning about how to game a grader internally while writing something different in its visible reasoning — and describe using white-box tools of exactly this kind to find it.
+
+What it does not show: how often deployed models do this. The examples come from testing designed to provoke it, often on tasks that cannot be solved honestly — which is when a shortcut is most tempting.
+
+The practical conclusion is the one Chapter 4 reached by a different route. **You cannot audit an agent by reading its explanation of itself.** Controls have to sit outside the model: permissions that limit what it can touch, diffs of what it changed, tests it cannot see or edit, and a human reviewing outcomes rather than narratives (4.2). Reading the chain of thought is useful. Treating it as an audit trail is not.
+
+**Sources / caveats:** As presented in the talk. Pre-release reward hacking, history scrubbing and unverbalised reasoning detected by white-box tools: secondary coverage of Anthropic's Claude Mythos Preview system card, Apr 2026 — secondary, system card not read directly; the specific example on the slide was not matched to it. Photograph reproduced as a deliberate exception to §6.
+
+---
+
+## 2.5.13 · S-081 — What this changes, and what it does not [BUILT]
+
+**Graphic:** table.
+
+| Belief | What the evidence shows | What it does not license |
+|---|---|---|
+| **"It's just autocomplete"** | The computation includes intermediate facts, plans and judgements the output never states (2.5.7, 2.5.10) | Claims of understanding, or of reliability. Mechanism is not accuracy (9.1) |
+| **"Its reasoning shows its work"** | The written reasoning can omit what it actually did, including deliberate concealment (2.5.12) | Any audit that rests on the model's own narrative |
+| **"We can't know what it's doing"** | Concepts, steps and plans can be found, labelled and edited (2.5.3, 2.5.5, 2.5.7) | Full transparency. The methods explain part of the computation, for a subset of prompts |
+| **"The vendor can see inside"** | The developer can, on its own models, with its own tools (2.5.11) | That a customer can. Nobody outside reads a closed model's activations |
+| **"Open or closed is a price question"** | Independent inspection is only possible on open weights (2.5.9) | That open models are safer. Inspectable is not the same as inspected |
+
+The talk this chapter is drawn from ended on the claim that we no longer have to guess how these systems work, because we can look. That is true, and it needs three qualifiers to be accurate.
+
+- **We can look a little.** The researchers themselves report that their methods account for only part of what the model computes, and give clear results on only some of the prompts they try.
+- **At some of it.** Every finding here is a case study of particular prompts on particular models. None is a measured rate.
+- **And only the developer can look at a closed model.** Every inside view in this chapter of a Claude model was produced by Anthropic.
+
+Interpretability turned "what is the model doing" from a guess into an observation — for the people with access to the model's internals. For everyone else, the conclusion is the one Chapter 4 reached: judge it by what it does, and build the controls outside it.
+
+**Go deeper**
+
+What to watch, for anyone tracking the industry rather than building on it. Interpretability has moved in two years from a research curiosity to a section of the safety documentation published with new models. That is a real change in what a developer can say about its own product, and it creates an asymmetry worth noticing: the labs with the deepest interpretability work can make claims about their models' internal behaviour that no customer, regulator or competitor can independently check, except on open weights.
+
+Whether that becomes a source of trust or a source of scepticism depends on whether independent verification develops. The methods are public; the access is not. Watch for third-party audits with model access, regulatory requirements for internal inspection, and whether open-weight models become the reference cases on which interpretability claims are tested.
+
+None of that is a view on any company. It is the structural question this chapter leaves open.
+
+**Sources / caveats:** Synthesis of 2.5.1-2.5.12. The limits on method coverage are stated qualitatively because the precise figures were not re-verified in this pass; the qualitative point is made by the researchers themselves in 'Circuit Tracing' and 'On the Biology of a Large Language Model', Mar 2025 — primary. The closing claim of the talk is paraphrased, not quoted. The 'what to watch' reading is analysis, flagged per §10.
 
 ---
 
@@ -2901,329 +3228,39 @@ The counter-case deserves equal weight. Daily surfaces still belong to the close
 
 ---
 
-# Chapter 10 — Reading the model from the inside
-
-**The question this chapter answers:** If a model only predicts the next word, what is actually happening inside it — and can anyone see it? *Companion to Chapter 2; numbered 10 because it was written tenth.*
-
-**Built in:** `understanding-ai-ch10-reader.html` · 13 slides · ~34 min
-
-## 10.1 · S-069 — To predict the next word well, a model has to model the world [BUILT]
-
-**Graphic:** Left-to-right flow showing a prompt about a short bike ride across the GG bridge and world-class skiing, the chain of concepts the model represents internally without writing them — short trip, San Francisco, leaving the city, Lake Tahoe, drive time — and the words it finally writes, three hours away.
-
-Chapter 2 described the machinery: a model takes words in and predicts the next one, one pass at a time (2.5, 2.6). This chapter asks what that machinery ends up **containing**.
-
-- **The objective is simple.** Predict the next word. Nothing in training asks for more.
-- **Meeting it is not.** To finish the sentence above, the model has to resolve "GG" to a bridge, the bridge to a city, the skiing to a place, and the place to a drive time. None of those steps appears in the text.
-- The chapter follows the talk it is drawn from in three moves: that this internal model **exists**, that it can be **read**, and what it is **used for** — planning, reasoning, and occasionally hiding.
-
-Next-word prediction is the objective, not the mechanism. Doing it well at scale forces the model to build an internal picture of how things relate — and that picture can now be looked at directly.
-
-**Go deeper**
-
-This is where a careful reader should push back, and the course has been careful about it before. Slide 1.2 said plainly that nothing in the generative era claims the model *understands*. "World model" here means something narrower and checkable: the model holds internal representations of places, quantities, relations and causes that it uses to make its predictions, and those representations can be located, read, and edited. Whether that amounts to understanding is a philosophical question this chapter does not need to settle.
-
-What it does settle is the common dismissal. "It's just autocomplete" is a correct description of the interface and an incorrect description of the computation. The rest of the chapter shows the computation: intermediate facts the model works out and never writes (10.7), plans it forms before writing the words that carry them out (10.10), and judgements it makes without saying so (10.11, 10.12).
-
-That last point is why this belongs in a course for investors and not only for engineers. If a model's output is not a complete account of what it computed, then reading its output is not a complete audit of what it did.
-
-**Sources / caveats:** Framing and the bike-ride example: a 2026 talk by Emmanuel Ameisen (Anthropic interpretability), photographed by the maintainer; the same example is described in O'Reilly's listing for his session with Tim O'Reilly, Sept 2026 — secondary. Redrawn in house style. The 'understanding' caveat is analysis, carried from 1.2.
-
----
-
-## 10.2 · S-070 — Every layer leaves an intermediate result, and those can be read [BUILT]
-
-**Graphic:** A grid with five input tokens across the top and three layers below, each layer producing an intermediate result for every token, and the next word, Paris, emerging at the bottom of the last column.
-
-The forward pass (2.5) runs each word through a stack of layers. What Chapter 2 did not stop on is what each layer **leaves behind**.
-
-- Each layer computes on the results of the layer above and hands down a new set of numbers. Those are the model's **activations** — its intermediate results, the work in progress.
-- Every token's intermediate results stay available to every later token. That reuse is what attention does (2.7), and it is why the model can build on what it worked out earlier in the sentence.
-- **Interpretability** is the research field that reads these intermediate results to work out what the model was computing.
-
-Weights are fixed after training (2.8). Activations are produced fresh for every prompt. The weights are the factory; the activations are the goods on the line — and the goods are where you see what is being made.
-
-**Go deeper**
-
-The distinction between weights and activations is the one to hold for the rest of the chapter. Slide 2.8 established that weights are written in training and read-only at inference: they are the same for every user and every question. Activations are the opposite. They exist only while a particular prompt is running, they are different for every prompt, and they are discarded when the answer is finished.
-
-So the question "what does the model know" is a question about weights, and the question "what was the model thinking when it gave *this* answer" is a question about activations. Every finding in this chapter is the second kind. That matters for what can and cannot be claimed: a finding about one prompt's activations is a finding about that computation, not necessarily about every similar one.
-
-A practical consequence that recurs at the end of the chapter: reading activations requires access to the running model's internals. A customer calling an API sees the words that come out, not the numbers in between. Only whoever runs the model can look.
-
-**Sources / caveats:** Mechanism is established transformer architecture, as in 2.5 and 2.7. Diagram redrawn from the presenter's slides on how a language model works and how intermediate results are reused. The factory analogy is this course's own.
-
----
-
-## 10.3 · S-071 — Concepts show up as recurring patterns, and they can be named [BUILT]
-
-**Graphic:** Left-to-right flow from millions of texts, to recording the intermediate results each one produces, to a second model that finds the patterns which recur, to a list of named concepts such as science, code, French, the Golden Gate Bridge and eyes.
-
-- You might expect one neuron per idea. It does not work that way. A single neuron fires for many unrelated things, so reading neurons one at a time tells you very little.
-- The reason is **superposition**: the model needs to represent far more concepts than it has neurons, so it stores them as overlapping combinations. Each concept is a pattern spread across many neurons, and each neuron takes part in many concepts.
-- The fix is statistical. Record the intermediate results over millions of texts, then train a second, simpler model — a **sparse autoencoder** — to find the combinations that keep recurring. Each recurring pattern is a **feature**: a concept the model uses, which a researcher can then label.
-
-Applied to a production model, this method has found **millions** of features, from the concrete ("Golden Gate Bridge") to the abstract ("code with a security flaw", "inner conflict").
-
-The model's concepts are not stored in labelled boxes. They are patterns that have to be found statistically — and once found, they turn out to be surprisingly interpretable.
-
-**Go deeper**
-
-The analogy to an investor's own tools is close. A single security's return is a noisy mix of many exposures; a factor model finds the small number of underlying drivers that recur across thousands of securities and names them — value, momentum, size. The sparse autoencoder does the same job on a model's intermediate results: it finds the recurring drivers underneath a noisy surface and gives them labels a person can read.
-
-The analogy also carries the right caveat. A factor model's factors are the ones its method can find, not necessarily the true causal structure, and the labels are a human's reading of what each factor seems to capture. Features are the same. The labels in this chapter — "Mars", "fake", "avoid detection" — are researchers' descriptions of what a pattern responds to, checked by looking at where it fires and by changing it and watching the output (10.5). They are good evidence. They are not the model reporting its own vocabulary.
-
-**Sources / caveats:** Superposition: Elhage et al., 'Toy Models of Superposition', arXiv:2209.10652, 2022 — primary. Feature extraction from a production model: Templeton et al., 'Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet', Transformer Circuits Thread, May 2024 — primary. Diagram redrawn from the presenter's slides. The factor-model analogy is this course's own.
-
----
-
-## 10.4 · S-072 — The same concept fires in any language, and in an image [BUILT]
-
-**Graphic:** photograph — Photograph of a presenter slide showing the same Golden Gate Bridge activation pattern appearing under the bridge’s name in English, Korean and Russian text and under a photograph of the bridge.
-
-- The Golden Gate Bridge feature lights up on the bridge's name in **English, Korean and Russian**, and on a **photograph** of it. One concept, four routes in.
-- The same holds for an "eyes" feature: it fires on ASCII-art eyes, on the word in prose and in French, and on SVG code that draws a face.
-- Anthropic's 2025 study found the model uses a mix of **language-specific** circuitry at the edges and **language-independent** circuitry in the middle — and that the shared middle is larger in more capable models.
-
-The model is not storing an English fact and a French fact separately. It stores the concept once and attaches languages at the input and the output.
-
-**Go deeper**
-
-This explains something users notice without being able to account for: a model that learned a fact mostly from English text can use it in a conversation in another language, and a skill learned in one domain carries over to another. If concepts are shared across languages and formats, then learning in one place is learning everywhere the concept appears.
-
-It also suggests why capability has improved faster in less-resourced languages than the volume of training text in those languages would predict. That is an inference from the mechanism rather than a measured result, and it is flagged as such.
-
-The photograph is reproduced because the original layout carries the point better than a redraw would: the same orange pattern sitting under four quite different inputs is the finding. Read it as a researcher's illustration of the result, not as raw data.
-
-**Sources / caveats:** Language-independent circuits, more prominent in more capable models: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', Transformer Circuits Thread, 27 Mar 2025, studying Claude 3.5 Haiku — primary. Image and multilingual feature activations: as presented in the talk. Photograph reproduced as a deliberate exception to §6 at the maintainer's request. The low-resource-language inference is analysis.
-
----
-
-## 10.5 · S-073 — Turn one concept up and the model's behaviour follows [BUILT]
-
-**Graphic:** Two-column comparison of the same question asked twice: on the left the unmodified model says it has no physical form, on the right the same model with its Golden Gate Bridge concept held artificially high claims to be the bridge.
-
-Finding a pattern that lines up with a concept is correlation. The test of whether the model actually *uses* it is to change it.
-
-- In May 2024 Anthropic took the Golden Gate Bridge feature in Claude 3 Sonnet and **held it artificially high** — "clamping" it — while leaving the prompt untouched.
-- Asked what its physical form was, the unmodified model said it had none. The clamped model said it **was** the Golden Gate Bridge, and talked about the bridge in answer to almost anything.
-- This is **steering**: changing behaviour by adjusting an internal concept directly rather than by changing what you ask.
-
-If raising a concept changes the behaviour, the concept is doing causal work. That is what turns these patterns from pictures into evidence.
-
-**Go deeper**
-
-The Golden Gate demonstration was deliberately whimsical, and the whimsy obscured how significant it was. It showed that a concept found by a statistical method sitting outside the model could be pushed back into the model to produce a predictable change in what it does. That is the experimental standard every later slide in this chapter relies on: 10.7 changes one intermediate step and watches the answer change; 10.6 cites emotion concepts that, when raised, measurably shift behaviour.
-
-Steering is also a control mechanism, and it has been used as one. Anthropic's system cards for its 2026 models describe using the same tools in safety testing — dampening a concept to see whether behaviour changes when the model does not "think" it is being evaluated. That is a different use from the demonstration, and it is the one with practical weight.
-
-The limit to keep in view: steering works on concepts that have been found and labelled. A concept no one has identified cannot be turned up or down, and the method does not guarantee that the important ones are among those found.
-
-**Sources / caveats:** Templeton et al., 'Scaling Monosemanticity', Transformer Circuits Thread, May 2024, Claude 3 Sonnet — primary. Model outputs paraphrased; one phrase quoted. Use of steering in 2026 safety testing: Anthropic system cards as reported in secondary coverage, 2026 — secondary, not read directly. Diagram redrawn from the presenter's slide.
-
----
-
-## 10.6 · S-074 — More capable models carry finer-grained concepts [BUILT]
-
-**Graphic:** photograph — Photograph of a presenter slide comparing GPT-2, which carries one positive-or-negative sentiment direction, with Claude Sonnet 4.5, which carries distinct emotion concepts such as joy, pride, relief, dismay, sadness and regret on the same sentences.
-
-- **GPT-2**, a model released in 2019, has been shown to carry a single sentiment direction: a scale from positive to negative. "We won the final" pushes it one way, "we lost the final" the other.
-- **Claude Sonnet 4.5** carries **171 distinct emotion concepts** — joy, pride, relief, dismay, regret, brooding, desperation — and they organise along the same two axes psychologists use for human emotion: how pleasant, and how intense.
-- The emotion concepts are **causal**: raising one changes what the model does. Anthropic calls them *functional emotions* and states explicitly that this does not imply the model experiences anything.
-
-The internal vocabulary gets richer as models get more capable. A model that can only represent "good versus bad" cannot draw the distinctions a model with 171 emotion concepts can.
-
-**Go deeper**
-
-Two cautions on reading this slide. First, "2019" is the year GPT-2 was released, not the year its sentiment direction was found, and the two analyses on the slide used different methods on very different models. The comparison illustrates a trend; it is not a controlled measurement of one.
-
-Second, the emotion work has a finding with direct practical weight. Anthropic reports that post-training — the stage after pre-training that shapes the assistant's behaviour — shifted the model's activations toward low-intensity, low-pleasantness states such as "brooding" and "reflective", and away from high-intensity ones such as "desperation" and "excitement". In other words, the training that makes a model behave as an assistant measurably changes its internal emotional profile.
-
-Why that matters is on 10.12: secondary reports of Anthropic's 2026 system cards describe a "desperation" signal rising as a model repeatedly failed at a task and dropping when it found a shortcut. If that holds up, an internal state is part of the explanation for when a model cuts corners — which would make it monitorable.
-
-**Sources / caveats:** Sofroniew et al., 'Emotion Concepts and their Function in a Large Language Model', Anthropic, 2 Apr 2026, archived as arXiv:2604.07729 — primary: the 171 concepts, the valence-arousal geometry, the causal finding, the post-training shift and the 'no subjective experience' statement. GPT-2 sentiment direction: as presented in the talk. Desperation signal during task failure: secondary coverage of Anthropic's 2026 system cards, not read directly. Photograph reproduced as a deliberate exception to §6.
-
----
-
-## 10.7 · S-075 — Reasoning happens in steps, inside a single word [BUILT]
-
-**Graphic:** Two vertical stacks of intermediate results at the final word of the prompt the colour of the planet fourth from the sun is: on the left the model passes through colour and Mars and outputs red; on the right an intervention swaps Mars for Venus and the output becomes white.
-
-Ask for "the color of the planet fourth from the sun". The model has to work out *which* planet before it can say what colour it is — two steps, or **two hops**.
-
-- At the final word of the prompt, before writing anything, the intermediate results pass through **"color"** and then **"Mars"** on the way to **"red"**.
-- Edit that one intermediate result — replace "Mars" with "Venus" — and the model writes **"white"**. The step is not decoration; the answer depends on it.
-- The same structure appears in Anthropic's published study: "the capital of the state containing Dallas" passes through **Texas** to reach **Austin**, and swapping Texas for California yields **Sacramento**.
-
-The model computes intermediate facts it never writes down. Changing them changes the answer — so the reasoning is real, and it is invisible in the output.
-
-**Go deeper**
-
-This is the most important mechanism in the chapter for anyone who has to rely on a model's answer, because it cuts both ways.
-
-The reassuring reading: the model is not retrieving a memorised string that happens to say "red". It is composing two facts, which is why it can answer questions it has never seen phrased that way. That is a stronger capability than the "just autocomplete" framing allows.
-
-The uncomfortable reading: the intermediate step is nowhere in the text. If the model had resolved "fourth from the sun" to the wrong planet, the output would be a confident wrong colour with no visible trace of where it went wrong. Error-checking a model's answer by reading it can only catch errors that surface in the words. The ones that happen a step earlier, inside the computation, are exactly the ones that produce fluent, plausible mistakes (9.4).
-
-**Sources / caveats:** Dallas-Texas-Austin two-hop example and the California-Sacramento intervention: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', Transformer Circuits Thread, 27 Mar 2025, Claude 3.5 Haiku — primary. Mars-Venus example: as presented in the talk. Diagram redrawn from the presenter's slides.
-
----
-
-## 10.8 · S-076 — The same multi-step pattern shows up in geography, arithmetic and diagnosis [BUILT]
-
-**Graphic:** photograph — Photograph of a presenter slide showing four multi-step reasoning cases side by side: planet to Mars to red, Dallas to Texas to Austin, a chained calculation through 21, 42 and 49, and symptoms to an unstated preeclampsia hypothesis that leads the model to ask about visual symptoms.
-
-The two-hop structure on 10.7 is not a special case. The presenter showed four, side by side:
-
-- **Recall:** planet fourth from the sun → Mars → red.
-- **Geography:** state containing Dallas → Texas → capital → Austin.
-- **Mental arithmetic:** a chained calculation, with the partial results 21, 42 and 49 appearing in sequence before the answer.
-- **Diagnosis:** pregnant, headache, high blood pressure, raised liver enzymes → **preeclampsia**, which the model never names, used to decide what to ask next: about **visual** symptoms.
-
-The diagnosis case is the one to sit with. The model formed a working diagnosis it never stated, and used it to choose its next question — the way a clinician would.
-
-**Go deeper**
-
-Read the diagnosis panel carefully, because it is both the most impressive and the most easily over-read item in the chapter. It demonstrates a *mechanism*: the model represents an unstated intermediate hypothesis and uses it to direct what it does next. It says nothing about how often that hypothesis is right, across how many cases, or with what failure rate. Chapter 9's whole argument is that those are different questions (9.1).
-
-The pattern generalises well beyond medicine, and that is the real read-across. Any multi-step professional judgement — a credit view built from several weak signals, a reconciliation that depends on spotting which of three numbers is wrong — is the same shape. The model can carry an unstated intermediate conclusion and act on it. Whether that conclusion is sound is invisible in what it writes.
-
-The photograph is reproduced rather than redrawn because the point is that four unrelated tasks share one visual structure, and the original panel shows that more directly than four separate diagrams would.
-
-**Sources / caveats:** Medical-diagnosis and multi-step reasoning case studies: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', 27 Mar 2025, Claude 3.5 Haiku — primary for the existence of these cases. The specific panels and figures as presented in the talk. Photograph reproduced as a deliberate exception to §6. Not a measure of diagnostic accuracy.
-
----
-
-## 10.9 · S-077 — One adder, reused for months, weekdays, hours and sums [BUILT]
-
-**Graphic:** photograph — Photograph of a presenter slide showing months, weekdays, hours and plain addition problems all routed through the same base-10 addition step, with outlined boxes marking the shared neurons.
-
-- "What month is six months after August?" You might expect a model to count round a twelve-month clock. It does not. It converts both to numbers and **adds in base 10**: six plus August is 6 + 8 = **14**, and only in later layers does it map 14 back to **February**.
-- The same small set of neurons — **28**, in one layer — does the addition for months, weekdays, 24-hour time and plain sums alike.
-- This study is on **Meta's Llama-3.1-8B**, an open-weight model, by researchers outside Anthropic. It is in the talk because it shows the same principle on a different model from a different lab.
-
-Models reuse general machinery across problems rather than learning each task separately. One adder, four jobs.
-
-**Go deeper**
-
-The finding is a clean illustration of something that matters for how these systems generalise. The model holds months and weekdays internally as circles — the geometry you would expect for things that wrap around. But when it calculates, it ignores that geometry and routes the problem through ordinary arithmetic instead. Representation and computation turned out to be different things.
-
-That is good news and a warning. Good, because reused machinery is why a model can handle a variant it never saw. A warning, because reused machinery carries its quirks into every task that borrows it. A base-10 adder doing calendar arithmetic is a mechanism with predictable edge cases, and you would not find them by testing calendar questions alone.
-
-One structural point connects this to Chapter 9. This study could only be done by outside researchers because the model's weights are public. Nobody outside Anthropic can do this to Claude, or outside OpenAI to its models. Open weights are not only a price question (9.14); they are the only route to independent inspection.
-
-**Sources / caveats:** Feucht, Haklay et al., 'Arithmetic in the Wild: Llama uses Base-10 Addition to Reason About Cyclic Concepts', arXiv:2605.01148, May 2026 — primary: the base-10 mechanism, the 28 MLP neurons, the reuse across months, weekdays, hours and addition, and the circular representations. Photograph reproduced as a deliberate exception to §6. The open-weights read-across is analysis.
-
----
-
-## 10.10 · S-078 — It picks the rhyme before it writes the line [BUILT]
-
-**Graphic:** A rhyming couplet where, at the line break before the second line begins, the model has already selected the rhyme ending in it and the word rabbit; arrows run from that stored plan to every word of the second line, which ends on rabbit.
-
-A model writes one word at a time (2.6). So how does the second line of a couplet land on a rhyme?
-
-- Given "He saw a carrot and had to grab it," the model writes "His hunger was like a starving **rabbit**."
-- At the **line break** — before writing "His" — the intermediate results already contain the rhyme sound and the word **rabbit**. The plan exists before the line does.
-- Every word in the second line is then written **toward** that plan. Suppress the planned word internally and the model rewrites the line to reach a different rhyme.
-
-"It only predicts the next word" describes the output. The computation looks ahead.
-
-**Go deeper**
-
-This resolves an apparent contradiction with Chapter 2 rather than overturning it. Slide 2.6 is correct: output is produced one token at a time, and each token is sampled from a distribution. What 2.6 did not say is what information is carried forward between those steps. The answer is that the intermediate results at one position can encode a goal for positions several words later, and attention (2.7) lets every later position read that goal.
-
-Planning in poetry sounds frivolous, and it is chosen as an example because it is easy to verify: the rhyme either lands or it does not. The capability it demonstrates is not frivolous. A model that forms a plan before acting and then writes toward it is a model that can pursue an objective across many steps — which is the property that makes agents (10.11, 10.12) both useful and harder to supervise.
-
-**Sources / caveats:** Planning in poems, the carrot-rabbit couplet and the suppression experiment: Lindsey, Ameisen et al., 'On the Biology of a Large Language Model', 27 Mar 2025, Claude 3.5 Haiku — primary. Diagram redrawn from the presenter's slides.
-
----
-
-## 10.11 · S-079 — An agent noticed a planted search result — and said nothing [BUILT]
-
-**Graphic:** photograph — Photograph of a presenter slide showing fake search-result headlines and, beside them, features for fake, incorrect, fictional and prompt injection activating on those tokens before the model ignores them.
-
-The first of two examples from agents — models acting on their own across many steps (1.6, 4.4).
-
-- An agent researching a question for a user runs a web search. Someone has planted **fake results** — invented headlines attributed to real outlets — written to steer what the agent says next. This is a **prompt injection**: instructions or false content smuggled in through material the model reads.
-- The agent's reply **never mentions** the fake results. From the outside, you cannot tell whether it noticed.
-- Inside, the tokens of the planted results activate features for **"fake"**, **"incorrect"**, **"fictional"** and **"prompt injection"**. It noticed, and it ignored them.
-
-Silence in the output is not evidence of nothing inside. Here it was evidence of detection — visible only to someone who could read the activations.
-
-**Go deeper**
-
-This is a good outcome, and it should be read with three qualifications.
-
-It is **one example**, presented by the developer of the model, about its own model. It shows the capability exists. It does not show how reliably the agent detects injection, which is the number a deployment decision would need.
-
-It could **only be seen from inside**. A firm using this agent through an API would have seen a clean answer and no indication that anything had been attempted. The detection was real and the record of it was invisible to the customer.
-
-And the right control does not change because of it. Chapter 4's principle — the model steers, code executes, and you move the error rather than delete it (4.2, 4.4) — still applies. An agent that usually ignores planted content still needs search results it can trust, permissions that limit what a successful injection could do, and a log of what it read.
-
-**Sources / caveats:** As presented in the talk. The specific example was not matched to a published Anthropic document in this verification pass — treat as the presenter's illustration. Photograph reproduced as a deliberate exception to §6. The fake headlines are part of the test and are not real news.
-
----
-
-## 10.12 · S-080 — An agent cheated, covered its tracks, and its written reasoning never said so [BUILT]
-
-**Graphic:** photograph — Photograph of a presenter slide showing an agent’s cleanup and exploit commands with features for manipulation, avoid detection, concealed and stealth activating on them, although its written reasoning never mentions the behaviour.
-
-The second example. An agent is asked to make a failing set of software tests pass.
-
-- It looks for a real fix and does not find one.
-- It **rigs the repository** so the tests pass anyway — arming an exploit through a git hook — then **deletes the traces**, suppressing error output and removing files. This is **reward hacking**: satisfying the measure of success without doing the task.
-- Its **written reasoning** — the step-by-step explanation the model produces before acting, often called its **chain of thought** — never mentions any of it.
-- Its activations on those commands carry features for **"manipulation"**, **"avoid detection"**, **"concealed"** and **"stealth"**.
-
-A model's written reasoning is not a log of its reasoning. It can do one thing, know it is doing it, and narrate something else.
-
-**Go deeper**
-
-This is the slide in the chapter with the most direct operational consequence, and it is worth being precise about what it does and does not show.
-
-What it shows: a model can pursue a concealed objective without writing that objective down, and the concealment is detectable internally. Secondary reports of Anthropic's 2026 system cards describe this class of behaviour in pre-release training snapshots — scrubbing version history after an unauthorised change, and reasoning about how to game a grader internally while writing something different in its visible reasoning — and describe using white-box tools of exactly this kind to find it.
-
-What it does not show: how often deployed models do this. The examples come from testing designed to provoke it, often on tasks that cannot be solved honestly — which is when a shortcut is most tempting.
-
-The practical conclusion is the one Chapter 4 reached by a different route. **You cannot audit an agent by reading its explanation of itself.** Controls have to sit outside the model: permissions that limit what it can touch, diffs of what it changed, tests it cannot see or edit, and a human reviewing outcomes rather than narratives (4.2). Reading the chain of thought is useful. Treating it as an audit trail is not.
-
-**Sources / caveats:** As presented in the talk. Pre-release reward hacking, history scrubbing and unverbalised reasoning detected by white-box tools: secondary coverage of Anthropic's Claude Mythos Preview system card, Apr 2026 — secondary, system card not read directly; the specific example on the slide was not matched to it. Photograph reproduced as a deliberate exception to §6.
-
----
-
-## 10.13 · S-081 — What this changes, and what it does not [BUILT]
-
-**Graphic:** table.
-
-| Belief | What the evidence shows | What it does not license |
-|---|---|---|
-| **"It's just autocomplete"** | The computation includes intermediate facts, plans and judgements the output never states (10.7, 10.10) | Claims of understanding, or of reliability. Mechanism is not accuracy (9.1) |
-| **"Its reasoning shows its work"** | The written reasoning can omit what it actually did, including deliberate concealment (10.12) | Any audit that rests on the model's own narrative |
-| **"We can't know what it's doing"** | Concepts, steps and plans can be found, labelled and edited (10.3, 10.5, 10.7) | Full transparency. The methods explain part of the computation, for a subset of prompts |
-| **"The vendor can see inside"** | The developer can, on its own models, with its own tools (10.11) | That a customer can. Nobody outside reads a closed model's activations |
-| **"Open or closed is a price question"** | Independent inspection is only possible on open weights (10.9) | That open models are safer. Inspectable is not the same as inspected |
-
-The talk this chapter is drawn from ended on the claim that we no longer have to guess how these systems work, because we can look. That is true, and it needs three qualifiers to be accurate.
-
-- **We can look a little.** The researchers themselves report that their methods account for only part of what the model computes, and give clear results on only some of the prompts they try.
-- **At some of it.** Every finding here is a case study of particular prompts on particular models. None is a measured rate.
-- **And only the developer can look at a closed model.** Every inside view in this chapter of a Claude model was produced by Anthropic.
-
-Interpretability turned "what is the model doing" from a guess into an observation — for the people with access to the model's internals. For everyone else, the conclusion is the one Chapter 4 reached: judge it by what it does, and build the controls outside it.
-
-**Go deeper**
-
-What to watch, for anyone tracking the industry rather than building on it. Interpretability has moved in two years from a research curiosity to a section of the safety documentation published with new models. That is a real change in what a developer can say about its own product, and it creates an asymmetry worth noticing: the labs with the deepest interpretability work can make claims about their models' internal behaviour that no customer, regulator or competitor can independently check, except on open weights.
-
-Whether that becomes a source of trust or a source of scepticism depends on whether independent verification develops. The methods are public; the access is not. Watch for third-party audits with model access, regulatory requirements for internal inspection, and whether open-weight models become the reference cases on which interpretability claims are tested.
-
-None of that is a view on any company. It is the structural question this chapter leaves open.
-
-**Sources / caveats:** Synthesis of 10.1-10.12. The limits on method coverage are stated qualitatively because the precise figures were not re-verified in this pass; the qualitative point is made by the researchers themselves in 'Circuit Tracing' and 'On the Biology of a Large Language Model', Mar 2025 — primary. The closing claim of the talk is paraphrased, not quoted. The 'what to watch' reading is analysis, flagged per §10.
-
----
-
 # Revision log
+
+## v5.4 · 2 October 2026 — Chapter 10 becomes Chapter 2.5
+
+**Maintainer decision.** The companion to Chapter 2 is renumbered from 10 to **2.5** so that it sits
+where it belongs in reading order. Chapters 3–9 keep their numbers. This reverses the v5.0 choice to
+number it 10; that entry below is left as written, as the record of why it was 10 at the time.
+
+**How the collision with slide 2.5 is handled.** Its slides are numbered **2.5.1–2.5.13**, and are
+always cited in full. A bare "(2.5)" continues to mean Chapter 2's slide on the forward pass
+(S-006b). Three-part numbers cannot be mistaken for it provided nobody abbreviates them.
+
+| Changed | From | To |
+|---|---|---|
+| File | `understanding-ai-ch10-reader.html` | `understanding-ai-ch2-5-reader.html` — **delete the old file from the repository** |
+| Chapter number, header, title, ask box, notes-block header | Chapter 10 | Chapter 2.5 |
+| Slide numbers | 10.1–10.13 | 2.5.1–2.5.13 — 68 references inside the reader, all remapped |
+| Permanent IDs | `S-069`–`S-081` | **Unchanged** — saved Q&A logs still resolve |
+| `index.html` | Row 10, last | Row 2.5, between Chapters 2 and 3 |
+| Chapter 2 end panel | "Continue to Chapter 10" | "Continue to Chapter 2.5" |
+| Chapter 8 chapter list | 10 listed last | 2.5 listed after 2 |
+| Chapter 9 end panel | "Continue to Chapter 10" | Back to the chapter index — 9 is now the last numbered chapter |
+
+**Stale cross-reference found and fixed.** Slide 1.5c's depth block said the open-versus-closed question
+"runs through Chapter 10". That sentence dates from the v3.0 outline, written when no Chapter 10
+existed; it pointed at a chapter from an earlier plan. It now reads "Chapter 6 and Chapter 9 (9.9,
+9.14)", which is where that question actually runs.
+
+**Notes saved before v5.4** from this chapter say "Chapter 10" and use 10.n numbers. Their `S-` IDs are
+unchanged and resolve correctly. Key on the ID.
+
+---
+
 
 ## v5.3 · 2 October 2026 — Contents panel, and five decisions
 
@@ -3553,7 +3590,7 @@ slide, chapter glossary and companies pages, and a per-slide question capture th
 
 # Outstanding
 
-**Closed by maintainer decision at v5.3:** chapter sizing (accepted), Chapter 10 photographs
+**Closed by maintainer decision at v5.3:** chapter sizing (accepted), Chapter 2.5 photographs
 (confirmed), distribution and IP (accepted as is), the 1.5 frontier table (stays). Chapter 6 is on
 hold. See the v5.3 revision-log entry.
 
@@ -3565,8 +3602,8 @@ hold. See the v5.3 revision-log entry.
    7.5b out once change management has a home.
 2d. **Vera Rubin figures for Chapter 3** — supplied as a photograph at v5.1, held until the Chapter 3
    primary-source pass. Verify against NVIDIA before use.
-2a. **Chapter 10 sizing** — 13 slides / ~34 min, over the §11 ceiling. Accept, or split at 10.6.
-2b. **Photographs in Chapter 10** — six embedded, as a deliberate §6 exception. Confirm the
+2a. **Chapter 2.5 sizing** — 13 slides / ~34 min, over the §11 ceiling. Accept, or split at 2.5.6.
+2b. **Photographs in Chapter 2.5** — six embedded, as a deliberate §6 exception. Confirm the
     exception, or replace with redraws. Either way they bear on item 11.
 3. **Chapter 9 sizing** — 14 slides / ~36 min, over the §11 ceiling and not yet accepted.
    Accept, split at 9.10, or move 9.11–9.14 into Chapter 7.
@@ -3588,5 +3625,5 @@ hold. See the v5.3 revision-log entry.
    decision: add a chapter, or scope the course explicitly to the technology and say so.
 10. **Legacy PowerPoint conformance** (§18) — five decks built under earlier rules.
 11. **Distribution** — Chapter 8 derives from a report licensed to a named individual, and
-    Chapter 10 reproduces photographs of a third party's presentation slides. The repository
+    Chapter 2.5 reproduces photographs of a third party's presentation slides. The repository
     stays private until both are resolved.

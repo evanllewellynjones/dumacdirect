@@ -1,7 +1,16 @@
 # Understanding AI — Project Instruction Note
 
-**Version 5.5 · 2 Oct 2026**
+**Version 5.6 · 2 Oct 2026**
 Maintainer only. Not distributed.
+
+## Changes from 5.5
+
+Deck v5.4. Chapter 2.5 is renumbered **Chapter 2.5** by maintainer decision.
+
+- **§4** — the "chapter numbers are integers" rule is replaced. A companion chapter takes a half-step
+  number beside the chapter it extends; its slides take three-part numbers, always cited in full.
+- **§11** — Chapter 2.5 sits between 2 and 3.
+- **§15** — the renumbering regex must handle three-part numbers before two-part ones.
 
 ## Changes from 5.4
 
@@ -46,14 +55,14 @@ the checklist should have caught, so the rules tighten:
 
 ## Changes from 5.1
 
-Chapter 10 was built — a companion to Chapter 2, drawn from photographs of a conference talk —
+Chapter 2.5 was built — a companion to Chapter 2, drawn from photographs of a conference talk —
 and four rules in 5.1 did not survive contact with it:
 
 - **§6** gains a defined exception for embedded photographs. 5.1 banned them outright, including
-  as source material; Chapter 10 embeds six at the maintainer's request. The exception has
+  as source material; Chapter 2.5 embeds six at the maintainer's request. The exception has
   conditions, and the decision to keep it is open (§20).
 - **§9** adds "system card" to the permitted compounds of *card*.
-- **§11** gains Chapter 10, a third unaccepted ceiling breach, and a rule for companion chapters.
+- **§11** gains Chapter 2.5, a third unaccepted ceiling breach, and a rule for companion chapters.
 - **§15** moves the next free ID to `S-082`. Chapter 6 no longer takes `S-069`.
 - **§4** gains a numbering rule: a chapter number must never take a form that collides with a
   slide number. "Chapter 2.5" was proposed and declined for exactly that reason.
@@ -192,11 +201,12 @@ Rules:
 - Approval is per-chapter, and "new content" is called out separately from wording. A slide that
   did not exist before is a content decision, not an editorial one.
 
-**Chapter numbers are integers.** A chapter number must never be a form a slide number can take.
-"Chapter 2.5" would number its slides `2.5.1`, collide with the cross-reference "(2.5)" — which
-already means slide S-006b — and break the §15 renumbering regex over `[chapter].[n]` tokens. A
-chapter that belongs beside an existing one takes the next free integer and is declared a
-**companion** (§11).
+**Companion chapters take a half-step number** *(maintainer decision, deck v5.4; replaces the 5.2
+rule that chapter numbers are integers)*. A chapter that extends an earlier one is numbered beside
+it — Chapter 2.5 sits between 2 and 3. Its slides take **three-part numbers** (2.5.1, 2.5.2 …) and
+are **always cited in full**: a bare "(2.5)" means Chapter 2's slide 2.5, and an abbreviated
+three-part number is the one way the scheme breaks. The file is named with a hyphen,
+`understanding-ai-ch2-5-reader.html`, because a second dot in a filename invites trouble.
 
 **Where steps 1 and 2 are skipped.** Chapter 9 was built directly from research at the maintainer's
 request, with no draft file and no recorded wording approval. That is a permitted deviation when the
@@ -299,7 +309,7 @@ sources line that it was redrawn and where the numbers came from. Chapter 9's sl
 example.
 
 **Exception, added at v5.2 and confirmed by the maintainer at deck v5.3 — embedded photographs, on the maintainer's explicit instruction only.**
-Chapter 10 embeds six photographs of a presenter's slides (10.4, 10.6, 10.8, 10.9, 10.11, 10.12),
+Chapter 2.5 embeds six photographs of a presenter's slides (2.5.4, 2.5.6, 2.5.8, 2.5.9, 2.5.11, 2.5.12),
 because the original layout carries the finding better than a redraw would. Where the exception is
 used, all of the following hold:
 
@@ -387,7 +397,7 @@ physical object, and the collision confused a reader.
 *Clarified at v5.1:* the ban is on *card* as the name for the unit. Compound terms of art where
 "card" means something else are permitted and should not be rewritten — **graphics card**, **rate
 card**, **model card**, **system card**. A regex sweep for the word will hit these; they are not
-defects. "Rate card" appears eleven times in Chapter 9 and "system card" six times in Chapter 10,
+defects. "Rate card" appears eleven times in Chapter 9 and "system card" six times in Chapter 2.5,
 both deliberately.
 
 **How to audit for it.** Search the whole file for the word itself, case-insensitive, then
@@ -427,6 +437,7 @@ securities. Any future slide ranking vendors does the same.
 |---|---|---|---|---|
 | 1 | How AI got here, and where it stands | 13 | ~30 min | Ready — direction: progression over time |
 | 2 | Inside the model: how it actually works | 10 | ~24 min | Ready |
+| 2.5 | Reading the model from the inside — *companion to Ch 2* | 13 | ~34 min | Ready, sizing not accepted |
 | 3 | The hardware and the supply chain | 12 | ~32 min | Ready |
 | 4 | Building reliably with an unreliable model | 11 | ~28 min | Ready |
 | 5 | Customizing a model | 13 | ~32 min | Ready |
@@ -434,7 +445,6 @@ securities. Any future slide ranking vendors does the same.
 | 7 | What it costs, and what drives the cost | 13 | ~33 min | Ready, sizing not accepted |
 | 8 | Mapping AI capex | 10 | ~28 min | Ready |
 | 9 | Measuring competency: what the scores mean and how far they moved | 14 | ~36 min | Ready, sizing not accepted |
-| 10 | Reading the model from the inside — *companion to Ch 2* | 13 | ~34 min | Ready, sizing not accepted |
 
 **Sizing:** target 20–30 minutes per chapter; a chapter is one sitting; never split a single argument
 across a chapter boundary. **Decided at deck v5.3:** chapters over 30 minutes are acceptable. The
@@ -447,13 +457,13 @@ where each overrun splits, should that ever be wanted.
   measurement (9.1–9.10, ~26 min), and the cost of the capability gap (9.11–9.14, ~10 min). The
   second half is also a candidate for merging into Chapter 7, which already prices tokens. §20 item 3.
 
-- **Chapter 10 runs ~34 minutes and is not accepted.** It splits cleanly at 10.6 — what is inside
-  and how it is read (10.1–10.6, ~16 min), and what it is used for (10.7–10.13, ~18 min). §20 item 3.
+- **Chapter 2.5 runs ~34 minutes and is not accepted.** It splits cleanly at 2.5.6 — what is inside
+  and how it is read (2.5.1–2.5.6, ~16 min), and what it is used for (2.5.7–2.5.13, ~18 min). §20 item 3.
 
-**Companion chapters.** A chapter written later that belongs beside an earlier one is numbered by
-when it was written (§4) and declared a companion. Three places must say so: the earlier chapter's end
+**Companion chapters.** A chapter written later that belongs beside an earlier one takes a half-step number (§4) and is
+declared a companion. Three places must say so: the earlier chapter's end
 panel links to it first, ahead of the next numbered chapter; the index row for the earlier chapter names
-it; and the companion's own end panel explains its number. Chapter 10 is the companion to Chapter 2.
+it; and the companion's own end panel explains its number. Chapter 2.5 is the companion to Chapter 2.
 
 **Timing model:** light slide 1.5 min · standard 2.5 min · dense 3.5–4 min · glossary 2 min ·
 companies 2.5 min · check yourself 3 min. Times assume Go deeper is opened occasionally, not always.
@@ -543,6 +553,10 @@ Rules:
 - **Chapter-relative numbers are unique within a chapter.** Two slides may share a permanent-ID stem
   (`S-008a`, `S-008b`) but never a displayed number. Chapter 1 broke this from v3.0 to v5.2 — 1.3,
   1.4 and 1.5 each named more than one slide — so a cross-reference to them could not be resolved.
+- **Three-part numbers** (`2.5.7`) belong to half-step chapters (§4). Any renumbering regex must
+  match three-part numbers **first** — a pattern for `[chapter].[n]` will otherwise read `2.5.7` as
+  slide `2.5` followed by `.7`. Exclude currency (`$10.00`) and measurements (`10.4 points`), which
+  the v5.4 pass had to.
 - **Suffixed chapter-relative numbers** (`1.5b`, `7.6b`) insert a slide without renumbering its
   neighbours. Prefer this to a renumbering pass whenever other chapters cross-reference the slides
   that would move. Chapter 7 took three at v5.1 for that reason. The permanent ID is still the next
@@ -552,7 +566,7 @@ Rules:
 
 **State: `S-001`–`S-086` assigned. Next free ID `S-087`.** `S-085`–`S-086` went to Chapter 1's
 progression slides (1.4d, 1.4e). Earlier note, for the record: `S-055`–`S-068` went to Chapter 9,
-`S-069`–`S-081` to Chapter 10, and `S-082`–`S-084` to Chapter 7's suffixed slides, all on
+`S-069`–`S-081` to Chapter 2.5, and `S-082`–`S-084` to Chapter 7's suffixed slides, all on
 2 Oct 2026. Chapter 6 — a lower-numbered chapter — takes `S-085` onward when built. That is correct
 and expected: IDs record creation order, not position.
 
@@ -578,13 +592,13 @@ the one the slide follows.
 
 **Conference slides are wrong often enough to assume it.** Of four photographed slide sets
 received between deck v5.0 and v5.2, three contained a misattribution that changed what the slide
-argued: a Llama finding presented within a Claude talk (10.9), a closed model read as open (9.13),
+argued: a Llama finding presented within a Claude talk (2.5.9), a closed model read as open (9.13),
 and a 2025 result credited to the wrong system (1.4e). Verify attribution before anything else.
 
 **A talk is a pointer to sources, not a source.** Where material arrives as photographs of a
 presentation, identify the paper behind every finding and verify against it before drafting. Record
 which model and which lab each finding is about — a talk by one lab may present another lab's work on
-another lab's model, as Chapter 10's adder slide did. Findings with no matchable document stay at a
+another lab's model, as Chapter 2.5's adder slide did. Findings with no matchable document stay at a
 lower tier, labelled as the presenter's illustration.
 
 **A benchmark scored against another model's output is not scored against ground truth.** Say so
@@ -691,8 +705,8 @@ not in Go deeper, because a reader who already holds the misconception is the on
 |---|---|
 | Chapters over the 30-minute ceiling (3, 5, 7, 9, 10) | Accepted. §11 now treats 30 minutes as a target |
 | Chapter 6 | On hold — not ready. Takes `S-087` onward whenever it resumes; Chapters 5 and 8 end panels to be updated then |
-| Chapter 10's embedded photographs | Confirmed. §6 exception stands |
-| Distribution and IP — Chapter 8's licensed source, Chapter 10's photographs | Accepted as is. No change to the current position |
+| Chapter 2.5's embedded photographs | Confirmed. §6 exception stands |
+| Distribution and IP — Chapter 8's licensed source, Chapter 2.5's photographs | Accepted as is. No change to the current position |
 | The dated frontier table (1.5) in Chapter 1 | Stays |
 
 **Still open:**
@@ -710,7 +724,7 @@ not in Go deeper, because a reader who already holds the misconception is the on
 7. **Maintainer-only files in the repository** — subfolder separation or exclusion.
 8. **Re-verification cadence for Chapter 9** — its scoreboards and prices decay fastest.
 
-*Closed since 5.4:* sizing, Chapter 10 photographs, distribution position, the 1.5 frontier table —
+*Closed since 5.4:* sizing, Chapter 2.5 photographs, distribution position, the 1.5 frontier table —
 by maintainer decision. Chapter 6 moved to on hold.
 
 ---

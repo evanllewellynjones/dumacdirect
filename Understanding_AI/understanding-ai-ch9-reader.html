@@ -144,7 +144,7 @@
 <div class="shell">
   <header class="top">
     <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 9 — Measuring competency: what the scores mean and how far they moved</div>
-    <div class="meta">v5.3 · 2 Oct 2026</div>
+    <div class="meta">v5.4 · 2 Oct 2026</div>
   </header>
   <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
 
@@ -686,7 +686,7 @@ const CARDS = [
  body:`<p>Fourteen slides, in two halves. <strong>Competency (9.1&ndash;9.10):</strong> the benchmarks you have heard of stopped separating models, the ones that replaced them measure whether work gets done and whether the model knows what it does not know, and over the past year factual accuracy moved 13 points while the calibration-adjusted score moved roughly tenfold. <strong>Cost (9.11&ndash;9.14):</strong> the open tier buys most of the frontier's capability for a fraction of the price, the rate card is the wrong unit because tokens consumed vary more than tokens are priced, and the real advantage of open weights is that competition can form a price at all.</p>
  <p><strong>Every model name and number in this chapter is point-in-time and decays faster than anything else in the course.</strong> Four of the ten models on 9.6 did not exist six months ago, and several prices on 9.11 were already weeks old when they were compiled. The durable content is 9.1, 9.2, 9.4, 9.10, 9.12 and 9.14 — what competency means, why benchmarks die, why accuracy alone rewards guessing, how to run your own evaluation, why cost per task is the only real unit, and where the open-weight advantage actually sits. Those will outlast every name on the scoreboards and every figure on the price tables.</p>
  <p><strong>Where this connects.</strong> Chapter 1 established that knowledge benchmarks had saturated (1.5b); this chapter is what the field measures instead. Chapter 4 argued that these systems relocate error rather than removing it (4.11); 9.8 is the measurement of that relocation. Chapter 5 made evaluation the ship gate (5.8); 9.10 is the same discipline applied to selection rather than to fine-tuning. Chapter 7 priced the tokens (7.2); 9.11 to 9.14 extend that to the open tier and to the question of whether the most capable model is the right one for the job.</p>
- <p class="nextlink"><a href="understanding-ai-ch10-reader.html">Continue to Chapter 10 — Reading the model from the inside →</a></p>
+ <p class="nextlink"><a href="index.html">Back to all chapters →</a></p>
  <p class="hint2">Chapters are added as the subject moves, and it moves constantly. The numbering is for convenience, not sequence, and no chapter is the last one. Chapters 3, 6, 7 and this one decay fastest — check anything dated before you rely on it.</p>
  <div class="btnrow">
    <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
@@ -792,7 +792,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 9\nDeck version: v5.3 · 2 Oct 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 9\nDeck version: v5.4 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });

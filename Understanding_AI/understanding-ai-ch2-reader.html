@@ -141,7 +141,7 @@
 <div class="shell">
   <header class="top">
     <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 2 — Inside the model: how it actually works</div>
-    <div class="meta">v5.3 · 2 Oct 2026</div>
+    <div class="meta">v5.4 · 2 Oct 2026</div>
   </header>
   <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
 
@@ -624,8 +624,8 @@ const CARDS = [
  figure:null,
  body:`<p>Ten slides. The argument, in one line: a neuron is two arithmetic steps, a model is a great many of them with fixed numbers inside, and every word you read cost one full pass over all of them.</p>
  <p>Three things from this chapter get paid for later. Inference reads every weight per token — that is Chapter 3's bottleneck. The model samples from a distribution and cannot tell a right answer from a wrong one — that is Chapter 4. And each turn re-reads the whole conversation — that is Chapter 7.</p>
- <p><strong>Companion chapter — Chapter 10, Reading the model from the inside.</strong> This chapter is the machinery. Chapter 10 is what the machinery turns out to contain: concepts that can be found and edited, reasoning in steps the model never writes down, plans formed before the words that carry them out. It is numbered 10 because it was written tenth; it belongs here.</p>
- <p class="nextlink"><a href="understanding-ai-ch10-reader.html">Continue to Chapter 10 — Reading the model from the inside →</a></p>
+ <p><strong>Companion chapter — Chapter 2.5, Reading the model from the inside.</strong> This chapter is the machinery. Chapter 2.5 is what the machinery turns out to contain: concepts that can be found and edited, reasoning in steps the model never writes down, plans formed before the words that carry them out.</p>
+ <p class="nextlink"><a href="understanding-ai-ch2-5-reader.html">Continue to Chapter 2.5 — Reading the model from the inside →</a></p>
  <p><strong>Or Chapter 3 — The hardware and the supply chain.</strong> What physically runs these models, and where the constraint sits: a PC against a data centre, where CUDA fits, HBM as the bottleneck, and why supply cannot simply scale.</p>
  <p class="nextlink"><a href="understanding-ai-ch3-reader.html">Continue to Chapter 3 →</a></p>
  <div class="btnrow">
@@ -753,7 +753,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 2\nDeck version: v5.3 · 2 Oct 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 2\nDeck version: v5.4 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });

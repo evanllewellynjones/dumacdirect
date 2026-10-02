@@ -2,7 +2,7 @@
 
 A self-paced reference on artificial intelligence written for investment professionals — numerate, fluent in financial, industrial and supply-chain concepts, no machine-learning background assumed.
 
-**Version v5.3 · 2 Oct 2026**
+**Version v5.4 · 2 Oct 2026**
 
 > Descriptive material on industry structure. **Not investment advice and not a view on any security.** Figures were gathered July to October 2026 unless a slide says otherwise.
 
@@ -30,6 +30,7 @@ start index.html          # Windows
 |----|-------|--------|------|--------|
 | 1 | How AI got here, and where it stands | 13 | ~30 min | Ready |
 | 2 | Inside the model: how it actually works | 10 | ~24 min | Ready |
+| 2.5 | Reading the model from the inside — *companion to Chapter 2* | 13 | ~34 min | Ready |
 | 3 | The hardware and the supply chain | 12 | ~32 min | Ready |
 | 4 | Building reliably with an unreliable model | 11 | ~28 min | Ready |
 | 5 | Customizing a model | 13 | ~32 min | Ready |
@@ -37,13 +38,12 @@ start index.html          # Windows
 | 7 | What it costs, and what drives the cost | 13 | ~33 min | Ready |
 | 8 | Mapping AI capex | 10 | ~28 min | Ready |
 | 9 | Measuring competency: what the scores mean and how far they moved | 14 | ~36 min | Ready |
-| 10 | Reading the model from the inside — *companion to Chapter 2* | 13 | ~34 min | Ready |
 
-Chapters are added as the subject moves. The set is open-ended, the numbering is for convenience rather than sequence, and no chapter is the last one. The early chapters build on each other — read them in order the first time; after that they stand alone as reference. **Chapter 10 is a companion to Chapter 2** and is best read straight after it; it is numbered by when it was written, not where it sits.
+Chapters are added as the subject moves. The set is open-ended, the numbering is for convenience rather than sequence, and no chapter is the last one. The early chapters build on each other — read them in order the first time; after that they stand alone as reference. **Chapter 2.5 is a companion to Chapter 2** and sits between Chapters 2 and 3. Its slides are numbered 2.5.1 onward.
 
 Each chapter ends with a glossary page and a companies page. Both are excluded from the slide count. Chapter 9 also carries a **Check yourself** page — eight questions with answers in the Go deeper block.
 
-Chapters 9 and 10 run to ~36 and ~34 minutes, over the 30-minute target. Chapter 10 splits at 10.6.
+Chapters 9 and 2.5 run to ~36 and ~34 minutes, over the 30-minute target; accepted.
 
 Chapter 9 runs to ~36 minutes, over the 30-minute target. It splits cleanly at 9.10 into competency (9.1–9.10) and the cost of the capability gap (9.11–9.14), and that split is an open decision.
 
@@ -130,12 +130,13 @@ The pre-delivery checklist is §19 of the instruction note. Run it before any co
 | 5 | Chapter 9 was built without the §4 Markdown draft and approval step, at the maintainer's request. No `understanding-ai-ch9-cards-draft.md` exists; its corrections are logged in the outline's revision log instead | Open — generate retroactively or accept the deviation |
 | 6 | The *Check yourself* page in Chapter 9 was an apparatus type §5 did not describe | **Closed** — admitted to §5 in instruction note 5.2 |
 | 7 | Chapter 9 runs ~36 min, over the §11 ceiling | **Accepted** by maintainer, v5.3 |
-| 8 | Chapter 10 runs ~34 min, over the §11 ceiling | **Accepted** by maintainer, v5.3 |
-| 9 | Chapter 10 embeds six photographs of a third party's presentation slides — a deliberate exception to the instruction note's no-photographs rule, made at the maintainer's request. It raises the file to ~515 KB and is a distribution question alongside Chapter 8 | **Confirmed** by maintainer, v5.3; distribution position accepted as is |
+| 8 | Chapter 2.5 runs ~34 min, over the §11 ceiling | **Accepted** by maintainer, v5.3 |
+| 9 | Chapter 2.5 embeds six photographs of a third party's presentation slides — a deliberate exception to the instruction note's no-photographs rule, made at the maintainer's request. It raises the file to ~515 KB and is a distribution question alongside Chapter 8 | **Confirmed** by maintainer, v5.3; distribution position accepted as is |
 | 10 | Chapter 7 runs ~33 min after three slides were added at v5.1 | **Accepted** by maintainer, v5.3 |
 | 11 | Chapter 1 reused slide numbers (two slides numbered 1.3, three numbered 1.4, two numbered 1.5) | **Closed at v5.2** — suffixed 1.3b, 1.4b, 1.4c, 1.5c; no outside cross-reference affected |
 | 12 | v5.1's sweep claimed no reader-facing "card" remained; twenty instances had been missed, including the ask-box heading in Chapters 1 and 2 | **Closed at v5.2** |
 | 13 | No way to jump to a specific slide except clicking unlabelled dots | **Closed at v5.3** — two-column Contents panel in every chapter |
+| 14 | The companion to Chapter 2 was numbered 10 and listed last | **Closed at v5.4** — renumbered Chapter 2.5, file `understanding-ai-ch2-5-reader.html`; delete the old `understanding-ai-ch10-reader.html` |
 
 ---
 
@@ -143,6 +144,6 @@ The pre-delivery checklist is §19 of the instruction note. Run it before any co
 
 **No open-source licence is attached, and this repository should be private.**
 
-Chapter 8 is derived from a sell-side research note licensed to a named individual. The value chain and constraint taxonomy were carried across; no rating, price target, upside percentage or model portfolio was reproduced. Chapter 10 reproduces six photographs of slides from a third party's conference talk. Neither has been cleared for redistribution, and the distribution question is an open decision in the instruction note.
+Chapter 8 is derived from a sell-side research note licensed to a named individual. The value chain and constraint taxonomy were carried across; no rating, price target, upside percentage or model portfolio was reproduced. Chapter 2.5 reproduces six photographs of slides from a third party's conference talk. Neither has been cleared for redistribution, and the distribution question is an open decision in the instruction note.
 
 Do not make this repository public, and do not add a permissive licence file, until that is resolved.
