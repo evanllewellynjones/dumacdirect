@@ -238,7 +238,7 @@
     <div class="sect">Contributors</div>
     <div class="row">
       <input type="text" id="newcontrib" placeholder="Contributor name" style="flex:3">
-      <button class="btn" id="btn_addcontrib" style="flex:1">Add</button>
+      <button class="btn adminonly" id="btn_addcontrib" style="flex:1">Add</button>
     </div>
     <table class="grid" id="contribtbl" style="margin-top:7px">
       <thead><tr><th>Name</th><th>Initials</th><th>Records</th><th></th></tr></thead>
@@ -253,8 +253,9 @@
     <div class="sect">Actions</div>
     <div class="row">
       <input type="text" id="newaction" placeholder="Action value, lowercase" style="flex:3">
-      <button class="btn" id="btn_addaction" style="flex:1">Add</button>
+      <button class="btn adminonly" id="btn_addaction" style="flex:1">Add</button>
     </div>
+    <div class="sub cfgmsg" id="msg_actions"></div>
     <table class="grid" id="actiontbl" style="margin-top:7px">
       <thead><tr><th>Action</th><th>Records</th><th></th></tr></thead>
       <tbody></tbody>
@@ -272,8 +273,9 @@
     <div class="sect">Strategies</div>
     <div class="row">
       <input type="text" id="newstrategy" placeholder="Strategy name" style="flex:3">
-      <button class="btn" id="btn_addstrategy" style="flex:1">Add</button>
+      <button class="btn adminonly" id="btn_addstrategy" style="flex:1">Add</button>
     </div>
+    <div class="sub cfgmsg" id="msg_strategies"></div>
     <table class="grid" id="strattbl" style="margin-top:7px">
       <thead><tr><th>Strategy</th><th>Records</th><th></th></tr></thead>
       <tbody></tbody>
@@ -1046,21 +1048,44 @@ function renderList(sel,key,values,pick){
     tr.appendChild(act); tb.appendChild(tr);
   }
 }
+/* Status is written next to the input, not only to the top banner: the
+   Strategies card is at the bottom of Config, so a banner message ("Unlock
+   admin first", "Already listed") was off-screen and the click looked dead. */
+function listMsg(key,t,ok){
+  const m=$("#msg_"+key); if(m){ m.textContent=t||""; m.style.color=ok?"":"#b42318"; }
+  banner(t,ok);
+}
 async function addToList(key,inputSel,transform){
-  if(!requireUnlock()) return;
+  if(!UNLOCKED){ listMsg(key,"Unlock admin first \u2014 badge at the right of the tab bar."); return; }
+  if(!RC.dir || !RC.cfg){ listMsg(key,"No folder connected \u2014 nothing to save to."); return; }
   const raw=$(inputSel).value.trim();
-  if(!raw) return;
+  if(!raw){ listMsg(key,"Type a value first."); return; }
   const v=transform?transform(raw):raw;
   const cfg=RC.cfg;
-  if((cfg[key]||[]).includes(v)){ banner("Already listed."); return; }
-  cfg[key]=[...(cfg[key]||[]),v];
-  await saveConfig(cfg,who());
-  await appendHistory({at:new Date().toISOString(),by:who(),op:key+"_add",value:v});
-  $(inputSel).value=""; banner("Added "+v+".",true); renderConfig();
+  if((cfg[key]||[]).includes(v)){ listMsg(key,v+" is already listed."); return; }
+  try{
+    cfg[key]=[...(cfg[key]||[]),v];
+    await saveConfig(cfg,who());
+    /* Round-trip: re-read _config.json from disk. If the value is gone,
+       the write path in rc-core.js is dropping this key. */
+    await loadConfig();
+    if(!(RC.cfg[key]||[]).includes(v)){
+      listMsg(key,"Saved, but "+v+" was not in _config.json on re-read \u2014 "
+        +"saveConfig()/loadConfig() in rc-core.js is dropping '"+key+"'.");
+      renderConfig(); return;
+    }
+    await appendHistory({at:new Date().toISOString(),by:who(),op:key+"_add",value:v});
+    $(inputSel).value=""; listMsg(key,"Added "+v+".",true); renderConfig();
+  }catch(e){
+    console.error(e);
+    listMsg(key,"Save failed: "+(e&&e.message||e));
+  }
 }
 $("#btn_addaction").onclick   = () => addToList("actions","#newaction",
                                                 s=>s.toLowerCase().replace(/\s+/g,"-"));
 $("#btn_addstrategy").onclick = () => addToList("strategies","#newstrategy");
+[["#newaction","#btn_addaction"],["#newstrategy","#btn_addstrategy"],["#newcontrib","#btn_addcontrib"]]
+  .forEach(([i,b])=>$(i).addEventListener("keydown",e=>{ if(e.key==="Enter") $(b).click(); }));
 $("#btn_addcontrib").onclick=async()=>{
   if(!requireUnlock()) return;
   const n=$("#newcontrib").value.trim();

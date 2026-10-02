@@ -116,6 +116,24 @@
     nav.bar .inner{padding:10px 18px;gap:10px}
     h1.cardtitle{font-size:20px}
   }
+
+  details.toc{border:1px solid var(--rule);margin:-12px 0 24px;padding:0 14px;background:#fff}
+  details.toc summary{cursor:pointer;color:var(--navy);font-size:14px;font-weight:bold;padding:9px 0;list-style:none}
+  details.toc summary::-webkit-details-marker{display:none}
+  details.toc summary::before{content:"\25B8  ";color:var(--blue)}
+  details.toc[open] summary::before{content:"\25BE  "}
+  details.toc summary span{font-weight:normal;color:var(--muted)}
+  ol.toclist{list-style:none;margin:2px 0 12px;padding:0;column-count:2;column-gap:28px}
+  ol.toclist li{break-inside:avoid;margin:0 0 3px}
+  ol.toclist button{display:flex;gap:8px;width:100%;text-align:left;border:none;background:none;
+    padding:4px 6px;font-size:14px;line-height:1.35;color:var(--ink);border-radius:2px}
+  ol.toclist button:hover{background:var(--wash);color:var(--ink)}
+  ol.toclist button .n{flex:0 0 3.4em;color:var(--blue);font-weight:bold}
+  ol.toclist li.app button{color:var(--muted);font-style:italic}
+  ol.toclist li.app button .n{color:var(--muted)}
+  ol.toclist li.cur button{background:var(--wash);box-shadow:inset 3px 0 0 var(--navy)}
+  ol.toclist li.seen button .n::after{content:" \2713";color:var(--muted);font-weight:normal}
+  @media (max-width:640px){ ol.toclist{column-count:1} }
 </style>
 </head>
 <body>
@@ -123,15 +141,17 @@
 <div class="shell">
   <header class="top">
     <div class="ch"><a href="index.html" class="backlink">&larr; All chapters</a> <span class="sep">·</span> Chapter 1 — How AI got here, and where it stands</div>
-    <div class="meta">v2.1 · 30 Aug 2026</div>
+    <div class="meta">v5.3 · 2 Oct 2026</div>
   </header>
+  <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
+
 
   <main id="stage" tabindex="-1"></main>
 
   <section class="ask">
-    <h2>Ask about this card</h2>
-    <p class="hint">This reader has the cards but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the card ID so the answer lands in the right place in your notes.</p>
-    <textarea id="q" placeholder="What's your question about this card?"></textarea>
+    <h2>Ask about this slide</h2>
+    <p class="hint">This reader has the slides but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the slide ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this slide?"></textarea>
     <div class="btnrow">
       <button id="copyq">Copy question for Claude</button>
       <button id="copyall" class="ghost">Copy all questions from this session</button>
@@ -291,13 +311,17 @@ const SVG_FLOW = `
 <text x="340" y="160" font-size="13" fill="#595959">Blue — the single architectural unlock. The other three are what it made possible.</text>
 </g></svg>`;
 
+const SVG_HORIZON = `<svg viewBox="0 0 680 330" role="img" aria-label="Log-scale chart of the length of task, measured by how long a skilled human takes, that AI models complete half the time: about two seconds for GPT-2 in 2019, nine seconds for GPT-3, thirty-six seconds for GPT-3.5, five minutes for GPT-4 in 2023, and at least sixteen hours for an early Claude Mythos Preview in March 2026, above a dashed long-run trend line that doubles about every seven months."><g font-family="Calibri, sans-serif" fill="#1a1a1a"><text x="30" y="20" font-size="12" fill="#595959">Legend — blue: earlier models, 50% reliability · orange: the latest measurement · log scale, each gridline ×60 or more</text><text x="30" y="40" font-size="12" fill="#595959">Length of task (time a skilled human takes) the model completes at least half the time</text><line x1="96" y1="262.0" x2="620" y2="262.0" stroke="#d9d9d9" stroke-width="0.75"/><text x="88" y="266.0" font-size="11" text-anchor="end" fill="#595959">1 sec</text><line x1="96" y1="195.5" x2="620" y2="195.5" stroke="#d9d9d9" stroke-width="0.75"/><text x="88" y="199.5" font-size="11" text-anchor="end" fill="#595959">1 min</text><line x1="96" y1="129.0" x2="620" y2="129.0" stroke="#d9d9d9" stroke-width="0.75"/><text x="88" y="133.0" font-size="11" text-anchor="end" fill="#595959">1 hour</text><line x1="96" y1="83.9" x2="620" y2="83.9" stroke="#d9d9d9" stroke-width="0.75"/><text x="88" y="87.9" font-size="11" text-anchor="end" fill="#595959">16 hours</text><text x="96.0" y="280" font-size="11" text-anchor="middle" fill="#595959">2019</text><text x="161.5" y="280" font-size="11" text-anchor="middle" fill="#595959">2020</text><text x="227.0" y="280" font-size="11" text-anchor="middle" fill="#595959">2021</text><text x="292.5" y="280" font-size="11" text-anchor="middle" fill="#595959">2022</text><text x="358.0" y="280" font-size="11" text-anchor="middle" fill="#595959">2023</text><text x="423.5" y="280" font-size="11" text-anchor="middle" fill="#595959">2024</text><text x="489.0" y="280" font-size="11" text-anchor="middle" fill="#595959">2025</text><text x="554.5" y="280" font-size="11" text-anchor="middle" fill="#595959">2026</text><text x="620.0" y="280" font-size="11" text-anchor="middle" fill="#595959">2027</text><line x1="102.5" y1="250.7" x2="620.0" y2="98.2" stroke="#156082" stroke-width="1" stroke-dasharray="5 4"/><text x="462.8" y="160.6" font-size="11" fill="#156082">long-run trend: doubling about every 7 months</text><circle cx="102.5" cy="250.7" r="4.5" fill="#156082"/><text x="120.5" y="242.7" font-size="11">GPT-2</text><circle cx="187.7" cy="226.3" r="4.5" fill="#156082"/><text x="197.7" y="242.3" font-size="11">GPT-3</text><circle cx="305.6" cy="203.8" r="4.5" fill="#156082"/><text x="313.6" y="197.8" font-size="11">GPT-3.5</text><circle cx="371.1" cy="169.3" r="4.5" fill="#156082"/><text x="381.1" y="185.3" font-size="11">GPT-4</text><line x1="567.6" y1="94.2" x2="567.6" y2="63.9" stroke="#E97132" stroke-width="1.5"/><circle cx="567.6" cy="83.9" r="5.5" fill="#E97132" stroke="#1a1a1a" stroke-width="0.75"/><text x="549.6" y="63.9" font-size="11" text-anchor="end" font-weight="bold">Claude Mythos Preview (early), ≥16 h</text><text x="549.6" y="83.9" font-size="10" text-anchor="end" fill="#595959">bar: 95% interval, 8.5–55 h</text><text x="549.6" y="116.6" font-size="10" text-anchor="end" fill="#595959">at 80% reliability: about 3 h</text><circle cx="567.6" cy="110.6" r="4" fill="#fff" stroke="#E97132" stroke-width="1.5"/><line x1="96" y1="262" x2="620" y2="262" stroke="#1a1a1a" stroke-width="0.75"/><rect x="30" y="292" width="620" height="32" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/><text x="340" y="313" font-size="12" text-anchor="middle">Two seconds to sixteen hours in seven years — and the recent points sit above the long-run line</text></g></svg>`;
+
+const SVG_MATH = `<svg viewBox="0 0 680 354" role="img" aria-label="Milestone timeline of AI in mathematics: unreliable arithmetic in 2022; correct addition but a failure to count letters in 2024; an International Mathematical Olympiad silver in July 2024 that needed human translation into a formal language; an officially certified gold in July 2025 by a general model working in plain English; dozens of open research problems resolved in 2026; and in September 2026 an announced but unverified proof on the Navier-Stokes Millennium Prize problem."><g font-family="Calibri, sans-serif" fill="#1a1a1a"><text x="30" y="20" font-size="12" fill="#595959">Legend — grey: arithmetic · blue: competition, answers known · orange: open research · dashed: not yet verified</text><text x="30" y="56" font-size="12" font-weight="bold">2022</text><rect x="128" y="40" width="522" height="32" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/><text x="140" y="54" font-size="12" font-weight="bold">Unreliable at multi-digit arithmetic</text><text x="30" y="94" font-size="12" font-weight="bold">2024</text><rect x="128" y="78" width="522" height="32" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/><text x="140" y="92" font-size="12" font-weight="bold">Adds correctly — but cannot count the r's in “strawberry”</text><text x="140" y="105" font-size="11" fill="#595959">the failure is in how words are split into tokens (2.4)</text><text x="30" y="132" font-size="12" font-weight="bold">Jul 2024</text><rect x="128" y="116" width="522" height="32" fill="#fff" stroke="#156082" stroke-width="1.5"/><text x="140" y="130" font-size="12" font-weight="bold">IMO silver: AlphaProof + AlphaGeometry 2, 28 / 42</text><text x="140" y="143" font-size="11" fill="#595959">problems hand-translated into Lean first; up to three days</text><text x="30" y="170" font-size="12" font-weight="bold">Jul 2025</text><rect x="128" y="154" width="522" height="32" fill="#fff" stroke="#156082" stroke-width="1.5"/><text x="140" y="168" font-size="12" font-weight="bold">IMO gold: Gemini Deep Think, 35 / 42, officially certified</text><text x="140" y="181" font-size="11" fill="#595959">plain English, within the 4.5-hour limit, no translation</text><text x="30" y="208" font-size="12" font-weight="bold">2026</text><rect x="128" y="192" width="522" height="32" fill="#fff" stroke="#E97132" stroke-width="1.5"/><text x="140" y="206" font-size="12" font-weight="bold">Dozens of open Erdős problems; OEIS conjectures; unit-distance disproof</text><text x="140" y="219" font-size="11" fill="#595959">problems nobody had solved, not competition questions</text><text x="30" y="246" font-size="12" font-weight="bold">Jul–Aug 2026</text><rect x="128" y="230" width="522" height="32" fill="#fff" stroke="#E97132" stroke-width="1.5"/><text x="140" y="244" font-size="12" font-weight="bold">Jacobian conjecture counterexample (dimension 3); zeta-zeros result</text><text x="140" y="257" font-size="11" fill="#595959">credited jointly to a mathematician and Claude Fable 5</text><text x="30" y="284" font-size="12" font-weight="bold">Sep 2026</text><rect x="128" y="268" width="522" height="32" fill="#fff" stroke="#E97132" stroke-width="1.5" stroke-dasharray="5 3"/><text x="140" y="282" font-size="12" font-weight="bold">Navier–Stokes blow-up proof announced — a Millennium Prize problem</text><text x="140" y="295" font-size="11" fill="#595959">unverified · credit disputed · prize not claimed</text><rect x="30" y="310" width="620" height="36" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/><text x="340" y="333" font-size="12" text-anchor="middle"><tspan font-weight="bold">Mathematics preprints disclosing AI use: 4.75% in March 2026 → 24.14% by 20 August</tspan></text></g></svg>`;
+
 const CARDS = [
 {
  id:"S-001", num:"1.1", title:"Sixty years in eight moments",
  figure:SVG_TIMELINE,
  body:`<p>Rules → learning → deep learning → generative AI. Each era let machines do more with less hand-coding by humans.</p>
  <p>Two of these eight are architectural step changes. The other six are the field executing on them. Telling those apart is most of what this chapter is for.</p>`,
- depth:`<p>The thing to hold onto is that the ideas are old. The perceptron dates to the late 1950s and backpropagation to 1986. What changed was never the concept — it was having enough data and compute to make depth pay, which is card 3. This pattern recurs: capability arrives when a physical constraint lifts, not when someone has an idea.</p>
+ depth:`<p>The thing to hold onto is that the ideas are old. The perceptron dates to the late 1950s and backpropagation to 1986. What changed was never the concept — it was having enough data and compute to make depth pay, which is 1.3. This pattern recurs: capability arrives when a physical constraint lifts, not when someone has an idea.</p>
  <p>The 1997 Deep Blue result is worth noticing precisely because it was <em>not</em> a step change — it was brute-force search plus hand-coded chess knowledge, the symbolic era at its peak, and it produced nothing that generalised.</p>`,
  sources:"Established computing history; dates uncontroversial. The 2026 marker characterises the current period rather than a dated event."
 },
@@ -322,7 +346,7 @@ const CARDS = [
  sources:"Rumelhart, Hinton and Williams 1986 (backpropagation). Established ML history."
 },
 {
- id:"S-007b", num:"1.3", title:"Three things converged, and then it worked",
+ id:"S-007b", num:"1.3b", title:"Three things converged, and then it worked",
  figure:SVG_CONVERGE,
  body:`<p>Around 2012 three enablers reached critical mass at the same time:</p>
  <ul>
@@ -349,7 +373,7 @@ const CARDS = [
  sources:"Vaswani et al. 2017."
 },
 {
- id:"S-008b", num:"1.4", title:"Self-supervision and scaling laws",
+ id:"S-008b", num:"1.4b", title:"Self-supervision and scaling laws",
  figure:SVG_FLOW,
  body:`<p>Two things followed the transformer, and neither is an architecture.</p>
  <p><strong>Self-supervised pretraining</strong> removed the labelling bottleneck. Train the model to predict the next word, and any text becomes its own training label. No humans annotating anything. The whole internet becomes usable training data.</p>
@@ -360,7 +384,7 @@ const CARDS = [
  sources:"Kaplan et al. 2020 (scaling laws); Brown et al. 2020 (GPT-3)."
 },
 {
- id:"S-008c", num:"1.4", title:"Three different tipping points, routinely confused",
+ id:"S-008c", num:"1.4c", title:"Three different tipping points, routinely confused",
  figure:null,
  body:`<p>The public tipping point was <strong>ChatGPT, November 2022</strong>. RLHF — reinforcement learning from human feedback — plus instruction-tuning turned a raw next-word predictor into something a non-specialist could use. Research capability became mass product.</p>
  <p>But "when did generative AI happen" has three defensible answers, and conversations go wrong when people are holding different ones:</p>
@@ -372,6 +396,39 @@ const CARDS = [
  depth:`<p>The distinction has practical consequences. Someone arguing that AI progress is recent and therefore fragile is usually pointing at 2022. Someone arguing it is long-running and therefore durable is pointing at 2012 or 2017. Both are describing real things; they are just not describing the same thing.</p>
  <p>The through-line for the whole chapter: the missing ingredient was never the <em>idea</em> of neural networks. It was enough compute and data, plus an architecture that turns more of both into reliably better — without hand-labelling.</p>`,
  sources:"Ouyang et al. 2022 (InstructGPT / RLHF)."
+},
+{
+ id:"S-085", num:"1.4d", title:"The length of task AI can finish has been doubling every few months",
+ figure:SVG_HORIZON,
+ body:`<p>Scaling laws (1.4b) predict that bigger models get better. METR, an independent research organisation, measures <em>how much</em> better in a unit anyone can read: hours of human work.</p>
+ <ul>
+ <li>A model's <strong>time horizon</strong> is the length of task — measured by how long a skilled human takes to do it — that the model completes with a stated reliability. METR's headline figure uses 50%: the model succeeds at least half the time.</li>
+ <li><strong>GPT-2 (2019): about 2 seconds. GPT-4 (2023): about 5 minutes.</strong> An early version of <strong>Claude Mythos Preview</strong>, tested in March 2026: <strong>at least 16 hours</strong>, at the upper end of what METR's tasks can measure.</li>
+ <li>The <strong>doubling time</strong> — how long the horizon takes to double — has been about <strong>seven months</strong> over the long run since 2019, and closer to <strong>four</strong> since 2023.</li>
+ <li>Demand the same task at <strong>80% reliability</strong> and the latest figure drops to about <strong>3 hours</strong>. The gap between "half the time" and "reliably" is the gap Chapter 9 is about (9.1).</li>
+ </ul>`,
+ band:`A doubling every four to seven months means a twelve-month plan is written against two or three doublings of what the tools can do. Very few planning processes are built for that.`,
+ depth:`<p>The talk this chart was taken from asked whether it is "just scaling from here on". The honest answer is that the trend has held across two very different eras — plain next-word predictors up to 2023, and reasoning models since late 2024 — and has, if anything, steepened. That is evidence about the past, not a forecast. Trends of this kind end, and they rarely announce it in advance.</p>
+ <p>A second talk at the same period put the difficulty plainly: exponentials defy human reasoning, and demand for AI is growing exponentially while budgets are set quarterly or annually. Anyone sizing a capacity commitment, a headcount plan or a vendor contract against today's capability is sizing it against a number that will have doubled before the contract renews. The error is not stupidity. Intuition is linear, and the curve is not.</p>
+ <p>Three cautions on the measure itself. The tasks are mostly software engineering and closely related work, so the horizon describes that domain best. The 50% threshold flatters: the 80% figure is the one that matters for anything you would rely on. And at the top the instrument is running out of road — METR says its task suite cannot reliably measure much beyond sixteen hours without new tasks, which is itself a sign of how far the curve has come.</p>`,
+ sources:"Claude Mythos Preview early-version result (50% horizon at least 16 h, 95% CI 8.5-55 h, March 2026): METR's own statement, May 2026 \u2014 primary. The 80% figure of about 3 h and the GPT-2 to GPT-4 points: METR data as summarised in secondary sources, Time Horizon 1.0 and 1.1 suites mixed \u2014 secondary. Doubling of about 7 months since 2019: METR, 'Measuring AI Ability to Complete Long Tasks', March 2025 \u2014 primary. About 4.3 months since 2023: METR Time Horizon 1.1, January 2026, as reported \u2014 secondary. Chart redrawn from a slide photographed at The AI Conference, 2026. 'Exponentials defy human reasoning': a Baseten conference slide, 2026 \u2014 vendor framing."
+},
+{
+ id:"S-086", num:"1.4e", title:"In mathematics, from failing arithmetic to a claimed Millennium Prize proof in four years",
+ figure:SVG_MATH,
+ body:`<p>Mathematics is the cleanest place to watch the curve, because a proof is either right or wrong and can be checked.</p>
+ <ul>
+ <li><strong>2022–2024: basic failures.</strong> Models stumbled on arithmetic, and as late as 2024 could not count the letters in "strawberry".</li>
+ <li><strong>2024 → 2025: specialist to generalist.</strong> The 2024 silver at the International Mathematical Olympiad (<strong>IMO</strong>) needed humans to translate each problem into <strong>Lean</strong>, a formal proof language, and took up to three days. The 2025 gold came from a general model reading the problems in plain English and finishing inside the contest's time limit.</li>
+ <li><strong>2026: research, not exercises.</strong> Dozens of open problems from Paul Erdős's catalogue resolved; a counterexample to the Jacobian conjecture in three dimensions; and in September an announced proof that the Navier–Stokes fluid equations can "blow up" — one of the seven <strong>Millennium Prize Problems</strong>, each carrying a $1 million prize.</li>
+ <li>The share of mathematics preprints disclosing AI use rose from <strong>4.75%</strong> in March 2026 to <strong>24.14%</strong> by 20 August. "Substantive" use — AI contributing to the mathematics itself — went from <strong>1.39%</strong> to <strong>14.09%</strong>.</li>
+ </ul>
+ <p class="warn"><strong>Corrected from the source slide.</strong> The talk credited the 2025 gold to AlphaProof. It was Gemini Deep Think. The difference is the point: a specialist system needing human translation was replaced, within a year, by a general model that did not need it.</p>`,
+ band:`From arithmetic errors to a claimed Millennium Prize result in about four years — if that proof survives checking. Mathematics moved fastest because its answers can be verified, and capability compounds fastest wherever verification is cheap.`,
+ depth:`<p>Why mathematics leads, and why that matters for reading the rest of this course. A proof can be checked mechanically: Lean will accept it or reject it. That gives training a clean signal of right and wrong, and gives outsiders a way to confirm a claim without trusting the lab that made it. Most professional work has no equivalent. There is no Lean for a credit judgement or an investment memo, which is why Chapter 9 spends fourteen slides on how hard it is to measure competency outside domains like this one. Progress in mathematics is real evidence of capability. It is not evidence that the same progress has happened in judgement-heavy work.</p>
+ <p>The strawberry failure deserves its explanation, because it looks like stupidity and is not. Models read text as tokens — chunks of words — rather than letters (2.4). A model that has never seen the letters inside "strawberry" individually cannot count them reliably, however capable it is otherwise. Early arithmetic failures had a similar root. The fix was representation, not intelligence.</p>
+ <p>The Navier–Stokes result needs every caveat it carries. OpenAI announced on 8 September 2026 that an unreleased internal model, run as roughly 10,000 coordinating agents for about 88 hours, produced a proof that the equations can develop a singularity, with a formalisation in Lean. It has not been formally recognised by the Clay Mathematics Institute; OpenAI says it will not claim the prize; and the author of the official problem statement credited the human mathematicians whose earlier work it built on, while one of them has publicly disputed how that work was used. Treat it as announced, significant, and unsettled.</p>`,
+ sources:"IMO 2024 silver (28/42, manual Lean translation, up to three days) and IMO 2025 gold (Gemini Deep Think, 35/42, natural language, officially certified): Google DeepMind's own announcements \u2014 primary. OpenAI also reported gold-level performance in 2025, not officially certified. Preprint shares: Jin, Ke and Sui, 'The Gold Rush in AI4Math', arXiv:2608.24961, covering 32,944 maths submissions 1 Mar to 20 Aug 2026 \u2014 primary. Jacobian counterexample credited to L. Alp\u00f6ge and Claude Fable 5, July 2026, and the August 2026 zeta-zeros result: as cited in arXiv:2603.15617 \u2014 secondary, announcements not read directly. Navier-Stokes: Quanta Magazine, Axios and CNBC reporting of OpenAI's 8 Sept 2026 announcement \u2014 secondary. Timeline adapted and corrected from a slide photographed at The AI Conference, 2026; its 'rumor of 100 more' and several entries that could not be identified are omitted."
 },
 {
  id:"S-003a", num:"1.5", title:"The frontier, as of 30 August 2026",
@@ -414,11 +471,11 @@ const CARDS = [
  sources:"Epoch AI frontier benchmark update, 27 Apr 2026, via TechJack Solutions summary; Digital Applied \u201CFrontier Models H1 2026 Retrospective\u201D, 15 May 2026; VentureBeat summary of Stanford AI Index 2026, Apr 2026; Digital Applied Frontier Model Release Velocity Index Q2 2026, Jul 2026. All four are secondary aggregators, not primary sources — flagged per \u00A716. Verify the MLE-bench and one-in-three figures against the Stanford AI Index itself, and the H1 deltas against Epoch AI directly, before external use."
 },
 {
- id:"S-003b", num:"1.5", title:"Export control stopped being an abstraction",
+ id:"S-003b", num:"1.5c", title:"Export control stopped being an abstraction",
  figure:null,
  body:`<p>In June 2026 Anthropic introduced a Mythos tier above Opus — Fable 5 and Mythos 5.</p>
  <p>On <strong>12 June 2026</strong> it suspended access to both under a US Department of Commerce export-control directive. The directive was lifted on 30 June and access was restored on <strong>1 July 2026</strong>.</p>`,
- depth:`<p>This is worth a card of its own because of what kind of event it is. Every other entry in this chapter is a capability event — someone built something that works better. This is a regulatory action that removed a frontier model from the market for nineteen days.</p>
+ depth:`<p>This is worth a slide of its own because of what kind of event it is. Every other entry in this chapter is a capability event — someone built something that works better. This is a regulatory action that removed a frontier model from the market for nineteen days.</p>
  <p>For anyone modelling this sector, that is a different risk category than the ones usually discussed. It is not about whether a lab can build the model, or fund it, or sell it. It is about whether it is permitted to ship it, and that variable can move in days rather than quarters.</p>
  <p>It also cuts across the open-versus-closed question that runs through Chapter 10. Export controls are enforceable against a hosted API in a way they are not enforceable against a weight file that has already been downloaded.</p>`,
  sources:"Anthropic's own statement on the June 2026 suspension and restoration. Dates as published."
@@ -439,7 +496,7 @@ const CARDS = [
 },
 {
  apparatus:true, label:"Glossary", title:"Chapter 1 — Glossary",
- figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Card</th></tr></thead><tbody>
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Slide</th></tr></thead><tbody>
  <tr><td>artificial intelligence</td><td>The whole field — all four eras, rules-based and learned alike</td><td>1.1</td></tr>
  <tr><td>symbolic AI</td><td>Hand-coded rules and logic; no learning from data</td><td>1.2</td></tr>
  <tr><td>machine learning</td><td>Systems that learn patterns from data instead of following written rules</td><td>1.2</td></tr>
@@ -449,24 +506,29 @@ const CARDS = [
  <tr><td>perceptron</td><td>The earliest artificial neuron, late 1950s</td><td>1.3</td></tr>
  <tr><td>backpropagation</td><td>Algorithm that trains a network by adjusting every weight to shrink its error</td><td>1.3</td></tr>
  <tr><td>AI winter</td><td>Period when funding and interest collapsed after AI underdelivered</td><td>1.3</td></tr>
- <tr><td>ImageNet</td><td>2009 dataset of 14 million labelled images; the contest AlexNet won</td><td>1.3</td></tr>
- <tr><td>GPU</td><td>Chip built for parallel arithmetic; suits the matrix maths networks need</td><td>1.3</td></tr>
- <tr><td>CUDA</td><td>NVIDIA's 2007 platform making GPUs programmable for general mathematics</td><td>1.3</td></tr>
- <tr><td>discriminative model</td><td>Classifies its input rather than producing new output. AlexNet is one</td><td>1.3</td></tr>
+ <tr><td>ImageNet</td><td>2009 dataset of 14 million labelled images; the contest AlexNet won</td><td>1.3b</td></tr>
+ <tr><td>GPU</td><td>Chip built for parallel arithmetic; suits the matrix maths networks need</td><td>1.3b</td></tr>
+ <tr><td>CUDA</td><td>NVIDIA's 2007 platform making GPUs programmable for general mathematics</td><td>1.3b</td></tr>
+ <tr><td>discriminative model</td><td>Classifies its input rather than producing new output. AlexNet is one</td><td>1.3b</td></tr>
  <tr><td>recurrent neural network</td><td>Reads a sequence one step at a time, carrying a running summary forward</td><td>1.4</td></tr>
  <tr><td>LSTM</td><td>RNN variant with gates controlling what to keep and discard; longer context</td><td>1.4</td></tr>
  <tr><td>transformer</td><td>2017 architecture whose training is fully parallel across many chips</td><td>1.4</td></tr>
  <tr><td>attention</td><td>Re-weighing which parts of the input matter for the next prediction</td><td>1.4</td></tr>
- <tr><td>self-supervised pretraining</td><td>Predicting the next word, so any text becomes its own training label</td><td>1.4</td></tr>
- <tr><td>scaling laws</td><td>More data plus more compute produces predictably better models</td><td>1.4</td></tr>
+ <tr><td>self-supervised pretraining</td><td>Predicting the next word, so any text becomes its own training label</td><td>1.4b</td></tr>
+ <tr><td>scaling laws</td><td>More data plus more compute produces predictably better models</td><td>1.4b</td></tr>
  <tr><td>parameter</td><td>One of the learned numbers inside a model; counted in billions or trillions</td><td>1.4</td></tr>
- <tr><td>RLHF</td><td>Reinforcement learning from human feedback; turns a predictor into an assistant</td><td>1.4</td></tr>
+ <tr><td>RLHF</td><td>Reinforcement learning from human feedback; turns a predictor into an assistant</td><td>1.4c</td></tr>
+ <tr><td>time horizon</td><td>Length of task, in human working time, a model completes at a stated reliability</td><td>1.4d</td></tr>
+ <tr><td>doubling time</td><td>How long a growing quantity takes to double. About 4–7 months for time horizon</td><td>1.4d</td></tr>
+ <tr><td>IMO</td><td>International Mathematical Olympiad. AI reached silver in 2024 and gold in 2025</td><td>1.4e</td></tr>
+ <tr><td>Lean</td><td>A formal proof language. A computer checks every step, so a proof is right or rejected</td><td>1.4e</td></tr>
+ <tr><td>Millennium Prize Problems</td><td>Seven problems named in 2000, $1 million each. Only one officially solved, by a human</td><td>1.4e</td></tr>
  <tr><td>frontier model</td><td>A lab's most capable current model, at the edge of what exists</td><td>1.5</td></tr>
  <tr><td>open-weight model</td><td>A model whose weight file the lab publishes for download</td><td>1.5</td></tr>
  <tr><td>benchmark saturation</td><td>Top models scoring close enough together that a benchmark stops separating them</td><td>1.5b</td></tr>
  <tr><td>agentic benchmark</td><td>Scores multi-step, tool-using task completion rather than single-answer knowledge</td><td>1.5b</td></tr>
  </tbody></table>`,
- body:`<p>Terms this chapter owns. Later chapters reference them by card number rather than redefining.</p>`
+ body:`<p>Terms this chapter owns. Later chapters reference them by slide number rather than redefining.</p>`
 },
 {
  apparatus:true, label:"Companies", title:"Chapter 1 — Companies and organisations",
@@ -493,7 +555,11 @@ const CARDS = [
  <tr><td>Microsoft</td><td>Nasdaq: MSFT</td><td>Azure capacity plus the OpenAI relationship; principal channel into enterprise IT</td></tr>
  <tr><td>Hugging Face</td><td>Private</td><td>Where open weights are distributed and discovered</td></tr>
  <tr><td>Epoch AI</td><td>Non-commercial</td><td>Frontier benchmark tracking; source of the MMLU-Pro saturation figure</td></tr>
- <tr><td>Gartner</td><td>NYSE: IT</td><td>Source of both figures on the deployment card</td></tr>
+ <tr><td>METR</td><td>Non-commercial</td><td>Independent measurement of AI task-length time horizons, 1.4d</td></tr>
+ <tr><td>Google DeepMind</td><td>Division of Alphabet, Nasdaq: GOOGL</td><td>AlphaProof (IMO silver, 2024) and Gemini Deep Think (IMO gold, 2025), 1.4e</td></tr>
+ <tr><td>OpenAI</td><td>Private</td><td>Announced the Navier–Stokes blow-up proof, Sept 2026 — unverified, 1.4e <em>(also 1.5)</em></td></tr>
+ <tr><td>Clay Mathematics Institute</td><td>Non-commercial</td><td>Sets and awards the Millennium Prize Problems, 1.4e</td></tr>
+ <tr><td>Gartner</td><td>NYSE: IT</td><td>Source of both figures on the deployment slide (1.6)</td></tr>
  <tr><td>McKinsey &amp; Company</td><td>Private</td><td>The $2.6–4.4T agentic-value estimate</td></tr>
  <tr><td>Deloitte</td><td>Private</td><td>Physical-AI adoption survey</td></tr>
  </tbody></table>`,
@@ -502,7 +568,8 @@ const CARDS = [
 {
  apparatus:true, label:"What's next", title:"End of Chapter 1",
  figure:null,
- body:`<p>That's the eleven cards. The argument, in one line: the ideas were old, the constraint was physical, and what lifted it in 2012 and again in 2017 is still what the rest of the course is about.</p>
+ body:`<p>Thirteen slides. The argument, in one line: the ideas were old, the constraint was physical, and what lifted it in 2012 and again in 2017 is still what the rest of the course is about — and every measure of progress since then, from the length of task a model can finish to the mathematics it can do, says the curve has not yet bent.</p>
+ <p><strong>Numbering changed at v5.2.</strong> Four slides that had shared a number with their neighbour now carry a suffix — 1.3b, 1.4b, 1.4c and 1.5c — and two new slides sit at 1.4d and 1.4e. Every number that previously pointed at one slide still points at the same one.</p>
  <p><strong>Chapter 2 — Inside the model: how it actually works.</strong> A neuron, a network, the pipeline that turns your words into an answer, what attention is doing, why weights are written in training and read-only at inference, and why a model's knowledge lags its release date.</p>
  <p class="nextlink"><a href="understanding-ai-ch2-reader.html">Continue to Chapter 2 →</a></p>
  <div class="btnrow">
@@ -535,7 +602,7 @@ function render(){
   stage.innerHTML =
     '<h1 class="cardtitle">' + c.title + '</h1>' +
     (c.apparatus ? '' :
-      '<p class="cardid">' + c.num + ' · ' + c.id + ' — card ' + (i+1) + ' of ' + CONTENT + '</p>') +
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — slide ' + (i+1) + ' of ' + CONTENT + '</p>') +
     (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
     '<div class="body">' + c.body + '</div>' +
     (c.band ? '<div class="band">' + c.band + '</div>' : '') +
@@ -567,7 +634,7 @@ function render(){
     const b = document.createElement('button');
     b.type = 'button';
     b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
-    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Slide ' + (n+1) + ': ' + c2.title));
     if (n === i) b.setAttribute('aria-current','true');
     let cls = c2.apparatus ? 'app' : '';
     if (seen.has(n) && n !== i) cls += ' seen';
@@ -597,12 +664,12 @@ document.addEventListener('keydown', function(e){
 });
 
 function promptFor(card, q){
-  return 'Understanding AI — Chapter 1, card ' + card.num + ' (' + card.id + '), "' +
+  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
     card.title + '".\n\nMy question: ' + q;
 }
 
 const CH2_PROMPT =
-'Understanding AI — I have finished Chapter 1 in the card reader.\n\n' +
+'Understanding AI — I have finished Chapter 1 in the slide reader.\n\n' +
 'Let\'s develop Chapter 2, "Inside the model: how it actually works", the same way. ' +
 'Per the §11 inventory it covers outline slides 5, the single-neuron zoom, 6, attention, ' +
 '12, 7 and 8 — a neuron, a network, the pipeline from words to an answer, what attention ' +
@@ -629,7 +696,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 1\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 1\nDeck version: v5.3 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });
@@ -656,6 +723,36 @@ document.getElementById('copyq').onclick = function(){
 };
 
 document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+
+/* Contents panel — generated from CARDS, so it cannot drift from the slides */
+(function(){
+  const list = document.getElementById('toclist');
+  const toc = document.getElementById('toc');
+  document.getElementById('tocsum').textContent = '\u2014 ' + CONTENT + ' slides';
+  CARDS.forEach(function(c, n){
+    const li = document.createElement('li');
+    if (c.apparatus) li.className = 'app';
+    const b = document.createElement('button');
+    b.type = 'button';
+    const num = document.createElement('span'); num.className = 'n';
+    num.textContent = c.apparatus ? '' : c.num;
+    const t = document.createElement('span');
+    t.textContent = c.apparatus ? c.label : c.title.replace(/<[^>]+>/g, '');
+    b.appendChild(num); b.appendChild(t);
+    b.onclick = function(){ i = n; render(); toc.open = false; };
+    li.appendChild(b); list.appendChild(li);
+  });
+})();
+function tocMark(){
+  const items = document.querySelectorAll('#toclist li');
+  items.forEach(function(li, n){
+    li.classList.toggle('cur', n === i);
+    li.classList.toggle('seen', seen.has(n) && n !== i);
+  });
+}
+const _renderBase = render;
+render = function(){ _renderBase(); tocMark(); };
 
 render();
 </script>

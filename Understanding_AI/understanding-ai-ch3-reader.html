@@ -116,6 +116,24 @@
     nav.bar .inner{padding:10px 18px;gap:10px}
     h1.cardtitle{font-size:20px}
   }
+
+  details.toc{border:1px solid var(--rule);margin:-12px 0 24px;padding:0 14px;background:#fff}
+  details.toc summary{cursor:pointer;color:var(--navy);font-size:14px;font-weight:bold;padding:9px 0;list-style:none}
+  details.toc summary::-webkit-details-marker{display:none}
+  details.toc summary::before{content:"\25B8  ";color:var(--blue)}
+  details.toc[open] summary::before{content:"\25BE  "}
+  details.toc summary span{font-weight:normal;color:var(--muted)}
+  ol.toclist{list-style:none;margin:2px 0 12px;padding:0;column-count:2;column-gap:28px}
+  ol.toclist li{break-inside:avoid;margin:0 0 3px}
+  ol.toclist button{display:flex;gap:8px;width:100%;text-align:left;border:none;background:none;
+    padding:4px 6px;font-size:14px;line-height:1.35;color:var(--ink);border-radius:2px}
+  ol.toclist button:hover{background:var(--wash);color:var(--ink)}
+  ol.toclist button .n{flex:0 0 3.4em;color:var(--blue);font-weight:bold}
+  ol.toclist li.app button{color:var(--muted);font-style:italic}
+  ol.toclist li.app button .n{color:var(--muted)}
+  ol.toclist li.cur button{background:var(--wash);box-shadow:inset 3px 0 0 var(--navy)}
+  ol.toclist li.seen button .n::after{content:" \2713";color:var(--muted);font-weight:normal}
+  @media (max-width:640px){ ol.toclist{column-count:1} }
 </style>
 </head>
 <body>
@@ -123,8 +141,10 @@
 <div class="shell">
   <header class="top">
     <div class="ch"><a href="index.html" class="backlink">&larr; All chapters</a> <span class="sep">·</span> Chapter 3 — The hardware and the supply chain</div>
-    <div class="meta">v2.1 · 30 Aug 2026</div>
+    <div class="meta">v5.3 · 2 Oct 2026</div>
   </header>
+  <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
+
 
   <main id="stage" tabindex="-1"></main>
 
@@ -482,7 +502,7 @@ const CARDS = [
  <li><strong>A kernel</strong> is the unit it all runs as: a small program that performs one operation — a matrix multiply, an attention step — launched across thousands of GPU threads at once. A model's forward pass is a long sequence of kernel launches. "Hand-tuned kernels" means someone wrote a faster version of one of those small programs for one specific chip.</li>
  </ul>
  <p><strong>What CUDA is actually operating on:</strong> the numbers, not the model. It has no representation of your model as a thing, and no notion of what any weight means. PyTorch turns the model into an ordered list of operations; CUDA supplies a kernel for each one and runs it over the arrays of numbers from 2.4. Below CUDA the driver has translated those kernels into machine code, and below that it is binary — so the ones and zeros are downstream of CUDA, not what CUDA works with directly. The algorithm lives in the framework; CUDA does the arithmetic it is told to do, very fast.</p>`,
- depth:`<p>The reason this card exists is that "NVIDIA makes the chips" is only half the position, and the weaker half. The layer diagram is the other half: five of the seven rows are NVIDIA's, and three of those five are software.</p>
+ depth:`<p>The reason this slide exists is that "NVIDIA makes the chips" is only half the position, and the weaker half. The layer diagram is the other half: five of the seven rows are NVIDIA's, and three of those five are software.</p>
  <p>For anyone trying to place where value accrues: the silicon rows are replicable — TSMC will fabricate a competitor's accelerator on the same node. The software rows are the accumulated output of nineteen years of kernel engineering, and they are not.</p>
  <p>The framework-versus-CUDA split is also why porting a model to other hardware is easier than it sounds and harder than it looks. Easier, because the model is defined in portable PyTorch and never mentions CUDA. Harder, because the kernels underneath it were tuned for one vendor's chips, and a correct-but-untuned kernel can be several times slower. Nothing needs rewriting; everything needs re-optimising. That distinction is the whole of 3.5.</p>`,
  sources:"NVIDIA CUDA Toolkit release notes 13.3 (Jun 2026) and CUDA Toolkit Archive."
@@ -503,7 +523,7 @@ const CARDS = [
  band:`What to watch: NVIDIA's pricing power rests on CUDA at least as much as on the chip. Adoption of Triton and ROCm inside production serving stacks is the leading indicator of margin pressure — and note that serving is precisely where the gap has already closed most.`,
  depth:`<p>The distinction the headline numbers obscure: the gap is nearly closed for inference and materially open for training. That is not a small asymmetry, because inference is the larger and faster-growing share of total compute spend, and it is the workload most sensitive to cost per token. A challenger does not need to win training to take revenue.</p>
  <p>Two 2026 developments to keep in view. AMD announced ROCm.AI at its Advancing AI event, pairing a kernel-writing AI agent with an orchestrator and claiming a verified 21.8% throughput gain on shipping silicon, with availability from August 2026 — automating exactly the hand-tuning that constitutes the moat. Against that, one analyst house documented AMD's own internal cluster shortage causing regressions in its vLLM work: the company is compute-constrained in closing a software gap, which is a genuinely awkward position.</p>
- <p>Treat every throughput figure on this card as benchmark- and vendor-dependent. The 90–95% range recurs across many independent write-ups, which is reassuring, but they may share sources.</p>`,
+ <p>Treat every throughput figure on this slide as benchmark- and vendor-dependent. The 90–95% range recurs across many independent write-ups, which is reassuring, but they may share sources.</p>`,
  sources:"Thunder Compute ROCm vs CUDA (Jul 2026, updated within the last week); Spheron (Apr 2026); Convly (Jul 2026); GPUAdvisor (Apr 2026) \u2014 all secondary, though all cite MLPerf Inference 6.0, a standardised primary benchmark. ROCm.AI and the cluster shortage: TechTimes summary of SemiAnalysis, Jul 2026 \u2014 secondary reporting a paywalled primary."
 },
 {
@@ -544,7 +564,7 @@ const CARDS = [
  <li><strong>NVIDIA alone is estimated to hold about 60% of 2026 CoWoS capacity</strong> — roughly 595,000 wafers — with the top three customers together above 85%.</li>
  </ul>`,
  band:`Capacity announcements from any single link only matter when both links move together. A doubling of HBM output against flat CoWoS capacity ships no additional accelerators.`,
- depth:`<p>This is the card that explains why "the memory makers are adding capacity" is not by itself good news for accelerator supply. Two constrained steps in series means output is set by whichever is tighter, and adding to the other one changes nothing.</p>
+ depth:`<p>This is the slide that explains why "the memory makers are adding capacity" is not by itself good news for accelerator supply. Two constrained steps in series means output is set by whichever is tighter, and adding to the other one changes nothing.</p>
  <p>The 60% allocation figure is the more strategically interesting number. One customer holding that share of a chokepoint is not a market — it is a queue with a preferred customer at the front, and it goes some way to explaining why competing accelerators can be competitive on paper and still scarce in practice.</p>
  <p>Watch also for the successor. TSMC is developing CoPoS, a panel-level packaging platform, with pilot production targeted for mid-2027 — the constraint moving rather than disappearing.</p>`,
  sources:"TSMC CEO C.C. Wei, annual shareholders' meeting, 4 Jun 2026 (sold out through 2026) \u2014 primary, via trade press. Capacity trajectory and the 20%\u219210% gap estimate: TrendForce, 15 Jun 2026, citing Economic Daily News and institutional investors \u2014 secondary, and an estimate. The 60% NVIDIA allocation and the 595,000-wafer figure trace to sell-side analysis reproduced across outlets, not to TSMC or NVIDIA \u2014 treat as indicative. Capacity targets vary by source between 120,000 and 140,000 wafers per month."
@@ -605,14 +625,14 @@ const CARDS = [
  <li>Nobody credible expects relief before <strong>late 2027, and several say 2028</strong>.</li>
  </ul>`,
  band:`The bottleneck in the data centre and the price of a graphics card are the same fact observed at two ends of one supply chain.`,
- depth:`<p>For a general audience this is the most persuasive card in the chapter, because it converts an abstract supply-chain argument into something already visible in a household budget.</p>
+ depth:`<p>For a general audience this is the most persuasive slide in the chapter, because it converts an abstract supply-chain argument into something already visible in a household budget.</p>
  <p>Two things worth drawing out. First, this is a <em>reallocation</em>, not a shortage in the usual sense — no factory burned down. The wafers exist and are being pointed at the more profitable product, exactly as slide 3.10 describes. Second, note who absorbs it. The consumer market has no bargaining power against hyperscaler demand, so it functions as the residual claimant on whatever capacity is left. That is a durable structural position, not a temporary squeeze.</p>
  <p>The related detail on slide 3.1: this is why local inference on consumer hardware got harder rather than easier through 2026, despite better small models. The models improved and the cards to run them on got scarcer.</p>`,
- sources:"All figures on this card are secondary. IDC's 70%-of-memory-output figure and its 2026 supply-growth forecasts come via IDC's own blog (Aug 2026) and trade summaries \u2014 the closest to primary here. DRAM contract price moves: TrendForce data via multiple outlets. Retail prices, the 3D Center index, GPU street prices and console pricing: Tech Insider (Aug 2026), Aliteq (Aug 2026), Barrack AI (Mar 2026), Compute Market (Apr 2026) \u2014 trade and enthusiast press, directionally consistent but individually unverified. Verify anything quoted externally against IDC or TrendForce directly."
+ sources:"All figures on this slide are secondary. IDC's 70%-of-memory-output figure and its 2026 supply-growth forecasts come via IDC's own blog (Aug 2026) and trade summaries \u2014 the closest to primary here. DRAM contract price moves: TrendForce data via multiple outlets. Retail prices, the 3D Center index, GPU street prices and console pricing: Tech Insider (Aug 2026), Aliteq (Aug 2026), Barrack AI (Mar 2026), Compute Market (Apr 2026) \u2014 trade and enthusiast press, directionally consistent but individually unverified. Verify anything quoted externally against IDC or TrendForce directly."
 },
 {
  apparatus:true, label:"Glossary", title:"Chapter 3 — Glossary",
- figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Card</th></tr></thead><tbody>
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Slide</th></tr></thead><tbody>
  <tr><td>VRAM</td><td>Memory on a graphics card. The hard limit on what model you can run locally</td><td>3.1</td></tr>
  <tr><td>quantization</td><td>Compressing weights to lower precision so a bigger model fits in less memory</td><td>3.1</td></tr>
  <tr><td>accelerator</td><td>The data-centre GPU or equivalent chip that does the model arithmetic</td><td>3.3</td></tr>
@@ -706,9 +726,9 @@ const CARDS = [
  body:`<p>Twelve slides. The argument, in one line: inference is a memory problem, memory is made by three companies, packaging is dominated by one, the machines that make any of it possible come from one supplier — and those constraints sit in series, which is why the buildout is gated and why your own hardware got expensive.</p>
  <p>This is the chapter that decays fastest. Every figure carries a date and a sourcing note for that reason. Before quoting anything here outside the firm, check it.</p>
  <p><strong>Chapter 4 — Building reliably with an unreliable model.</strong> If the model samples from a distribution and cannot tell a right answer from a wrong one (2.5), how does anyone build something dependable on top of it? The model steers and deterministic code executes; you move the error rather than deleting it; and the clarification gap.</p>
- <p class="warn">Chapter 4 is not built in this format yet. The button below copies a prompt that starts the work in Claude — drafted in markdown for your approval first, then built as a reader like this one.</p>
+ <p class="nextlink"><a href="understanding-ai-ch4-reader.html">Continue to Chapter 4 →</a></p>
+ <p class="hint2">Chapters are added as the subject moves. The numbering is for convenience, not sequence, and no chapter is the last one.</p>
  <div class="btnrow">
-   <button id="ch2btn">Copy prompt to start Chapter 4</button>
    <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
    <span id="say2" class="said"></span>
  </div>
@@ -770,7 +790,7 @@ function render(){
     const b = document.createElement('button');
     b.type = 'button';
     b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
-    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Slide ' + (n+1) + ': ' + c2.title));
     if (n === i) b.setAttribute('aria-current','true');
     let cls = c2.apparatus ? 'app' : '';
     if (seen.has(n) && n !== i) cls += ' seen';
@@ -800,12 +820,12 @@ document.addEventListener('keydown', function(e){
 });
 
 function promptFor(card, q){
-  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
+  return 'Understanding AI — Chapter 3, slide ' + card.num + ' (' + card.id + '), "' +
     card.title + '".\n\nMy question: ' + q;
 }
 
 const CH2_PROMPT =
-'Understanding AI \u2014 I have finished Chapter 3 in the card reader.\n\n' +
+'Understanding AI \u2014 I have finished Chapter 3 in the slide reader.\n\n' +
 'Let\'s develop Chapter 4, "Building reliably with an unreliable model", the same way. ' +
 'Per the \u00A711 inventory it covers outline slides 13, 14, 15 and 16 \u2014 the LLM steers ' +
 'while deterministic code executes, how that moves the error rather than deleting it, the ' +
@@ -832,7 +852,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 3\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 3\nDeck version: v5.3 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });
@@ -859,6 +879,36 @@ document.getElementById('copyq').onclick = function(){
 };
 
 document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+
+/* Contents panel — generated from CARDS, so it cannot drift from the slides */
+(function(){
+  const list = document.getElementById('toclist');
+  const toc = document.getElementById('toc');
+  document.getElementById('tocsum').textContent = '\u2014 ' + CONTENT + ' slides';
+  CARDS.forEach(function(c, n){
+    const li = document.createElement('li');
+    if (c.apparatus) li.className = 'app';
+    const b = document.createElement('button');
+    b.type = 'button';
+    const num = document.createElement('span'); num.className = 'n';
+    num.textContent = c.apparatus ? '' : c.num;
+    const t = document.createElement('span');
+    t.textContent = c.apparatus ? c.label : c.title.replace(/<[^>]+>/g, '');
+    b.appendChild(num); b.appendChild(t);
+    b.onclick = function(){ i = n; render(); toc.open = false; };
+    li.appendChild(b); list.appendChild(li);
+  });
+})();
+function tocMark(){
+  const items = document.querySelectorAll('#toclist li');
+  items.forEach(function(li, n){
+    li.classList.toggle('cur', n === i);
+    li.classList.toggle('seen', seen.has(n) && n !== i);
+  });
+}
+const _renderBase = render;
+render = function(){ _renderBase(); tocMark(); };
 
 render();
 </script>

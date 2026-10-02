@@ -116,6 +116,24 @@
     nav.bar .inner{padding:10px 18px;gap:10px}
     h1.cardtitle{font-size:20px}
   }
+
+  details.toc{border:1px solid var(--rule);margin:-12px 0 24px;padding:0 14px;background:#fff}
+  details.toc summary{cursor:pointer;color:var(--navy);font-size:14px;font-weight:bold;padding:9px 0;list-style:none}
+  details.toc summary::-webkit-details-marker{display:none}
+  details.toc summary::before{content:"\25B8  ";color:var(--blue)}
+  details.toc[open] summary::before{content:"\25BE  "}
+  details.toc summary span{font-weight:normal;color:var(--muted)}
+  ol.toclist{list-style:none;margin:2px 0 12px;padding:0;column-count:2;column-gap:28px}
+  ol.toclist li{break-inside:avoid;margin:0 0 3px}
+  ol.toclist button{display:flex;gap:8px;width:100%;text-align:left;border:none;background:none;
+    padding:4px 6px;font-size:14px;line-height:1.35;color:var(--ink);border-radius:2px}
+  ol.toclist button:hover{background:var(--wash);color:var(--ink)}
+  ol.toclist button .n{flex:0 0 3.4em;color:var(--blue);font-weight:bold}
+  ol.toclist li.app button{color:var(--muted);font-style:italic}
+  ol.toclist li.app button .n{color:var(--muted)}
+  ol.toclist li.cur button{background:var(--wash);box-shadow:inset 3px 0 0 var(--navy)}
+  ol.toclist li.seen button .n::after{content:" \2713";color:var(--muted);font-weight:normal}
+  @media (max-width:640px){ ol.toclist{column-count:1} }
 </style>
 </head>
 <body>
@@ -123,8 +141,10 @@
 <div class="shell">
   <header class="top">
     <div class="ch"><a href="index.html" class="backlink">&larr; All chapters</a> <span class="sep">·</span> Chapter 4 — Building reliably with an unreliable model</div>
-    <div class="meta">v2.1 · 30 Aug 2026</div>
+    <div class="meta">v5.3 · 2 Oct 2026</div>
   </header>
+  <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
+
 
   <main id="stage" tabindex="-1"></main>
 
@@ -539,9 +559,9 @@ const CARDS = [
  body:`<p>Eleven slides. The argument, in one line: an LLM is interpretative and code is deterministic, so you shrink what the interpretative part is trusted with, hand every exact job to code you can check, and design what happens when the interpretation is wrong — because the error moves rather than disappearing.</p>
  <p>The clarification gap is the same story from the user's side. The model knows your request was ambiguous and answers anyway, because asking was trained out of it. Until that changes, ask it to state its assumptions.</p>
  <p><strong>Chapter 5 — Customizing a model.</strong> How you make a general model do your specific job: the ladder from prompting to retrieval to tool use to fine-tuning, what fine-tuning actually is and the methods available, a worked example end to end, and when not to bother.</p>
- <p class="warn">Chapter 5 is not built in this format yet. The button below copies a prompt that starts the work in Claude — drafted in markdown for your approval first, then built as a reader like this one.</p>
+ <p class="nextlink"><a href="understanding-ai-ch5-reader.html">Continue to Chapter 5 →</a></p>
+ <p class="hint2">Chapters are added as the subject moves. The numbering is for convenience, not sequence, and no chapter is the last one.</p>
  <div class="btnrow">
-   <button id="ch2btn">Copy prompt to start Chapter 5</button>
    <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
    <span id="say2" class="said"></span>
  </div>
@@ -603,7 +623,7 @@ function render(){
     const b = document.createElement('button');
     b.type = 'button';
     b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
-    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Slide ' + (n+1) + ': ' + c2.title));
     if (n === i) b.setAttribute('aria-current','true');
     let cls = c2.apparatus ? 'app' : '';
     if (seen.has(n) && n !== i) cls += ' seen';
@@ -633,12 +653,12 @@ document.addEventListener('keydown', function(e){
 });
 
 function promptFor(card, q){
-  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
+  return 'Understanding AI — Chapter 4, slide ' + card.num + ' (' + card.id + '), "' +
     card.title + '".\n\nMy question: ' + q;
 }
 
 const CH2_PROMPT =
-'Understanding AI \u2014 I have finished Chapter 4 in the card reader.\n\n' +
+'Understanding AI \u2014 I have finished Chapter 4 in the slide reader.\n\n' +
 'Let\'s develop Chapter 5, "Customizing a model", the same way. Per the \u00A711 inventory it ' +
 'covers outline slides 17, 18, 19 and 20 \u2014 the customization ladder from prompting to RAG ' +
 'to tool use to fine-tuning, what fine-tuning is and the methods, a worked example end to ' +
@@ -665,7 +685,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 4\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 4\nDeck version: v5.3 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });
@@ -692,6 +712,36 @@ document.getElementById('copyq').onclick = function(){
 };
 
 document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+
+/* Contents panel — generated from CARDS, so it cannot drift from the slides */
+(function(){
+  const list = document.getElementById('toclist');
+  const toc = document.getElementById('toc');
+  document.getElementById('tocsum').textContent = '\u2014 ' + CONTENT + ' slides';
+  CARDS.forEach(function(c, n){
+    const li = document.createElement('li');
+    if (c.apparatus) li.className = 'app';
+    const b = document.createElement('button');
+    b.type = 'button';
+    const num = document.createElement('span'); num.className = 'n';
+    num.textContent = c.apparatus ? '' : c.num;
+    const t = document.createElement('span');
+    t.textContent = c.apparatus ? c.label : c.title.replace(/<[^>]+>/g, '');
+    b.appendChild(num); b.appendChild(t);
+    b.onclick = function(){ i = n; render(); toc.open = false; };
+    li.appendChild(b); list.appendChild(li);
+  });
+})();
+function tocMark(){
+  const items = document.querySelectorAll('#toclist li');
+  items.forEach(function(li, n){
+    li.classList.toggle('cur', n === i);
+    li.classList.toggle('seen', seen.has(n) && n !== i);
+  });
+}
+const _renderBase = render;
+render = function(){ _renderBase(); tocMark(); };
 
 render();
 </script>

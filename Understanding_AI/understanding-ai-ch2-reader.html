@@ -21,7 +21,7 @@
   header.top{display:flex;justify-content:space-between;align-items:baseline;
     border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:26px}
   header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
-  header.top .ch a.backlink{color:var(--blue);text-decoration:underline;text-underline-offset:3px;font-weight:normal}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
   header.top .ch a.backlink:hover{text-decoration:underline}
   header.top .ch .sep{color:var(--muted);font-weight:normal}
   header.top .meta{color:var(--muted);font-size:13px}
@@ -116,22 +116,42 @@
     nav.bar .inner{padding:10px 18px;gap:10px}
     h1.cardtitle{font-size:20px}
   }
+
+  details.toc{border:1px solid var(--rule);margin:-12px 0 24px;padding:0 14px;background:#fff}
+  details.toc summary{cursor:pointer;color:var(--navy);font-size:14px;font-weight:bold;padding:9px 0;list-style:none}
+  details.toc summary::-webkit-details-marker{display:none}
+  details.toc summary::before{content:"\25B8  ";color:var(--blue)}
+  details.toc[open] summary::before{content:"\25BE  "}
+  details.toc summary span{font-weight:normal;color:var(--muted)}
+  ol.toclist{list-style:none;margin:2px 0 12px;padding:0;column-count:2;column-gap:28px}
+  ol.toclist li{break-inside:avoid;margin:0 0 3px}
+  ol.toclist button{display:flex;gap:8px;width:100%;text-align:left;border:none;background:none;
+    padding:4px 6px;font-size:14px;line-height:1.35;color:var(--ink);border-radius:2px}
+  ol.toclist button:hover{background:var(--wash);color:var(--ink)}
+  ol.toclist button .n{flex:0 0 3.4em;color:var(--blue);font-weight:bold}
+  ol.toclist li.app button{color:var(--muted);font-style:italic}
+  ol.toclist li.app button .n{color:var(--muted)}
+  ol.toclist li.cur button{background:var(--wash);box-shadow:inset 3px 0 0 var(--navy)}
+  ol.toclist li.seen button .n::after{content:" \2713";color:var(--muted);font-weight:normal}
+  @media (max-width:640px){ ol.toclist{column-count:1} }
 </style>
 </head>
 <body>
 
 <div class="shell">
   <header class="top">
-    <div class="ch"><a href="index.html" class="backlink">&larr; All chapters</a> <span class="sep">·</span> Chapter 2 — Inside the model: how it actually works</div>
-    <div class="meta">v2.1 · 30 Aug 2026</div>
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Chapter 2 — Inside the model: how it actually works</div>
+    <div class="meta">v5.3 · 2 Oct 2026</div>
   </header>
+  <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
+
 
   <main id="stage" tabindex="-1"></main>
 
   <section class="ask">
-    <h2>Ask about this card</h2>
-    <p class="hint">This reader has the cards but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the card ID so the answer lands in the right place in your notes.</p>
-    <textarea id="q" placeholder="What's your question about this card?"></textarea>
+    <h2>Ask about this slide</h2>
+    <p class="hint">This reader has the slides but not a model. Type a question, copy it, and paste it into Claude with the Understanding AI skill — it arrives tagged with the slide ID so the answer lands in the right place in your notes.</p>
+    <textarea id="q" placeholder="What's your question about this slide?"></textarea>
     <div class="btnrow">
       <button id="copyq">Copy question for Claude</button>
       <button id="copyall" class="ghost">Copy all questions from this session</button>
@@ -393,7 +413,7 @@ const CARDS = [
  </ul>
  <p>That is the whole unit. Multiply, add, then apply one simple rule. A frontier model is hundreds of billions of these numbers, arranged so the output of one becomes the input of the next.</p>`,
  depth:`<p>The activation function is the part that looks trivial and is not. Without it, every layer would be a weighted sum of weighted sums — which collapses algebraically into a single weighted sum. A hundred stacked layers would have exactly the power of one. The non-linearity is what makes depth mean anything at all, and it is why "deep learning" is a claim about capability rather than just about size.</p>
- <p>Worth being precise about what a weight is, because everything downstream depends on it. It is one number. Not a rule, not a fact, not a concept. When card 2.8 says weights are frozen at inference, it means these numbers — every one of them — stop changing.</p>
+ <p>Worth being precise about what a weight is, because everything downstream depends on it. It is one number. Not a rule, not a fact, not a concept. When slide 2.8 says weights are frozen at inference, it means these numbers — every one of them — stop changing.</p>
  <p>The scale is the part that resists intuition. A single neuron doing 700 multiplications and one comparison is arithmetic you could do by hand. Nothing anywhere in the system is more complicated than this; there is simply an enormous amount of it, run very fast.</p>
  <p><strong>How much of it:</strong> the working rule is two operations per parameter per token — one multiply, one add. A 70-billion-parameter model therefore does roughly <strong>140 billion operations to produce a single token</strong>. A 500-word answer is about 700 tokens, so on the order of <strong>100 trillion operations for one reply</strong> — and reading your question costs the same per token again. Frontier models hold far more parameters but activate only a fraction of them per token, so the figure lands in the same range rather than scaling with the headline size. Order of magnitude, not a measurement: it ignores attention, which grows with context length, and the arithmetic around the KV cache (2.7).</p>`,
  sources:"Established ML fundamentals; no dated claims."
@@ -410,7 +430,7 @@ const CARDS = [
  </ul>
  <p>Nobody programmed the intermediate features. They are a by-product of training, which is the next card.</p>`,
  depth:`<p>"Hidden" means only that the layer is neither the input nor the output — it is not hidden in any deeper sense. The name has caused an unreasonable amount of confusion.</p>
- <p>The claim that the network "learns its own features" is the one that separates this from the machine-learning era on card 1.2. In the 1990s a person decided which properties of the data mattered and wrote code to extract them; the model only weighed features a human had chosen. Deep networks removed that step. This is genuine, and it is also the source of the interpretability problem — the features are real and useful, and nobody specified them, so nobody has a list of what they are.</p>
+ <p>The claim that the network "learns its own features" is the one that separates this from the machine-learning era on slide 1.2. In the 1990s a person decided which properties of the data mattered and wrote code to extract them; the model only weighed features a human had chosen. Deep networks removed that step. This is genuine, and it is also the source of the interpretability problem — the features are real and useful, and nobody specified them, so nobody has a list of what they are.</p>
  <p>Do not over-read the edges-to-shapes-to-objects story. It is well evidenced in image networks and reported honestly. In language models the picture is far messier: individual neurons respond to many unrelated things at once, and the tidy hierarchy is not what researchers find.</p>`,
  sources:"Established ML fundamentals. The feature-hierarchy description is best evidenced in computer vision; language-model interpretability findings are more equivocal."
 },
@@ -425,8 +445,8 @@ const CARDS = [
  <li><strong>Update.</strong> Nudge every weight a small step in the direction that would have reduced the error.</li>
  </ul>
  <p>Repeat across billions of examples. No individual step is clever. The result is.</p>`,
- depth:`<p>Backpropagation is the 1986 algorithm from card 1.3 — the one that sat unused for twenty-five years because nobody had the compute to run it at depth. This loop is what card 1.3 means by "the theory was largely there."</p>
- <p>Two things worth carrying into the cost chapters. First, <strong>training is the expensive direction</strong>, and it is expensive because of the update step: every weight is read, and then written. Card 2.8 is about why inference, which only reads, is a fundamentally lighter operation. Second, the "small step" is deliberately small. Too large and the model overshoots and destabilises; too small and training takes longer than the budget allows. That step size is the <strong>learning rate</strong>, and tuning it is one of the more expensive kinds of expertise in the field.</p>
+ depth:`<p>Backpropagation is the 1986 algorithm from slide 1.3 — the one that sat unused for twenty-five years because nobody had the compute to run it at depth. This loop is what slide 1.3 means by "the theory was largely there."</p>
+ <p>Two things worth carrying into the cost chapters. First, <strong>training is the expensive direction</strong>, and it is expensive because of the update step: every weight is read, and then written. Slide 2.8 is about why inference, which only reads, is a fundamentally lighter operation. Second, the "small step" is deliberately small. Too large and the model overshoots and destabilises; too small and training takes longer than the budget allows. That step size is the <strong>learning rate</strong>, and tuning it is one of the more expensive kinds of expertise in the field.</p>
  <p>What the loop does not contain is any notion of understanding, or truth, or intent. It contains a number that goes down. Everything the model does is downstream of making that number go down on the data it was shown — which is also a fair summary of why models inherit the biases and errors in that data.</p>`,
  sources:"Rumelhart, Hinton and Williams 1986 (backpropagation). Established ML fundamentals."
 },
@@ -449,11 +469,11 @@ const CARDS = [
 {
  id:"S-006b", num:"2.5", title:"The forward pass, and what \u201Cpredict\u201D means",
  figure:SVG_FORWARD,
- body:`<p>The embeddings are multiplied through the network's layers — the same forward pass as card 2.2, at a scale of billions of weights, with <strong>attention</strong> at each layer re-weighing which earlier tokens matter. This is where essentially all the compute goes.</p>
+ body:`<p>The embeddings are multiplied through the network's layers — the same forward pass as slide 2.2, at a scale of billions of weights, with <strong>attention</strong> at each layer re-weighing which earlier tokens matter. This is where essentially all the compute goes.</p>
  <p>The arithmetic is <strong>matrix multiplication</strong>: a matrix is just a grid of numbers, and multiplying two of them means taking each row of one against each column of the other, multiplying the pairs and adding the results. One number out per row-column pair. That is the entire operation — and every one of those pairs is independent of the others, which is why it suits a chip with thousands of small cores rather than a few fast ones.</p>
  <p>What comes out is not a word. It is a score for <strong>every token in the vocabulary</strong> — all hundred-thousand-plus of them — converted by a function called <strong>softmax</strong> into probabilities that sum to 1.</p>
  <p>The model does not decide what to say. It produces a probability distribution over what could come next.</p>`,
- depth:`<p>This is the card that explains most model behaviour people find surprising.</p>
+ depth:`<p>This is the slide that explains most model behaviour people find surprising.</p>
  <p><strong>Hallucination</strong> is not a malfunction on this picture. The model always produces a distribution and always samples from it. A confident wrong answer and a confident right answer are produced by the identical mechanism; nothing in the machinery distinguishes them, which is why "just make it say when it doesn't know" is much harder than it sounds. Chapter 4 is about building around this rather than fixing it.</p>
  <p><strong>Temperature</strong> is the dial on this distribution. Low temperature sharpens it toward the highest-scoring token, giving repeatable, conservative output. High temperature flattens it, giving variety and more errors. It is not a creativity setting in any deeper sense — it is how peaked the curve is before you sample from it.</p>
  <p>And every number here is stored as binary. The GPU runs arithmetic over these numbers. It does not execute your words as a program — a point worth holding onto in Chapter 4, where the distinction between the model choosing an action and code executing it does real work.</p>`,
@@ -473,7 +493,7 @@ const CARDS = [
 {
  id:"S-031", num:"2.7", title:"What attention is actually doing",
  figure:SVG_ATTN,
- body:`<p>Card 1.4 said attention re-weighs which parts of the input matter. Concretely:</p>
+ body:`<p>Slide 1.4 said attention re-weighs which parts of the input matter. Concretely:</p>
  <p>For each token being processed, the model compares it against every other token in the context and produces a weight for each — how relevant that other token is to this one right now. Those weights determine how much of each other token's information gets mixed in.</p>
  <ul>
  <li>The weights are computed <strong>from the content</strong>, not fixed in advance. Change the sentence and they change.</li>
@@ -491,7 +511,7 @@ const CARDS = [
 {
  id:"S-012", num:"2.8", title:"Weights: written in training, read-only at inference",
  figure:SVG_WEIGHTS,
- body:`<p>The weights are the billions of learned numbers from card 2.1. When they change, and when they do not, is the distinction people most often get wrong.</p>
+ body:`<p>The weights are the billions of learned numbers from slide 2.1. When they change, and when they do not, is the distinction people most often get wrong.</p>
  <ul>
  <li><strong>Training:</strong> weights are read <strong>and written</strong>. Backpropagation computes the error and updates every one of them. This is the only place they change.</li>
  <li><strong>Inference</strong> — every time you use the model — weights are <strong>read-only</strong>. They are loaded and multiplied against your input to predict the next token. The values never change.</li>
@@ -512,7 +532,7 @@ const CARDS = [
  </tbody></table>`,
  body:`<p>Training cutoff is not release date. Pretraining freezes a snapshot of the world; the model ships later.</p>
  <ul>
- <li><strong>Two stages, and only the first sets the knowledge.</strong> <strong>Pretraining</strong> is the long self-supervised run of card 2.3 over a vast text corpus. It sets essentially all the weights, consumes most of the compute, takes months, and produces a <strong>base model</strong> that continues text but does not follow instructions. <strong>Post-training</strong> is everything after: supervised fine-tuning on instruction-and-response pairs, RLHF, reasoning training, safety work. It is a small fraction of the compute and it changes <em>behaviour</em> — what the model does with what it knows — not what it knows.</li>
+ <li><strong>Two stages, and only the first sets the knowledge.</strong> <strong>Pretraining</strong> is the long self-supervised run of slide 2.3 over a vast text corpus. It sets essentially all the weights, consumes most of the compute, takes months, and produces a <strong>base model</strong> that continues text but does not follow instructions. <strong>Post-training</strong> is everything after: supervised fine-tuning on instruction-and-response pairs, RLHF, reasoning training, safety work. It is a small fraction of the compute and it changes <em>behaviour</em> — what the model does with what it knows — not what it knows.</li>
  <li><strong>What happens in the gap:</strong> post-training, evaluations, red-teaming, safety review, then a staged rollout. Months, not weeks.</li>
  <li><strong>The published cutoff is deliberately conservative.</strong> Anthropic distinguishes the <em>training data cutoff</em> — the last date any data was included — from the <em>reliable knowledge cutoff</em>, the date through which the model answers dependably. The last months before a cutoff are thinly represented, so the reliable date is usually earlier.</li>
  <li><strong>Point releases stretch it further.</strong> A "4.x" version is often refined mostly through post-training on a base model whose pretraining is older and shared across the family. The version number moves; the underlying knowledge may not — because the version number is tracking post-training, and the knowledge came from pretraining.</li>
@@ -533,15 +553,15 @@ const CARDS = [
  <li>Serving adds more C++ and, increasingly, <strong>Rust</strong> — llama.cpp in C and C++, Hugging Face's tokenizers and serving stack in Rust, vLLM in Python over CUDA.</li>
  </ul>
  <p>Short version: Python for what people write, C++ and CUDA for what the GPU runs.</p>
- <p><strong>And where does that GPU sit?</strong> If you are using a hosted assistant, every calculation on the last six cards happens in the provider's data centre. Your laptop sends text and draws the reply; it does no model arithmetic at all, which is why a phone and a workstation give identical answers at identical speed. Only a model you have downloaded and run locally uses your own hardware — and then the size you can run is capped by your GPU's memory. Chapter 3 is that comparison in full.</p>`,
+ <p><strong>And where does that GPU sit?</strong> If you are using a hosted assistant, every calculation on the last six slides happens in the provider's data centre. Your laptop sends text and draws the reply; it does no model arithmetic at all, which is why a phone and a workstation give identical answers at identical speed. Only a model you have downloaded and run locally uses your own hardware — and then the size you can run is capped by your GPU's memory. Chapter 3 is that comparison in full.</p>`,
  depth:`<p>The reason this matters commercially is Chapter 3. The Python layer is portable — a PyTorch model runs on anything PyTorch supports. The CUDA layer is not. Nineteen years of hand-tuned kernels were written CUDA-first, and that accumulated library, not the silicon, is the thing competitors have to replicate.</p>
- <p>Triton is the name to watch for exactly this reason. It is hardware-agnostic: one kernel, either vendor. Its adoption inside production serving stacks is the leading indicator of whether the CUDA position erodes — which is a Chapter 3 argument, previewed here because this card is where the layer first appears.</p>
+ <p>Triton is the name to watch for exactly this reason. It is hardware-agnostic: one kernel, either vendor. Its adoption inside production serving stacks is the leading indicator of whether the CUDA position erodes — which is a Chapter 3 argument, previewed here because this slide is where the layer first appears.</p>
  <p>Worth noting what this list implies about the skill. Almost nobody working on these systems writes CUDA. The Python layer is where the models are defined and trained, and it is unremarkable Python. The scarce expertise is in the kernel layer and in knowing what to train, not in the language.</p>`,
  sources:"Established practice as of Aug 2026. Framework and tooling names churn faster than the underlying division of labour."
 },
 {
  apparatus:true, label:"Glossary", title:"Chapter 2 — Glossary",
- figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Card</th></tr></thead><tbody>
+ figure:`<table class="grid wide"><thead><tr><th>Term</th><th>Definition</th><th>Slide</th></tr></thead><tbody>
  <tr><td>neuron</td><td>The basic unit: a weighted sum of its inputs, then an activation function</td><td>2.1</td></tr>
  <tr><td>weight</td><td>One learned number saying how much a given input matters</td><td>2.1</td></tr>
  <tr><td>bias</td><td>A learned number added to the sum, shifting the total up or down</td><td>2.1</td></tr>
@@ -585,14 +605,14 @@ const CARDS = [
  <tr><td>parameter</td><td>One of the learned numbers inside a model — a weight or a bias</td><td>1.4</td></tr>
  <tr><td>RLHF</td><td>Reinforcement learning from human feedback; turns a predictor into an assistant</td><td>1.4</td></tr>
  </tbody></table>`,
- body:`<p>Terms this chapter owns, in order of first appearance. Later chapters reference them by card number rather than redefining.</p>`
+ body:`<p>Terms this chapter owns, in order of first appearance. Later chapters reference them by slide number rather than redefining.</p>`
 },
 {
  apparatus:true, label:"Companies", title:"Chapter 2 — Companies and organisations",
  figure:`<table class="grid wide"><thead><tr><th>Organisation</th><th>Listing</th><th>Role in this chapter</th></tr></thead><tbody>
  <tr><td>Meta</td><td>Nasdaq: META</td><td>Maintains PyTorch, the framework most models are defined in. Also Llama, the standing example of a long cutoff gap <em>(also 1.5)</em></td></tr>
  <tr><td>NVIDIA</td><td>Nasdaq: NVDA</td><td>CUDA — the layer the arithmetic actually runs on, and the one that is not portable <em>(also 1.3)</em></td></tr>
- <tr><td>Google / DeepMind</td><td>Nasdaq: GOOGL</td><td>JAX, and the 2017 transformer paper behind the attention card <em>(also 1.4)</em></td></tr>
+ <tr><td>Google / DeepMind</td><td>Nasdaq: GOOGL</td><td>JAX, and the 2017 transformer paper behind the attention slide <em>(also 1.4)</em></td></tr>
  <tr><td>OpenAI</td><td>Private</td><td>Triton — the hardware-agnostic kernel language that would neutralise the CUDA position <em>(also 1.5)</em></td></tr>
  <tr><td>Anthropic</td><td>Private</td><td>Publishes both a training data cutoff and a reliable knowledge cutoff; the worked examples on 2.9 <em>(also 1.5)</em></td></tr>
  <tr><td>Hugging Face</td><td>Private</td><td>Tokenizers and serving stack, in Rust; where open weights are distributed <em>(also 1.5)</em></td></tr>
@@ -602,9 +622,11 @@ const CARDS = [
 {
  apparatus:true, label:"What's next", title:"End of Chapter 2",
  figure:null,
- body:`<p>Ten cards. The argument, in one line: a neuron is two arithmetic steps, a model is a great many of them with fixed numbers inside, and every word you read cost one full pass over all of them.</p>
+ body:`<p>Ten slides. The argument, in one line: a neuron is two arithmetic steps, a model is a great many of them with fixed numbers inside, and every word you read cost one full pass over all of them.</p>
  <p>Three things from this chapter get paid for later. Inference reads every weight per token — that is Chapter 3's bottleneck. The model samples from a distribution and cannot tell a right answer from a wrong one — that is Chapter 4. And each turn re-reads the whole conversation — that is Chapter 7.</p>
- <p><strong>Chapter 3 — The hardware and the supply chain.</strong> What physically runs these models, and where the constraint sits: a PC against a data centre, where CUDA fits, HBM as the bottleneck, and why supply cannot simply scale.</p>
+ <p><strong>Companion chapter — Chapter 10, Reading the model from the inside.</strong> This chapter is the machinery. Chapter 10 is what the machinery turns out to contain: concepts that can be found and edited, reasoning in steps the model never writes down, plans formed before the words that carry them out. It is numbered 10 because it was written tenth; it belongs here.</p>
+ <p class="nextlink"><a href="understanding-ai-ch10-reader.html">Continue to Chapter 10 — Reading the model from the inside →</a></p>
+ <p><strong>Or Chapter 3 — The hardware and the supply chain.</strong> What physically runs these models, and where the constraint sits: a PC against a data centre, where CUDA fits, HBM as the bottleneck, and why supply cannot simply scale.</p>
  <p class="nextlink"><a href="understanding-ai-ch3-reader.html">Continue to Chapter 3 →</a></p>
  <div class="btnrow">
    <button id="allbtn" class="ghost">Copy my questions from this chapter</button>
@@ -636,7 +658,7 @@ function render(){
   stage.innerHTML =
     '<h1 class="cardtitle">' + c.title + '</h1>' +
     (c.apparatus ? '' :
-      '<p class="cardid">' + c.num + ' · ' + c.id + ' — card ' + (i+1) + ' of ' + CONTENT + '</p>') +
+      '<p class="cardid">' + c.num + ' · ' + c.id + ' — slide ' + (i+1) + ' of ' + CONTENT + '</p>') +
     (c.figure ? '<div class="figure">' + c.figure + '</div>' : '') +
     '<div class="body">' + c.body + '</div>' +
     (c.band ? '<div class="band">' + c.band + '</div>' : '') +
@@ -668,7 +690,7 @@ function render(){
     const b = document.createElement('button');
     b.type = 'button';
     b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
-    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Slide ' + (n+1) + ': ' + c2.title));
     if (n === i) b.setAttribute('aria-current','true');
     let cls = c2.apparatus ? 'app' : '';
     if (seen.has(n) && n !== i) cls += ' seen';
@@ -698,18 +720,18 @@ document.addEventListener('keydown', function(e){
 });
 
 function promptFor(card, q){
-  return 'Understanding AI — Chapter 1, card ' + card.num + ' (' + card.id + '), "' +
+  return 'Understanding AI — Chapter 2, slide ' + card.num + ' (' + card.id + '), "' +
     card.title + '".\n\nMy question: ' + q;
 }
 
 const CH2_PROMPT =
-'Understanding AI \u2014 I have finished Chapter 2 in the card reader.\n\n' +
+'Understanding AI \u2014 I have finished Chapter 2 in the slide reader.\n\n' +
 'Let\'s develop Chapter 3, "The hardware and the supply chain", the same way. ' +
 'Per the \u00A711 inventory it covers outline slides 9, 9a, 10 and 11 \u2014 personal PC against ' +
 'data centre, where CUDA fits, HBM as the AI bottleneck, and why HBM supply cannot just ' +
 'scale up.\n\n' +
 'Chapter 3 is the fastest-decaying material in the deck, so verify every figure by search ' +
-'against primary sources before drafting. Draft the cards in markdown first for my approval, ' +
+'against primary sources before drafting. Draft the slides in markdown first for my approval, ' +
 'one idea per card, with graphic specs and dated sources. Then build the HTML reader once I ' +
 'have signed off the wording.';
 
@@ -731,7 +753,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 2\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 2\nDeck version: v5.3 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });
@@ -758,6 +780,36 @@ document.getElementById('copyq').onclick = function(){
 };
 
 document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+
+/* Contents panel — generated from CARDS, so it cannot drift from the slides */
+(function(){
+  const list = document.getElementById('toclist');
+  const toc = document.getElementById('toc');
+  document.getElementById('tocsum').textContent = '\u2014 ' + CONTENT + ' slides';
+  CARDS.forEach(function(c, n){
+    const li = document.createElement('li');
+    if (c.apparatus) li.className = 'app';
+    const b = document.createElement('button');
+    b.type = 'button';
+    const num = document.createElement('span'); num.className = 'n';
+    num.textContent = c.apparatus ? '' : c.num;
+    const t = document.createElement('span');
+    t.textContent = c.apparatus ? c.label : c.title.replace(/<[^>]+>/g, '');
+    b.appendChild(num); b.appendChild(t);
+    b.onclick = function(){ i = n; render(); toc.open = false; };
+    li.appendChild(b); list.appendChild(li);
+  });
+})();
+function tocMark(){
+  const items = document.querySelectorAll('#toclist li');
+  items.forEach(function(li, n){
+    li.classList.toggle('cur', n === i);
+    li.classList.toggle('seen', seen.has(n) && n !== i);
+  });
+}
+const _renderBase = render;
+render = function(){ _renderBase(); tocMark(); };
 
 render();
 </script>

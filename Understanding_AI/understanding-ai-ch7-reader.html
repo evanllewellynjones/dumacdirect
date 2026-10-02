@@ -116,6 +116,24 @@
     nav.bar .inner{padding:10px 18px;gap:10px}
     h1.cardtitle{font-size:20px}
   }
+
+  details.toc{border:1px solid var(--rule);margin:-12px 0 24px;padding:0 14px;background:#fff}
+  details.toc summary{cursor:pointer;color:var(--navy);font-size:14px;font-weight:bold;padding:9px 0;list-style:none}
+  details.toc summary::-webkit-details-marker{display:none}
+  details.toc summary::before{content:"\25B8  ";color:var(--blue)}
+  details.toc[open] summary::before{content:"\25BE  "}
+  details.toc summary span{font-weight:normal;color:var(--muted)}
+  ol.toclist{list-style:none;margin:2px 0 12px;padding:0;column-count:2;column-gap:28px}
+  ol.toclist li{break-inside:avoid;margin:0 0 3px}
+  ol.toclist button{display:flex;gap:8px;width:100%;text-align:left;border:none;background:none;
+    padding:4px 6px;font-size:14px;line-height:1.35;color:var(--ink);border-radius:2px}
+  ol.toclist button:hover{background:var(--wash);color:var(--ink)}
+  ol.toclist button .n{flex:0 0 3.4em;color:var(--blue);font-weight:bold}
+  ol.toclist li.app button{color:var(--muted);font-style:italic}
+  ol.toclist li.app button .n{color:var(--muted)}
+  ol.toclist li.cur button{background:var(--wash);box-shadow:inset 3px 0 0 var(--navy)}
+  ol.toclist li.seen button .n::after{content:" \2713";color:var(--muted);font-weight:normal}
+  @media (max-width:640px){ ol.toclist{column-count:1} }
 </style>
 </head>
 <body>
@@ -123,8 +141,10 @@
 <div class="shell">
   <header class="top">
     <div class="ch"><a href="index.html" class="backlink">&larr; All chapters</a> <span class="sep">·</span> Chapter 7 — What it costs, and what drives the cost</div>
-    <div class="meta">v2.1 · 30 Aug 2026</div>
+    <div class="meta">v5.3 · 2 Oct 2026</div>
   </header>
+  <details class="toc" id="toc"><summary>Contents <span id="tocsum"></span></summary><ol class="toclist" id="toclist"></ol></details>
+
 
   <main id="stage" tabindex="-1"></main>
 
@@ -332,6 +352,55 @@ const SVG_HABITS = `
 <text x="340" y="248" font-size="13" text-anchor="middle" fill="#595959">Optimise for the habits, not the arithmetic. The price is falling faster than you can shop.</text>
 </g></svg>`;
 
+const SVG_SPREAD = `
+<svg viewBox="0 0 680 330" role="img" aria-label="A bar chart of cost per benchmark task across twenty-three models, rising from six cents to seven dollars sixty-three, with four open-weight models highlighted at roughly twenty-five cents and two dollars, showing a spread of more than a hundredfold between the cheapest and most expensive model on the same work.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="30" y="20" font-size="12" fill="#595959">Legend — orange: open-weight models the presenter highlighted · grey: all others, open and closed</text>
+<text x="30" y="40" font-size="12" fill="#595959">Cost per Intelligence Index task, US dollars, cheapest to most expensive. Linear scale.</text>
+<line x1="34" y1="236" x2="638" y2="236" stroke="#1a1a1a" stroke-width="0.75"/>
+<rect x="40" y="234.5" width="20" height="1.5" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><text x="50.0" y="229.5" font-size="10" text-anchor="middle" font-weight="bold">$0.06</text><rect x="66" y="234.4" width="20" height="1.6" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="92" y="233.2" width="20" height="2.8" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="118" y="233.0" width="20" height="3.0" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="144" y="230.2" width="20" height="5.8" fill="#E97132" stroke="#1a1a1a" stroke-width="0.5"/><text x="154.0" y="225.2" font-size="10" text-anchor="middle" font-weight="bold">$0.25</text><rect x="170" y="229.8" width="20" height="6.2" fill="#E97132" stroke="#1a1a1a" stroke-width="0.5"/><text x="180.0" y="224.8" font-size="10" text-anchor="middle" font-weight="bold">$0.27</text><rect x="196" y="225.9" width="20" height="10.1" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="222" y="224.2" width="20" height="11.8" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="248" y="223.3" width="20" height="12.7" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="274" y="221.9" width="20" height="14.1" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="300" y="219.4" width="20" height="16.6" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="326" y="212.7" width="20" height="23.3" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="352" y="211.5" width="20" height="24.5" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="378" y="207.4" width="20" height="28.6" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="404" y="199.1" width="20" height="36.9" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="430" y="193.1" width="20" height="42.9" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="456" y="189.9" width="20" height="46.1" fill="#E97132" stroke="#1a1a1a" stroke-width="0.5"/><text x="466.0" y="184.9" font-size="10" text-anchor="middle" font-weight="bold">$2.00</text><rect x="482" y="189.6" width="20" height="46.4" fill="#E97132" stroke="#1a1a1a" stroke-width="0.5"/><text x="492.0" y="184.6" font-size="10" text-anchor="middle" font-weight="bold">$2.01</text><rect x="508" y="161.0" width="20" height="75.0" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="534" y="149.7" width="20" height="86.3" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="560" y="111.2" width="20" height="124.8" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="586" y="100.4" width="20" height="135.6" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><rect x="612" y="60.0" width="20" height="176.0" fill="#d9d9d9" stroke="#1a1a1a" stroke-width="0.5"/><text x="622.0" y="55.0" font-size="10" text-anchor="middle" font-weight="bold">$7.63</text>
+<text x="164" y="252" font-size="10" text-anchor="middle" fill="#595959">GLM-5.3 Flash · DeepSeek V4 Flash</text>
+<text x="476" y="252" font-size="10" text-anchor="middle" fill="#595959">Kimi K3 · GLM-5.3</text>
+<text x="622.0" y="252" font-size="10" text-anchor="end" fill="#595959">closed frontier</text>
+<rect x="30" y="262" width="620" height="56" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="0.75"/>
+<text x="340" y="283" font-size="13" font-weight="bold" text-anchor="middle">Same work, more than a hundredfold apart: $0.06 to $7.63 per task</text>
+<text x="340" y="302" font-size="12" text-anchor="middle" fill="#595959">Redrawn from a photographed Artificial Analysis chart. Two of the 25 bars were illegible and are omitted.</text>
+</g></svg>`;
+
+const SVG_FANOUT = `
+<svg viewBox="0 0 680 300" role="img" aria-label="On the left, the agent loop in which inference generates an action, the action creates new context, and the context updates the next inference; on the right, bars showing the input sent with each call growing turn by turn; along the bottom, one user action fanning out into subagents, tool calls, inference requests and tokens.">
+<g font-family="Calibri, sans-serif" fill="#1a1a1a">
+<text x="30" y="20" font-size="12" fill="#595959">Legend — blue: the loop and the input it re-sends · orange: what one user action becomes</text>
+<rect x="110" y="40" width="120" height="34" fill="#d6e4ec" stroke="#156082" stroke-width="1.5"/>
+<text x="170" y="62" font-size="12" font-weight="bold" text-anchor="middle">inference</text>
+<rect x="40" y="128" width="110" height="34" fill="#fff" stroke="#156082" stroke-width="1.5"/>
+<text x="95" y="150" font-size="12" text-anchor="middle">context</text>
+<rect x="196" y="128" width="110" height="34" fill="#fff" stroke="#156082" stroke-width="1.5"/>
+<text x="251" y="150" font-size="12" text-anchor="middle">action</text>
+<line x1="230" y1="57" x2="251" y2="57" stroke="#156082" stroke-width="1"/><line x1="251" y1="57" x2="251" y2="120" stroke="#156082" stroke-width="1"/><polygon points="247,120 251,128 255,120" fill="#156082"/>
+<text x="258" y="94" font-size="10" fill="#595959">generates</text>
+<line x1="196" y1="145" x2="158" y2="145" stroke="#156082" stroke-width="1"/><polygon points="158,141 150,145 158,149" fill="#156082"/>
+<text x="173" y="178" font-size="10" text-anchor="middle" fill="#595959">creates</text>
+<line x1="95" y1="128" x2="95" y2="57" stroke="#156082" stroke-width="1"/><line x1="95" y1="57" x2="102" y2="57" stroke="#156082" stroke-width="1"/><polygon points="102,53 110,57 102,61" fill="#156082"/>
+<text x="56" y="94" font-size="10" fill="#595959">updates</text>
+<text x="380" y="46" font-size="12" font-weight="bold">Input sent with each call</text>
+<text x="380" y="62" font-size="10" fill="#595959">the whole history, every time (7.6)</text>
+<text x="380" y="86" font-size="11">turn 1</text><rect x="430" y="76" width="30" height="12" fill="#156082"/>
+<text x="380" y="106" font-size="11">turn 2</text><rect x="430" y="96" width="62" height="12" fill="#156082"/>
+<text x="380" y="126" font-size="11">turn 3</text><rect x="430" y="116" width="96" height="12" fill="#156082"/>
+<text x="380" y="146" font-size="11" fill="#595959">…</text>
+<text x="380" y="166" font-size="11">turn N</text><rect x="430" y="156" width="220" height="12" fill="#156082"/>
+<text x="30" y="214" font-size="12" font-weight="bold">One user action becomes:</text>
+<rect x="30" y="224" width="140" height="30" fill="#fff" stroke="#E97132" stroke-width="1.5"/><text x="100" y="244" font-size="11" text-anchor="middle">several subagents</text>
+<text x="180" y="244" font-size="14" fill="#595959">→</text>
+<rect x="196" y="224" width="140" height="30" fill="#fff" stroke="#E97132" stroke-width="1.5"/><text x="266" y="244" font-size="11" text-anchor="middle">dozens of tool calls</text>
+<text x="346" y="244" font-size="14" fill="#595959">→</text>
+<rect x="362" y="224" width="140" height="30" fill="#fff" stroke="#E97132" stroke-width="1.5"/><text x="432" y="244" font-size="11" text-anchor="middle">hundreds of requests</text>
+<text x="512" y="244" font-size="14" fill="#595959">→</text>
+<rect x="528" y="224" width="122" height="30" fill="#E97132" stroke="#1a1a1a" stroke-width="0.75"/><text x="589" y="244" font-size="11" font-weight="bold" text-anchor="middle" fill="#fff">millions of tokens</text>
+<text x="340" y="282" font-size="11" text-anchor="middle" fill="#595959">Redrawn from an inference provider's conference slide. Its counts are that vendor's characterisation of its own market.</text>
+</g></svg>`;
+
 const CARDS = [
 {
  id:"S-026a", num:"7.1", title:"Two pricing models, and they do not resemble each other",
@@ -402,6 +471,25 @@ const CARDS = [
  sources:"The three-layer structure is described in secondary sources (Finout, 2026). Specific claims an earlier draft carried \u2014 Enterprise-plan only, Primary Owner access, cost data in beta, roughly four-hour refresh with up to 24-hour delay, aggregation by user and time rather than per request, Bedrock-routed usage excluded \u2014 were not verified in this pass and are stated in general terms here instead. Check Anthropic's documentation before putting the specifics in front of anyone."
 },
 {
+ id:"S-084", num:"7.5b", title:"Before anyone approves the spend, IT asks three questions",
+ figure:`<table class="grid wide"><thead><tr><th>IT's question</th><th>What it is really about</th><th>Where the course covers it</th></tr></thead><tbody>
+ <tr><td><b>Where is our data going?</b></td><td>Retention, residency and which provider sees the prompt</td><td>Chapter 6 (in development); hosted open models, 9.14</td></tr>
+ <tr><td><b>Which users get access to this?</b></td><td>Identity, permissions, and what an agent is allowed to touch</td><td>4.2; per-user attribution, 7.5</td></tr>
+ <tr><td><b>How do I monitor usage and spend?</b></td><td>Attribution, caps, and spotting the agentic sleeper before the invoice does</td><td>7.4, 7.5, 7.7</td></tr>
+ </tbody></table>`,
+ body:`<p>Every cost slide in this chapter assumes the tool has already been approved. In most firms that is the slow step, and it is slow for good reason.</p>
+ <ul>
+ <li>One practitioner's framing of a 2026 conference talk on building AI-native companies: the capability is here, and <strong>IT is in the way — for good reason</strong>. The firms that move fastest <strong>start with IT's needs</strong> rather than routing around them.</li>
+ <li>The three questions above are the whole of the governance case. Two of them — access and spend — are the same data 7.5's attribution layers produce.</li>
+ <li>The failure mode when IT is bypassed is not a security breach first. It is <strong>tool sprawl</strong>: no firm-wide view, and, in the presenter's phrase, thirty random tools — each with its own contract, its own data flow and its own bill.</li>
+ </ul>`,
+ band:`Spend monitoring is not a finance afterthought. It is one of the three conditions for approval in the first place — which is why per-user attribution (7.5) arrives packaged with access controls rather than separately.`,
+ depth:`<p>The cost case for taking IT's questions first is easy to miss because the costs are scattered. Thirty tools means thirty subscriptions at list price rather than one negotiated contract, thirty separate allowances that cannot be pooled, and no single place to see that one team's agentic usage (7.7) is burning through budget. Consolidation is itself a cost lever, and it is only available to a firm that knows what it is running.</p>
+ <p>The same talk argued that adoption only takes off when three groups are all in — IT, the operators who do the work, and leadership — and that a single enthusiast standing in for all three produces exactly the sprawl described here. That is an organisational claim rather than a cost one, and it belongs to the change-management question this course has parked (1.6, 5.11, 8.9). It is noted here because its first symptom shows up on the bill.</p>
+ <p>For an investment firm specifically, the first question is usually decisive. Where client or portfolio data goes, under what retention terms, is a compliance question before it is a technology one — and it is the question that most often determines whether a hosted model, a dedicated deployment, or nothing at all is acceptable.</p>`,
+ sources:"The three questions, the 'IT is in the way, for good reason' framing, the three-groups argument and the thirty-tools phrase: slides photographed by the maintainer at a 2026 conference talk on building AI-native companies, redrawn as a table \u2014 a practitioner's view, not a study. The cost reading and the investment-firm read-across are analysis."
+},
+{
  id:"S-028b", num:"7.6", title:"The cost levers, ranked",
  figure:SVG_LEVERS,
  body:`<p>The context-length lever is the one that surprises people, because the cost is invisible at the point you incur it. Your twentieth message may be four words long; the request that carries it includes everything from messages one to nineteen.</p>`,
@@ -409,6 +497,21 @@ const CARDS = [
  depth:`<p>The bill grows quadratically with conversation length even though your typing does not. Ten short exchanges cost far less than the tenth exchange of a long one.</p>
  <p>Note which levers are available to whom. Model choice, output length, context length and attachments are yours on any plan. Caching and batching exist only on the API — a subscriber cannot reach them, which is part of why the flat plan smooths cost rather than reducing it.</p>`,
  sources:"Price ratios from 7.2 (primary). The ranking is a judgment about typical usage, not a measurement."
+},
+{
+ id:"S-083", num:"7.6b", title:"Across the market, the same task costs anywhere from six cents to seven dollars",
+ figure:SVG_SPREAD,
+ body:`<p>Slide 7.6 ranked model choice as the biggest cost lever, using Anthropic's own price ratios: Opus about 5× Sonnet. Across the whole market the lever is far longer.</p>
+ <ul>
+ <li>Artificial Analysis runs every model on the same benchmark tasks and reports what one task costs to complete. Across the 25 models on the chart shown, that ran from <strong>$0.06</strong> to <strong>$7.63</strong> — more than <strong>a hundredfold</strong> for the same work.</li>
+ <li>The presenter — an inference provider that hosts open models — highlighted four open-weight models: <strong>GLM-5.3 Flash</strong> and <strong>DeepSeek V4 Flash</strong> at about <strong>$0.25</strong>, and <strong>Kimi K3</strong> and <strong>GLM-5.3</strong> at about <strong>$2.00</strong>.</li>
+ <li>The bars were split by token type — input, cache reads and writes, reasoning, answer. On the expensive models, <strong>reasoning tokens</strong> make up much of the bar: the model thinks for longer, and you pay for every word of it.</li>
+ </ul>`,
+ band:`Model choice is not a 5× decision. Across the market it is a 100× decision — and the right answer is the cheapest model that passes your own test on your own task (9.10), not the one at the top of a leaderboard.`,
+ depth:`<p>The same presenter's companion advice was to look at <strong>task-specific</strong> benchmarks rather than general ones, citing an open model ranked first on one frontend-coding arena and fourth on an agent leaderboard. The point generalises: a model's rank moves a lot between tasks, so a general ranking says little about whether the cheap option is good enough for your particular job. Only your own evaluation answers that (9.10).</p>
+ <p>A caution on comparing these dollars with Chapter 9. Slide 9.12 quoted earlier Artificial Analysis cost-per-task figures — about $0.68 for GLM-5.3 and $0.95 for Kimi K3. This chart puts them at roughly $2.01 and $2.00. Nothing got more expensive: the benchmark was revised to heavier agentic tasks, so every model costs more per task. The <em>ratios</em> between models held. That is precisely the caveat 9.12 gave, now with a second data point behind it.</p>
+ <p>And a caution on the source. The chart is Artificial Analysis's; the selection of which models to show and which to arrow was made by a company that sells open-model inference. The data is independent. The framing is a vendor's.</p>`,
+ sources:"Cost per Intelligence Index task, 25 of 673 models: Artificial Analysis chart as shown on a Baseten conference slide, 2026, photographed by the maintainer \u2014 independent data, vendor-selected framing. Values read from a 640 \u00d7 480 photograph: the minimum, maximum and four highlighted values are legible; two bars were not and are omitted from the redraw; other individual values may be misread and are not quoted. The task-specific benchmark point: same talk. Comparison with 9.12: analysis."
 },
 {
  id:"S-028c", num:"7.7", title:"The sleeper: agentic tools",
@@ -421,6 +524,21 @@ const CARDS = [
  depth:`<p>The economics are not unreasonable — the agent is doing work that would otherwise be many manual turns, and often does it better. The problem is purely one of <em>visibility</em>. A chat turn feels like a unit of consumption because you typed it. An agentic action feels like one instruction and is fifty.</p>
  <p>Two habits follow. Use Sonnet rather than Opus for agentic work unless the task genuinely needs the reasoning — the loop multiplies whatever per-token rate you chose. And scope the task before starting it, because an agent given a vague objective (4.7) explores, and exploration is where the multiplier lives.</p>`,
  sources:"The 10\u201350\u00d7 range is a practitioner estimate carried from the earlier draft and not verified against a published measurement. The mechanism is not in dispute; the multiplier is indicative."
+},
+{
+ id:"S-082", num:"7.7b", title:"Subagents turn one instruction into hundreds of requests",
+ figure:SVG_FANOUT,
+ body:`<p>Slide 7.7 described one agent looping. Current agentic tools go further: the agent <strong>delegates</strong>.</p>
+ <ul>
+ <li>A <strong>subagent</strong> is a second model instance the main agent starts to handle part of the job — search this, test that, summarise those files — each running its own loop.</li>
+ <li>An inference provider's characterisation of one user action: <strong>several subagents, dozens of tool calls, hundreds of inference requests, millions of tokens</strong>.</li>
+ <li>And every one of those requests carries its loop's history so far. Input per call grows turn by turn — the same re-sent-history effect as a long chat (7.6), now running inside every subagent at once.</li>
+ </ul>`,
+ band:`An agentic action is not one request. It is a tree of loops, each re-sending a growing history. That is why it can cost more than a hundred chat turns — and why prompt caching (7.2) matters more here than anywhere else.`,
+ depth:`<p>An illustrative calculation, not a measurement. Suppose one action produces 200 inference requests averaging 20,000 input tokens each, because each carries its loop's accumulated context. That is 4 million input tokens. At Claude Opus 5's list price of $5 per million that is <strong>$20 of input</strong> for one action; on Sonnet 5 at $2 it is $8. If most of each request's context is a cached prefix, read at one tenth of input price ($0.50 per million on Opus 5), the same input costs nearer $2–3. Output, reasoning and cache writes come on top. The arithmetic makes the two habits on 7.7 concrete: model choice multiplies through every request, and caching is the difference between a tolerable bill and an alarming one.</p>
+ <p>Note what the 10–50× figure on 7.7 and this slide's "hundreds of requests" are measuring. The first is a single agentic step in a desktop tool against a single chat turn; the second is a whole multi-agent task. Both are estimates, neither is a published measurement, and they are not in conflict — the gap between them is the fan-out.</p>
+ <p>The read-across beyond your own bill: inference providers present agents as the main driver of demand for their product, and this fan-out is the mechanism. It is the consumption side of the capex story in Chapter 8. That is a description of an industry argument, not a view on any company in it.</p>`,
+ sources:"Subagent and request counts and the agent-loop diagram: a Baseten conference slide, 2026, photographed by the maintainer and redrawn \u2014 vendor estimate about its own market, not a published measurement. Prices in the illustration from 7.2 (Anthropic documentation, primary). The calculation is illustrative and its inputs are assumptions, stated as such."
 },
 {
  id:"S-029a", num:"7.8", title:"Worked case: building a five-page website",
@@ -476,7 +594,12 @@ const CARDS = [
  <tr><td>effort level</td><td>How much reasoning the model spends before answering. Affects consumption</td><td>7.4</td></tr>
  <tr><td>per-user attribution</td><td>Cost and usage reported by named user, for chargeback and governance</td><td>7.5</td></tr>
  <tr><td>chargeback</td><td>Allocating shared platform cost back to the team that incurred it</td><td>7.5</td></tr>
+ <tr><td>tool sprawl</td><td>Many unconnected AI tools bought team by team: no firm-wide view, no pooled spend</td><td>7.5b</td></tr>
+ <tr><td>cost per task</td><td>What completing one piece of work costs, all tokens included. Spans 100× across models</td><td>7.6b</td></tr>
+ <tr><td>reasoning tokens</td><td>Tokens a model spends thinking before it answers. Billed, and often the largest share</td><td>7.6b</td></tr>
  <tr><td>agentic loop cost</td><td>One instruction becoming many billed model calls</td><td>7.7</td></tr>
+ <tr><td>subagent</td><td>A second model instance an agent starts to handle part of a task, running its own loop</td><td>7.7b</td></tr>
+ <tr><td>fan-out</td><td>One action branching into many parallel loops and requests</td><td>7.7b</td></tr>
  </tbody></table>
  <h4 class="grouplabel">Carried forward from earlier chapters</h4>
  <table class="grid wide"><tbody>
@@ -489,6 +612,8 @@ const CARDS = [
  <h4 class="grouplabel">Sources in this chapter</h4>
  <table class="grid wide"><tbody>
  <tr><td>Anthropic</td><td>Private</td><td>The price table on 7.2, from its own model documentation — the only primary pricing source in the course <em>(also 1.5)</em></td></tr>
+ <tr><td>Artificial Analysis</td><td>Private</td><td>Independent benchmark and cost-per-task measurement behind the chart on 7.6b <em>(also 9.2, 9.12)</em></td></tr>
+ <tr><td>Baseten</td><td>Private</td><td>Inference provider whose conference slides supplied 7.6b and 7.7b. Sells open-model hosting, so its framing is a vendor's</td></tr>
  <tr><td>Independent limit trackers</td><td>Various</td><td>Morph, DeployHyre, ClaudeLimit and others. Consistent with each other, unaffiliated with Anthropic, and the only source for limit mechanics because Anthropic does not publish them</td></tr>
  </tbody></table>
  <p class="disclaim">Combined page, permitted under §12. Every price and limit in this chapter is point-in-time and will change. Not investment advice and not a view on any security.</p>`,
@@ -497,7 +622,8 @@ const CARDS = [
 {
  apparatus:true, label:"What's next", title:"End of Chapter 7",
  figure:null,
- body:`<p>Ten slides. The argument, in one line: a subscription buys capacity and an API bills consumption, the same token economics underneath both; model choice, output length and conversation length drive most of the bill; agentic tools are the sleeper because one instruction becomes fifty calls; and the price is falling fast enough that habits matter more than arithmetic.</p>
+ body:`<p>Thirteen slides. The argument, in one line: a subscription buys capacity and an API bills consumption, the same token economics underneath both; IT's three questions come before any spend; model choice drives most of the bill, and across the market it spans a hundredfold per task; agentic tools are the sleeper because one instruction becomes a tree of loops; and the price is falling fast enough that habits matter more than arithmetic.</p>
+ <p><strong>Three slides were added at v5.1</strong> — 7.5b, 7.6b and 7.7b — numbered with a suffix so that no existing slide number, and no cross-reference to one elsewhere in the course, had to change.</p>
  <p><strong>Every price and limit in this chapter is point-in-time.</strong> The list prices came from Anthropic's documentation on 30 August 2026 and the limit mechanics from independent trackers, because Anthropic does not publish them. Both move. Check before you quote.</p>
  <p><strong>Chapter 8 — Mapping AI capex.</strong> Where the money actually goes across the whole value chain: half of every dollar to something other than chips, power as the second-biggest line, and the constraints nobody models.</p>
  <p class="nextlink"><a href="understanding-ai-ch8-reader.html">Continue to Chapter 8 →</a></p>
@@ -563,7 +689,7 @@ function render(){
     const b = document.createElement('button');
     b.type = 'button';
     b.title = c2.apparatus ? c2.title : (c2.num + ' — ' + c2.title);
-    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Card ' + (n+1) + ': ' + c2.title));
+    b.setAttribute('aria-label', c2.apparatus ? c2.title : ('Slide ' + (n+1) + ': ' + c2.title));
     if (n === i) b.setAttribute('aria-current','true');
     let cls = c2.apparatus ? 'app' : '';
     if (seen.has(n) && n !== i) cls += ' seen';
@@ -593,7 +719,7 @@ document.addEventListener('keydown', function(e){
 });
 
 function promptFor(card, q){
-  return 'Understanding AI — Chapter 1, slide ' + card.num + ' (' + card.id + '), "' +
+  return 'Understanding AI — Chapter 7, slide ' + card.num + ' (' + card.id + '), "' +
     card.title + '".\n\nMy question: ' + q;
 }
 
@@ -617,7 +743,7 @@ function copyText(text, ok, target){
 function copyAll(target){
   const el = target || sayEl;
   if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
-  let out = '# Understanding AI — questions from Chapter 7\nDeck version: v2.1 · 30 Aug 2026\n\n';
+  let out = '# Understanding AI — questions from Chapter 7\nDeck version: v5.3 · 2 Oct 2026\n\n';
   asked.forEach(function(a){
     out += '## ' + a.card.id + ' · ' + a.card.num + ' — ' + a.card.title + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
   });
@@ -644,6 +770,36 @@ document.getElementById('copyq').onclick = function(){
 };
 
 document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+
+/* Contents panel — generated from CARDS, so it cannot drift from the slides */
+(function(){
+  const list = document.getElementById('toclist');
+  const toc = document.getElementById('toc');
+  document.getElementById('tocsum').textContent = '\u2014 ' + CONTENT + ' slides';
+  CARDS.forEach(function(c, n){
+    const li = document.createElement('li');
+    if (c.apparatus) li.className = 'app';
+    const b = document.createElement('button');
+    b.type = 'button';
+    const num = document.createElement('span'); num.className = 'n';
+    num.textContent = c.apparatus ? '' : c.num;
+    const t = document.createElement('span');
+    t.textContent = c.apparatus ? c.label : c.title.replace(/<[^>]+>/g, '');
+    b.appendChild(num); b.appendChild(t);
+    b.onclick = function(){ i = n; render(); toc.open = false; };
+    li.appendChild(b); list.appendChild(li);
+  });
+})();
+function tocMark(){
+  const items = document.querySelectorAll('#toclist li');
+  items.forEach(function(li, n){
+    li.classList.toggle('cur', n === i);
+    li.classList.toggle('seen', seen.has(n) && n !== i);
+  });
+}
+const _renderBase = render;
+render = function(){ _renderBase(); tocMark(); };
 
 render();
 </script>
