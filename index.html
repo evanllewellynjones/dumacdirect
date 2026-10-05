@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DUMAC Direct Research</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+    line-height: 1.6;
+    color: #1a202c;
+    background-color: #f5f7fa;
+  }
+  header {
+    background: linear-gradient(135deg, #0a2540 0%, #1e3a5f 100%);
+    color: #fff;
+    padding: 64px 24px 56px;
+    text-align: center;
+    border-bottom: 4px solid #c5a572;
+  }
+  header h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+  }
+  header .tagline {
+    font-size: 1rem;
+    opacity: 0.85;
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+  .section-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #4a5568;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #cbd5e0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+  }
+  .grid.full { grid-template-columns: 1fr; }
+  .dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .dual .col { display: flex; flex-direction: column; }
+  .dual .col .section-label { margin-bottom: 24px; }
+  .dual .col .research-card { flex: 1; }
+  .research-card {
+    display: block;
+    background: #fff;
+    border-radius: 8px;
+    padding: 28px 28px 24px;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #1e3a5f;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    position: relative;
+  }
+  .research-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border-left-color: #c5a572;
+  }
+  .research-card .card-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #1e3a5f;
+    background: #edf2f7;
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 14px;
+  }
+  .research-card h2 {
+    font-size: 1.2rem;
+    color: #0a2540;
+    margin-bottom: 12px;
+    line-height: 1.35;
+  }
+  .research-card p {
+    font-size: 0.92rem;
+    color: #4a5568;
+    line-height: 1.55;
+  }
+  .research-card .arrow {
+    position: absolute;
+    bottom: 20px;
+    right: 24px;
+    color: #c5a572;
+    font-size: 1.1rem;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .research-card:hover .arrow {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+  footer {
+    text-align: center;
+    color: #718096;
+    font-size: 0.82rem;
+    padding: 32px 16px 40px;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 24px;
+  }
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.9rem; letter-spacing: 2px; }
+    .container { padding: 32px 16px; }
+    .research-card { padding: 22px; }
+    .dual { grid-template-columns: 1fr; gap: 32px; }
+  }
+
+  /* ===== Login gate ===== */
+  /* While gated, hide everything except the login overlay (no content flash). */
+  body.gated > *:not(#login-overlay) { display: none !important; }
+
+  #login-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: linear-gradient(135deg, #0a2540 0%, #1e3a5f 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  body:not(.gated) #login-overlay { display: none; }
+
+  #login-overlay .login-card {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    border-radius: 10px;
+    border-top: 4px solid #c5a572;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    padding: 40px 34px 32px;
+    text-align: center;
+  }
+  #login-overlay .login-mark {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #0a2540;
+    margin-bottom: 6px;
+  }
+  #login-overlay .login-sub {
+    font-size: 0.78rem;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 28px;
+  }
+  #login-overlay label {
+    display: block;
+    text-align: left;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #4a5568;
+    margin-bottom: 8px;
+  }
+  #login-overlay input[type=password] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    color: #1a202c;
+    transition: border-color 0.15s;
+  }
+  #login-overlay input[type=password]:focus {
+    outline: none;
+    border-color: #c5a572;
+    box-shadow: 0 0 0 3px rgba(197,165,114,0.18);
+  }
+  #login-overlay button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #fff;
+    background: #1e3a5f;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #login-overlay button:hover { background: #0a2540; }
+  #login-overlay .login-error {
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: #c0392b;
+    min-height: 1.1em;
+    visibility: hidden;
+  }
+  #login-overlay .login-error.show { visibility: visible; }
+  #login-overlay .login-note {
+    margin-top: 22px;
+    font-size: 0.72rem;
+    color: #a0aec0;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body class="gated">
+
+<!-- ===== Login overlay ===== -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-mark">DUMAC Direct Research</div>
+    <div class="login-sub">Internal Use Only</div>
+    <label for="login-pass">Access Password</label>
+    <input type="password" id="login-pass" autocomplete="off" autofocus>
+    <button id="login-btn">Enter</button>
+    <div class="login-error" id="login-error">Incorrect password. Try again.</div>
+    <div class="login-note">Authorized personnel only</div>
+  </div>
+</div>
+
+<header>
+  <h1>DUMAC DIRECT RESEARCH</h1>
+  <p class="tagline">Primary Source Insights &amp; Earnings Intelligence</p>
+</header>
+
+<div class="container">
+
+  <div class="dual">
+
+    <div class="col">
+      <div class="section-label">Knowledge Base</div>
+      <a href="themes/" class="research-card">
+        <span class="card-tag">Knowledge Base</span>
+        <h2>Theme Knowledge Base</h2>
+        <p>A traversable map of macro themes and the securities they touch &mdash; winners, losers, and the mechanisms in between. Structured tear-sheets across Productivity, Physical AI, Financial, Energy Transition, and Future.</p>
+        <span class="arrow">&rarr;</span>
+      </a>
+    </div>
+
+    <div class="col">
+      <div class="section-label">Learning</div>
+      <a href="Understanding_AI/" class="research-card">
+        <span class="card-tag">Course</span>
+        <h2>Understanding AI</h2>
+        <p>AI explained for people who are numerate but have no machine-learning background. Nine chapters of slide-based readers, each with a clickable contents list &mdash; how the technology arrived and how fast it is progressing, what happens inside the model and how researchers read it, the hardware and supply chain, building reliably, customization, cost drivers, the capex map, and how to tell which models are actually competent.</p>
+        <span class="arrow">&rarr;</span>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:52px">Research Tools</div>
+
+  <div class="grid">
+
+    <a href="research/entry.html" class="research-card">
+      <span class="card-tag">Capture</span>
+      <h2>Research Entry</h2>
+      <p>Log a company note or a theme note &mdash; subject, memo, attachments, price targets, auto-tagging. Writes markdown straight to the shared folder.</p>
+      <span class="arrow">&rarr;</span>
+    </a>
+
+    <a href="research/reports.html" class="research-card">
+      <span class="card-tag">Retrieve</span>
+      <h2>Reports &amp; Search</h2>
+      <p>Company pages with price target history by contributor, theme pages with associated tickers, the dated review queue, and full-text search across every note.</p>
+      <span class="arrow">&rarr;</span>
+    </a>
+
+    <a href="research/admin.html" class="research-card">
+      <span class="card-tag">Maintain</span>
+      <h2>Admin &amp; Maintenance</h2>
+      <p>Record table with bulk curation, theme and tag management with usage counts, rename and merge with dry-run preview, CSV export.</p>
+      <span class="arrow">&rarr;</span>
+    </a>
+
+  </div>
+
+  <div class="section-label" style="margin-top:52px">Past Research</div>
+
+  <div class="grid full">
+
+    <a href="q1-2026-commentary.html" class="research-card">
+      <span class="card-tag">Earnings</span>
+      <h2>Q1 2026 Earnings Commentary from Management</h2>
+      <p>Direct quotes from recent earnings calls covering trucking &amp; logistics market conditions and AI's impact on advertising and marketing &mdash; organized by company.</p>
+      <span class="arrow">&rarr;</span>
+    </a>
+
+  </div>
+
+</div>
+
+<footer>
+  DUMAC Direct Research &nbsp;·&nbsp; Internal Use Only
+</footer>
+
+<script>
+  // ===== Simple client-side password gate =====
+  // NOTE: This is light-touch protection only. The page source is visible to
+  // anyone who downloads it. It stops casual/accidental access, not a determined user.
+  //
+  // The stored value below is the SHA-256 hash of the password (NOT the password
+  // itself). Default password is:  dumac2026
+  //
+  // ---- TO CHANGE THE PASSWORD ----
+  // 1. Open this page, then open your browser console (F12 / right-click > Inspect > Console).
+  // 2. Paste this, replacing YOUR_NEW_PASSWORD, and press Enter:
+  //
+  //      crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_NEW_PASSWORD'))
+  //        .then(b => console.log([...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join('')));
+  //
+  // 3. Copy the printed hash and paste it as PASSWORD_HASH below. Commit the change.
+  var PASSWORD_HASH = '6769d3fb66c2a39bb9dd2af19267e1ee3d7ca37e255b1e35d82a6b063dfb4f39';
+
+  var SESSION_KEY = 'dumac_authed';
+
+  // If already authenticated this session, unlock immediately (avoids re-prompting on navigation).
+  try {
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+      document.body.classList.remove('gated');
+    }
+  } catch (e) {}
+
+  function sha256Hex(text) {
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buf) {
+      return [].slice.call(new Uint8Array(buf))
+        .map(function (b) { return b.toString(16).padStart(2, '0'); })
+        .join('');
+    });
+  }
+
+  function attempt() {
+    var input = document.getElementById('login-pass');
+    var errEl = document.getElementById('login-error');
+    sha256Hex(input.value).then(function (hash) {
+      if (hash === PASSWORD_HASH) {
+        try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) {}
+        document.body.classList.remove('gated');
+      } else {
+        errEl.classList.add('show');
+        input.value = '';
+        input.focus();
+      }
+    });
+  }
+
+  document.getElementById('login-btn').addEventListener('click', attempt);
+  document.getElementById('login-pass').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') attempt();
+    else document.getElementById('login-error').classList.remove('show');
+  });
+</script>
+
+</body>
+</html>

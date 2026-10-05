@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Research Entry</title>
+<link rel="stylesheet" href="rc-style.css">
+<style>
+/* Mode accent. The only job here is that you cannot be in the wrong entry type
+   without seeing it: the selector, every card rule, and the Save button all
+   carry the same colour. */
+.wrap{ --accent:#6b7280; }
+.wrap .card{ border-left:3px solid var(--accent); }
+.modesel{ display:flex; gap:0; margin-bottom:10px; }
+.modesel button{
+  flex:1; padding:9px 6px; font-size:13px; font-weight:600; cursor:pointer;
+  background:#fff; border:1px solid #d3d8e0; border-left-width:0;
+  color:#5b6472; letter-spacing:.2px;
+}
+.modesel button:first-child{ border-left-width:1px; border-radius:4px 0 0 4px; }
+.modesel button:last-child{ border-radius:0 4px 4px 0; }
+.modesel button.on{ background:var(--accent); border-color:var(--accent); color:#fff; }
+.reqmark{ color:#b91c1c; font-weight:700; }
+.footstrip{ background:#f7f9fc; }
+.biasgrp{ display:flex; gap:0; }
+.biasgrp button{
+  width:38px; padding:6px 0; font-size:15px; font-weight:700; cursor:pointer;
+  background:#fff; border:1px solid #d3d8e0; border-left-width:0; color:#5b6472;
+}
+.biasgrp button:first-child{ border-left-width:1px; border-radius:4px 0 0 4px; }
+.biasgrp button:last-child{ border-radius:0 4px 4px 0; }
+.biasgrp button.on{ background:#374151; border-color:#374151; color:#fff; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home" href="../index.html">DUMAC</a>
+  <h1>Research Entry</h1>
+  <span class="sp"></span>
+  <a class="modelink cur" href="entry.html">Entry</a>
+  <a class="modelink" href="reports.html">Reports</a>
+  <a class="modelink" href="admin.html">Admin</a>
+  <span class="badge" id="folder">no folder</span>
+</div>
+
+<div class="wrap" id="wrap">
+
+<div class="banner" id="banner"></div>
+
+<!-- entry type -->
+<div class="modesel">
+  <button id="m_note">Quick Note</button>
+  <button id="m_theme">Theme Note</button>
+  <button id="m_company">Company Note</button>
+  <button id="m_trade">Trading Log</button>
+</div>
+<div class="sub" style="margin:-4px 0 12px">
+  <span id="modehint"></span>
+  <b>Switching type keeps everything you have typed</b> &mdash; subject, note,
+  tags and attachments carry over. Only the fields change.
+</div>
+
+<!-- TICKER block: Company + Trade -->
+<div class="card hide" id="blk_ticker">
+  <div class="frow">
+    <label for="f_ticker" class="narrow">Ticker <span class="reqmark">*</span></label>
+    <div class="f sm"><input type="text" id="f_ticker" list="tkrlist" placeholder="Ticker"
+        autocomplete="off" maxlength="12" class="mono" style="text-transform:uppercase">
+      <datalist id="tkrlist"></datalist></div>
+    <div class="f" id="entwrap">
+      <input type="text" id="f_entity" list="entlist" placeholder="Company &mdash; fills from ticker"
+        autocomplete="off">
+      <datalist id="entlist"></datalist>
+    </div>
+  </div>
+  <div class="frow" id="row_listed">
+    <label class="narrow" style="visibility:hidden">.</label>
+    <div class="f">
+      <label style="display:flex;align-items:center;gap:6px;text-transform:none;
+                    font-size:12.5px;letter-spacing:0;font-weight:400;color:var(--ink);margin:0">
+        <input type="checkbox" id="f_listed" checked style="width:auto">
+        Publicly listed &mdash; fetch price data for this ticker
+      </label>
+      <div class="sub" id="tickerhint">Company name is optional. Leave it blank and
+        it resolves from the ticker &mdash; from names you have entered before, or
+        later in Admin.</div>
+    </div>
+  </div>
+</div>
+
+<!-- THEME block -->
+<div class="card hide" id="blk_theme">
+  <div class="frow">
+    <label for="f_theme" class="narrow">Theme <span class="reqmark">*</span></label>
+    <div class="f md"><select id="f_theme"></select></div>
+    <div class="f tiny">Defined in Admin. Ask EJ to add one if it is missing.</div>
+  </div>
+</div>
+
+<!-- TICKERS block — Theme and Quick Note. A note that mentions names should
+     surface on each of those company pages; tickers[] is the reverse index
+     reports.html walks for that. -->
+<div class="card hide" id="blk_tkrs">
+  <div class="frow">
+    <label for="tkradd" class="narrow">Tickers</label>
+    <div class="f sm"><input type="text" id="tkradd" class="mono" placeholder="Ticker"
+        maxlength="12" style="text-transform:uppercase"></div>
+    <button class="btn" id="tkrbtn" style="flex:0 0 auto">Add</button>
+    <div class="f chips" id="tkrchips"></div>
+    <span class="tiny" id="tkrcount" style="flex:0 0 auto"></span>
+  </div>
+  <div class="frow">
+    <label class="narrow" style="visibility:hidden">.</label>
+    <div class="f sub" style="margin-top:0">Optional. Names this note touches &mdash; it
+      then shows on each company&rsquo;s page. Private companies use a
+      <b>P.</b> prefix &mdash; <span class="mono">P.SECURITIZE</span>.</div>
+  </div>
+</div>
+
+<!-- SUBJECT -->
+<div class="card">
+  <div class="frow">
+    <label for="f_subject" class="narrow">Subject <span class="reqmark">*</span></label>
+    <div class="f"><input type="text" id="f_subject" placeholder="Subject" autocomplete="off"></div>
+  </div>
+  <div class="sub hide" id="subjecthint">Be explicit &mdash; the subject is the trade.
+    <span class="mono">BUY 1.5% NAV of MSFT</span>. It is what a report row shows.</div>
+</div>
+
+<!-- DECISION block -->
+<div class="card hide" id="blk_decision">
+  <div class="frow hide" id="row_strategy">
+    <label for="f_strategy" class="narrow">Strategy <span class="reqmark hide" id="req_strategy">*</span></label>
+    <div class="f md"><select id="f_strategy"></select></div>
+    <div class="f tiny" id="strathint"></div>
+  </div>
+  <div class="frow hide" id="row_action">
+    <label for="f_action" class="narrow">Action <span class="reqmark hide" id="req_action">*</span></label>
+    <div class="f md"><select id="f_action"></select></div>
+    <div class="f tiny" id="actionhint"></div>
+  </div>
+  <div class="frow hide" id="row_why">
+    <label for="f_why" class="narrow">Why <span class="reqmark hide" id="req_why">*</span></label>
+    <div class="f"><input type="text" id="f_why"
+        placeholder="One line &mdash; the reason, not the summary" autocomplete="off"></div>
+    <span class="tiny" id="whycount" style="flex:0 0 auto"></span>
+  </div>
+  <div class="frow hide" id="row_source">
+    <label for="f_source" class="narrow">Source</label>
+    <div class="f"><input type="text" id="f_source"
+        placeholder="What you were reading" autocomplete="off"></div>
+  </div>
+  <div class="frow hide" id="row_outcome">
+    <label for="f_outcome" class="narrow">Check on</label>
+    <div class="f sm"><input type="date" id="f_outcome"></div>
+    <div class="f tiny">When to ask whether this call was right. Not the Review
+      Queue &mdash; that is the Review date below.</div>
+  </div>
+</div>
+
+<!-- NOTE -->
+<div class="card">
+  <label for="f_note">Note <span class="reqmark hide" id="req_note">*</span></label>
+  <textarea id="f_note" placeholder="Note"></textarea>
+  <div class="sub">Markdown passes through. Paste an image with Ctrl+V to attach it
+    at the cursor.</div>
+</div>
+
+<!-- TARGETS: Company only -->
+<div class="card hide" id="blk_pt">
+  <div class="frow">
+    <label class="narrow">Targets</label>
+    <div class="f sm"><input type="number" id="f_ptb" step="1" placeholder="Buy"></div>
+    <div class="f sm"><input type="number" id="f_pts" step="1" placeholder="Sell"></div>
+  </div>
+  <div class="sub">Leave blank if this note does not change your target. Blank is not
+    zero, and does not clear a previous target.</div>
+</div>
+
+<!-- BIAS + REVIEW -->
+<div class="card hide" id="blk_bias">
+  <div class="frow">
+    <label class="narrow">Bias</label>
+    <div class="f sm">
+      <div class="biasgrp" id="biasgrp">
+        <button type="button" data-v="+" title="positive">+</button>
+        <button type="button" data-v="=" title="neutral">=</button>
+        <button type="button" data-v="-" title="negative">&minus;</button>
+      </div>
+    </div>
+    <label for="f_review" style="flex:0 0 auto">Review date</label>
+    <div class="f sm"><input type="date" id="f_review"></div>
+    <div class="f tiny" id="biashint"></div>
+  </div>
+  <div class="sub">Bias is your lean on the name, not a confidence score. Click a
+    second time to clear it. A review date puts this record in the Review Queue on
+    the Reports page &mdash; use it for catalysts, a rulemaking deadline, an
+    expected disclosure.</div>
+</div>
+
+<!-- TAGS -->
+<div class="card">
+  <label>Tags <span class="tiny" id="tagcount"></span></label>
+  <div class="chips" id="chips"></div>
+  <details style="margin-top:7px">
+    <summary>Add a tag manually</summary>
+    <input type="text" id="tagsearch" placeholder="Filter tags" autocomplete="off" style="margin-top:6px">
+    <div class="picker" id="picker"></div>
+  </details>
+</div>
+
+<!-- ATTACHMENTS -->
+<div class="card">
+  <label>Attachments</label>
+  <div id="drop">Drop files here, or click to browse</div>
+  <input type="file" id="filein" multiple hidden>
+  <div id="atts"></div>
+  <div class="sub">Files are copied into this record's folder and listed in
+    <span class="mono">attachments</span>. Ctrl+V an image anywhere on the page and
+    it lands here <i>and</i> at the cursor in the note.</div>
+</div>
+
+<!-- DATE / CONTRIBUTOR — end of the form, out of the way -->
+<div class="card footstrip">
+  <div class="frow">
+    <label for="f_date" class="narrow">Date</label>
+    <div class="f sm"><input type="date" id="f_date"></div>
+    <label for="f_contrib" style="flex:0 0 auto">Contributor</label>
+    <div class="f md"><select id="f_contrib"></select></div>
+    <div class="f"></div>
+  </div>
+</div>
+
+<!-- IMPORT: not an attachment path — it fills the form from text -->
+<details class="card">
+  <summary>Import a drafted note</summary>
+  <div class="sub" style="margin-top:6px">Different from Attachments. This takes
+    <b>text</b> &mdash; a record drafted in Claude, or an email header block &mdash;
+    and loads it into the fields above so you can check the tags and the action
+    before anything is written. It cannot carry files; those go in the drop zone.
+    Nothing is saved until you press Save.</div>
+  <textarea id="pastebox" style="min-height:100px;margin-top:6px"
+    placeholder="---&#10;record_type: Note&#10;action: observation&#10;why: ...&#10;---&#10;&#10;Body"></textarea>
+  <div style="margin-top:6px;display:flex;gap:7px;align-items:center">
+    <button class="btn" id="btn_paste">Load into form</button>
+    <span class="tiny" id="pastemsg"></span>
+  </div>
+</details>
+
+</div>
+
+<div class="bar">
+  <div class="in">
+    <button class="btn pri" id="btn_save">Save</button>
+    <button class="btn" id="btn_clear">Clear</button>
+  </div>
+  <div class="in"><div id="msg"></div></div>
+</div>
+
+<script src="rc-core.js"></script>
+<script>
+const S = { mode:"Note", atts:[], manual:new Set(), removed:new Set(),
+            tickers:[], imgN:0, bias:"" };
+
+function flash(t,cls){ const m=$("#msg"); m.textContent=t; m.className=cls||""; }
+function banner(t,ok){
+  const b=$("#banner"); b.textContent=t||"";
+  b.className="banner"+(t?" show":"")+(ok?" ok":"");
+}
+const show=(sel,on)=>$(sel).classList.toggle("hide",!on);
+
+/* ==========================================================================
+   MODES
+   Four entry types. MODE_FIELDS is the single source of truth for what is on
+   screen and what is required — every visibility toggle and every required
+   check below reads from it, so adding a fifth type is one table entry rather
+   than a hunt through the file.
+
+   Trade is a real record_type, not a filtered view of Company. It gets analysed
+   separately and often, which is the reason. Cost: reports.html and admin.html
+   both need a fourth bucket, in the same commit as this file, or Trade records
+   save correctly and are invisible.
+   ========================================================================== */
+const MODES = ["Note","Theme","Company","Trade"];
+const MODE_FIELDS = {
+  Note:{
+    label:"Quick Note", btn:"#m_note", accent:"#6b7280",
+    hint:"A thought that is neither a company nor a theme \u2014 Brazil, a "
+        +"conference, something you read. Tags do the retrieval; list any "
+        +"tickers it touches so it shows on their pages.",
+    ticker:false, tickers:true, theme:false, pt:false, bias:true,
+    strategy:"opt", action:false, why:false, note:"opt"
+  },
+  Theme:{
+    label:"Theme Note", btn:"#m_theme", accent:"#0f6e56",
+    hint:"A note about a theme or a catalyst. Lists the tickers it touches.",
+    ticker:false, tickers:true, theme:true, pt:false, bias:true,
+    strategy:false, action:false, why:false, note:"opt"
+  },
+  Company:{
+    label:"Company Note", btn:"#m_company", accent:"#534ab7",
+    hint:"A note about one company. Ticker required \u2014 the company name "
+        +"resolves from it.",
+    ticker:true, tickers:false, theme:false, pt:true, bias:true,
+    strategy:false, action:false, why:false, note:"opt"
+  },
+  Trade:{
+    label:"Trading Log", btn:"#m_trade", accent:"#ba7517",
+    hint:"A position change, or a reaction to one. Action, why and the note are "
+        +"all required \u2014 this is the record that has to answer later.",
+    ticker:true, tickers:false, theme:false, pt:false, bias:false,
+    strategy:"req", action:"req", why:"req", note:"req"
+  }
+};
+const M = () => MODE_FIELDS[S.mode];
+
+function setMode(m){
+  if(MODES.indexOf(m)<0) m="Note";
+  S.mode=m;
+  const f=M();
+  MODES.forEach(k=>$(MODE_FIELDS[k].btn).className = (k===m?"on":""));
+  $("#wrap").style.setProperty("--accent",f.accent);
+  $("#modehint").textContent = f.hint+" ";
+  $("#btn_save").textContent = "Save "+f.label;
+
+  show("#blk_ticker", f.ticker);
+  show("#blk_theme",  f.theme);
+  show("#blk_tkrs",   !!f.tickers);
+  show("#blk_pt",     f.pt);
+  show("#blk_bias",   f.bias);
+  show("#subjecthint", m==="Trade");
+  /* Trade records are always a position change in a real strategy, so the
+     listed/price-data question does not arise there. */
+  show("#row_listed", m==="Company");
+
+  show("#row_strategy", !!f.strategy);
+  show("#row_action",   !!f.action);
+  show("#row_why",      !!f.why);
+  show("#req_strategy", f.strategy==="req");
+  show("#req_action",   f.action==="req");
+  show("#req_why",      f.why==="req");
+  show("#req_note",     f.note==="req");
+  show("#blk_decision", !!(f.strategy||f.action||f.why));
+
+  localStorage.setItem("rc_mode",m);
+  onAction();
+  renderTags();
+}
+
+/* ---------- action / why ---------- */
+const ACTION_HINT = {
+  initiate:"Opened a position.", add:"Added to a position.",
+  trim:"Trimmed a position.",   exit:"Exited a position.",
+  pass:"Looked and declined \u2014 the record nobody keeps.",
+  observation:"A reaction with no decision attached.",
+  reference:"An artifact filed for retrieval, not a view. Why is optional."
+};
+function actionsList(){ return (RC.cfg&&RC.cfg.actions)||ACTIONS; }
+function buildActions(){
+  const sel=$("#f_action"); const cur=sel.value;
+  sel.innerHTML=""; sel.appendChild(new Option("\u2014",""));
+  actionsList().forEach(a=>sel.appendChild(new Option(a,a)));
+  if(cur && actionsList().indexOf(cur)>=0) sel.value=cur;
+}
+function onAction(){
+  const a=$("#f_action").value, f=M();
+  $("#actionhint").textContent = f.action ? (ACTION_HINT[a]||"") : "";
+  $("#strathint").textContent =
+    f.strategy==="req" && !$("#f_strategy").value
+      ? "Required \u2014 a position change belongs to a strategy."
+      : (POSITION_ACTIONS.indexOf(a)>=0 && !$("#f_strategy").value
+         ? "Set this \u2014 a position change belongs to a strategy." : "");
+  show("#row_source",  !!f.action && a==="observation");
+  show("#row_outcome", !!f.action && CHECKABLE_ACTIONS.indexOf(a)>=0);
+  onWhy();
+}
+function onWhy(){
+  const n=$("#f_why").value.trim().length, f=M();
+  const exempt = f.why!=="req" && WHY_EXEMPT_ACTIONS.indexOf($("#f_action").value)>=0;
+  $("#whycount").textContent =
+    n>WHY_SOFT_CAP ? n+" \u2014 long for a one-liner"
+    : (!n && exempt ? "optional here" : "");
+}
+
+/* ---------- bias ----------
+   Replaces conviction outright. High/Med/Low was a confidence scale nobody
+   filled in honestly; +/=/- is a direction, which is the thing a report can
+   group on. Clicking the active value clears it — blank is a legitimate answer
+   and must not need a fourth button. */
+function setBias(v){
+  S.bias = (S.bias===v) ? "" : v;
+  [...$("#biasgrp").children].forEach(b=>b.classList.toggle("on",b.dataset.v===S.bias));
+  $("#biashint").textContent = S.bias ? "" : "optional";
+}
+
+/* ---------- tags ---------- */
+function allTags(){
+  const auto=matchTags($("#f_subject").value, $("#f_note").value)
+               .filter(h=>!S.removed.has(h.tag));
+  const out=[];
+  for(const t of S.manual) out.push({tag:t,src:"manual"});
+  for(const h of auto) if(!S.manual.has(h.tag)) out.push(h);
+  return out;
+}
+function maxTags(){ return (RC.cfg&&RC.cfg.maxTags)||8; }
+function currentTags(){ return allTags().slice(0,maxTags()); }
+function renderTags(){
+  const tags=currentTags(), c=$("#chips"); c.innerHTML="";
+  for(const h of tags){
+    const e=el("span","chip"); e.dataset.src=h.src;
+    e.appendChild(el("b","",h.tag));
+    const b=el("button","","\u00d7"); b.title="remove";
+    b.onclick=()=>{ S.manual.delete(h.tag); S.removed.add(h.tag); renderTags(); renderPicker(); };
+    e.appendChild(b); c.appendChild(e);
+  }
+  const over=allTags().length-tags.length;
+  $("#tagcount").textContent = tags.length+" of "+maxTags()
+    + (over>0 ? " \u2014 "+over+" more matched, not applied" : "");
+}
+function renderPicker(){
+  const q=$("#tagsearch").value.trim().toLowerCase(), p=$("#picker");
+  const chosen=new Set(currentTags().map(t=>t.tag));
+  const tax=(RC.cfg&&RC.cfg.taxonomy)||SEED.taxonomy;
+  p.innerHTML=""; let n=0;
+  for(const tag in tax){
+    if(chosen.has(tag)) continue;
+    if(q && !tag.toLowerCase().includes(q)) continue;
+    if(++n>60) break;
+    const d=el("div","",tag);
+    d.onclick=()=>{
+      if(currentTags().length>=maxTags()){
+        flash("Tag cap of "+maxTags()+" reached \u2014 remove one first.","err"); return; }
+      S.removed.delete(tag); S.manual.add(tag);
+      $("#tagsearch").value=""; renderTags(); renderPicker(); };
+    p.appendChild(d); }
+  if(!n) p.innerHTML="<div style='color:#6b7280;cursor:default'>no match</div>";
+}
+
+/* ---------- ticker chips (Theme mode) ---------- */
+const TKR_RE=/^[A-Z0-9.\-]{1,12}$/;
+function renderTkr(){
+  const c=$("#tkrchips"); c.innerHTML="";
+  S.tickers.forEach((t,i)=>{
+    const e=el("span","chip"); e.dataset.src="tkr";
+    e.appendChild(el("b","",t));
+    const b=el("button","","\u00d7");
+    b.onclick=()=>{ S.tickers.splice(i,1); renderTkr(); };
+    e.appendChild(b); c.appendChild(e);
+  });
+  $("#tkrcount").textContent = S.tickers.length ? S.tickers.length+" linked" : "";
+}
+function addTkr(){
+  const raw=$("#tkradd").value.trim().toUpperCase();
+  if(!raw) return;
+  if(!TKR_RE.test(raw)){
+    flash("Ticker must be 1-12 chars: letters, digits, dot or hyphen. "
+        + "Private names: P.SECURITIZE","err"); return; }
+  if(!S.tickers.includes(raw)) S.tickers.push(raw);
+  $("#tkradd").value=""; renderTkr(); flash("");
+}
+
+/* ---------- entity / ticker resolution ----------
+   Company name comes from the uploaded ticker map (_tickers.json, loaded by
+   loadTickers) first, then from names already written on records, then from
+   pairs seen on this machine. All three are conveniences: a ticker nothing
+   knows about leaves entity blank on disk, which is legal, and Admin resolves
+   those in a pass later. */
+function pairs(){ try{ return JSON.parse(localStorage.getItem("rc_pairs")||"[]"); }
+                  catch(e){ return []; } }
+/* The datalists are a typing convenience, not the resolution mechanism —
+   resolveEntity() runs on every keystroke regardless of what is listed here.
+   So they are capped. A <datalist> is real DOM: 5,000 tickers plus 5,000
+   company names is 10,000 nodes rebuilt on every boot, which is measurable
+   on a page meant to open instantly and sit there all day.
+
+   The company-name list is deliberately NOT fed from the ticker map at all.
+   Ticker leads the form now, and the name fills itself in, so an autocomplete
+   over every company you own is 5,000 nodes serving a field almost nobody
+   types into. */
+const DATALIST_CAP = 2000;
+function refreshLists(){
+  const p=pairs(), de=$("#entlist"), dt=$("#tkrlist");
+  de.innerHTML=""; dt.innerHTML="";
+  const names=new Set(p.map(x=>x.e).filter(Boolean));
+  const tkrs =new Set(p.map(x=>x.t).filter(Boolean));
+  const map=RC.tickers||{};
+  const keys=Object.keys(map);
+  if(keys.length<=DATALIST_CAP) for(const tk of keys) tkrs.add(tk);
+  [...names].sort().forEach(v=>{ const o=el("option"); o.value=v; de.appendChild(o); });
+  [...tkrs ].sort().forEach(v=>{ const o=el("option"); o.value=v; dt.appendChild(o); });
+}
+function rememberPair(e,t){
+  if(!e) return;
+  const p=pairs();
+  if(p.some(x=>x.e===e && x.t===(t||""))) return;
+  p.push({e:e,t:t||""}); localStorage.setItem("rc_pairs",JSON.stringify(p));
+  refreshLists();
+}
+/* True while the name in the box was put there by us, not typed. Resolution
+   runs per keystroke, so "LRCX" arrives as L, LR, LRC, LRCX — and L is Loews.
+   The old rule ("never overwrite a non-blank name") froze that first partial
+   hit in place, so every ticker beginning with a letter that is itself a
+   listed ticker resolved to the wrong company. A name we filled is ours to
+   replace; a name the user typed is not. */
+let ENTITY_AUTO=false;
+function resolveEntity(){
+  const tk=$("#f_ticker").value.trim().toUpperCase();
+  const cur=$("#f_entity").value.trim();
+  if(cur && !ENTITY_AUTO) return;              // hand-typed name wins
+  if(!tk){
+    if(ENTITY_AUTO){ $("#f_entity").value=""; ENTITY_AUTO=false; }
+    $("#tickerhint").textContent=""; return;
+  }
+  const hit = companyFor(tk) || (pairs().find(x=>x.t===tk)||{}).e || "";
+  if(hit){ $("#f_entity").value=hit; ENTITY_AUTO=true; }
+  else if(ENTITY_AUTO){ $("#f_entity").value=""; ENTITY_AUTO=false; }
+  $("#tickerhint").textContent = hit
+    ? hit
+    : (tk.startsWith("P.") ? "Private company \u2014 no price data will be fetched."
+       : "Not in the ticker list. Leave the name blank and it resolves later, "
+       + "or type it once.");
+}
+
+/* ---------- attachments ---------- */
+const sanitize = n => n.replace(/[^A-Za-z0-9._-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,80);
+function addFiles(files,atCursor){
+  for(const f of files){
+    let name=sanitize(f.name||"");
+    if(!name || /^image\.(png|jpe?g)$/i.test(name) || !f.name){
+      const ext=(String(f.type).split("/")[1]||"png").replace("jpeg","jpg");
+      name="image-"+String(++S.imgN).padStart(2,"0")+"."+ext;
+    }
+    if(S.atts.some(a=>a.name===name)){
+      const p=name.lastIndexOf("."); const b=p<0?name:name.slice(0,p);
+      const x=p<0?"":name.slice(p); let i=2;
+      while(S.atts.some(a=>a.name===b+"-"+i+x)) i++;
+      name=b+"-"+i+x;
+    }
+    S.atts.push({name,file:f});
+    if(atCursor && f.type.startsWith("image/")) insertAtCursor("\n![]("+name+")\n");
+  }
+  renderAtts();
+}
+function insertAtCursor(txt){
+  const t=$("#f_note"), s=t.selectionStart??t.value.length, e=t.selectionEnd??s;
+  t.value=t.value.slice(0,s)+txt+t.value.slice(e);
+  t.selectionStart=t.selectionEnd=s+txt.length; t.focus(); renderTags();
+}
+function renderAtts(){
+  const c=$("#atts"); c.innerHTML="";
+  S.atts.forEach((a,i)=>{
+    const d=el("div","att");
+    d.appendChild(el("span","nm",a.name));
+    d.appendChild(el("span","sz",(a.file.size/1024).toFixed(0)+" KB"));
+    const b=el("button","","\u00d7");
+    b.onclick=()=>{ S.atts.splice(i,1); renderAtts(); };
+    d.appendChild(b); c.appendChild(d);
+  });
+}
+
+/* ==========================================================================
+   SAVE
+   ========================================================================== */
+function buildRecord(){
+  const f=M();
+  const contributor=$("#f_contrib").value;
+  const date=$("#f_date").value || new Date().toISOString().slice(0,10);
+  const subject=$("#f_subject").value.trim();
+  const rec={};
+
+  if(S.mode==="Company" || S.mode==="Trade"){
+    /* entity may be blank — it resolves from the ticker, here or later. */
+    rec.entity=$("#f_entity").value.trim()||null;
+    rec.ticker=$("#f_ticker").value.trim().toUpperCase()||null;
+    rec.tickers=[];
+    rec.listed = S.mode==="Company" ? $("#f_listed").checked : true;
+  } else if(S.mode==="Theme"){
+    rec.entity=$("#f_theme").value;
+    rec.ticker=null; rec.listed=null;
+    rec.tickers=S.tickers.slice();
+  } else {
+    /* Quick note. There is no Topic input any more; entity is the subject so it
+       is never blank on disk, but nobody is asked for it. tickers[] is the same
+       reverse index a Theme note carries, so a quick note about three names
+       shows on all three company pages. `ticker` (singular) stays null — a
+       quick note is not about one company, or it would be a Company note. */
+    rec.entity=subject;
+    rec.ticker=null; rec.listed=null; rec.tickers=S.tickers.slice();
+  }
+
+  if(f.pt){
+    for(const [id,sel] of [["price_target_buy","#f_ptb"],["price_target_sell","#f_pts"]]){
+      const raw=$(sel).value.trim();
+      rec[id] = raw==="" ? null : raw;   // validateRecord enforces whole numbers
+    }
+  } else { rec.price_target_buy=null; rec.price_target_sell=null; }
+
+  const a=$("#f_action").value;
+  const review = f.bias ? ($("#f_review").value||null) : null;
+
+  Object.assign(rec,{
+    date:date, contributor:contributor, origin:"app",
+    record_type:S.mode, subject:subject,
+    strategy: f.strategy ? ($("#f_strategy").value||null) : null,
+    action:   f.action   ? (a||null) : null,
+    why:      f.why      ? ($("#f_why").value.trim()||null) : null,
+    source:   f.action && a==="observation" ? ($("#f_source").value.trim()||null) : null,
+    outcome_check_date: f.action && CHECKABLE_ACTIONS.indexOf(a)>=0
+           ? ($("#f_outcome").value||null) : null,
+    tags:currentTags().map(t=>t.tag),
+    attachments:S.atts.map(a=>a.name),
+    bias: f.bias ? (S.bias||null) : null,
+    review_date:review, review_status:review?"Pending":null,
+    priority:null, revision:1
+  });
+  return rec;
+}
+
+/* No field checking happens here. TYPE_RULES in rc-core.js is the single
+   source of truth for what each entry type requires, and validateRecord()
+   reads it — so the /note skill and the email reader enforce exactly the same
+   rules against the same record shape without any of it being duplicated in
+   this file. The body is passed in because Trade requires one. */
+
+async function save(){
+  if(!RC.dir){ flash("Choose a folder first.","err"); return; }
+
+  resolveEntity();
+  const body=$("#f_note").value;
+  const rec=buildRecord();
+
+  const v=validateRecord(rec, RC.cfg, body);
+  if(!v.ok){
+    flash(v.errors[0],"err");
+    banner(v.errors.length>1 ? v.errors.join("  \u00b7  ") : "");
+    focusFor(v.errors[0]);
+    return;
+  }
+  banner(v.warnings.length ? v.warnings.join("  \u00b7  ") : "", true);
+
+  for(const k of ["price_target_buy","price_target_sell"])
+    rec[k] = (rec[k]===null||rec[k]==="") ? null : parseInt(rec[k],10);
+
+  const now=new Date().toISOString();
+  const [yy,mm]=rec.date.split("-");
+  let folder=rec.date+"_"+initials(rec.contributor)+"_"+slug(rec.subject);
+  const root=await notesRoot(true);
+  const parent=await subdir(root,[yy,mm]);
+  if(await dirExists(parent,folder)){
+    let i=2; while(await dirExists(parent,folder+"-"+i)) i++;
+    folder=folder+"-"+i;
+  }
+  rec.note_id=folder; rec.created=now; rec.last_updated=now;
+
+  try{
+    const dir=await parent.getDirectoryHandle(folder,{create:true});
+    await writeFile(dir,"note.md",buildFM(rec,body));
+    for(const a of S.atts) await writeFile(dir,a.name,a.file);
+    if(rec.entity && rec.ticker) rememberPair(rec.entity,rec.ticker);
+    RC.notes=null;
+    flash("Saved "+yy+"/"+mm+"/"+folder+" \u2014 "+rec.tags.length+" tags, "
+        + S.atts.length+" attachment(s).","ok");
+    clearForm(true);
+  }catch(e){ flash("Save failed: "+e.message,"err"); }
+}
+
+function focusFor(err){
+  const map=[["Subject","#f_subject"],["Ticker","#f_ticker"],["Theme","#f_theme"],
+             ["Strategy","#f_strategy"],["Action","#f_action"],["Why","#f_why"],
+             ["why","#f_why"],["Note","#f_note"],["Entity","#f_entity"],
+             ["Price targets","#f_ptb"],["outcome_check_date","#f_outcome"],
+             ["review_date","#f_review"]];
+  for(const [k,sel] of map)
+    if(err.indexOf(k)>=0){ const e=$(sel); if(e && !e.closest(".hide")) e.focus(); return; }
+}
+
+/* ---------- import a drafted note ---------- */
+function loadPasted(){
+  const raw=$("#pastebox").value;
+  if(!raw.trim()){ $("#pastemsg").textContent="Nothing to load."; return; }
+
+  let f={}, body="", how="";
+  const fm=parseFM(raw);
+  if(fm){ f=fm; body=fm._body||""; how="frontmatter"; }
+  else {
+    const e=parseEmailHeaders(raw);
+    f=e.fields; body=e.body; how="header block";
+    if(e.unknown.length) how += " \u2014 ignored: "+e.unknown.join(", ");
+  }
+
+  const type = MODES.indexOf(f.record_type)>=0 ? f.record_type : "Note";
+  setMode(type);
+
+  if(f.date && /^\d{4}-\d{2}-\d{2}$/.test(f.date)) $("#f_date").value=f.date;
+  if(f.contributor && [...$("#f_contrib").options].some(o=>o.value===f.contributor))
+    $("#f_contrib").value=f.contributor;
+  $("#f_subject").value = f.subject || "";
+  $("#f_note").value = body;
+
+  if(type==="Company" || type==="Trade"){
+    $("#f_entity").value = f.entity || ""; ENTITY_AUTO=false;
+    $("#f_ticker").value = (f.ticker||"").toUpperCase();
+    if(f.listed!==undefined) $("#f_listed").checked = !(f.listed===false||f.listed==="false");
+    $("#f_ptb").value = f.price_target_buy ?? "";
+    $("#f_pts").value = f.price_target_sell ?? "";
+  } else if(type==="Theme"){
+    if(f.entity && [...$("#f_theme").options].some(o=>o.value===f.entity))
+      $("#f_theme").value=f.entity;
+    S.tickers = Array.isArray(f.tickers) ? f.tickers.slice() : [];
+    renderTkr();
+  }
+
+  /* conviction is gone. A pasted record that still carries High/Med/Low is not
+     mapped onto bias — those are different questions and guessing would put a
+     value nobody chose into an immutable field. */
+  S.bias="";
+  setBias(["+","=","-"].indexOf(f.bias)>=0 ? f.bias : "");
+
+  if(f.strategy && [...$("#f_strategy").options].some(o=>o.value===f.strategy))
+    $("#f_strategy").value=f.strategy;
+  $("#f_action").value = actionsList().indexOf(f.action)>=0 ? f.action : "";
+  $("#f_why").value = f.why || "";
+  $("#f_source").value = f.source || "";
+  $("#f_outcome").value = f.outcome_check_date || "";
+  $("#f_review").value = f.review_date || "";
+  onAction();
+
+  S.manual.clear(); S.removed.clear();
+  let tagMsg="";
+  const supplied = Array.isArray(f.tags) ? f.tags
+                 : (typeof f.tags==="string" && f.tags ? f.tags.split(",") : null);
+  if(supplied){
+    const r=resolveTagNames(supplied, RC.cfg);
+    r.tags.forEach(t=>S.manual.add(t));
+    if(r.missing.length) tagMsg=" \u2014 not in the taxonomy, dropped: "+r.missing.join(", ");
+  }
+  renderTags(); renderPicker();
+
+  $("#pastemsg").textContent="Loaded from "+how+". Check it, then Save."+tagMsg;
+  flash("Loaded into the form. Nothing saved yet.","ok");
+  $("#f_subject").focus();
+}
+
+function clearForm(keepMsg){
+  $("#f_subject").value=""; $("#f_entity").value=""; $("#f_ticker").value="";
+  ENTITY_AUTO=false;
+  $("#f_note").value=""; $("#f_ptb").value=""; $("#f_pts").value="";
+  $("#f_review").value=""; $("#f_listed").checked=true;
+  $("#f_action").value=""; $("#f_why").value=""; $("#f_source").value="";
+  $("#f_outcome").value="";
+  /* strategy is deliberately NOT cleared — someone entering five records is
+     almost always in one strategy, and re-picking it each time is friction that
+     gets skipped. */
+  $("#pastebox").value=""; $("#pastemsg").textContent="";
+  S.atts=[]; S.manual.clear(); S.removed.clear(); S.tickers=[]; S.imgN=0;
+  S.bias=""; setBias("");
+  renderAtts(); renderTags(); renderPicker(); renderTkr(); onAction();
+  $("#f_date").value=new Date().toISOString().slice(0,10);
+  /* keepMsg is set after a successful save, and a save can succeed WITH
+     warnings. Clearing the banner here would wipe them before they were read. */
+  if(!keepMsg){ banner(""); flash(""); }
+}
+
+/* ---------- boot ---------- */
+async function boot(){
+  await restoreFolder();
+  if(RC.dir){ await loadConfig(); await loadTickers(); }
+  const cfg=RC.cfg||SEED;
+
+  const sel=$("#f_contrib"); sel.innerHTML="";
+  cfg.contributors.forEach(c=>{ const o=el("option","",c); o.value=c; sel.appendChild(o); });
+  sel.value=localStorage.getItem("rc_contributor")||cfg.contributors[0];
+  sel.onchange=()=>localStorage.setItem("rc_contributor",sel.value);
+
+  const th=$("#f_theme"); th.innerHTML="";
+  th.appendChild(new Option("\u2014",""));
+  (cfg.themes||[]).forEach(t=>th.appendChild(new Option(t,t)));
+
+  const st=$("#f_strategy"); st.innerHTML="";
+  st.appendChild(new Option("\u2014",""));
+  (cfg.strategies||[]).forEach(x=>st.appendChild(new Option(x,x)));
+  st.value=localStorage.getItem("rc_strategy")||"";
+
+  $("#f_date").value=new Date().toISOString().slice(0,10);
+  refreshLists();
+  buildActions();
+  setBias("");
+  setMode(localStorage.getItem("rc_mode")||"Note");
+  renderTags(); renderPicker(); renderTkr();
+
+  if(!RC.dir) banner("No folder connected. Click the badge, top right, and pick the "
+                   + "shared folder that contains NOTES.");
+  else banner("");
+}
+
+/* ---------- wiring ---------- */
+document.addEventListener("rc-folder", async()=>{ await boot(); });
+MODES.forEach(k=>$(MODE_FIELDS[k].btn).onclick=()=>setMode(k));
+[...$("#biasgrp").children].forEach(b=>b.onclick=()=>setBias(b.dataset.v));
+$("#f_action").addEventListener("change",onAction);
+$("#f_strategy").addEventListener("change",()=>{
+  localStorage.setItem("rc_strategy",$("#f_strategy").value); onAction(); });
+$("#f_why").addEventListener("input",onWhy);
+$("#btn_paste").onclick=loadPasted;
+$("#f_subject").addEventListener("input",()=>{renderTags();renderPicker();});
+$("#f_note").addEventListener("input",()=>{renderTags();renderPicker();});
+$("#tagsearch").addEventListener("input",renderPicker);
+$("#f_ticker").addEventListener("input",e=>{
+  e.target.value=e.target.value.toUpperCase();
+  if(e.target.value.startsWith("P.")) $("#f_listed").checked=false;
+  resolveEntity();
+});
+$("#f_ticker").addEventListener("change",resolveEntity);
+$("#f_entity").addEventListener("input",()=>{ ENTITY_AUTO=false; });
+$("#f_entity").addEventListener("change",()=>{
+  const e=$("#f_entity").value.trim();
+  if(!e||$("#f_ticker").value.trim()) return;
+  const hit=pairs().find(x=>x.e===e&&x.t); if(hit) $("#f_ticker").value=hit.t;
+});
+$("#tkrbtn").onclick=addTkr;
+$("#tkradd").addEventListener("input",e=>e.target.value=e.target.value.toUpperCase());
+$("#tkradd").addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault();addTkr();} });
+$("#btn_save").onclick=save;
+$("#btn_clear").onclick=()=>clearForm(false);
+
+const drop=$("#drop"), filein=$("#filein");
+drop.onclick=()=>filein.click();
+filein.onchange=e=>{ addFiles(e.target.files,false); filein.value=""; };
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{
+  e.preventDefault(); drop.classList.add("hot"); }));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{
+  e.preventDefault(); drop.classList.remove("hot"); }));
+drop.addEventListener("drop",e=>{ if(e.dataTransfer.files.length) addFiles(e.dataTransfer.files,false); });
+window.addEventListener("dragover",e=>e.preventDefault());
+window.addEventListener("drop",e=>{ e.preventDefault();
+  if(e.dataTransfer&&e.dataTransfer.files.length) addFiles(e.dataTransfer.files,false); });
+window.addEventListener("paste",e=>{
+  const fs=[...(e.clipboardData?.files||[])];
+  if(fs.length){ e.preventDefault(); addFiles(fs,true); } });
+window.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){ e.preventDefault(); save(); } });
+
+boot();
+</script>
+</body>
+</html>

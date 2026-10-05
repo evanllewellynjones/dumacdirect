@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>800V HVDC Data Center Power — DUMAC Direct</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     THEME WRITE-UP TEMPLATE  —  DUMAC Direct
+     Section order locked: Header / Thesis / Catalysts /
+     Market Dynamic / Key Leaders / Sub-theme structure /
+     DB Structure / Caveats
+     Palette: white bg, black type, blue + yellow accents.
+     Font floor: 13px (~10pt) everywhere.
+     ========================================================= */
+  :root {
+    --bg:          #ffffff;
+    --bg-tint:     #f5f7fb;
+    --bg-yellow:   #fdf6e0;
+    --ink:         #14181f;
+    --ink-soft:    #565d6b;
+    --blue:        #1b3a8f;
+    --blue-deep:   #122a66;
+    --blue-soft:   #e4e9f6;
+    --yellow:      #f2b705;
+    --yellow-deep: #b8860b;
+    --line:        #d9dde6;
+    --tail:        #1f7a4d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 40px 110px;
+  }
+
+  /* ---------- Breadcrumb ---------- */
+  .crumb {
+    padding: 28px 0 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .crumb a {
+    color: var(--blue);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .crumb a:hover { color: var(--yellow-deep); }
+  .crumb .sep { margin: 0 10px; color: var(--line); }
+
+  /* ---------- SECTION 1 — Header line ---------- */
+  .masthead {
+    margin-top: 24px;
+    padding-bottom: 26px;
+    border-bottom: 3px solid var(--yellow);
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.6vw, 3.15rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--blue-deep);
+    max-width: 18ch;
+  }
+  .updated {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    padding-bottom: 6px;
+  }
+  .updated b { color: var(--yellow-deep); font-weight: 500; }
+
+  /* ---------- Section scaffold ---------- */
+  section { margin-top: 50px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .sec-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--yellow-deep);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    letter-spacing: -0.012em;
+    color: var(--blue);
+  }
+  .sec-head::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: var(--line);
+    align-self: center;
+  }
+
+  /* ---------- Bullet list (thesis / catalysts) ---------- */
+  .points { list-style: none; }
+  .points > li {
+    position: relative;
+    padding: 0 0 20px 30px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .points > li:last-child { border-bottom: none; margin-bottom: 0; }
+  .points > li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 9px;
+    width: 9px; height: 9px;
+    background: var(--yellow);
+    border: 1px solid var(--yellow-deep);
+    transform: rotate(45deg);
+  }
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.16rem;
+    color: var(--blue);
+    letter-spacing: -0.005em;
+  }
+  .points p {
+    font-size: 1.08rem;
+    line-height: 1.62;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+
+  /* ---------- Market dynamic block ---------- */
+  .dynamic {
+    background: var(--bg-tint);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--blue);
+    padding: 26px 30px;
+  }
+  .dynamic p {
+    font-size: 1.1rem;
+    line-height: 1.66;
+    color: var(--ink);
+  }
+  .dynamic .pill {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 2px 9px;
+    border-radius: 2px;
+    color: var(--ink);
+    background: var(--yellow);
+  }
+  .dynamic .pill.tail { background: var(--tail); color: #ffffff; }
+
+  /* ---------- Leaders ---------- */
+  .leaders { display: grid; gap: 0; }
+  .lgroup {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .lgroup:last-child { border-bottom: none; }
+  .lgroup .gname {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 3px solid var(--yellow);
+  }
+  .lgroup p {
+    font-size: 1.06rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .tk {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--blue-deep);
+    background: var(--blue-soft);
+    padding: 1px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* ---------- Table (sub-theme structure) ---------- */
+  .tbl-scroll { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.02rem;
+    min-width: 560px;
+    border: 1px solid var(--line);
+  }
+  thead th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--blue);
+    text-align: left;
+    padding: 11px 16px;
+  }
+  tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) td { background: var(--bg-tint); }
+  tbody td:first-child {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+
+  /* ---------- DB structure meta table ---------- */
+  .meta {
+    border: 1px solid var(--line);
+  }
+  .meta-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+  .meta-row:last-child { border-bottom: none; }
+  .meta-row .k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    padding: 13px 16px;
+    background: var(--bg-tint);
+    border-right: 1px solid var(--line);
+  }
+  .meta-row .v {
+    padding: 13px 16px;
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  /* ---------- Caveats ---------- */
+  .caveats { list-style: none; }
+  .caveats li {
+    position: relative;
+    padding: 0 0 14px 26px;
+    margin-bottom: 14px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--ink);
+    border-bottom: 1px dotted var(--line);
+  }
+  .caveats li:last-child { border-bottom: none; margin-bottom: 0; }
+  .caveats li::before {
+    content: "\2014";
+    position: absolute;
+    left: 0; top: 0;
+    color: var(--yellow-deep);
+    font-weight: 600;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 3px solid var(--yellow);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { color: var(--yellow-deep); }
+
+  .disclaimer {
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  strong { color: var(--blue); font-weight: 600; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 0 22px 80px; }
+    .meta-row { grid-template-columns: 1fr; }
+    .meta-row .k { border-right: none; border-bottom: 1px solid var(--line); }
+    .title-row { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="crumb">
+    <a href="../index.html">Theme Knowledge Base</a>
+    <span class="sep">/</span> Data Center Power
+    <span class="sep">/</span> 800V HVDC
+  </nav>
+
+  <!-- ============ 1 · HEADER LINE ============ -->
+  <header class="masthead">
+    <div class="eyebrow">Theme Tear-Sheet</div>
+    <div class="title-row">
+      <h1>800V HVDC Data Center Power</h1>
+      <div class="updated">Last updated <b>May 29, 2026</b></div>
+    </div>
+  </header>
+
+  <!-- ============ 2 · THESIS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Thesis</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">Rack power has broken the 54V status quo.</span>
+        <p>AI racks distribute power at 54V DC today and hit physical limits as they pass roughly 200kW &mdash; bulky copper busbars can no longer shuttle that current efficiently. NVIDIA's roadmap takes racks to 1MW and beyond, which low-voltage distribution cannot carry without prohibitive copper mass and conversion loss. 800V high-voltage DC is the architectural response, and the binding constraint is now power, not compute.</p>
+      </li>
+      <li>
+        <span class="lead">NVIDIA has effectively set 800V DC as the AI-factory standard.</span>
+        <p>Its 800 VDC architecture converts 13.8kV AC grid power directly to 800V DC at the data-center perimeter using industrial rectifiers, eliminating most intermediate AC/DC and DC/DC conversion stages. Mass production is targeted for 2027 in sync with the Kyber rack system and Rubin Ultra platform. When the dominant GPU vendor publishes the reference design, the supply chain standardizes around it.</p>
+      </li>
+      <li>
+        <span class="lead">The transition pulls a multi-year content wave across the power chain.</span>
+        <p>Each watt to a GPU now passes through more high-voltage conversion stages, and each stage favors wide-bandgap semiconductors &mdash; SiC for grid-to-rack and solid-state-transformer duty, GaN for high-frequency final-stage delivery near the die. The result is a demand multiplier on power-semiconductor and power-module content per rack, not a one-time swap.</p>
+      </li>
+      <li>
+        <span class="lead">Incumbents are committing product roadmaps, not just press releases.</span>
+        <p>Eaton launched an 800V DC reference architecture (Oct 2025); Vertiv announced a full 800V HVDC product line for 2026 to support Rubin Ultra; STMicroelectronics expanded its 800VDC conversion portfolio with 800VDC-to-12V and -to-6V stages at GTC 2026; Navitas unveiled a 10kW 800V-to-50V GaN DC-DC platform at 98.5% peak efficiency (Feb 2026). The commitments are concrete and dated.</p>
+      </li>
+      <li>
+        <span class="lead">Private-market and M&amp;A validation precede clean public repricing.</span>
+        <p>The independent GaN layer is being absorbed by public incumbents &mdash; GaN Systems into Infineon (2023), Transphorm into Renesas (2024) &mdash; while venture capital funds data-center-native power startups such as Vertical Semiconductor (MIT spin-out, $11M seed led by Playground Global). Capital recognizes the shift; most public-equity exposure is still embedded in diversified names rather than pure-plays.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ 3 · CATALYSTS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Catalysts to Watch</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">First 1MW-rack production deployment on 800V DC.</span>
+        <p>Confirmation that Kyber / Rubin Ultra ships at volume on 800V validates both the timeline and the named supplier set. Slippage back toward the OCP transitional path would reshuffle which suppliers capture the content.</p>
+      </li>
+      <li>
+        <span class="lead">Hyperscaler adoption beyond the NVIDIA ecosystem.</span>
+        <p>Whether AWS, Google, and Meta adopt NVIDIA's 800V reference (or an equivalent self-developed design) determines whether this is an NVIDIA-ecosystem story or an industry-wide standard. Watch Open Compute Project (OCP) updates for convergence signals.</p>
+      </li>
+      <li>
+        <span class="lead">Power content-per-rack disclosure from the semis.</span>
+        <p>The first time Infineon, onsemi, STMicroelectronics, TI, or Navitas breaks out AI-data-center power as a reported revenue driver is the repricing inflection &mdash; it converts a narrative into attributable bookings.</p>
+      </li>
+      <li>
+        <span class="lead">Pure-play IPO or major M&amp;A.</span>
+        <p>A Vertical Semiconductor, EPC, or Cambridge GaN event would create the first clean public proxy and justify carving out a pure-play sub-theme. Continued roll-up into incumbents is the base case and is itself a tradeable signal.</p>
+      </li>
+      <li>
+        <span class="lead">Resolution of the 800V vs OCP &plusmn;400V standards split.</span>
+        <p>The market is currently split between OCP's &plusmn;400V transitional approach and NVIDIA's 800V standard. Convergence (or durable fragmentation) changes the addressable content for each supplier and the strength of every edge in this theme.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ 4 · MARKET DYNAMIC ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Market Dynamic, Direction, Horizon &amp; Conviction</h2></div>
+    <div class="dynamic">
+      <p>Emerging but rapidly consensus-forming &mdash; and, unlike PQC, public-equity flows have already begun repricing the most visible names (Vertiv in particular). This is a <span class="pill tail">Tailwind</span> for the power-semiconductor and data-center-power supply chain, expected to play out over a <span class="pill">3&ndash;5 year</span> horizon (reference designs shipping 2025&ndash;2026, mass production 2027, build-out beyond). Theme conviction is <span class="pill">Medium-High</span> &mdash; the secular driver (AI power demand) is strong and the reference design is set, but timing risk, the unresolved 800V / &plusmn;400V standard split, and the degree already priced into names like Vertiv all temper it. Conviction is <span class="pill">Claude-inferred</span> pending confirmation.</p>
+    </div>
+  </section>
+
+  <!-- ============ 5 · KEY LEADERS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Key Leaders to Watch</h2></div>
+    <div class="leaders">
+      <div class="lgroup">
+        <div class="gname">Public Incumbents &middot; Power Semiconductors</div>
+        <p>Infineon <span class="tk">IFX</span> and STMicroelectronics <span class="tk">STM</span> hold the broadest grid-to-core SiC/GaN portfolios. Texas Instruments <span class="tk">TXN</span>, onsemi <span class="tk">ON</span>, Analog Devices <span class="tk">ADI</span>, Monolithic Power <span class="tk">MPWR</span>, Renesas <span class="tk">6723</span>, and ROHM <span class="tk">6963</span> span the conversion and control chain. Navitas <span class="tk">NVTS</span> is the closest to a GaN/SiC pure-play, with Power Integrations <span class="tk">POWI</span> and Wolfspeed <span class="tk">WOLF</span> on the wide-bandgap edge.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Public Integrators &middot; Power Systems &amp; Components</div>
+        <p>Vertiv <span class="tk">VRT</span>, Eaton <span class="tk">ETN</span>, Schneider Electric <span class="tk">SU</span>, and ABB <span class="tk">ABBN</span> build the rack- and facility-level 800V power systems and solid-state transformers. Flex <span class="tk">FLEX</span> and Lite-On <span class="tk">2301</span> supply power-conversion components and modules. These are the picks-and-shovels of the architecture.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Important Private Companies to Monitor</div>
+        <p>Vertical Semiconductor (data-center-native vertical GaN) is the most thesis-aligned private name. Efficient Power Conversion (EPC) and Cambridge GaN Devices are the remaining independent GaN players; VisIC Technologies (Israel) holds high-voltage 800V GaN IP but is EV-first; Lead Wealth (China) is the one private name on NVIDIA's own power-components partner list. Note GaN Systems and Transphorm are already inside Infineon and Renesas respectively.</p>
+      </div>
+    </div>
+    <p class="disclaimer">Not exhaustive &mdash; see Neo4j for the full edge list.</p>
+  </section>
+
+  <!-- ============ 6 · SUB-THEME STRUCTURE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Sub-Theme Structure</h2></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr><th>Sub-theme</th><th>Driver</th><th>Initial public-equity surface</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Power Semiconductors (GaN / SiC)</td>
+            <td>Wide-bandgap content rises with each high-voltage conversion stage &mdash; SiC for grid-to-rack and SST duty, GaN for high-frequency final-stage delivery.</td>
+            <td>Broad &mdash; mostly diversified semis where AI-DC power is additive (IFX, STM, TXN, ON, ADI, MPWR, 6723, 6963); NVTS closest to pure-play.</td>
+          </tr>
+          <tr>
+            <td>Power Conversion and Delivery Components</td>
+            <td>DC-DC bricks, PSUs, busbars and power modules executing the 800V-to-point-of-load chain on the server board and in the rack.</td>
+            <td>Mixed &mdash; Flex (FLEX) and Lite-On (2301 TT) listed; several key module makers (Delta, Megmeet) sit outside the universe or are non-Western.</td>
+          </tr>
+          <tr>
+            <td>Data Center Power Systems and Infrastructure</td>
+            <td>Facility- and rack-level power systems, solid-state transformers and switchgear converting medium-voltage grid power to 800V DC.</td>
+            <td>Cleanest &mdash; Vertiv (VRT), Eaton (ETN), Schneider (SU FP), ABB (ABBN SW) are direct, large-cap surfaces.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 7 · DB STRUCTURE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Theme Database Structure</h2></div>
+    <div class="meta">
+      <div class="meta-row"><div class="k">Topic</div><div class="v">AI Infrastructure / Data Center Power &mdash; no umbrella Topic node created yet; left untagged for now.</div></div>
+      <div class="meta-row"><div class="k">Theme level</div><div class="v">800V HVDC is Level 2, child of the Data Center Power Level 1 parent, with 3 Level 3 sub-themes.</div></div>
+      <div class="meta-row"><div class="k">Status</div><div class="v">Active &mdash; loaded May 31, 2026.</div></div>
+      <div class="meta-row"><div class="k">Direction</div><div class="v">Tailwind. Headwind exposures (e.g. legacy 54V-only power-shelf vendors displaced by the architecture) would be wired as separate Headwind edges, never a Mixed direction.</div></div>
+      <div class="meta-row"><div class="k">Conviction</div><div class="v">Medium-High; conviction_source = 'Claude-inferred' until confirmed.</div></div>
+      <div class="meta-row"><div class="k">Time horizon</div><div class="v">3&ndash;5 years (reference designs 2025&ndash;2026, mass production 2027).</div></div>
+      <div class="meta-row"><div class="k">Companies</div><div class="v">17 Tailwind EXPOSED_TO edges aggregated via children: 11 Power Semiconductors (GaN / SiC), 4 Data Center Power Systems and Infrastructure, 2 Power Conversion and Delivery Components. All edges reviewed = false pending sign-off.</div></div>
+      <div class="meta-row"><div class="k">Relates to</div><div class="v">No material overlap with existing themes; closest adjacency is the broader AI-infrastructure capex cycle, which is not yet a node &mdash; so no RELATES_TO edge is proposed at this time.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 8 · CAVEATS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Caveats &amp; Discipline Notes</h2></div>
+    <ul class="caveats">
+      <li>Most candidate names are diversified semis where 800V DC is one of several AI-infrastructure drivers; edge strength reflects revenue attributability, not headline association &mdash; NVTS is far more levered to this than ADI or TXN.</li>
+      <li>Mechanism on every edge specifies the layer (silicon / components / systems) and whether the name sells 800V content versus merely benefits indirectly.</li>
+      <li>Scope decision: EV 800V powertrains share the same GaN/SiC suppliers. This theme is scoped to data center only to keep the thesis clean &mdash; VisIC is the flag where the two worlds blur.</li>
+      <li>Unlike PQC, Vertiv and several semis have already repriced substantially on the AI-power narrative &mdash; strength/confidence on incumbent edges should not assume the market is asleep.</li>
+      <li>Standards risk is the key downside: OCP &plusmn;400V is a live transitional alternative; a durable shift away from 800V would impair edges on names levered specifically to it.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div><a href="../index.html">&larr; Back to Knowledge Base</a></div>
+    <div>DUMAC Direct &middot; Framework-driven analysis, not investment advice</div>
+  </footer>
+
+</div>
+</body>
+</html>

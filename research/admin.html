@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin &amp; Maintenance</title>
+<link rel="stylesheet" href="rc-style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <a class="home" href="../index.html">DUMAC</a>
+  <h1>Admin &amp; Maintenance</h1>
+  <span class="sp"></span>
+  <a class="modelink" href="entry.html">Entry</a>
+  <a class="modelink" href="reports.html">Reports</a>
+  <a class="modelink cur" href="admin.html">Admin</a>
+  <span class="badge" id="folder">no folder</span>
+</div>
+
+<div class="wrap wide">
+
+<div class="banner" id="banner"></div>
+
+<div class="tabs">
+  <div class="tab cur" data-v="records">Records</div>
+  <div class="tab" data-v="themes">Themes</div>
+  <div class="tab" data-v="tags">Tags</div>
+  <div class="tab" data-v="tickers">Tickers</div>
+  <div class="tab" data-v="config">Config</div>
+  <span style="flex:1"></span>
+  <span class="badge" id="lockbadge" style="cursor:pointer">read-only &mdash; unlock</span>
+</div>
+
+<!-- RECORDS -->
+<div id="v_records">
+  <div class="card">
+    <div class="frow">
+      <label for="q_type" class="narrow">Type</label>
+      <div class="f sm"><select id="q_type">
+        <option value="">All</option><option>Company</option><option>Theme</option>
+        <option>Note</option><option>Trade</option>
+        <option value="__none">Unclassified</option></select></div>
+      <label for="q_action" style="flex:0 0 auto">Action</label>
+      <div class="f sm"><select id="q_action"><option value="">Any</option>
+        <option value="__none">Unset</option></select></div>
+      <label for="q_origin" style="flex:0 0 auto">Origin</label>
+      <div class="f sm"><select id="q_origin"><option value="">Any</option>
+        <option value="__notapp">Not app</option></select></div>
+      <label for="q_who" style="flex:0 0 auto">Contributor</label>
+      <div class="f md"><select id="q_who"><option value="">Everyone</option></select></div>
+      <label for="q_pri" style="flex:0 0 auto">Priority</label>
+      <div class="f sm"><select id="q_pri">
+        <option value="">Any</option><option>1</option><option>2</option><option>3</option>
+        <option value="__none">Unset</option></select></div>
+      <label for="q_tag" style="flex:0 0 auto">Tag</label>
+      <div class="f md"><select id="q_tag"><option value="">Any tag</option></select></div>
+      <label for="q_text" style="flex:0 0 auto">Text</label>
+      <div class="f"><input type="text" id="q_text" placeholder="Search"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="frow" style="margin-bottom:6px">
+      <div class="f" id="recstatus" style="font-weight:600"></div>
+    </div>
+    <div class="row" style="align-items:center;margin-bottom:7px">
+      <div style="flex:0 0 auto"><b id="selcount" class="tiny">0 selected</b></div>
+      <div style="flex:0 0 auto">
+        <label style="display:inline">Set priority</label>
+        <select id="bulk_pri" style="width:auto;display:inline-block">
+          <option value="">&mdash;</option><option>1</option><option>2</option><option>3</option>
+        </select>
+      </div>
+      <div style="flex:0 0 auto">
+        <label style="display:inline">Set type</label>
+        <select id="bulk_type" style="width:auto;display:inline-block">
+          <option value="">&mdash;</option><option>Company</option><option>Theme</option>
+          <option>Note</option><option>Trade</option>
+        </select>
+      </div>
+      <div style="flex:0 0 auto"><button class="btn" id="btn_bulk">Apply to selected</button></div>
+      <div class="tiny" style="flex:1">Bulk edit only. Records below load automatically
+        and the filters apply as you type.</div>
+    </div>
+    <div style="max-height:520px;overflow:auto">
+      <table class="grid" id="rectbl">
+        <thead><tr>
+          <th style="width:22px"><input type="checkbox" id="selall" style="width:auto"></th>
+          <th>Date</th><th>Type</th><th>Action</th><th>Origin</th>
+          <th>Ticker</th><th>Entity</th>
+          <th>Subject</th><th>Tags</th><th>Contributor</th><th>Pri</th><th>Rev</th>
+          <th style="width:58px"></th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- THEMES -->
+<div id="v_themes" class="hide">
+  <div class="card">
+    <div class="sect">Add a theme</div>
+    <div class="row">
+      <input type="text" id="newtheme" placeholder="Theme name" style="flex:3">
+      <button class="btn" id="btn_addtheme" style="flex:1">Add</button>
+    </div>
+    <div class="sub">New themes appear in the Theme Entry dropdown for everyone
+      after the folder syncs.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Themes in use</div>
+    <table class="grid" id="themetbl">
+      <thead><tr><th>Theme</th><th>Records</th><th>Tickers</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TAGS -->
+<div id="v_tags" class="hide">
+  <div class="card">
+    <div class="sect">Add a tag</div>
+    <div class="row">
+      <input type="text" id="newtag" placeholder="Tag name" style="flex:2">
+      <input type="text" id="newterms" placeholder="Match terms, comma separated" style="flex:3">
+      <select id="newmode" style="flex:1">
+        <option value="n">normal</option><option value="s">strict (case-sensitive)</option>
+        <option value="a">ambiguous (subject only)</option>
+      </select>
+      <button class="btn" id="btn_addtag" style="flex:1">Add</button>
+    </div>
+    <div class="sub">Leave match terms blank to use the tag name itself.
+      <b>normal</b> matches subject or body, case-insensitive.
+      <b>strict</b> is case-sensitive &mdash; use for short acronyms like US, EV, RE.
+      <b>ambiguous</b> matches the subject only &mdash; use for ordinary English words
+      like Value, Growth, Power.</div>
+  </div>
+  <div class="card">
+    <div class="row" style="margin-bottom:7px">
+      <input type="text" id="tagfilter" placeholder="Filter tags" style="flex:3">
+      <div style="flex:2" class="tiny" id="tagsummary"></div>
+    </div>
+    <div style="max-height:520px;overflow:auto">
+      <table class="grid" id="tagtbl">
+        <thead><tr><th>Tag</th><th>Match terms</th><th>Notes</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TICKERS -->
+<div id="v_tickers" class="hide">
+  <div class="card">
+    <div class="sect">Load a ticker list</div>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn pri" id="btn_tkfile" style="flex:0 0 auto">Choose a CSV file</button>
+      <input type="file" id="tkfile" accept=".csv,.tsv,.txt" hidden>
+      <div class="tiny" style="flex:1" id="tkfilename">
+        Two columns: ticker and company name, in either order, with or without a
+        header row. Comma, tab or semicolon separated &mdash; a paste straight
+        out of Excel works.</div>
+    </div>
+    <details style="margin-top:8px">
+      <summary>Or paste the list</summary>
+      <textarea id="tkpaste" style="min-height:120px;margin-top:6px"
+        placeholder="MSFT,Microsoft Corporation&#10;AAPL,Apple Inc.&#10;P.SECURITIZE,Securitize"></textarea>
+      <button class="btn" id="btn_tkpaste" style="margin-top:6px">Read pasted list</button>
+    </details>
+    <div class="row" style="margin-top:9px;align-items:center">
+      <label style="display:flex;align-items:center;gap:6px;text-transform:none;
+                    font-size:12.5px;letter-spacing:0;font-weight:400;color:var(--ink);
+                    margin:0;flex:0 0 auto">
+        <input type="checkbox" id="tkreplace" style="width:auto">
+        Replace the whole list instead of merging into it
+      </label>
+      <div class="tiny" style="flex:1">Merge is the default: existing tickers not
+        in the upload are kept. Replace drops them, which is what you want after
+        fixing a bad load and nothing else.</div>
+    </div>
+  </div>
+
+  <div class="card hide" id="tkpreview">
+    <div class="sect">Preview</div>
+    <div id="tkstats" style="margin-bottom:8px"></div>
+    <pre id="tkproblems" class="tiny" style="display:none;max-height:200px;overflow:auto;
+      background:#f7f9fc;padding:9px;border-radius:4px;margin-bottom:8px"></pre>
+    <div class="row">
+      <button class="btn pri adminonly" id="btn_tkapply" style="flex:0 0 auto">Apply</button>
+      <button class="btn" id="btn_tkcancel" style="flex:0 0 auto">Cancel</button>
+      <div class="tiny" style="flex:1">Nothing is written until you press Apply.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="margin-bottom:7px">
+      <input type="text" id="tkfilter" placeholder="Filter by ticker or company" style="flex:3">
+      <div style="flex:2" class="tiny" id="tksummary"></div>
+      <button class="btn adminonly danger" id="btn_tkclear" style="flex:0 0 auto">Clear list</button>
+    </div>
+    <div style="max-height:460px;overflow:auto">
+      <table class="grid" id="tktbl">
+        <thead><tr><th style="width:110px">Ticker</th><th>Company</th>
+          <th style="width:80px">Records</th><th style="width:90px"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="sub">Stored as <span class="mono">_tickers.json</span> beside
+      <span class="mono">_config.json</span>, so it syncs to everyone through
+      SharePoint. It is a convenience for the Entry page, not a source of truth
+      &mdash; a ticker missing from it still saves fine, the company name just
+      stays blank until someone fills it in.</div>
+  </div>
+
+  <div class="card">
+    <div class="sect">Resolve blank company names</div>
+    <div class="row">
+      <button class="btn adminonly" id="btn_resolve" style="flex:0 0 auto">Find and fill</button>
+      <div class="tiny" style="flex:1" id="resolvehint">Records that carry a ticker
+        but no company name, where the ticker list knows the name. Rewrites
+        <span class="mono">entity</span> on those records and bumps the revision.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div id="v_config" class="hide">
+  <div class="card">
+    <div class="sect">Config file</div>
+    <table class="grid"><tbody id="cfgmeta"></tbody></table>
+    <div class="sub">Stored as <span class="mono">_config.json</span> beside the
+      NOTES folder. It syncs to everyone through SharePoint. Only edit it from
+      this page, or by hand in Notepad when nobody else is editing.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Contributors</div>
+    <div class="row">
+      <input type="text" id="newcontrib" placeholder="Contributor name" style="flex:3">
+      <button class="btn adminonly" id="btn_addcontrib" style="flex:1">Add</button>
+    </div>
+    <table class="grid" id="contribtbl" style="margin-top:7px">
+      <thead><tr><th>Name</th><th>Initials</th><th>Records</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="sub">Initials go into <span class="mono">note_id</span>, which is
+      what stops two people colliding on the same subject on the same day.
+      Two contributors with the same initials would collide &mdash; flagged below
+      if that happens.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Actions</div>
+    <div class="row">
+      <input type="text" id="newaction" placeholder="Action value, lowercase" style="flex:3">
+      <button class="btn adminonly" id="btn_addaction" style="flex:1">Add</button>
+    </div>
+    <div class="sub cfgmsg" id="msg_actions"></div>
+    <table class="grid" id="actiontbl" style="margin-top:7px">
+      <thead><tr><th>Action</th><th>Records</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="sub">Fills the Action dropdown on the Entry page for everyone.
+      Adding a value is cheap &mdash; records written before it stay valid.
+      <b>Removing one is not</b>: records already carrying it keep it on disk and
+      will read back as a value that is no longer in the list, so a value in use
+      cannot be removed here. Values are lowercase by convention;
+      <span class="mono">initiate add trim exit</span> are treated as position
+      changes elsewhere in the app, so renaming those breaks the strategy
+      warning.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Strategies</div>
+    <div class="row">
+      <input type="text" id="newstrategy" placeholder="Strategy name" style="flex:3">
+      <button class="btn adminonly" id="btn_addstrategy" style="flex:1">Add</button>
+    </div>
+    <div class="sub cfgmsg" id="msg_strategies"></div>
+    <table class="grid" id="strattbl" style="margin-top:7px">
+      <thead><tr><th>Strategy</th><th>Records</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="sub">Required on a Trading Log entry. Closed list on purpose
+      &mdash; free text gives you <span class="mono">Direct US</span>,
+      <span class="mono">DirectUS</span> and <span class="mono">Direct U.S.</span>
+      inside a month, and the grouping query is then worthless.</div>
+  </div>
+  <div class="card">
+    <div class="sect">Maintenance</div>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn" id="btn_reload" style="flex:0 0 auto">Reload notes</button>
+      <button class="btn" id="btn_history" style="flex:0 0 auto">View change log</button>
+      <div style="flex:1"></div>
+    </div>
+    <pre id="histout" class="tiny" style="display:none;max-height:240px;overflow:auto;
+      background:#f7f9fc;padding:9px;border-radius:4px;margin-top:8px"></pre>
+  </div>
+</div>
+
+</div>
+
+<!-- dry-run modal -->
+<div class="modal" id="dry">
+  <div class="box">
+    <div class="hd"><h3 id="dry_title"></h3>
+      <button class="btn" id="dry_cancel">Cancel</button>
+      <button class="btn pri" id="dry_go" style="flex:0 0 auto">Apply</button>
+    </div>
+    <div class="bd">
+      <div id="dry_summary" style="margin-bottom:10px"></div>
+      <pre id="dry_list"></pre>
+    </div>
+  </div>
+</div>
+
+<script src="rc-core.js"></script>
+<script>
+/* ==========================================================================
+   ADMIN UNLOCK
+   Convention, not security — the page source is visible. It stops accidents,
+   not a determined user. Anyone with folder access can edit _config.json in
+   Notepad regardless.
+
+   Default password:  dumacadmin
+   To change it, run this in the browser console and paste the result below:
+     crypto.subtle.digest('SHA-256', new TextEncoder().encode('NEWPASS'))
+       .then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16)
+       .padStart(2,'0')).join('')));
+   ========================================================================== */
+const ADMIN_HASH = "96403e5e12f144b1a4d2684d457bd8af69d003d3b1663e637cca2f40c6b97144";
+let UNLOCKED=false;
+
+async function sha(t){
+  const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function setLock(on){
+  UNLOCKED=on;
+  const b=$("#lockbadge");
+  b.textContent = on ? "unlocked \u2014 admin" : "read-only \u2014 unlock";
+  b.className = "badge "+(on?"on":"off");
+  $$(".adminonly").forEach(e=>e.disabled=!on);
+}
+$("#lockbadge").onclick=async()=>{
+  if(UNLOCKED){ setLock(false); return; }
+  const p=prompt("Admin password");
+  if(p===null) return;
+  if(await sha(p)===ADMIN_HASH){ setLock(true); banner("Admin unlocked.",true); }
+  else banner("Wrong password.");
+};
+function requireUnlock(){
+  if(!UNLOCKED){ banner("Unlock admin first \u2014 badge at the right of the tab bar."); return false; }
+  return true;
+}
+
+function banner(t,ok){ const b=$("#banner"); b.textContent=t||"";
+  b.className="banner"+(t?" show":"")+(ok?" ok":""); }
+function who(){ return localStorage.getItem("rc_contributor")||"unknown"; }
+
+/* ---------- usage counting ---------- */
+function tagUsage(ns){
+  const m=new Map();
+  for(const n of ns) for(const t of (Array.isArray(n.tags)?n.tags:[]))
+    m.set(t,(m.get(t)||0)+1);
+  return m;
+}
+function themeUsage(ns){
+  const m=new Map();
+  for(const n of ns) if(n.record_type==="Theme"&&n.entity)
+    m.set(n.entity,(m.get(n.entity)||0)+1);
+  return m;
+}
+
+/* ---------- dry-run confirm ---------- */
+function dryRun(title,summary,lines,apply){
+  $("#dry_title").textContent=title;
+  $("#dry_summary").innerHTML=summary;
+  $("#dry_list").textContent=lines.join("\n")||"(no notes affected)";
+  $("#dry").classList.add("show");
+  $("#dry_go").onclick=async()=>{
+    $("#dry_go").disabled=true;
+    try{ await apply(); $("#dry").classList.remove("show"); }
+    catch(e){ banner("Failed: "+e.message); }
+    $("#dry_go").disabled=false;
+  };
+}
+$("#dry_cancel").onclick=()=>$("#dry").classList.remove("show");
+
+/* ---------- TAGS ---------- */
+function renderTags(){
+  const ns=RC.notes||[], cfg=RC.cfg||SEED;
+  const use=tagUsage(ns);
+  const q=$("#tagfilter").value.trim().toLowerCase();
+  const tb=$("#tagtbl tbody"); tb.innerHTML="";
+  const names=Object.keys(cfg.taxonomy);
+  let shown=0;
+  for(const tag of names){
+    if(q && !tag.toLowerCase().includes(q)) continue;
+    shown++;
+    const terms=cfg.taxonomy[tag], n=use.get(tag)||0;
+    const tr=el("tr");
+    tr.appendChild(el("td","",tag));
+    tr.appendChild(el("td","tiny",
+      Object.keys(terms).map(t=>t+" ("+terms[t]+")").join(", ")));
+    tr.appendChild(el("td","num",String(n)));
+    const act=el("td");
+    if(n===0){
+      const d=el("button","btn adminonly danger","Delete"); d.disabled=!UNLOCKED;
+      d.onclick=()=>delTag(tag); act.appendChild(d);
+    }else{
+      const r=el("button","btn adminonly","Rename"); r.disabled=!UNLOCKED;
+      r.onclick=()=>renameTag(tag,n); act.appendChild(r);
+      const m=el("button","btn adminonly","Merge"); m.disabled=!UNLOCKED;
+      m.style.marginLeft="4px"; m.onclick=()=>mergeTag(tag,n); act.appendChild(m);
+    }
+    tr.appendChild(act); tb.appendChild(tr);
+  }
+  // tags present on notes but missing from the taxonomy
+  const orphan=[...use.keys()].filter(t=>!(t in cfg.taxonomy));
+  $("#tagsummary").textContent = shown+" of "+names.length+" tags shown"
+    + (orphan.length ? "  \u00b7  "+orphan.length+" tag(s) on notes are not in the taxonomy: "
+       +orphan.join(", ") : "");
+}
+async function delTag(tag){
+  if(!requireUnlock()) return;
+  if(!confirm("Delete tag \""+tag+"\"? It is on no notes, so nothing is rewritten."))
+    return;
+  const cfg=RC.cfg; delete cfg.taxonomy[tag];
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"tag_delete",tag:tag,notes:0});
+  banner("Deleted tag "+tag+".",true); renderTags();
+}
+function notesWithTag(tag){
+  return (RC.notes||[]).filter(n=>Array.isArray(n.tags)&&n.tags.includes(tag));
+}
+/* Rewrite the tags: line only. Body and every other key are untouched.
+   last_updated is deliberately NOT changed — this is a system edit, not
+   an authorship edit — but revision is bumped. */
+async function applyTagChange(list,map,opLabel,tag,to){
+  let done=0;
+  for(const n of list){
+    const next=[...new Set((n.tags||[]).map(map))];
+    await rewriteNote(n,txt=>{
+      txt=setFMLine(txt,"tags","["+next.map(x=>JSON.stringify(x)).join(", ")+"]");
+      return bumpRevision(txt);
+    });
+    n.tags=next; done++;
+  }
+  await appendHistory({at:new Date().toISOString(),by:who(),op:opLabel,
+                       from:tag,to:to,notes:done});
+  return done;
+}
+function renameTag(tag,n){
+  if(!requireUnlock()) return;
+  const to=prompt("Rename \""+tag+"\" to:",tag);
+  if(!to||to===tag) return;
+  const cfg=RC.cfg;
+  if(to in cfg.taxonomy){ banner("\""+to+"\" already exists \u2014 use Merge instead."); return; }
+  const list=notesWithTag(tag);
+  dryRun("Rename tag",
+    "<b>"+esc_html(tag)+"</b> \u2192 <b>"+esc_html(to)+"</b><br>"
+    + list.length+" note(s) will be rewritten. Body text is not touched; "
+    + "only the <span class='mono'>tags:</span> line changes and "
+    + "<span class='mono'>revision</span> is bumped.",
+    list.map(x=>x.note_id+"   ["+(x.tags||[]).join(", ")+"]"),
+    async()=>{
+      const c=await applyTagChange(list,t=>t===tag?to:t,"tag_rename",tag,to);
+      const tx=cfg.taxonomy, out={};
+      for(const k in tx) out[k===tag?to:k]=tx[k];
+      cfg.taxonomy=out;
+      await saveConfig(cfg,who());
+      banner("Renamed "+tag+" \u2192 "+to+" across "+c+" note(s).",true);
+      renderTags();
+    });
+}
+function mergeTag(tag){
+  if(!requireUnlock()) return;
+  const cfg=RC.cfg;
+  const to=prompt("Merge \""+tag+"\" INTO which tag?\n\n"
+    + "\""+tag+"\" disappears. Its notes get the target tag instead.");
+  if(!to||to===tag) return;
+  if(!(to in cfg.taxonomy)){ banner("\""+to+"\" is not an existing tag."); return; }
+  const list=notesWithTag(tag);
+  dryRun("Merge tag",
+    "<b>"+esc_html(tag)+"</b> is absorbed into <b>"+esc_html(to)+"</b>.<br>"
+    + list.length+" note(s) rewritten. <b>"+esc_html(tag)+"</b> is then removed "
+    + "from the taxonomy.",
+    list.map(x=>x.note_id+"   ["+(x.tags||[]).join(", ")+"]"),
+    async()=>{
+      const c=await applyTagChange(list,t=>t===tag?to:t,"tag_merge",tag,to);
+      // fold match terms across so nothing stops matching
+      const src=cfg.taxonomy[tag]||{};
+      cfg.taxonomy[to]=Object.assign({},cfg.taxonomy[to],src);
+      delete cfg.taxonomy[tag];
+      await saveConfig(cfg,who());
+      banner("Merged "+tag+" into "+to+" across "+c+" note(s).",true);
+      renderTags();
+    });
+}
+$("#btn_addtag").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const name=$("#newtag").value.trim();
+  if(!name){ banner("Tag name required."); return; }
+  const cfg=RC.cfg;
+  if(name in cfg.taxonomy){ banner("\""+name+"\" already exists."); return; }
+  const mode=$("#newmode").value;
+  const raw=$("#newterms").value.trim();
+  const terms={};
+  (raw?raw.split(",").map(s=>s.trim()).filter(Boolean):[name])
+    .forEach(t=>terms[t]=mode);
+  cfg.taxonomy[name]=terms;
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"tag_add",tag:name,terms:terms});
+  $("#newtag").value=""; $("#newterms").value="";
+  banner("Added tag "+name+".",true); renderTags();
+};
+
+/* ---------- THEMES ---------- */
+function renderThemes(){
+  const ns=RC.notes||[], cfg=RC.cfg||SEED;
+  const use=themeUsage(ns);
+  const tickers=new Map();
+  for(const n of ns) if(n.record_type==="Theme"&&n.entity){
+    if(!tickers.has(n.entity)) tickers.set(n.entity,new Set());
+    for(const t of (Array.isArray(n.tickers)?n.tickers:[])) tickers.get(n.entity).add(t);
+  }
+  const all=[...new Set([...(cfg.themes||[]),...use.keys()])].sort();
+  const tb=$("#themetbl tbody"); tb.innerHTML="";
+  for(const th of all){
+    const n=use.get(th)||0;
+    const tr=el("tr");
+    const nameCell=el("td","",th);
+    if(!(cfg.themes||[]).includes(th)){
+      nameCell.appendChild(el("span","pill due"," not in config"));
+    }
+    tr.appendChild(nameCell);
+    tr.appendChild(el("td","num",String(n)));
+    tr.appendChild(el("td","num",String((tickers.get(th)||new Set()).size)));
+    const act=el("td");
+    if(n===0){
+      const d=el("button","btn adminonly danger","Delete"); d.disabled=!UNLOCKED;
+      d.onclick=()=>delTheme(th); act.appendChild(d);
+    }else{
+      const r=el("button","btn adminonly","Rename"); r.disabled=!UNLOCKED;
+      r.onclick=()=>renameTheme(th); act.appendChild(r);
+    }
+    tr.appendChild(act); tb.appendChild(tr);
+  }
+}
+async function delTheme(th){
+  if(!requireUnlock()) return;
+  if(!confirm("Delete theme \""+th+"\"? No records use it, so nothing is rewritten.")) return;
+  const cfg=RC.cfg;
+  cfg.themes=(cfg.themes||[]).filter(x=>x!==th);
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"theme_delete",theme:th,notes:0});
+  banner("Deleted theme "+th+".",true); renderThemes();
+}
+function renameTheme(th){
+  if(!requireUnlock()) return;
+  const to=prompt("Rename theme \""+th+"\" to:",th);
+  if(!to||to===th) return;
+  const list=(RC.notes||[]).filter(n=>n.record_type==="Theme"&&n.entity===th);
+  dryRun("Rename theme",
+    "<b>"+esc_html(th)+"</b> \u2192 <b>"+esc_html(to)+"</b><br>"
+    + list.length+" theme record(s) rewritten. The "
+    + "<span class='mono'>entity:</span> line changes; body is untouched.",
+    list.map(x=>x.note_id),
+    async()=>{
+      for(const n of list){
+        await rewriteNote(n,txt=>bumpRevision(setFMLine(txt,"entity",yamlStr(to))));
+        n.entity=to;
+      }
+      const cfg=RC.cfg;
+      cfg.themes=[...new Set((cfg.themes||[]).map(x=>x===th?to:x))];
+      await saveConfig(cfg,who());
+      await appendHistory({at:new Date().toISOString(),by:who(),op:"theme_rename",
+                           from:th,to:to,notes:list.length});
+      banner("Renamed theme across "+list.length+" record(s).",true);
+      renderThemes();
+    });
+}
+$("#btn_addtheme").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const t=$("#newtheme").value.trim();
+  if(!t){ banner("Theme name required."); return; }
+  const cfg=RC.cfg;
+  if((cfg.themes||[]).includes(t)){ banner("Theme already exists."); return; }
+  cfg.themes=[...(cfg.themes||[]),t].sort();
+  await saveConfig(cfg,who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"theme_add",theme:t});
+  $("#newtheme").value=""; banner("Added theme "+t+".",true); renderThemes();
+};
+
+/* ---------- RECORDS ---------- */
+const SEL=new Set();
+function filtered(){
+  const ns=RC.notes||[];
+  const ty=$("#q_type").value, w=$("#q_who").value, pr=$("#q_pri").value,
+        tg=$("#q_tag").value, q=$("#q_text").value.trim().toLowerCase(),
+        ac=$("#q_action").value, og=$("#q_origin").value;
+  return ns.filter(n=>{
+    if(ty==="__none"){ if(n.record_type) return false; }
+    else if(ty && n.record_type!==ty) return false;
+    if(ac==="__none"){ if(n.action) return false; }
+    else if(ac && n.action!==ac) return false;
+    /* origin is the approval surface for pipeline- and Claude-written records
+       (delta §6). "Not app" is the one that matters: everything that arrived
+       through a door other than someone typing it. */
+    if(og==="__notapp"){ if((n.origin||"app")==="app") return false; }
+    else if(og && n.origin!==og) return false;
+    if(w && n.contributor!==w) return false;
+    if(pr==="__none"){ if(n.priority) return false; }
+    else if(pr && String(n.priority)!==pr) return false;
+    if(tg && !(Array.isArray(n.tags)&&n.tags.includes(tg))) return false;
+    if(q && !((n.subject||"")+" "+(n._body||"")).toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function renderRecords(){
+  const rows=filtered();
+  const tb=$("#rectbl tbody"); tb.innerHTML="";
+  for(const n of rows.slice(0,400)){
+    const tr=el("tr");
+    const cb=el("input"); cb.type="checkbox"; cb.style.width="auto";
+    cb.checked=SEL.has(n.note_id);
+    cb.onchange=()=>{ cb.checked?SEL.add(n.note_id):SEL.delete(n.note_id); updSel(); };
+    const td=el("td"); td.appendChild(cb); tr.appendChild(td);
+    tr.appendChild(el("td","tiny",fmtDate(n.date)));
+    const ty=el("td");
+    ty.appendChild(el("span","pill"+(n.record_type?"":" due"),n.record_type||"unclassified"));
+    tr.appendChild(ty);
+    tr.appendChild(el("td","tiny",n.action||"\u2014"));
+    const og=el("td");
+    og.appendChild(el("span","pill"+((n.origin||"app")==="app"?"":" due"),n.origin||"app"));
+    tr.appendChild(og);
+    tr.appendChild(el("td","mono",n.ticker||(Array.isArray(n.tickers)&&n.tickers.length
+      ? n.tickers.length+" linked" : "")));
+    tr.appendChild(el("td","",n.entity||""));
+    tr.appendChild(el("td","",n.subject||""));
+    // Tags — clicking one filters the table to it, which is the reason
+    // to have the column at all rather than just reading them.
+    const tg=el("td","tagcell");
+    const list=Array.isArray(n.tags)?n.tags:[];
+    if(!list.length) tg.appendChild(el("span","tiny","\u2014"));
+    list.forEach((t,i)=>{
+      const a=el("span","tagpick",t);
+      a.title="Filter to "+t;
+      a.onclick=()=>{ $("#q_tag").value=t; renderRecords(); };
+      tg.appendChild(a);
+      if(i<list.length-1) tg.appendChild(document.createTextNode(" "));
+    });
+    tr.appendChild(tg);
+    tr.appendChild(el("td","tiny",n.contributor||""));
+    tr.appendChild(el("td","num",n.priority||""));
+    tr.appendChild(el("td","num",n.revision||""));
+    /* Per row, never in the bulk bar. Deletion is the one operation here with
+       no undo, so it is deliberately not available to a checkbox sweep. */
+    const dtd=el("td");
+    const del=el("button","btn adminonly danger","Delete");
+    del.style.padding="1px 7px"; del.style.fontSize="12px";
+    del.disabled=!UNLOCKED; del.title="Permanently delete this record and its attachments";
+    del.onclick=()=>confirmDelete(n);
+    dtd.appendChild(del); tr.appendChild(dtd);
+    tb.appendChild(tr);
+  }
+  if(!rows.length){
+    const tr=el("tr"); const td=el("td","");
+    td.colSpan=13;
+    const total=(RC.notes||[]).length;
+    td.appendChild(el("div","empty", total
+      ? "No records match the filters above. "+total+" record(s) exist \u2014 reset the filters."
+      : "No records found in "+notesLocation()+"."));
+    if(!total){
+      td.appendChild(el("div","tiny",
+        "Expected layout:  <granted folder>\\NOTES\\2026\\05\\<note_id>\\note.md   \u2014 "
+      + "or grant the NOTES folder itself, which also works. "
+      + "If you just unzipped the records, click Reload notes on the Config tab."));
+    }
+    tr.appendChild(td); tb.appendChild(tr);
+  }
+  if(rows.length>400){
+    const tr=el("tr"); const td=el("td","tiny","Showing first 400 of "+rows.length+".");
+    td.colSpan=13; tr.appendChild(td); tb.appendChild(tr);
+  }
+  $("#recstatus").textContent = (RC.notes||[]).length+" record(s) on disk in "
+    + notesLocation() + "  \u00b7  "+rows.length+" shown";
+  updSel();
+}
+function updSel(){ $("#selcount").textContent=SEL.size+" selected"; }
+$("#selall").onchange=e=>{
+  const rows=filtered().slice(0,400);
+  if(e.target.checked) rows.forEach(n=>SEL.add(n.note_id));
+  else rows.forEach(n=>SEL.delete(n.note_id));
+  renderRecords();
+};
+/* ---------- delete one record ----------
+   Three things make this safe enough to exist: it is one record at a time,
+   the note_id has to be typed back, and the manifest is written to
+   _config_history.jsonl BEFORE the folder goes. If the recursive remove fails
+   halfway, the log still says what was in there. */
+async function confirmDelete(n){
+  if(!requireUnlock()) return;
+  const atts=Array.isArray(n.attachments)?n.attachments:[];
+  const typed=prompt(
+    "PERMANENT DELETE \u2014 this cannot be undone.\n\n"
+    + (n.subject||"(no subject)") + "\n"
+    + [n.record_type||"unclassified", n.ticker||n.entity||"", n.date||"",
+       n.contributor||""].filter(Boolean).join("  \u00b7  ") + "\n"
+    + "NOTES/"+n._path.join("/")+"/\n"
+    + (atts.length ? atts.length+" attachment(s): "+atts.join(", ")+"\n" : "")
+    + "\nType the note_id to confirm:\n" + n.note_id);
+  if(typed===null) return;
+  if(typed.trim()!==n.note_id){ banner("note_id did not match \u2014 nothing deleted."); return; }
+  try{
+    /* Log first. A delete that fails halfway is still recoverable from
+       OneDrive version history, but only if you know what to look for. */
+    await appendHistory({at:new Date().toISOString(),by:who(),op:"note_delete",
+      note_id:n.note_id, path:"NOTES/"+n._path.join("/"),
+      record_type:n.record_type||null, date:n.date||null,
+      ticker:n.ticker||null, entity:n.entity||null,
+      subject:n.subject||null, contributor:n.contributor||null,
+      revision:n.revision||null, attachments:atts});
+    const files=await deleteNote(n);
+    await appendHistory({at:new Date().toISOString(),by:who(),op:"note_delete_done",
+      note_id:n.note_id, files:files});
+    SEL.delete(n.note_id); updSel();
+    banner("Deleted "+n.note_id+" ("+files.length+" file(s)).",true);
+    renderRecords();
+  }catch(e){
+    banner("Delete failed: "+e.message);
+  }
+}
+
+$("#btn_bulk").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const pri=$("#bulk_pri").value, ty=$("#bulk_type").value;
+  if(!pri&&!ty){ banner("Pick a priority or a type to set."); return; }
+  if(!SEL.size){ banner("Nothing selected."); return; }
+  const list=(RC.notes||[]).filter(n=>SEL.has(n.note_id));
+  dryRun("Bulk update",
+    list.length+" record(s)."
+    + (pri?"<br>priority \u2192 <b>"+pri+"</b>":"")
+    + (ty?"<br>record_type \u2192 <b>"+esc_html(ty)+"</b>":"")
+    + "<br><span class='tiny'>priority is a shared field \u2014 it overwrites whatever "
+    + "another contributor set. record_type should only be set on records that "
+    + "have none.</span>",
+    list.map(n=>n.note_id),
+    async()=>{
+      for(const n of list){
+        await rewriteNote(n,txt=>{
+          if(pri) txt=setFMLine(txt,"priority",pri);
+          if(ty)  txt=setFMLine(txt,"record_type",ty);
+          return bumpRevision(txt);
+        });
+        if(pri) n.priority=pri;
+        if(ty)  n.record_type=ty;
+      }
+      await appendHistory({at:new Date().toISOString(),by:who(),op:"bulk_update",
+                           priority:pri||null,record_type:ty||null,notes:list.length});
+      SEL.clear(); banner("Updated "+list.length+" record(s).",true); renderRecords();
+    });
+};
+
+/* ---------- TICKERS ----------
+   Bulk ticker -> company upload. The design point is that a thousand-row paste
+   is approved as a DIFF, not as a number: how many are new, how many change a
+   name you already had, and every row the parser refused, listed. A silent
+   1,000-row overwrite is unrecoverable in a shared folder. */
+let TKPEND=null;
+
+function tickerCounts(){
+  const c=new Map();
+  for(const n of (RC.notes||[])){
+    if(n.ticker) c.set(n.ticker,(c.get(n.ticker)||0)+1);
+    for(const t of (Array.isArray(n.tickers)?n.tickers:[])) c.set(t,(c.get(t)||0)+1);
+  }
+  return c;
+}
+
+function renderTickers(){
+  const map=RC.tickers||{}, cnt=tickerCounts();
+  const q=$("#tkfilter").value.trim().toLowerCase();
+  const keys=Object.keys(map).sort().filter(k=>
+    !q || k.toLowerCase().includes(q) || String(map[k]).toLowerCase().includes(q));
+  const tb=$("#tktbl tbody"); tb.innerHTML="";
+  for(const tk of keys.slice(0,500)){
+    const tr=el("tr");
+    tr.appendChild(el("td","mono",tk));
+    tr.appendChild(el("td","",map[tk]));
+    tr.appendChild(el("td","num",String(cnt.get(tk)||"")));
+    const act=el("td");
+    const d=el("button","btn adminonly danger","Remove"); d.disabled=!UNLOCKED;
+    d.onclick=async()=>{
+      if(!requireUnlock()) return;
+      const m=Object.assign({},RC.tickers); delete m[tk];
+      await saveTickers(m,who());
+      await appendHistory({at:new Date().toISOString(),by:who(),
+                           op:"ticker_remove",ticker:tk});
+      renderTickers();
+    };
+    act.appendChild(d); tr.appendChild(act);
+    tb.appendChild(tr);
+  }
+  const total=Object.keys(map).length;
+  $("#tksummary").textContent = total
+    ? total+" ticker(s)"+(keys.length!==total?"  \u00b7  "+keys.length+" shown":"")
+      +(keys.length>500?"  \u00b7  first 500 listed":"")
+    : "No ticker list loaded yet.";
+  const blanks=(RC.notes||[]).filter(n=>n.ticker && !n.entity
+                                    && (RC.tickers||{})[n.ticker]).length;
+  $("#resolvehint").innerHTML = blanks
+    ? "<b>"+blanks+" record(s)</b> carry a ticker with no company name that the "
+      + "ticker list can fill. Rewrites <span class='mono'>entity</span> on those "
+      + "records and bumps the revision."
+    : "Nothing to resolve \u2014 every record with a ticker either has a company "
+      + "name already or has one the ticker list does not know.";
+}
+
+function previewTickers(text,label){
+  const r=parseTickerCSV(text);
+  if(!r.count){
+    banner("Nothing readable in "+label+". "
+         + (r.skipped.length? r.skipped.length+" line(s) were rejected." : ""));
+    $("#tkpreview").classList.add("hide"); TKPEND=null;
+    if(r.skipped.length){
+      $("#tkpreview").classList.remove("hide");
+      $("#tkstats").innerHTML="<b>0 usable rows.</b>";
+      showProblems(r);
+      $("#btn_tkapply").disabled=true;
+    }
+    return;
+  }
+  const replace=$("#tkreplace").checked;
+  const cur=RC.tickers||{};
+  const d=diffTickers(cur,r.map);
+  TKPEND={parsed:r,replace:replace,raw:text,label:label};
+
+  const bits=[
+    "<b>"+r.count+"</b> ticker(s) read from "+label,
+    "<b>"+d.added.length+"</b> new",
+    "<b>"+d.changed.length+"</b> with a different company name",
+    "<b>"+d.same.length+"</b> unchanged"
+  ];
+  if(replace && d.missing.length)
+    bits.push("<b class='mono'>"+d.missing.length+"</b> existing ticker(s) will be "
+            + "<b>deleted</b> \u2014 replace mode");
+  else if(d.missing.length)
+    bits.push(d.missing.length+" existing ticker(s) not in this file are kept");
+  $("#tkstats").innerHTML=bits.join("<br>");
+  showProblems(r,d);
+  $("#btn_tkapply").disabled=!UNLOCKED;
+  $("#tkpreview").classList.remove("hide");
+  banner("");
+}
+
+function showProblems(r,d){
+  const lines=[];
+  if(d && d.changed.length){
+    lines.push("--- name changes ---");
+    d.changed.slice(0,40).forEach(c=>lines.push(c.ticker+"   "+c.from+"   \u2192   "+c.to));
+    if(d.changed.length>40) lines.push("... "+(d.changed.length-40)+" more");
+  }
+  if(r.dupes.length){
+    lines.push("--- duplicate tickers in the file, first kept ---");
+    r.dupes.slice(0,40).forEach(x=>lines.push("line "+x.line+"  "+x.ticker
+      +"  kept: "+x.kept+"   dropped: "+x.dropped));
+    if(r.dupes.length>40) lines.push("... "+(r.dupes.length-40)+" more");
+  }
+  if(r.skipped.length){
+    lines.push("--- rejected rows ---");
+    r.skipped.slice(0,40).forEach(x=>lines.push("line "+x.line+"  ["+x.why+"]  "+x.text));
+    if(r.skipped.length>40) lines.push("... "+(r.skipped.length-40)+" more");
+  }
+  const p=$("#tkproblems");
+  p.textContent=lines.join("\n");
+  p.style.display=lines.length?"block":"none";
+}
+
+$("#btn_tkfile").onclick=()=>$("#tkfile").click();
+$("#tkfile").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  $("#tkfilename").textContent=f.name+"  \u00b7  "+(f.size/1024).toFixed(0)+" KB";
+  previewTickers(await f.text(), f.name);
+  e.target.value="";
+};
+$("#btn_tkpaste").onclick=()=>previewTickers($("#tkpaste").value,"the pasted list");
+$("#btn_tkcancel").onclick=()=>{ TKPEND=null; $("#tkpreview").classList.add("hide"); };
+/* Toggling merge/replace re-runs the preview against the same text, so the
+   deletion count is visible BEFORE Apply rather than after. */
+$("#tkreplace").addEventListener("change",()=>{
+  if(TKPEND) previewTickers(TKPEND.raw, TKPEND.label);
+});
+$("#btn_tkapply").onclick=async()=>{
+  if(!requireUnlock()) return;
+  if(!TKPEND){ banner("Nothing to apply."); return; }
+  /* Re-read the file immediately before merging. RC.tickers was loaded at boot,
+     and a merge built on a stale copy would silently drop whatever someone else
+     uploaded in the meantime — the file is written whole, so last write wins
+     over the entire map, not per key. Re-reading costs one file read and turns
+     a silent data loss into a normal merge. */
+  let live={};
+  if(!TKPEND.replace){
+    try{ live=await loadTickers(); }catch(e){ live=RC.tickers||{}; }
+  }
+  const next = TKPEND.replace ? Object.assign({},TKPEND.parsed.map)
+                              : Object.assign({},live,TKPEND.parsed.map);
+  try{
+    await saveTickers(next,who());
+    await appendHistory({at:new Date().toISOString(),by:who(),
+      op:TKPEND.replace?"tickers_replace":"tickers_merge",
+      read:TKPEND.parsed.count, rejected:TKPEND.parsed.skipped.length,
+      total:Object.keys(next).length});
+    TKPEND=null; $("#tkpreview").classList.add("hide"); $("#tkpaste").value="";
+    banner("Ticker list saved \u2014 "+Object.keys(next).length+" entries.",true);
+    renderTickers();
+  }catch(e){ banner("Could not write _tickers.json: "+e.message); }
+};
+$("#btn_tkclear").onclick=async()=>{
+  if(!requireUnlock()) return;
+  if(!confirm("Delete the entire ticker list? Records are not touched.")) return;
+  await saveTickers({},who());
+  await appendHistory({at:new Date().toISOString(),by:who(),op:"tickers_clear"});
+  banner("Ticker list cleared.",true); renderTickers();
+};
+$("#tkfilter").addEventListener("input",renderTickers);
+
+/* Fill entity on records that carry a ticker the list knows and no company
+   name. This is the "later" half of the ticker->company decision: Entry does
+   not force a name at write time, so something has to fill them in. */
+$("#btn_resolve").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const map=RC.tickers||{};
+  const list=(RC.notes||[]).filter(n=>n.ticker && !n.entity && map[n.ticker]);
+  if(!list.length){ banner("Nothing to resolve."); return; }
+  dryRun("Resolve company names",
+    list.length+" record(s) will get an <b>entity</b> written from the ticker list."
+    + "<br><span class='tiny'>entity is a record field, but these are blank rather "
+    + "than wrong \u2014 completing a blank is not revising a judgement, the same "
+    + "rule that governs why.</span>",
+    list.map(n=>n.note_id+"   "+n.ticker+"  \u2192  "+map[n.ticker]),
+    async()=>{
+      for(const n of list){
+        await rewriteNote(n,txt=>bumpRevision(setFMLine(txt,"entity",
+          yamlStr(map[n.ticker]))));
+        n.entity=map[n.ticker];
+      }
+      await appendHistory({at:new Date().toISOString(),by:who(),
+                           op:"resolve_entities",notes:list.length});
+      banner("Filled "+list.length+" company name(s).",true);
+      renderRecords(); renderTickers();
+    });
+};
+
+/* ---------- CONFIG ---------- */
+function renderConfig(){
+  const cfg=RC.cfg||SEED, ns=RC.notes||[];
+  const rows=[["version",cfg.config_version],["last updated",cfg.config_updated||"\u2014"],
+              ["updated by",cfg.config_updated_by||"\u2014"],
+              ["tags",Object.keys(cfg.taxonomy).length],
+              ["themes",(cfg.themes||[]).length],
+              ["contributors",(cfg.contributors||[]).length],
+              ["actions",(cfg.actions||[]).length],
+              ["strategies",(cfg.strategies||[]).length],
+              ["records on disk",ns.length],
+              ["notes read from",notesLocation()]];
+  const tb=$("#cfgmeta"); tb.innerHTML="";
+  rows.forEach(([k,v])=>{ const tr=el("tr");
+    tr.appendChild(el("td","tiny",k)); tr.appendChild(el("td","",String(v)));
+    tb.appendChild(tr); });
+
+  const cnt=new Map();
+  for(const n of ns) cnt.set(n.contributor,(cnt.get(n.contributor)||0)+1);
+  const seen=new Map();
+  const ctb=$("#contribtbl tbody"); ctb.innerHTML="";
+  for(const c of (cfg.contributors||[])){
+    const ini=initials(c);
+    const tr=el("tr");
+    tr.appendChild(el("td","",c));
+    const it=el("td","mono",ini);
+    if(seen.has(ini)) it.appendChild(el("span","pill overdue"," collides with "+seen.get(ini)));
+    seen.set(ini,c);
+    tr.appendChild(it);
+    tr.appendChild(el("td","num",String(cnt.get(c)||0)));
+    const act=el("td");
+    if(!(cnt.get(c))){
+      const d=el("button","btn adminonly danger","Remove"); d.disabled=!UNLOCKED;
+      d.onclick=async()=>{
+        if(!requireUnlock()) return;
+        if(!confirm("Remove contributor "+c+"?")) return;
+        const cf=RC.cfg; cf.contributors=cf.contributors.filter(x=>x!==c);
+        await saveConfig(cf,who()); renderConfig();
+      };
+      act.appendChild(d);
+    }
+    tr.appendChild(act); ctb.appendChild(tr);
+  }
+
+  renderList("#actiontbl tbody","actions",cfg.actions||ACTIONS,n=>n.action);
+  renderList("#strattbl tbody","strategies",cfg.strategies||[],n=>n.strategy);
+}
+
+/* One renderer for both closed vocabularies. They have the same shape and the
+   same rule: add freely, remove only what nothing on disk is using. A value
+   still present in a record but absent from the list reads back as an orphan
+   nothing can filter on. */
+function renderList(sel,key,values,pick){
+  const ns=RC.notes||[], tb=$(sel);
+  if(!tb) return;
+  const cnt=new Map();
+  for(const n of ns){ const v=pick(n); if(v) cnt.set(v,(cnt.get(v)||0)+1); }
+  tb.innerHTML="";
+  const all=[...new Set([...values,...cnt.keys()])];
+  for(const v of all){
+    const used=cnt.get(v)||0, known=values.includes(v);
+    const tr=el("tr");
+    const nm=el("td","",v);
+    if(!known) nm.appendChild(el("span","pill due"," in records, not in the list"));
+    tr.appendChild(nm);
+    tr.appendChild(el("td","num",String(used)));
+    const act=el("td");
+    if(!known){
+      const a=el("button","btn adminonly","Add to list"); a.disabled=!UNLOCKED;
+      a.onclick=async()=>{
+        if(!requireUnlock()) return;
+        const cf=RC.cfg; cf[key]=[...(cf[key]||[]),v];
+        await saveConfig(cf,who());
+        await appendHistory({at:new Date().toISOString(),by:who(),
+                             op:key+"_add",value:v});
+        banner("Added "+v+".",true); renderConfig();
+      };
+      act.appendChild(a);
+    } else if(!used){
+      const d=el("button","btn adminonly danger","Remove"); d.disabled=!UNLOCKED;
+      d.onclick=async()=>{
+        if(!requireUnlock()) return;
+        if(!confirm("Remove "+v+" from "+key+"?")) return;
+        const cf=RC.cfg; cf[key]=(cf[key]||[]).filter(x=>x!==v);
+        await saveConfig(cf,who());
+        await appendHistory({at:new Date().toISOString(),by:who(),
+                             op:key+"_remove",value:v});
+        banner("Removed "+v+".",true); renderConfig();
+      };
+      act.appendChild(d);
+    } else {
+      act.appendChild(el("span","tiny","in use"));
+    }
+    tr.appendChild(act); tb.appendChild(tr);
+  }
+}
+/* Status is written next to the input, not only to the top banner: the
+   Strategies card is at the bottom of Config, so a banner message ("Unlock
+   admin first", "Already listed") was off-screen and the click looked dead. */
+function listMsg(key,t,ok){
+  const m=$("#msg_"+key); if(m){ m.textContent=t||""; m.style.color=ok?"":"#b42318"; }
+  banner(t,ok);
+}
+async function addToList(key,inputSel,transform){
+  if(!UNLOCKED){ listMsg(key,"Unlock admin first \u2014 badge at the right of the tab bar."); return; }
+  if(!RC.dir || !RC.cfg){ listMsg(key,"No folder connected \u2014 nothing to save to."); return; }
+  const raw=$(inputSel).value.trim();
+  if(!raw){ listMsg(key,"Type a value first."); return; }
+  const v=transform?transform(raw):raw;
+  const cfg=RC.cfg;
+  if((cfg[key]||[]).includes(v)){ listMsg(key,v+" is already listed."); return; }
+  try{
+    cfg[key]=[...(cfg[key]||[]),v];
+    await saveConfig(cfg,who());
+    /* Round-trip: re-read _config.json from disk. If the value is gone,
+       the write path in rc-core.js is dropping this key. */
+    await loadConfig();
+    if(!(RC.cfg[key]||[]).includes(v)){
+      listMsg(key,"Saved, but "+v+" was not in _config.json on re-read \u2014 "
+        +"saveConfig()/loadConfig() in rc-core.js is dropping '"+key+"'.");
+      renderConfig(); return;
+    }
+    await appendHistory({at:new Date().toISOString(),by:who(),op:key+"_add",value:v});
+    $(inputSel).value=""; listMsg(key,"Added "+v+".",true); renderConfig();
+  }catch(e){
+    console.error(e);
+    listMsg(key,"Save failed: "+(e&&e.message||e));
+  }
+}
+$("#btn_addaction").onclick   = () => addToList("actions","#newaction",
+                                                s=>s.toLowerCase().replace(/\s+/g,"-"));
+$("#btn_addstrategy").onclick = () => addToList("strategies","#newstrategy");
+[["#newaction","#btn_addaction"],["#newstrategy","#btn_addstrategy"],["#newcontrib","#btn_addcontrib"]]
+  .forEach(([i,b])=>$(i).addEventListener("keydown",e=>{ if(e.key==="Enter") $(b).click(); }));
+$("#btn_addcontrib").onclick=async()=>{
+  if(!requireUnlock()) return;
+  const n=$("#newcontrib").value.trim();
+  if(!n) return;
+  const cfg=RC.cfg;
+  if(cfg.contributors.includes(n)){ banner("Already listed."); return; }
+  cfg.contributors=[...cfg.contributors,n];
+  await saveConfig(cfg,who());
+  $("#newcontrib").value=""; banner("Added "+n+".",true); renderConfig();
+};
+$("#btn_history").onclick=async()=>{
+  const p=$("#histout");
+  if(p.style.display!=="none"){ p.style.display="none"; return; }
+  try{
+    const t=await readTextFile(RC.dir,"_config_history.jsonl");
+    p.textContent=t.trim().split("\n").reverse().join("\n")||"(empty)";
+  }catch(e){ p.textContent="(no change log yet)"; }
+  p.style.display="block";
+};
+$("#btn_reload").onclick=async()=>{ RC.notes=null; await boot(); };
+
+/* ---------- tabs ---------- */
+$$(".tab").forEach(t=>t.onclick=()=>{
+  const v=t.dataset.v;
+  $$(".tab").forEach(x=>x.classList.toggle("cur",x===t));
+  ["records","themes","tags","tickers","config"].forEach(x=>
+    $("#v_"+x).classList.toggle("hide",x!==v));
+  if(v==="tags") renderTags();
+  if(v==="tickers") renderTickers();
+  if(v==="themes") renderThemes();
+  if(v==="config") renderConfig();
+});
+
+/* ---------- boot ---------- */
+async function boot(){
+  await restoreFolder();
+  if(!RC.dir){ banner("No folder connected. Click the badge, top right."); return; }
+  banner("Loading\u2026");
+  await loadConfig();
+  await loadTickers();
+  await walkNotes(true);
+  const cfg=RC.cfg;
+  const s=$("#q_who"); s.innerHTML='<option value="">Everyone</option>';
+  (cfg.contributors||[]).forEach(c=>s.appendChild(new Option(c,c)));
+  const tgSel=$("#q_tag"), keep=tgSel.value;
+  tgSel.innerHTML='<option value="">Any tag</option>';
+  [...new Set((RC.notes||[]).flatMap(n=>Array.isArray(n.tags)?n.tags:[]))].sort()
+    .forEach(t=>tgSel.appendChild(new Option(t,t)));
+  tgSel.value=keep;
+
+  const acSel=$("#q_action"), acKeep=acSel.value;
+  acSel.innerHTML='<option value="">Any</option><option value="__none">Unset</option>';
+  [...new Set([...(cfg.actions||ACTIONS),
+               ...(RC.notes||[]).map(n=>n.action).filter(Boolean)])]
+    .forEach(a=>acSel.appendChild(new Option(a,a)));
+  acSel.value=acKeep;
+
+  const ogSel=$("#q_origin"), ogKeep=ogSel.value;
+  ogSel.innerHTML='<option value="">Any</option><option value="__notapp">Not app</option>';
+  const seedOrigins = cfg.origins || (typeof ORIGINS!=="undefined" ? ORIGINS : []);
+  [...new Set([...seedOrigins,
+               ...(RC.notes||[]).map(n=>n.origin).filter(Boolean)])]
+    .forEach(o=>ogSel.appendChild(new Option(o,o)));
+  ogSel.value=ogKeep;
+
+  setLock(UNLOCKED);
+  const total=(RC.notes||[]).length;
+  banner(total ? "" : "Connected to "+RC.dir.name+" but found no notes. Looked in "
+       + notesLocation()+". Check that NOTES\\2026\\05\\ exists there.");
+  renderRecords(); renderTags(); renderThemes(); renderTickers(); renderConfig();
+}
+document.addEventListener("rc-folder",boot);
+["#q_type","#q_who","#q_pri","#q_tag","#q_action","#q_origin"].forEach(s=>$(s).addEventListener("change",renderRecords));
+$("#q_text").addEventListener("input",renderRecords);
+$("#tagfilter").addEventListener("input",renderTags);
+boot();
+</script>
+</body>
+</html>

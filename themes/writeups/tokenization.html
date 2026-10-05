@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Tokenization — DUMAC Direct</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:          #ffffff;
+    --bg-tint:     #f5f7fb;
+    --bg-yellow:   #fdf6e0;
+    --ink:         #14181f;
+    --ink-soft:    #565d6b;
+    --blue:        #1b3a8f;
+    --blue-deep:   #122a66;
+    --blue-soft:   #e4e9f6;
+    --yellow:      #f2b705;
+    --yellow-deep: #b8860b;
+    --line:        #d9dde6;
+    --tail:        #1f7a4d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 40px 110px; }
+
+  .crumb {
+    padding: 28px 0 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .crumb a { color: var(--blue); text-decoration: none; transition: color 0.2s ease; }
+  .crumb a:hover { color: var(--yellow-deep); }
+  .crumb .sep { margin: 0 10px; color: var(--line); }
+
+  .masthead { margin-top: 24px; padding-bottom: 26px; border-bottom: 3px solid var(--yellow); }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; letter-spacing: 0.26em; text-transform: uppercase;
+    color: var(--blue); margin-bottom: 16px;
+  }
+  .title-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap; }
+  h1 {
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(2.1rem, 4.6vw, 3.15rem);
+    line-height: 1.05; letter-spacing: -0.02em; color: var(--blue-deep); max-width: 18ch;
+  }
+  .updated {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft);
+    white-space: nowrap; padding-bottom: 6px;
+  }
+  .updated b { color: var(--yellow-deep); font-weight: 500; }
+
+  section { margin-top: 50px; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; }
+  .sec-num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--yellow-deep); letter-spacing: 0.1em; font-weight: 500; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.6rem; letter-spacing: -0.012em; color: var(--blue); }
+  .sec-head::after { content: ""; flex: 1; height: 2px; background: var(--line); align-self: center; }
+
+  .points { list-style: none; }
+  .points > li {
+    position: relative; padding: 0 0 20px 30px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .points > li:last-child { border-bottom: none; margin-bottom: 0; }
+  .points > li::before {
+    content: ""; position: absolute; left: 0; top: 9px;
+    width: 9px; height: 9px; background: var(--yellow);
+    border: 1px solid var(--yellow-deep); transform: rotate(45deg);
+  }
+  .lead { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.16rem; color: var(--blue); letter-spacing: -0.005em; }
+  .points p { font-size: 1.08rem; line-height: 1.62; color: var(--ink); margin-top: 6px; }
+
+  .dynamic { background: var(--bg-tint); border: 1px solid var(--line); border-left: 4px solid var(--blue); padding: 26px 30px; }
+  .dynamic p { font-size: 1.1rem; line-height: 1.66; color: var(--ink); }
+  .dynamic .pill {
+    display: inline-block; font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.04em;
+    padding: 2px 9px; border-radius: 2px; color: var(--ink); background: var(--yellow);
+  }
+  .dynamic .pill.tail { background: var(--tail); color: #ffffff; }
+
+  .leaders { display: grid; gap: 0; }
+  .lgroup { padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .lgroup:last-child { border-bottom: none; }
+  .lgroup .gname {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue);
+    font-weight: 500; margin-bottom: 10px; padding-left: 10px; border-left: 3px solid var(--yellow);
+  }
+  .lgroup p { font-size: 1.06rem; line-height: 1.6; color: var(--ink); }
+  .tk {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500;
+    color: var(--blue-deep); background: var(--blue-soft); padding: 1px 6px;
+    border-radius: 2px; white-space: nowrap;
+  }
+
+  .meta { border: 1px solid var(--line); }
+  .meta-row { display: grid; grid-template-columns: 240px 1fr; border-bottom: 1px solid var(--line); }
+  .meta-row:last-child { border-bottom: none; }
+  .meta-row .k {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    letter-spacing: 0.05em; text-transform: uppercase; color: var(--blue);
+    font-weight: 500; padding: 13px 16px; background: var(--bg-tint); border-right: 1px solid var(--line);
+  }
+  .meta-row .v { padding: 13px 16px; font-size: 1.02rem; line-height: 1.55; color: var(--ink); }
+
+  .caveats { list-style: none; }
+  .caveats li {
+    position: relative; padding: 0 0 14px 26px; margin-bottom: 14px;
+    font-size: 1.05rem; line-height: 1.6; color: var(--ink); border-bottom: 1px dotted var(--line);
+  }
+  .caveats li:last-child { border-bottom: none; margin-bottom: 0; }
+  .caveats li::before { content: "\2014"; position: absolute; left: 0; top: 0; color: var(--yellow-deep); font-weight: 600; }
+
+  footer {
+    margin-top: 60px; padding-top: 24px; border-top: 3px solid var(--yellow);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { color: var(--yellow-deep); }
+  .disclaimer { margin-top: 16px; font-size: 13px; line-height: 1.55; color: var(--ink-soft); font-style: italic; }
+  strong { color: var(--blue); font-weight: 600; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 0 22px 80px; }
+    .meta-row { grid-template-columns: 1fr; }
+    .meta-row .k { border-right: none; border-bottom: 1px solid var(--line); }
+    .title-row { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="crumb">
+    <a href="../index.html">Theme Knowledge Base</a>
+    <span class="sep">/</span> Financial
+    <span class="sep">/</span> Tokenization
+  </nav>
+
+  <!-- 1 · HEADER -->
+  <header class="masthead">
+    <div class="eyebrow">Theme Tear-Sheet</div>
+    <div class="title-row">
+      <h1>Asset Tokenization</h1>
+      <div class="updated">Last updated <b>May 27, 2026</b></div>
+    </div>
+  </header>
+
+  <!-- 2 · THESIS -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Thesis</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">Tokenization has crossed from pilot to product.</span>
+        <p>On-chain real-world assets (excluding stablecoins) surpassed $32B in May 2026, roughly tripling over the trailing twelve months, led by tokenized US Treasuries (~45% of the market). BlackRock filed two new tokenized fund structures with the SEC on May 8, 2026, extending a BUIDL franchise that now holds ~$2.4B. Franklin Templeton, JPMorgan, Fidelity, and Apollo have all launched or expanded tokenized products &mdash; the inflection from experiment to permanent on-chain asset-management infrastructure.</p>
+      </li>
+      <li>
+        <span class="lead">Value accrues to rails and record-keepers, not crypto beta.</span>
+        <p>As Treasuries, money-market funds, private credit, and equities migrate on-chain, economics flow to (a) compliant issuance platforms, (b) regulated custody/transfer-agency and market structure, and (c) the stablecoin settlement layer. This theme is deliberately scoped to mechanism-clean beneficiaries and explicitly excludes bitcoin miners and crypto-treasury vehicles, whose P&amp;L tracks token price rather than tokenization volume.</p>
+      </li>
+      <li>
+        <span class="lead">Stablecoins are the cash leg &mdash; and now have a legal regime.</span>
+        <p>Every tokenized-asset trade needs an on-chain cash settlement instrument. The GENIUS Act (signed July 18, 2025) for the first time defines who may issue a payment stablecoin and removes compliant stablecoins from the SEC/CFTC &ldquo;security/commodity&rdquo; definitions, placing banking regulators in charge. The global stablecoin market exceeds $240B, with USDC (~27% share) the most regulation-aligned major issuer. Compliance deadlines tighten into January 2027.</p>
+      </li>
+      <li>
+        <span class="lead">Market structure is institutionalizing fast.</span>
+        <p>Nasdaq has filed to list tokenized equities and NYSE announced a dedicated venue to trade and settle tokenized securities 24/7. Tokenized equities are the fastest-growing new asset category. The plumbing &mdash; listing venues, custody, transfer agency &mdash; is being built by both incumbents and crypto-native exchanges, which is where the most defensible (regulatory-chokepoint) economics sit.</p>
+      </li>
+      <li>
+        <span class="lead">Forecasts are large but dispersed &mdash; treat as directional.</span>
+        <p>Estimates range widely: Fortune Business Insights at ~$16B by 2034 versus McKinsey at $2&ndash;4T by 2030 and a BCG/Ripple figure near $18.9T. The dispersion is the signal: consensus on direction, none on magnitude or timing. Conviction here is structural, not a call on any single forecast.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- 3 · CATALYSTS -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Catalysts to Watch</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">First tokenized-equity venue goes live at scale (NYSE / Nasdaq).</span>
+        <p>Live 24/7 trading and settlement of tokenized securities on a regulated US venue would be the cleanest demand-pull signal and would directly validate the custody/market-structure leg of the thesis.</p>
+      </li>
+      <li>
+        <span class="lead">GENIUS Act rulemaking finalizes &mdash; the rewards/yield question.</span>
+        <p>OCC and Treasury proposals in early 2026 cast doubt on whether exchange-paid stablecoin rewards survive. Resolution is double-edged: a hard prohibition pressures the Coinbase&ndash;Circle revenue-share economics; a workable carve-out is a tailwind. The single biggest swing factor for CRCL and COIN &mdash; watch as a binary event, not a gradual one.</p>
+      </li>
+      <li>
+        <span class="lead">A tokenized fund crosses a systemic AUM threshold.</span>
+        <p>BUIDL-style products being used as collateral in lending and leveraged trading would mark tokenized assets becoming load-bearing market infrastructure rather than a yield novelty &mdash; a structural step-up in the issuance/admin sub-thesis.</p>
+      </li>
+      <li>
+        <span class="lead">Incumbent transfer agents disclose tokenization-attributable revenue.</span>
+        <p>The first time SS&amp;C or Broadridge breaks out on-chain record-keeping or tokenized-fund administration as a line item is the inflection that repositions them from &ldquo;disruption risk&rdquo; to &ldquo;digitized incumbent&rdquo; in the eyes of public-equity flows.</p>
+      </li>
+      <li>
+        <span class="lead">A pure-play tokenization issuer IPO (Securitize, Ondo-type).</span>
+        <p>Would create the first clean public-equity proxy for the issuance layer and likely justify carving out an explicit Issuance sub-theme. Figure (FIGR) is the closest current public approximation on the origination side.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- 4 · MARKET DYNAMIC -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Market Dynamic, Direction, Horizon &amp; Conviction</h2></div>
+    <div class="dynamic">
+      <p>Partially anticipated &mdash; the rail and stablecoin names (CRCL, COIN) already carry tokenization narrative in their valuations, while the incumbent record-keepers (SSNC, BR) are largely not yet repriced for it. For the in-scope universe this is a <span class="pill tail">Tailwind</span>, expected over a <span class="pill">5&ndash;10 year</span> horizon as frameworks settle and asset classes migrate on-chain in sequence (cash &rarr; Treasuries &rarr; funds &rarr; private credit &rarr; equities). Theme conviction is <span class="pill">Medium-High</span> &mdash; strong directional evidence and institutional validation, tempered by uncertainty on timing, regulatory path, and which layer captures the durable economics.</p>
+    </div>
+  </section>
+
+  <!-- 5 · PRIVATE COMPANIES -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Private Companies to Watch</h2></div>
+    <p style="font-size:1.06rem; line-height:1.6; color:var(--ink-soft); font-style:italic; margin-bottom:18px;">The public roster (CRCL, FIGR, COIN, BLSH, SSNC, BR, XYZ, HOOD) is the full in-universe set. The most material tokenization pure-plays are still private &mdash; an IPO or large-incumbent acquisition of any would reshape the public-equity surface and likely warrant new edges.</p>
+    <div class="leaders">
+      <div class="lgroup">
+        <div class="gname">Issuance &mdash; Category Leader</div>
+        <p>Securitize &mdash; &gt;$4.6B tokenized AUM and BlackRock&rsquo;s issuance partner for BUIDL, also administering tokenized products for Apollo, Hamilton Lane, KKR, and VanEck. The single most important private name to track; a Securitize listing would be the cleanest pure-play issuance proxy to date.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Issuance &amp; Tokenized Markets</div>
+        <p>Ondo Finance &mdash; tokenized US Treasuries plus a fast-growing tokenized-equity platform (Ondo Global Markets, 200+ tokenized US stocks/ETFs for non-US investors); earns on reserve income. Superstate &mdash; regulated on-chain asset manager (USTB tokenized Treasury fund) pushing issuer-led native tokenized equity, the most legally defensible design for direct on-chain equity issuance.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Regulatory-Moat &amp; Infrastructure</div>
+        <p>Dinari &mdash; first SEC-registered broker-dealer and transfer agent approved to tokenize securities, issuing dShares backed 1:1 by real shares; the most US-native tokenized-equity attempt. Centrifuge anchors tokenized private credit; Tokeny provides white-label issuance infrastructure &mdash; both would slot directly into the issuance grouping if they reach public markets or are acquired by an incumbent already in the universe.</p>
+      </div>
+    </div>
+    <p class="disclaimer">Not exhaustive &mdash; see Neo4j for the full edge list.</p>
+  </section>
+
+  <!-- 6 · CAVEATS -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Caveats &amp; Discipline Notes</h2></div>
+    <ul class="caveats">
+      <li><strong>Scope discipline drove name selection.</strong> Seven crypto-beta names raised in discussion (MARA, RIOT, CLSK, CORZ, IREN miners; MSTR, SBET treasury vehicles) were excluded &mdash; their mechanism is token price, not tokenization volume, and they belong in the separate Crypto Asset Beneficiaries theme. Every edge here must name whether the company issues tokenized assets, keeps the record, or provides the settlement rail.</li>
+      <li><strong>The most durable layer is the least investable today.</strong> The regulated custody/exchange chokepoints are where the defensible economics sit, yet most of those names are orphans; the matchable universe skews toward issuers and rails. Separately, GENIUS rulemaking is an unresolved binary &mdash; reward/yield economics for CRCL and COIN hinge on pending OCC/Treasury rules, so treat status-quo revenue-share assumptions as carrying regulatory tail risk.</li>
+      <li><strong>All values are Claude-inferred and unreviewed.</strong> Theme conviction and all 8 edge properties are flagged source = Claude-inferred / reviewed = false &mdash; framework-driven hypotheses, not confirmed data. This document is framework-driven analysis, not investment advice.</li>
+    </ul>
+  </section>
+
+  <!-- 7 · DB STRUCTURE -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Theme Database Structure</h2></div>
+    <div class="meta">
+      <div class="meta-row"><div class="k">Theme name</div><div class="v">Asset Tokenization</div></div>
+      <div class="meta-row"><div class="k">Level / Status</div><div class="v">Level 1 (flat; no Level-2 sub-themes yet) &middot; Active</div></div>
+      <div class="meta-row"><div class="k">Conviction</div><div class="v">Medium-High (conviction_source = Claude-inferred, pending user confirmation)</div></div>
+      <div class="meta-row"><div class="k">Edges</div><div class="v">8 EXPOSED_TO, all Tailwind, all source = Claude-inferred, reviewed = false</div></div>
+      <div class="meta-row"><div class="k">In-universe members</div><div class="v">CRCL, FIGR, SSNC, BR, XYZ, HOOD (matched to 9,917-ticker universe)</div></div>
+      <div class="meta-row"><div class="k">AI-added nodes</div><div class="v">COIN, BLSH &mdash; created_by = Claude, source = Claude-added; not in original universe</div></div>
+      <div class="meta-row"><div class="k">Orphans to reconcile</div><div class="v">BNY, State Street, Northern Trust, ICE, CME, Nasdaq, CBOE &mdash; durable chokepoints absent from universe</div></div>
+      <div class="meta-row"><div class="k">Why separate from existing themes</div><div class="v">Overlaps PQC Migration and Cybersecurity Tailwind on key-management/HSM names, but the driver here is on-chain asset migration, not security spend. Cross-link via RELATES_TO, not CHILD_OF.</div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div><a href="../index.html">&larr; Back to Knowledge Base</a></div>
+    <div>DUMAC Direct &middot; Framework-driven analysis, not investment advice</div>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Computing Beneficiaries — DUMAC Direct</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     THEME WRITE-UP TEMPLATE  —  DUMAC Direct
+     Section order locked: Header / Thesis / Catalysts /
+     Market Dynamic / Key Leaders / Sub-theme structure /
+     DB Structure / Caveats
+     Palette: white bg, black type, blue + yellow accents.
+     Font floor: 13px (~10pt) everywhere.
+     ========================================================= */
+  :root {
+    --bg:          #ffffff;
+    --bg-tint:     #f5f7fb;
+    --bg-yellow:   #fdf6e0;
+    --ink:         #14181f;
+    --ink-soft:    #565d6b;
+    --blue:        #1b3a8f;
+    --blue-deep:   #122a66;
+    --blue-soft:   #e4e9f6;
+    --yellow:      #f2b705;
+    --yellow-deep: #b8860b;
+    --line:        #d9dde6;
+    --tail:        #1f7a4d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 40px 110px;
+  }
+
+  /* ---------- Breadcrumb ---------- */
+  .crumb {
+    padding: 28px 0 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .crumb a {
+    color: var(--blue);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .crumb a:hover { color: var(--yellow-deep); }
+  .crumb .sep { margin: 0 10px; color: var(--line); }
+
+  /* ---------- SECTION 1 — Header line ---------- */
+  .masthead {
+    margin-top: 24px;
+    padding-bottom: 26px;
+    border-bottom: 3px solid var(--yellow);
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.6vw, 3.15rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--blue-deep);
+    max-width: 18ch;
+  }
+  .updated {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    padding-bottom: 6px;
+  }
+  .updated b { color: var(--yellow-deep); font-weight: 500; }
+
+  /* ---------- Section scaffold ---------- */
+  section { margin-top: 50px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .sec-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--yellow-deep);
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    letter-spacing: -0.012em;
+    color: var(--blue);
+  }
+  .sec-head::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: var(--line);
+    align-self: center;
+  }
+
+  /* ---------- Bullet list (thesis / catalysts) ---------- */
+  .points { list-style: none; }
+  .points > li {
+    position: relative;
+    padding: 0 0 20px 30px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .points > li:last-child { border-bottom: none; margin-bottom: 0; }
+  .points > li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 9px;
+    width: 9px; height: 9px;
+    background: var(--yellow);
+    border: 1px solid var(--yellow-deep);
+    transform: rotate(45deg);
+  }
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.16rem;
+    color: var(--blue);
+    letter-spacing: -0.005em;
+  }
+  .points p {
+    font-size: 1.08rem;
+    line-height: 1.62;
+    color: var(--ink);
+    margin-top: 6px;
+  }
+
+  /* ---------- Market dynamic block ---------- */
+  .dynamic {
+    background: var(--bg-tint);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--blue);
+    padding: 26px 30px;
+  }
+  .dynamic p {
+    font-size: 1.1rem;
+    line-height: 1.66;
+    color: var(--ink);
+  }
+  .dynamic .pill {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 2px 9px;
+    border-radius: 2px;
+    color: var(--ink);
+    background: var(--yellow);
+  }
+  .dynamic .pill.tail { background: var(--tail); color: #ffffff; }
+
+  /* ---------- Leaders ---------- */
+  .leaders { display: grid; gap: 0; }
+  .lgroup {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .lgroup:last-child { border-bottom: none; }
+  .lgroup .gname {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 3px solid var(--yellow);
+  }
+  .lgroup p {
+    font-size: 1.06rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .tk {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--blue-deep);
+    background: var(--blue-soft);
+    padding: 1px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  /* ---------- Table (sub-theme structure) ---------- */
+  .tbl-scroll { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.02rem;
+    min-width: 560px;
+    border: 1px solid var(--line);
+  }
+  thead th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: var(--blue);
+    text-align: left;
+    padding: 11px 16px;
+  }
+  tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) td { background: var(--bg-tint); }
+  tbody td:first-child {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+
+  /* ---------- DB structure meta table ---------- */
+  .meta {
+    border: 1px solid var(--line);
+  }
+  .meta-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+  .meta-row:last-child { border-bottom: none; }
+  .meta-row .k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 500;
+    padding: 13px 16px;
+    background: var(--bg-tint);
+    border-right: 1px solid var(--line);
+  }
+  .meta-row .v {
+    padding: 13px 16px;
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  /* ---------- Caveats ---------- */
+  .caveats { list-style: none; }
+  .caveats li {
+    position: relative;
+    padding: 0 0 14px 26px;
+    margin-bottom: 14px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--ink);
+    border-bottom: 1px dotted var(--line);
+  }
+  .caveats li:last-child { border-bottom: none; margin-bottom: 0; }
+  .caveats li::before {
+    content: "\2014";
+    position: absolute;
+    left: 0; top: 0;
+    color: var(--yellow-deep);
+    font-weight: 600;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 3px solid var(--yellow);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { color: var(--yellow-deep); }
+
+  .disclaimer {
+    margin-top: 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  strong { color: var(--blue); font-weight: 600; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 0 22px 80px; }
+    .meta-row { grid-template-columns: 1fr; }
+    .meta-row .k { border-right: none; border-bottom: 1px solid var(--line); }
+    .title-row { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="crumb">
+    <a href="../index.html">Theme Knowledge Base</a>
+    <span class="sep">/</span> Future
+    <span class="sep">/</span> Quantum
+    <span class="sep">/</span> Beneficiaries
+  </nav>
+
+  <!-- ============ 1 · HEADER LINE ============ -->
+  <header class="masthead">
+    <div class="eyebrow">Theme Tear-Sheet</div>
+    <div class="title-row">
+      <h1>Quantum Computing Beneficiaries</h1>
+      <div class="updated">Last updated <b>May 16, 2026</b></div>
+    </div>
+  </header>
+
+  <!-- ============ 2 · THESIS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Thesis</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">The transition from research to commercial trajectory is underway, but commercial advantage is still 5&ndash;15 years out.</span>
+        <p>Google demonstrated the first verifiable quantum advantage on hardware in October 2025 (Quantum Echoes on the 105-qubit Willow chip, published in Nature, 13,000x faster than the best classical algorithm for the OTOC task). Bain estimates the first practical-advantage threshold around 100 logical qubits by 2028&ndash;2029, with commercially impactful applications requiring 1,000&ndash;10,000 logical qubits in the mid-2030s. The slope of progress is real; the timing to revenue is uneven across the value chain.</p>
+      </li>
+      <li>
+        <span class="lead">Pure-plays are scaling but durability is uncertain.</span>
+        <p>IonQ became the first quantum pure-play to clear $100M in annual GAAP revenue (reported Feb 2026) and is on an acquisition tear. Quantinuum has filed for what could be the sector's largest IPO. D-Wave is bringing an initial gate-model system to market in 2026 to complement its annealing platform. Six US-listed pure-plays now trade publicly. Modality competition &mdash; superconducting vs. trapped-ion vs. photonic vs. neutral-atom &mdash; remains unresolved, and winner-take-most outcomes are possible at the modality level.</p>
+      </li>
+      <li>
+        <span class="lead">Hyperscaler exposure is optionality, not revenue.</span>
+        <p>IBM operates the most mature superconducting roadmap (Heron, target 100,000 qubits by 2033) and the broadest enterprise pipeline via Qiskit. Google's Willow milestone is research credibility, not revenue. Microsoft's Azure Quantum is positioned as the orchestration cloud across modalities. AWS Braket is the modality-neutral broker. Honeywell stands apart &mdash; its retained stake in Quantinuum is a direct equity exposure that an IPO would crystallize.</p>
+      </li>
+      <li>
+        <span class="lead">Picks-and-shovels names are the cleanest modality-agnostic exposure.</span>
+        <p>Every quantum modality requires precision control electronics, lasers for cooling and gates, cryogenic probe systems, and photonics/vacuum components. NVIDIA's cuQuantum SDK and DGX Quantum platform position it as the hybrid GPU+QPU layer regardless of which hardware wins. These names benefit from total quantum R&amp;D spend without taking a modality bet, but quantum is a small share of revenue for each &mdash; exposure is incremental, not transformative.</p>
+      </li>
+      <li>
+        <span class="lead">Capital flows validate the theme ahead of public-equity recognition.</span>
+        <p>McKinsey calls 2026 a "commercial tipping point" with potential $2.7T in economic value across industries over the next decade. Private capital is well ahead &mdash; PsiQuantum building utility-scale photonic systems in Chicago and Brisbane, Atom Computing partnered with Microsoft, and the pure-play IPO/SPAC pipeline accelerating (Xanadu listed March 2026, Infleqtion Feb 2026, Quantinuum filed). The theme is recognizable in the tape; the open question is which sub-bucket compounds best from here.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ 3 · CATALYSTS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Catalysts to Watch</h2></div>
+    <ul class="points">
+      <li>
+        <span class="lead">Quantinuum IPO pricing.</span>
+        <p>Filed via Morgan Stanley joint lead; pricing crystallizes the largest private quantum valuation into a public mark and provides a direct public-equity proxy for trapped-ion leadership. Would also crystallize Honeywell's retained-stake value. Watch the float and lockup structure &mdash; a wide free float would tighten correlation with other pure-plays; a tight float could compress modality-spread trades.</p>
+      </li>
+      <li>
+        <span class="lead">First quantum pure-play reports profitability or material commercial-revenue inflection.</span>
+        <p>IonQ's $100M GAAP revenue milestone is the bar to clear. The next inflection point is positive operating income or gross-margin disclosure that proves the unit economics, not just topline. Until then, pure-plays trade on roadmap milestones and qubit-count announcements, not earnings.</p>
+      </li>
+      <li>
+        <span class="lead">Logical-qubit milestone &mdash; 100 fault-tolerant logical qubits demonstrated at scale.</span>
+        <p>Bain and others frame this as the practical-advantage threshold around 2028&ndash;2029. Microsoft+Atom Computing has demonstrated 24 entangled logical qubits; Quantinuum's Helios runs at 48 logical. A demonstrated path from tens to low-hundreds of logical qubits would compress timelines materially across the entire theme.</p>
+      </li>
+      <li>
+        <span class="lead">Modality winner signal &mdash; DARPA QBI Stage B selections, customer concentration in one architecture.</span>
+        <p>DARPA's Quantum Benchmarking Initiative Stage B selected IBM, Quantinuum, and IonQ; Google notably absent. Subsequent stage advancements, large customer wins concentrated in one modality, or a major retrenchment by a lagging modality would create the first defensible "modality winner" thesis. Today, intellectual honesty requires keeping exposure across modalities.</p>
+      </li>
+      <li>
+        <span class="lead">Hyperscaler quantum disclosure &mdash; first earnings-call line item for quantum revenue or pipeline.</span>
+        <p>IBM is most likely to break out PQC-and-quantum bookings first given its enterprise sales motion. The first quarter any hyperscaler discloses material quantum-attributable revenue is the inflection point that pulls public-market attention back to the picks-and-shovels and hyperscaler buckets.</p>
+      </li>
+      <li>
+        <span class="lead">Verified Shor's algorithm at scale &mdash; a cryptographically relevant quantum computer (CRQC).</span>
+        <p>Would shift this theme from tailwind-only to a mixed picture and create the explicit Quantum Disruption of Encryption headwind theme that PQC Migration partially anticipates. Compresses the entire PQC timeline and creates urgent demand-pull for both this theme and PQC.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ 4 · MARKET DYNAMIC ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Market Dynamic, Direction, Horizon &amp; Conviction</h2></div>
+    <div class="dynamic">
+      <p>Quantum is a recognized but not-yet-dominant theme as of May 2026. The dynamic is a structural <span class="pill tail">Tailwind</span> across the value chain, but with highly differentiated revenue timing by bucket. Commercial advantage is <span class="pill">5&ndash;15 years</span> out at the application layer; capital and engineering spend is happening today. Theme conviction is <span class="pill">Medium</span> &mdash; the force is real and the trajectory increasingly visible, but modality winners and commercial-advantage timing remain genuinely uncertain. The cleanest exposure is the picks-and-shovels bucket, where revenue today is modality-agnostic; the highest beta is the pure-play platforms; the safest optionality is the hyperscaler bucket where quantum is a small share of enterprise value. Position sizing should reflect this asymmetry.</p>
+    </div>
+  </section>
+
+  <!-- ============ 5 · KEY LEADERS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Key Leaders to Watch</h2></div>
+    <div class="leaders">
+      <div class="lgroup">
+        <div class="gname">Hyperscalers and Strategic Incumbents</div>
+        <p>IBM <span class="tk">IBM</span> &mdash; deepest enterprise pipeline; Heron/Eagle/Osprey roadmap targeting 100,000 qubits by 2033. Honeywell <span class="tk">HON</span> &mdash; direct equity exposure via its retained Quantinuum stake. Alphabet <span class="tk">GOOGL</span> &mdash; Willow chip delivered the first verifiable quantum advantage in Oct 2025. Microsoft <span class="tk">MSFT</span> &mdash; Azure Quantum orchestration layer plus Majorana topological-qubit research. Amazon <span class="tk">AMZN</span> &mdash; Braket as a modality-neutral cloud broker. Intel <span class="tk">INTC</span> and Alibaba <span class="tk">BABA</span> are present but furthest from commercial revenue.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Pure-Play Platforms</div>
+        <p>Quantinuum <span class="tk">QNT</span> (IPO pending) &mdash; vertically integrated trapped-ion leader, Helios at 48 logical qubits. IonQ <span class="tk">IONQ</span> &mdash; first quantum pure-play past $100M GAAP revenue. D-Wave <span class="tk">QBTS</span> &mdash; dual-platform (annealing in production; gate-model planned 2026). Rigetti <span class="tk">RGTI</span> &mdash; superconducting chiplet architecture. Quantum Computing Inc. <span class="tk">QUBT</span> &mdash; photonic, smallest and most speculative.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Picks and Shovels</div>
+        <p>Keysight <span class="tk">KEYS</span> &mdash; precision control electronics, modality-agnostic. Coherent <span class="tk">COHR</span> &mdash; lasers for trapped-ion and neutral-atom systems. FormFactor <span class="tk">FORM</span> &mdash; near-monopoly in cryogenic probe systems for superconducting qubits. NVIDIA <span class="tk">NVDA</span> &mdash; cuQuantum SDK and DGX Quantum hybrid platform. MKS Inc. <span class="tk">MKSI</span> &mdash; photonics and vacuum components.</p>
+      </div>
+      <div class="lgroup">
+        <div class="gname">Private Companies to Monitor</div>
+        <p>PsiQuantum (utility-scale photonic; $1B Chicago/Brisbane buildout; NVIDIA-backed). Atom Computing (neutral-atom; Microsoft and DARPA partnerships; 24 entangled logical qubits achieved). QuEra (neutral-atom; AIST Japan deployment). Pasqal (neutral-atom, French). IQM (Finnish; listed Feb 2026, the first European pure-play). Xanadu (photonic; listed March 2026 via SPAC). Infleqtion (listed Feb 2026).</p>
+      </div>
+    </div>
+    <p class="disclaimer">Not exhaustive &mdash; see Neo4j for the full edge list.</p>
+  </section>
+
+  <!-- ============ 6 · SUB-THEME STRUCTURE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Sub-Theme Structure</h2></div>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr><th>Sub-theme</th><th>Driver</th><th>Public-equity surface</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hyperscaler and Strategic Programs</td>
+            <td>Big-tech and strategic incumbents with active quantum R&amp;D. Quantum is peripheral to enterprise value but provides optionality plus a research-credibility moat.</td>
+            <td>Broad and liquid. Quantum is a small share of revenue for each; exposure is asymmetric optionality. HON is the cleanest direct-stake play via Quantinuum.</td>
+          </tr>
+          <tr>
+            <td>Pure-Play Platforms</td>
+            <td>Public companies whose business is primarily quantum hardware and platforms. High beta to the theme; durability is the open question.</td>
+            <td>Five public names today (plus QNT pre-IPO); pure-play count growing via the IPO/SPAC pipeline. Modality bets implicit. High-volatility, roadmap-driven trading.</td>
+          </tr>
+          <tr>
+            <td>Picks and Shovels</td>
+            <td>Test and measurement, lasers, cryogenics, photonics components, and hybrid GPU infrastructure. Modality-agnostic; benefits from total R&amp;D spend.</td>
+            <td>Cleanest modality-agnostic exposure. Quantum is incremental for each, not transformative.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 7 · DB STRUCTURE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Theme Database Structure</h2></div>
+    <div class="meta">
+      <div class="meta-row"><div class="k">Topic</div><div class="v">Quantum &mdash; tagged via TAGGED_AS to the umbrella QUANTUM Topic node; tag applied to the L1 parent only.</div></div>
+      <div class="meta-row"><div class="k">Theme level</div><div class="v">Level 1 (parent), with 3 Level 2 sub-themes.</div></div>
+      <div class="meta-row"><div class="k">Status</div><div class="v">Active</div></div>
+      <div class="meta-row"><div class="k">Conviction</div><div class="v">Medium &mdash; the force is real; modality winners and timing to commercial advantage remain genuinely uncertain.</div></div>
+      <div class="meta-row"><div class="k">Time horizon</div><div class="v">5+ years to commercial advantage; capital and engineering spend already underway.</div></div>
+      <div class="meta-row"><div class="k">Companies</div><div class="v">17 EXPOSED_TO edges aggregated via children: 7 Hyperscaler / 5 Pure-Play / 5 Picks-and-Shovels.</div></div>
+      <div class="meta-row"><div class="k">Related themes</div><div class="v">Tagged QUANTUM alongside Post-Quantum Cryptography Migration. No CHILD_OF or RELATES_TO links to other themes &mdash; quantum computing benefits and PQC migration are economically independent theses, connected via TAGGED_AS, not hierarchy.</div></div>
+      <div class="meta-row"><div class="k">Pre-IPO handling</div><div class="v">QNT US Equity added as a Company node despite being pre-IPO; carries listing_status = "Pre-IPO" and no GICS classification edges until a refreshed universe CSV after pricing.</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 8 · CAVEATS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Caveats &amp; Discipline Notes</h2></div>
+    <ul class="caveats">
+      <li>Modality competition is unresolved. Today's hierarchy groups all pure-plays under one sub-theme; if a clear modality winner emerges, a third hierarchy level by modality may be warranted. Avoid building modality conviction into the graph prematurely.</li>
+      <li>Pure-play platforms carry individual company durability risk. Pre-revenue or sub-scale names with significant cash burn can lose 80%+ on a missed roadmap milestone. Edge strength "Core" reflects theme purity, not balance-sheet quality.</li>
+      <li>Hyperscaler exposure is optionality, not a revenue line. Don't confuse the strategic-positioning narrative with quarterly P&amp;L impact. Quantum is a rounding error of revenue for GOOGL, MSFT, AMZN, NVDA.</li>
+      <li>Picks-and-shovels is the most defensible bucket but offers incremental, not transformative, exposure. Best owned in combination with primary theses for each name.</li>
+      <li>The theme will expand as IPOs and de-SPACs land. Periodic universe refresh and new edge wiring required; don't lock the company list.</li>
+      <li>If a CRQC milestone arrives ahead of schedule, build the Quantum Disruption of Encryption headwind theme. It compresses the PQC Migration timeline and creates a new headwind on slow-to-migrate incumbents.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div><a href="../index.html">&larr; Back to Knowledge Base</a></div>
+    <div>DUMAC Direct &middot; Framework-driven analysis, not investment advice</div>
+  </footer>
+
+</div>
+</body>
+</html>

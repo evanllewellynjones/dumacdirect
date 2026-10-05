@@ -1,0 +1,19 @@
+# secrets
+.env
+.env.*
+!.env.example
+*secret*
+*credentials*.json
+token*.json
+*.pfx
+*.pem
+*.key
+msal_cache*
+.claude/settings.local.json
+
+# data / output
+*.csv
+*.db
+*.sqlite
+*.log
+output/

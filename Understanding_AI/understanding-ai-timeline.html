@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Timeline</title>
+<style>
+  :root{
+    --navy:#002060; --ink:#1a1a1a; --muted:#595959; --rule:#d9d9d9;
+    --blue:#156082; --orange:#E97132; --wash:#f2f2f2; --grey:#a6a6a6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:#fff; color:var(--ink);
+    font-family:Calibri,"Segoe UI",system-ui,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .shell{max-width:880px;margin:0 auto;padding:28px 28px 180px}
+
+  header.top{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:22px}
+  header.top .ch{color:var(--navy);font-weight:bold;font-size:17px}
+  header.top .ch a.backlink{color:var(--blue);text-decoration:none;font-weight:normal}
+  header.top .ch a.backlink:hover{text-decoration:underline}
+  header.top .ch .sep{color:var(--muted);font-weight:normal}
+  header.top .meta{color:var(--muted);font-size:13px}
+
+  h1.pagetitle{color:var(--navy);font-size:25px;font-weight:bold;line-height:1.2;margin:0 0 6px}
+  p.standfirst{margin:0 0 18px;max-width:72ch;color:#2a2a2a}
+
+  .prov{background:var(--wash);padding:12px 16px;margin:0 0 18px;font-size:15px;max-width:72ch}
+  .prov b{color:var(--navy)}
+  .legend{font-size:13px;color:var(--muted);margin:0 0 22px;max-width:72ch}
+  .legend .key{display:inline-block;margin-right:16px;white-space:nowrap}
+  .legend .sw{display:inline-block;width:10px;height:10px;margin-right:5px;
+    vertical-align:-1px;border:1px solid var(--muted)}
+  .legend .sw.unv{background:var(--orange);border-color:var(--orange)}
+  .legend .sw.deep{background:var(--blue);border-color:var(--blue)}
+
+  .controls{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--rule);
+    padding:10px 0 11px;margin-bottom:8px;z-index:5;display:flex;gap:10px;
+    align-items:center;flex-wrap:wrap}
+  .controls input[type=search]{font-family:inherit;font-size:14px;padding:6px 9px;
+    border:1px solid var(--rule);border-radius:3px;min-width:220px}
+  .controls input[type=search]:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .controls select{font-family:inherit;font-size:14px;padding:6px 8px;
+    border:1px solid var(--rule);border-radius:3px;background:#fff;color:var(--ink)}
+  .controls .count{font-size:13px;color:var(--muted);margin-left:auto}
+
+  .phase{border-top:2px solid var(--navy);margin:34px 0 18px;padding-top:9px}
+  .phase h2{color:var(--navy);font-size:18px;margin:0 0 3px}
+  .phase p{margin:0;font-size:14px;color:var(--muted);max-width:72ch}
+
+  section.month{border-left:3px solid var(--rule);padding:2px 0 2px 20px;margin:0 0 26px;
+    position:relative}
+  section.month::before{content:"";position:absolute;left:-7px;top:9px;width:11px;height:11px;
+    border-radius:50%;background:#fff;border:2px solid var(--navy)}
+  section.month.hasdeep{border-left-color:var(--blue)}
+  section.month.hasdeep::before{background:var(--blue);border-color:var(--blue)}
+  section.month h3{color:var(--navy);font-size:19px;margin:0 0 2px;font-weight:bold}
+  section.month .mid{font-size:13px;color:var(--muted);margin:0 0 10px}
+  section.month .mid .flag{color:var(--orange);font-weight:bold}
+
+  ul.events{margin:0 0 12px;padding-left:19px;max-width:72ch}
+  ul.events li{margin:0 0 6px}
+  ul.events li b{color:#000}
+
+  .asking{background:var(--wash);padding:10px 14px;margin:0 0 12px;font-size:15px;max-width:72ch}
+  .asking b{color:var(--navy);display:block;font-size:13px;margin-bottom:3px;
+    text-transform:uppercase;letter-spacing:.04em}
+
+  p.deeplink{margin:0;font-size:15px}
+  p.deeplink a{color:var(--blue);font-weight:bold;text-decoration:none}
+  p.deeplink a:hover{text-decoration:underline}
+  p.deeplink span.none{color:var(--grey);font-size:13px;font-style:italic}
+
+  sup a{color:var(--blue);text-decoration:none;font-size:11px}
+  sup a:hover{text-decoration:underline}
+
+  .refs{border-top:1px solid var(--rule);margin-top:40px;padding-top:14px}
+  .refs h2{color:var(--navy);font-size:17px;margin:0 0 10px}
+  .refs ol{margin:0;padding-left:26px;font-size:14px;color:#2a2a2a;max-width:72ch}
+  .refs li{margin:0 0 4px}
+  .refs li:target{background:var(--wash)}
+
+  p.disclaim{font-size:13px;font-style:italic;color:var(--muted);margin-top:22px;max-width:72ch}
+  p.hint2{font-size:13px;color:var(--muted);margin-top:14px;max-width:72ch}
+
+  .ask{border-top:1px solid var(--rule);margin-top:34px;padding-top:16px}
+  .ask h2{font-size:15px;color:var(--navy);margin:0 0 8px;font-weight:bold}
+  .ask p.hint{font-size:13px;color:var(--muted);margin:0 0 10px;max-width:72ch}
+  .ask textarea{width:100%;max-width:72ch;min-height:62px;font-family:inherit;font-size:15px;
+    padding:8px 10px;border:1px solid var(--rule);border-radius:3px;resize:vertical}
+  .ask textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
+  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:14px;padding:7px 14px;border:1px solid var(--navy);
+    background:#fff;color:var(--navy);border-radius:3px;cursor:pointer}
+  button:hover{background:var(--navy);color:#fff}
+  button.ghost{border-color:var(--rule);color:var(--muted)}
+  button.ghost:hover{background:var(--wash);color:var(--ink)}
+  .said{font-size:13px;color:var(--blue)}
+  .err{font-size:13px;color:#a32d2d}
+  .logbox{border:1px solid var(--rule);padding:14px 16px;margin-top:18px;font-size:14px;display:none}
+  .logbox.on{display:block}
+  .logbox h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+  .logbox ol{margin:0;padding-left:20px}
+  .logbox li{margin-bottom:6px;color:#2a2a2a}
+
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--rule)}
+  nav.bar .inner{max-width:880px;margin:0 auto;padding:10px 28px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  nav.bar .now{font-size:13px;color:var(--muted);flex:1;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
+  nav.bar .now b{color:var(--navy)}
+
+  @media (max-width:640px){
+    .shell{padding:20px 18px 210px}
+    nav.bar .inner{padding:9px 18px;gap:8px}
+    h1.pagetitle{font-size:21px}
+    .controls{position:static}
+  }
+  @media print{
+    .controls,nav.bar,.ask{display:none}
+    section.month{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="ch"><a href="index.html" class="backlink">Chapters</a> <span class="sep">·</span> Timeline — what happened, month by month</div>
+    <div class="meta" id="vstamp">v0.1 · 2 Oct 2026</div>
+  </header>
+
+  <h1 class="pagetitle">The AI market, month by month</h1>
+  <p class="standfirst">A running chronology, not a chapter. It records what happened and what the market was arguing about at the time, so that a claim made in any chapter can be placed against the moment it was made. Entries are appended as months close; the earliest months will be revised as they are re-verified.</p>
+
+  <div class="prov">
+    <b>Provenance.</b> January to December 2025 is drawn from training knowledge and has <b>not</b> been re-verified against sources — treat every date and figure in those months as indicative until checked. January 2026 onward is search-verified and carries numbered references. This split is marked on every month entry.
+  </div>
+
+  <p class="legend">
+    <span class="key"><span class="sw deep"></span>Deep dive available — the month entry links onward</span>
+    <span class="key"><span class="sw unv"></span>Unverified — from training knowledge, no source check</span>
+    <br>Both distinctions are carried by the words as well as the colour.
+  </p>
+
+  <div class="controls">
+    <input type="search" id="find" placeholder="Filter: company, event, theme…" aria-label="Filter months">
+    <select id="jump" aria-label="Jump to month"><option value="">Jump to month…</option></select>
+    <select id="yr" aria-label="Filter by year">
+      <option value="">All years</option>
+      <option value="2025">2025 only</option>
+      <option value="2026">2026 only</option>
+    </select>
+    <span class="count" id="count"></span>
+  </div>
+
+  <main id="stage"></main>
+
+  <div class="refs">
+    <h2>References</h2>
+    <ol id="reflist"></ol>
+    <p class="disclaim">Descriptive chronology of events reported in public sources. Price and market-capitalisation moves are recorded as reported on the day. Not investment advice and not a view on any security. No rating, price target or recommendation from any source is reproduced here.</p>
+  </div>
+
+  <section class="ask">
+    <h2>Ask about a month</h2>
+    <p class="hint">Pick a month, type a question, and copy it. The prompt arrives tagged with the month's permanent ID so the answer lands in the right place in your notes. Session-only — copy before you leave the page.</p>
+    <select id="qmonth" aria-label="Which month"></select>
+    <textarea id="q" placeholder="What's your question about this month?"></textarea>
+    <div class="btnrow">
+      <button id="copyq">Copy question for Claude</button>
+      <button id="copyall" class="ghost">Copy all questions from this session</button>
+      <span id="say" class="said"></span>
+    </div>
+    <div class="logbox" id="logbox">
+      <h3>Questions saved this session</h3>
+      <ol id="loglist"></ol>
+    </div>
+  </section>
+
+  <p class="hint2">This timeline is appended to, never closed. A month gains a deep dive when the month's events turn out to matter to an argument somewhere in the course; most months will never need one.</p>
+</div>
+
+<nav class="bar">
+  <div class="inner">
+    <span class="now" id="now"></span>
+    <button id="top" class="ghost">↑ Top</button>
+    <button id="end" class="ghost">Latest ↓</button>
+  </div>
+</nav>
+
+<script>
+/* ============================================================
+   Understanding AI — Timeline spine
+   TO ADD A MONTH: append one object to MONTHS. Nothing else.
+   TO ADD A DEEP DIVE: set deep:"understanding-ai-timeline-YYYY-MM.html"
+   on that month. The link, the rail colour and the dot follow.
+   IDs: T-YYYY-MM is permanent and never changes (cf. INSTRUCTIONS §15).
+   ============================================================ */
+
+const VERSION = "v0.1 · 2 Oct 2026";
+
+const REFS = [
+  "eWEEK — Elon Musk's xAI Launches Grok Build",
+  "NxCode — SaaSpocalypse 2026",
+  "Nasdaq — 3 Under-the-Radar Software Stocks Ready to Bounce",
+  "Axios — OpenAI launches platform to manage AI agents (5 Feb 2026)",
+  "Sacra — Anthropic revenue, valuation and funding",
+  "Wikipedia — SpaceXAI",
+  "MLQ.ai — Microsoft Launches First Frontier Suite",
+  "Pinggy — Racing to a Trillion: OpenAI and Anthropic's Funding History",
+  "Kore.ai — Best AI agent management platforms 2026",
+  "Schwab Network — Software Stocks Show Resilience After Volatility in 2026",
+  "SQ Magazine — OpenAI vs Anthropic Statistics 2026",
+  "WinBuzzer — Anthropic Launches Claude Managed Agents",
+  "NerdLevelTech — Microsoft Agent 365 Goes GA",
+  "Wikipedia — Grok Build",
+  "ValueAdd VC — AI Valuations Dashboard",
+  "Axios — Anthropic's revenue run rate reportedly surpasses $65 billion pre-IPO (17 Aug 2026)",
+  "Reworked — xAI Wants In on the Enterprise With Grok Bot",
+  "Archyde — Software Stocks (IGV) Rebound as AI Disruption Fears Ease",
+  "SpaceXAI (x.ai) — News page",
+  "Yahoo Finance — 3 Software Stocks Rebounding as AI Fears Give Way to Growth",
+  "Yahoo Finance — 3 Software ETFs to Buy as the SaaSpocalypse Bottoms Out",
+  "Tech Times — Microsoft Copilot Autopilot Launches on OpenClaw"
+];
+
+function s(n){ return '<sup><a href="#ref-' + n + '">' + n + '</a></sup>'; }
+
+/* Phase bands sit above the month whose id they name. */
+const PHASES = [
+  { before:"T-2025-01", h:"2025 — \u201CIs it a bubble?\u201D",
+    p:"Capex, circular financing and the absence of demonstrated ROI. The argument is about whether the spending is justified." },
+  { before:"T-2026-01", h:"Early 2026 — \u201CDoes AI eat software?\u201D",
+    p:"The question moves from the infrastructure layer to the application layer. Agents are the mechanism; per-seat pricing is the thing at risk." },
+  { before:"T-2026-04", h:"Mid 2026 — \u201CWhich software survives, and what are the labs worth?\u201D",
+    p:"Software capitulates and then recovers. The labs file to go public, which turns private marks into a public pricing question." }
+];
+
+const MONTHS = [
+{
+  id:"T-2025-01", label:"January 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>DeepSeek R1</b> released (20 Jan).",
+    "<b>NVDA fell roughly 17% on 27 Jan</b>, about $590B of market capitalisation in one session \u2014 the largest single-day loss on record at the time.",
+    "<b>Stargate</b> announced (21 Jan): $500B, OpenAI with SoftBank and Oracle.",
+    "<b>OpenAI Operator</b>, its first browser agent."
+  ],
+  asking:"Does cheap Chinese training break the capex thesis? Is US model leadership a moat?"
+},
+{
+  id:"T-2025-02", label:"February 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>Claude 3.7 Sonnet</b> and the <b>Claude Code</b> preview.",
+    "<b>GPT-4.5.</b>",
+    "<b>Grok 3.</b>",
+    "Reports of <b>Microsoft pulling back on data centre leases</b>."
+  ],
+  asking:"Are scaling returns diminishing? Is hyperscaler capex peaking?"
+},
+{
+  id:"T-2025-03", label:"March 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>OpenAI raises $40B at $300B</b>, SoftBank-led.",
+    "<b>CoreWeave IPO</b> \u2014 the first pure neocloud listing.",
+    "<b>Gemini 2.5 Pro.</b>",
+    "<b>Manus</b> agent goes viral."
+  ],
+  asking:"Can neoclouds finance themselves? Is OpenAI's valuation supportable?"
+},
+{
+  id:"T-2025-04", label:"April 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>\u201CLiberation Day\u201D tariffs</b> (2 Apr) and the ensuing selloff.",
+    "<b>H20 China export ban</b>; NVDA takes a $5.5B charge.",
+    "Google launches the <b>A2A protocol</b>.",
+    "<b>o3</b> and <b>o4-mini</b>."
+  ],
+  asking:"Do tariffs and export controls derail the AI supply chain? How large is China revenue risk?"
+},
+{
+  id:"T-2025-05", label:"May 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>Claude 4</b> launch.",
+    "<b>OpenAI Codex.</b>",
+    "OpenAI buys <b>io</b> for about $6.5B.",
+    "<b>Microsoft Build adopts MCP</b> \u2014 the protocol becomes vendor-neutral in practice."
+  ],
+  asking:"Does MCP become the standard for agent connectivity? Is coding the first killer agent use case?"
+},
+{
+  id:"T-2025-06", label:"June 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>Meta invests $14.3B in Scale AI</b> and opens a superintelligence talent war.",
+    "<b>Gartner</b> predicts over 40% of agentic projects cancelled by 2027."
+  ],
+  asking:"Is AI talent spending rational? Are agents mostly hype \u2014 \u201Cagent washing\u201D?"
+},
+{
+  id:"T-2025-07", label:"July 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>NVDA hits $4T</b> (9 Jul).",
+    "<b>Grok 4</b> launches amid the \u201CMechaHitler\u201D controversy.",
+    "<b>ChatGPT Agent.</b>",
+    "<b>US AI Action Plan.</b>"
+  ],
+  asking:"Can xAI be enterprise-safe? How far can concentration in the mega-caps go?"
+},
+{
+  id:"T-2025-08", label:"August 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>GPT-5</b> launches and underwhelms.",
+    "<b>MIT report: 95% of generative-AI pilots show no ROI</b> \u2014 the single most-quoted number of the year.",
+    "Altman calls it a bubble.",
+    "NVDA and AMD agree a <b>15% China revenue share</b>.",
+    "Gartner: 40% of enterprise applications will carry agents by end-2026."
+  ],
+  asking:"Is this a bubble? Is the model frontier plateauing? Where is enterprise ROI?"
+},
+{
+  id:"T-2025-09", label:"September 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>Oracle RPO jumps to about $455B</b>; the stock rises about 36% in a day.",
+    "<b>OpenAI\u2013Oracle $300B compute deal.</b>",
+    "<b>NVDA to invest up to $100B in OpenAI.</b>",
+    "Anthropic raises at $183B; settles copyright litigation for $1.5B."
+  ],
+  asking:"Circular financing \u2014 is NVDA funding its own demand? Can OpenAI pay for what it has committed to?"
+},
+{
+  id:"T-2025-10", label:"October 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>OpenAI\u2013AMD deal</b> with warrants; <b>OpenAI\u2013Broadcom deal</b>.",
+    "OpenAI converts to a <b>public benefit corporation</b>.",
+    "<b>NVDA hits $5T.</b>",
+    "<b>Sora 2</b> and the <b>Atlas</b> browser."
+  ],
+  asking:"How much off-balance-sheet AI debt is building? Is vendor financing a red flag?"
+},
+{
+  id:"T-2025-11", label:"November 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "<b>Gemini 3</b> reasserts Google.",
+    "<b>Microsoft Ignite unveils Agent 365.</b>",
+    "<b>Anthropic\u2013Microsoft\u2013Nvidia</b> deal.",
+    "Michael Burry's <b>GPU-depreciation critique</b>.",
+    "Mid-month AI equity wobble."
+  ],
+  asking:"Is GPU depreciation overstated? Can Google \u2014 TPUs plus models \u2014 dethrone OpenAI?"
+},
+{
+  id:"T-2025-12", label:"December 2025", year:"2025", verified:false, deep:null,
+  events:[
+    "OpenAI declares an internal <b>\u201Ccode red\u201D</b>.",
+    "<b>Oracle capex and financing worries</b>; a data-centre funding partner pulls back.",
+    "<b>H200 China sales allowed.</b>",
+    "<b>MCP donated to the Linux Foundation.</b>",
+    "Federal order preempting state AI laws."
+  ],
+  asking:"Credit risk in AI infrastructure? Is OpenAI losing share?"
+},
+{
+  id:"T-2026-01", label:"January 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>xAI launches Grok Business and Grok Enterprise.</b>" + s(1),
+    "<b>Anthropic releases Claude Cowork plugins</b> covering legal, sales, finance, marketing and support (30 Jan)." + s(2),
+    "Q4 SaaS earnings increasingly cite <b>the agent threat</b> by name." + s(3)
+  ],
+  asking:"Do agents compress per-seat SaaS revenue? Which software categories are replaceable?"
+},
+{
+  id:"T-2026-02", label:"February 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>\u201CSaaSpocalypse\u201D</b> \u2014 about $285B of software market capitalisation lost in 48 hours from 3\u20134 Feb." + s(2),
+    "<b>OpenAI Frontier</b> launches (5 Feb), a platform for managing AI agents." + s(4),
+    "<b>Anthropic Series G at $380B</b> (12 Feb)." + s(5),
+    "<b>SpaceX acquires xAI at $250B.</b>" + s(6)
+  ],
+  asking:"Is the selloff structural or overdone? Will the model labs move up the stack into applications?"
+},
+{
+  id:"T-2026-03", label:"March 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>Microsoft announces Agent 365</b> and the <b>$99 Microsoft 365 E7</b> suite." + s(7),
+    "<b>OpenAI raises $122B at $852B.</b>" + s(8),
+    "<b>Kore.ai</b> launches a cross-framework agent management platform." + s(9)
+  ],
+  asking:"Who owns the agent control plane? Does bundling favour Microsoft?"
+},
+{
+  id:"T-2026-04", label:"April 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>IGV troughs</b>, down about 37% from its peak." + s(10),
+    "<b>Anthropic run-rate passes OpenAI</b> \u2014 about $30B against about $25B." + s(11),
+    "<b>Claude Managed Agents</b> launches." + s(12),
+    "<b>GPT-5.5</b> (23 Apr)." + s(11)
+  ],
+  asking:"Has Anthropic overtaken OpenAI in enterprise? Is software capitulation complete?"
+},
+{
+  id:"T-2026-05", label:"May 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>Agent 365 generally available at $15 per user</b>, with registry sync to AWS and Google." + s(13),
+    "<b>Grok Build</b> coding agent." + s(14),
+    "<b>Anthropic Series H at $965B.</b>" + s(8)
+  ],
+  asking:"Is about 15\u201320\u00D7 run-rate justified? Is agent governance a standalone category or a feature?"
+},
+{
+  id:"T-2026-06", label:"June 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>Anthropic files confidentially for IPO</b> (1 Jun); <b>OpenAI files</b> (8 Jun)." + s(15),
+    "<b>Claude Fable 5 and Mythos 5 launch</b> (9 Jun); access suspended 12 Jun under Commerce export controls.",
+    "<b>ADBE hits eight-year lows.</b>" + s(10)
+  ],
+  asking:"Can export controls reach frontier models themselves? What will the AI IPOs do to public multiples?"
+},
+{
+  id:"T-2026-07", label:"July 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>Commerce lifts the controls</b>; Fable and Mythos access restored 1 Jul.",
+    "<b>xAI rebrands as SpaceXAI.</b>" + s(6),
+    "<b>Anthropic run-rate about $65B</b> by end-July." + s(16)
+  ],
+  asking:"Is regulatory risk now priced into lab valuations? Is the growth durable?"
+},
+{
+  id:"T-2026-08", label:"August 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>Grok Bot</b> launches (11 Aug)." + s(17),
+    "<b>SpaceX S-1 shows the AI unit lost $2.47B in Q1 on $818M of revenue.</b>" + s(17),
+    "<b>SpaceXAI acquires Cursor.</b>" + s(6),
+    "<b>IGV turns positive</b> on the year." + s(18)
+  ],
+  asking:"Can xAI convert to enterprise? Is rotation from chips into software beginning?"
+},
+{
+  id:"T-2026-09", label:"September 2026", year:"2026", verified:true, deep:null,
+  events:[
+    "<b>Grok Bot opens to enterprises</b> (3 Sep)." + s(19),
+    "<b>CRM order-value growth hits a four-year high</b>; TEAM rebounds." + s(20),
+    "<b>IGV up more than 40% from the April lows.</b>" + s(21),
+    "<b>Microsoft Copilot Autopilot</b> runs on OpenClaw under Agent 365." + s(22)
+  ],
+  asking:"Is the SaaSpocalypse over? Do agents create software demand rather than destroy it?"
+},
+{
+  id:"T-2026-10", label:"October 2026", year:"2026", verified:true, deep:null, open:true,
+  events:[
+    "<b>Anthropic IPO window reportedly September\u2013October.</b>" + s(16),
+    "<b>Q3 earnings season begins.</b>"
+  ],
+  asking:"How will the first lab IPO price? Does consumption pricing show up in Q3 numbers?"
+}
+];
+
+/* ---------------- render ---------------- */
+
+const stage = document.getElementById('stage');
+const reflist = document.getElementById('reflist');
+const jumpEl = document.getElementById('jump');
+const qmonthEl = document.getElementById('qmonth');
+const yrEl = document.getElementById('yr');
+const findEl = document.getElementById('find');
+const countEl = document.getElementById('count');
+const nowEl = document.getElementById('now');
+const sayEl = document.getElementById('say');
+const qEl = document.getElementById('q');
+const logbox = document.getElementById('logbox');
+const loglist = document.getElementById('loglist');
+
+document.getElementById('vstamp').textContent = VERSION;
+
+REFS.forEach(function(t, n){
+  const li = document.createElement('li');
+  li.id = 'ref-' + (n + 1);
+  li.textContent = t;
+  reflist.appendChild(li);
+});
+
+function monthHTML(m){
+  const flags = [];
+  if (!m.verified) flags.push('<span class="flag">unverified \u2014 training knowledge, not source-checked</span>');
+  if (m.open) flags.push('month still open');
+  const deep = m.deep
+    ? '<p class="deeplink"><a href="' + m.deep + '">Deep dive: ' + m.label + ' \u2192</a></p>'
+    : '<p class="deeplink"><span class="none">No deep dive written for this month.</span></p>';
+  return '<section class="month' + (m.deep ? ' hasdeep' : '') + '" id="' + m.id + '" data-year="' + m.year + '">' +
+    '<h3>' + m.label + '</h3>' +
+    '<p class="mid">' + m.id + (flags.length ? ' \u00B7 ' + flags.join(' \u00B7 ') : '') + '</p>' +
+    '<ul class="events"><li>' + m.events.join('</li><li>') + '</li></ul>' +
+    '<div class="asking"><b>What the market was asking</b>' + m.asking + '</div>' +
+    deep +
+    '</section>';
+}
+
+function build(){
+  let out = '';
+  MONTHS.forEach(function(m){
+    PHASES.forEach(function(p){
+      if (p.before === m.id) {
+        out += '<div class="phase"><h2>' + p.h + '</h2><p>' + p.p + '</p></div>';
+      }
+    });
+    out += monthHTML(m);
+  });
+  stage.innerHTML = out;
+
+  MONTHS.forEach(function(m){
+    const o = document.createElement('option');
+    o.value = m.id; o.textContent = m.label;
+    jumpEl.appendChild(o);
+    const o2 = document.createElement('option');
+    o2.value = m.id; o2.textContent = m.label;
+    qmonthEl.appendChild(o2);
+  });
+  qmonthEl.value = MONTHS[MONTHS.length - 1].id;
+  applyFilter();
+}
+
+function applyFilter(){
+  const q = findEl.value.trim().toLowerCase();
+  const yr = yrEl.value;
+  let shown = 0;
+  MONTHS.forEach(function(m){
+    const el = document.getElementById(m.id);
+    const hay = (m.label + ' ' + m.events.join(' ') + ' ' + m.asking)
+      .replace(/<[^>]+>/g, ' ').toLowerCase();
+    const ok = (!q || hay.indexOf(q) !== -1) && (!yr || m.year === yr);
+    el.style.display = ok ? '' : 'none';
+    if (ok) shown++;
+  });
+  document.querySelectorAll('.phase').forEach(function(p){
+    p.style.display = (q || yr) ? 'none' : '';
+  });
+  countEl.textContent = shown + ' of ' + MONTHS.length + ' months shown';
+}
+
+findEl.addEventListener('input', applyFilter);
+yrEl.addEventListener('change', applyFilter);
+jumpEl.addEventListener('change', function(){
+  if (!jumpEl.value) return;
+  const el = document.getElementById(jumpEl.value);
+  if (el) { el.scrollIntoView({behavior:'smooth', block:'start'}); }
+});
+
+document.getElementById('top').onclick = function(){ window.scrollTo({top:0, behavior:'smooth'}); };
+document.getElementById('end').onclick = function(){
+  const el = document.getElementById(MONTHS[MONTHS.length - 1].id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+};
+
+/* scroll spy: keep the footer and the ask-box selector on the month in view */
+let spyLock = false;
+function spy(){
+  if (spyLock) return;
+  let cur = MONTHS[0];
+  MONTHS.forEach(function(m){
+    const el = document.getElementById(m.id);
+    if (el && el.style.display !== 'none' && el.getBoundingClientRect().top <= 140) cur = m;
+  });
+  nowEl.innerHTML = '<b>' + cur.label + '</b> \u00B7 ' + cur.id +
+    (cur.verified ? '' : ' \u00B7 unverified');
+  if (document.activeElement !== qmonthEl) qmonthEl.value = cur.id;
+}
+window.addEventListener('scroll', spy, {passive:true});
+
+/* ---------------- question capture ---------------- */
+
+const asked = [];
+
+function byId(id){
+  for (let n = 0; n < MONTHS.length; n++) if (MONTHS[n].id === id) return MONTHS[n];
+  return MONTHS[MONTHS.length - 1];
+}
+
+function promptFor(m, q){
+  return 'Understanding AI \u2014 Timeline, ' + m.label + ' (' + m.id + ').\n\n' +
+    'Events recorded for that month:\n' +
+    m.events.map(function(e){ return '- ' + e.replace(/<[^>]+>/g, ''); }).join('\n') +
+    '\n\nMy question: ' + q;
+}
+
+function copyText(text, ok, target){
+  const el = target || sayEl;
+  function fallback(){
+    const t = document.createElement('textarea');
+    t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); ok(); }
+    catch(e){ el.className = 'err'; el.textContent = 'Copy failed \u2014 select the text manually.'; }
+    document.body.removeChild(t);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(ok).catch(fallback);
+  } else { fallback(); }
+}
+
+function copyAll(target){
+  const el = target || sayEl;
+  if (!asked.length) { el.className = 'err'; el.textContent = 'No questions yet this session.'; return; }
+  let out = '# Understanding AI \u2014 questions from the Timeline\nDeck version: ' + VERSION + '\n\n';
+  asked.forEach(function(a){
+    out += '## ' + a.m.id + ' \u2014 ' + a.m.label + '\n**Q:** ' + a.q + '\n**A:**\n**Tag:**\n\n';
+  });
+  copyText(out, function(){
+    el.className = 'said';
+    el.textContent = 'Copied ' + asked.length + ' question(s) in notes-block format.';
+  }, el);
+}
+
+document.getElementById('copyq').onclick = function(){
+  const q = qEl.value.trim();
+  if (!q) { sayEl.className = 'err'; sayEl.textContent = 'Type a question first.'; qEl.focus(); return; }
+  const m = byId(qmonthEl.value);
+  copyText(promptFor(m, q), function(){
+    asked.push({ m: m, q: q });
+    const li = document.createElement('li');
+    li.textContent = m.id + ' \u2014 ' + q;
+    loglist.appendChild(li);
+    logbox.classList.add('on');
+    sayEl.className = 'said';
+    sayEl.textContent = 'Copied. Paste it into Claude.';
+    qEl.value = '';
+  });
+};
+
+document.getElementById('copyall').onclick = function(){ copyAll(sayEl); };
+
+qmonthEl.addEventListener('focus', function(){ spyLock = true; });
+qmonthEl.addEventListener('blur', function(){ spyLock = false; });
+
+build();
+spy();
+</script>
+</body>
+</html>

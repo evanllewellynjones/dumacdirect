@@ -1,0 +1,62 @@
+# Understanding AI — .gitignore
+# The deliverables are hand-written HTML and Markdown, so most of this is
+# environment noise rather than build output.
+
+# --- Windows / Explorer ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# --- macOS / Linux (in case a file ever passes through one) ---
+.DS_Store
+.Spotlight-V100
+.Trashes
+*~
+.directory
+
+# --- Editors ---
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+
+# --- Microsoft Office lock and temp files ---
+# The legacy PowerPoint path and any .docx/.xlsx working files
+~$*.pptx
+~$*.docx
+~$*.xlsx
+*.tmp
+
+# --- Reader notes ---
+# Q&A logs are the reader's own property and are keyed to permanent slide IDs.
+# They must never be committed into the material — anything stored inside the
+# course dies on reissue.
+notes/
+*-notes.md
+*-questions.md
+understanding-ai-notes*.md
+
+# --- Working and scratch files ---
+scratch/
+tmp/
+*.bak
+*.orig
+*.rej
+
+# --- Legacy PowerPoint decks (superseded, kept locally only) ---
+# Uncomment if you keep the pre-reader decks in the working folder.
+# legacy/
+# *.pptx
+
+# --- Local server for previewing the readers ---
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# --- Local environment ---
+.env
+.env.local

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Understanding AI — Project Handoff</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#666; --line:#e2e2e2; --accent:#2f3c7e; --bg:#ffffff; --code:#f4f4f6; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#fafafa; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; }
+  .wrap { max-width:900px; margin:0 auto; padding:48px 28px 96px; background:var(--bg);
+    box-shadow:0 0 0 1px var(--line); }
+  h1 { font-size:30px; line-height:1.2; margin:0 0 8px; }
+  h1:not(:first-child) { margin-top:56px; padding-top:28px; border-top:2px solid var(--line); }
+  h2 { font-size:21px; margin:38px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  h3 { font-size:16px; margin:22px 0 8px; color:#333; }
+  p { margin:10px 0; }
+  ul,ol { margin:8px 0 14px; padding-left:22px; }
+  li { margin:4px 0; }
+  li > ul, li > ol { margin:4px 0; }
+  hr { border:0; border-top:1px solid var(--line); margin:30px 0; }
+  code { background:var(--code); padding:1px 5px; border-radius:4px; font-size:0.9em;
+    font-family:"SF Mono",Consolas,"Courier New",monospace; }
+  strong { color:#000; }
+  a { color:var(--accent); word-break:break-word; }
+  em { color:#444; }
+  .meta { color:var(--muted); font-size:13px; margin-top:4px; }
+  .toc-note { background:#f0f3fb; border:1px solid #d5deec; border-radius:8px;
+    padding:12px 16px; font-size:14px; color:#33406f; margin:18px 0 8px; }
+  @media print { body{background:#fff;} .wrap{box-shadow:none;max-width:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="meta">Self-contained project handoff · generated 2026-08-10 · portable to any Claude account</div>
+<h1 id="understanding-ai-project-handoff">Understanding AI — Project Handoff</h1>
+<p><strong>What this is:</strong> a complete, self-contained record of a working session building an<br />
+"Understanding AI" slide deck. It packages the project context, the working agreement,<br />
+and every slide (built + drafted) so a <em>different</em> Claude account can pick up exactly<br />
+where this one left off.</p>
+<p><strong>How to use it in another Claude account:</strong><br />
+1. Download this file (or the companion <code>.md</code>) and upload it into a new Claude chat/project.<br />
+2. Tell Claude: <em>"This is a project handoff. Read it, then continue building the deck from the drafts using the same style rules and the working agreement below."</em><br />
+3. Point Claude at whichever slide(s) or cluster you want built next.</p>
+<hr />
+<h2 id="project-context">Project context</h2>
+<p>We are building a deck explaining AI and its developments over time.</p>
+<p><strong>Style rules (apply to every built slide):</strong><br />
+- Simple title at top; bullet points in black; white background.<br />
+- Most body text ~12pt.<br />
+- Graphics only to <em>explain</em>, never for decoration.<br />
+- No accent bars/stripes; clean and minimal.</p>
+<h2 id="working-agreement-how-this-session-operated">Working agreement (how this session operated)</h2>
+<ul>
+<li><strong>Draft in Markdown first, build slides later.</strong> Content is captured here as drafts (marked ✏️); only some are built (✅). The user finalizes wording here, then asks for a build.</li>
+<li><strong>Capture full detail — never summarize to save space.</strong> Keep concrete numbers, worked examples, and caveats. Split into more slides rather than compressing.</li>
+<li><strong>Each slide entry has:</strong> a title, on-slide bullets, a <em>graphic idea</em> (graphics are added at build time, not stored here), and sources/caveats where relevant.</li>
+<li><strong>Research current facts</strong> (dates, prices, model specs) rather than relying on memory; note the date of time-sensitive claims.</li>
+</ul>
+<h2 id="built-powerpoint-files-produced-this-session-need-to-be-re-generated-in-the-new-account">Built PowerPoint files produced this session (need to be re-generated in the new account)</h2>
+<p>These <code>.pptx</code> files were built and delivered in the original session's workspace. A new<br />
+account won't have the files, but every slide's content + graphic spec is below, so they<br />
+can be rebuilt identically:<br />
+- <code>AI_Evolution_Timeline.pptx</code> — Slides 1–2<br />
+- <code>AI_2026_Developments.pptx</code> — Slides 3–4<br />
+- <code>How_Neural_Networks_Work.pptx</code> — Slide 5<br />
+- <code>Words_to_Answer_LLM.pptx</code> — Slide 6</p>
+<hr />
+<h1 id="full-deck-outline-all-slides">Full deck outline (all slides)</h1>
+<h1 id="understanding-ai-deck-outline-source-of-truth">Understanding AI — Deck Outline (Source of Truth)</h1>
+<p>This Markdown doc is the working content for the "Understanding AI" deck. Draft and<br />
+edit slides <strong>here</strong> first (cheap to iterate), then batch-build to PowerPoint.<br />
+Each slide lists its <strong>title</strong>, <strong>bullets</strong> (the on-slide text), a <strong>graphic spec</strong><br />
+(what to build — graphics are added at build time, not from this Markdown), and any<br />
+<strong>sources / caveats</strong>.</p>
+<h2 id="style-rules-from-project">Style rules (from project)</h2>
+<ul>
+<li>Simple title at top; bullet points in black; white background.</li>
+<li>Most body text ~12pt.</li>
+<li>Graphics used to <strong>explain</strong>, never for decoration.</li>
+<li>No accent bars/stripes; clean and minimal.</li>
+</ul>
+<h2 id="status-legend">Status legend</h2>
+<ul>
+<li>✅ Built = a PowerPoint slide has been generated and delivered.</li>
+<li>✏️ Draft = content here, not yet built.</li>
+</ul>
+<h2 id="delivered-powerpoint-files-so-far">Delivered PowerPoint files so far</h2>
+<ul>
+<li><code>AI_Evolution_Timeline.pptx</code> — Slides 1–2</li>
+<li><code>AI_2026_Developments.pptx</code> — Slides 3–4</li>
+<li><code>How_Neural_Networks_Work.pptx</code> — Slide 5</li>
+<li><code>Words_to_Answer_LLM.pptx</code> — Slide 6</li>
+</ul>
+<hr />
+<h2 id="slide-1-the-evolution-of-ai-19502026">Slide 1 — The Evolution of AI (1950–2026) ✅</h2>
+<p><strong>Graphic:</strong> Horizontal timeline with 8 milestone markers (dots on a line, labels alternating above/below).</p>
+<p>Milestones: 1950 Turing Test proposed · 1956 "AI" coined (Dartmouth) · 1997 Deep Blue beats Kasparov · 2012 Deep learning (AlexNet) · 2017 Transformers · 2020 Large language models (GPT-3) · 2022 ChatGPT (generative AI) · 2025 Reasoning models &amp; AI agents.</p>
+<p><strong>Bullets:</strong><br />
+- Rules → Learning → Deep learning → Generative AI: each era let machines do more with less hand-coding.<br />
+- Progress accelerated sharply after 2012 as data, computing power, and neural networks scaled together.</p>
+<hr />
+<h2 id="slide-2-four-eras-of-ai-what-changed-at-each-stage">Slide 2 — Four Eras of AI: What Changed at Each Stage ✅</h2>
+<p><strong>Graphic:</strong> Four boxes left→right with arrows between (progression flow).</p>
+<ul>
+<li><strong>Symbolic AI (1950s–1980s):</strong> Hand-coded rules and logic · Expert systems · Brittle; no learning.</li>
+<li><strong>Machine Learning (1990s–2000s):</strong> Learns patterns from data · Statistics over rules · Needs manual features.</li>
+<li><strong>Deep Learning (2010s):</strong> Neural networks at scale · Learns features itself · Vision &amp; speech leap.</li>
+<li><strong>Generative &amp; Agentic (2020s):</strong> Creates text, images, code · General-purpose models · Reasoning &amp; AI agents.</li>
+</ul>
+<p><strong>Bullet:</strong> The trend — less hand-coding by humans, more learning directly from data, and steadily broader capability.</p>
+<hr />
+<h2 id="slide-3-ai-in-2026-the-frontier-model-race">Slide 3 — AI in 2026: The Frontier Model Race ✅</h2>
+<p><strong>Graphic:</strong> Two-column — bullets left, a lab/model table right.</p>
+<p><strong>Bullets (left):</strong><br />
+- Release cadence compressed to weeks: labs now ship frequent point versions, not yearly launches.<br />
+- 300+ model releases tracked across 50+ organizations so far in 2026.<br />
+- Reasoning and agent use are built-in defaults, no longer add-ons.<br />
+- Open-weight models (DeepSeek, Moonshot Kimi K3) stayed close to the frontier.<br />
+- Anthropic added new tiers (Fable) alongside Opus 5 and Sonnet 5.</p>
+<p><strong>Table (Lab → Notable 2026 model):</strong><br />
+- OpenAI → GPT-5.6 (Jul 2026)<br />
+- Anthropic → Claude Opus 5 (Opus 4.8 in May)<br />
+- Google → Gemini 3.6 Flash (Jul 2026)<br />
+- xAI → Grok 4.5 (Jul 2026)<br />
+- Moonshot AI → Kimi K3, open-weight (Jul 2026)</p>
+<p><strong>Sources / caveats:</strong> As of July 2026. Model names/dates from public release trackers (llm-stats, aireleasetracker) cross-checked vs Anthropic docs. Jan–Jun 2026 cadence not fully verified; slide sticks to confirmed July releases + the overall pattern.</p>
+<hr />
+<h2 id="slide-4-ai-in-2026-from-demos-to-deployment">Slide 4 — AI in 2026: From Demos to Deployment ✅</h2>
+<p><strong>Graphic:</strong> Row of 4 stat callouts (big number + label), then bullets below.</p>
+<p><strong>Stats:</strong><br />
+- <strong>40%</strong> — of enterprise apps to include task-specific AI agents by end-2026 (was &lt;5% in 2025) — Gartner<br />
+- <strong>$2.6–4.4T</strong> — potential annual value from agentic AI across business — McKinsey<br />
+- <strong>58%</strong> — of firms already using "physical AI" / robotics; ~80% within two years — Deloitte<br />
+- <strong>&gt;40%</strong> — of agentic AI projects likely canceled by 2027 amid ROI scrutiny — Gartner</p>
+<p><strong>Bullets:</strong><br />
+- 2026 is "the year of agents": AI shifted from chatting to acting — writing code, running multi-step workflows, operating tools.<br />
+- Enterprises moved from pilots to production, reporting faster financial close and 2–3x sales-pipeline velocity.<br />
+- A reality check set in: hype cooling, ROI scrutiny, high project cancellation rates driving consolidation.<br />
+- Compute and inference demand surged (IDC projects ~1000x by 2027); energy and cost became core constraints.<br />
+- Physical AI and robotics emerged as the next frontier beyond software.</p>
+<p><strong>Sources / caveats:</strong> Figures are analyst estimates/forecasts (Gartner, IDC, McKinsey, Deloitte), gathered July 2026 from a secondary summary. Firm up against primary Gartner/IDC/Stanford AI Index sources before final use.</p>
+<hr />
+<h2 id="slide-5-how-a-neural-network-works">Slide 5 — How a Neural Network Works ✅</h2>
+<p><strong>Graphic:</strong> Node-and-edge network diagram — input layer (3) → hidden layers (4, 4) → output layer (2), fully connected. Annotate "Forward pass: data flows in →" above and "← Learning: weights adjusted (backpropagation)" below; label Input / Hidden layers / Output.</p>
+<p><strong>Bullets:</strong><br />
+- Neurons are arranged in layers: an input layer, one or more hidden layers, and an output layer.<br />
+- Every connection carries a weight; each neuron adds up its weighted inputs.<br />
+- An activation function decides how strongly the neuron fires, letting the network capture non-linear patterns.<br />
+- Layer by layer, raw inputs are transformed into higher-level features.<br />
+- The output layer produces a prediction — a label, a number, or the next word.<br />
+- Training: the prediction is compared to the correct answer, then backpropagation nudges every weight to shrink the error — repeated over millions of examples.</p>
+<hr />
+<h2 id="slide-6-how-an-llm-turns-words-into-an-answer">Slide 6 — How an LLM Turns Words Into an Answer ✅</h2>
+<p><strong>Graphic:</strong> Six-stage pipeline left→right with arrows; a worked example threaded through each box; a full-width "autoregressive loop" arrow pointing back to the start.</p>
+<p><strong>Stages (title · description · example):</strong><br />
+1. <strong>Tokenize</strong> — Split text into vocabulary chunks (tokens). — <code>"cats sleep" → [cats, sleep]</code><br />
+2. <strong>Assign IDs</strong> — Look up each token's integer ID. — <code>[9245, 6134]</code><br />
+3. <strong>Embed</strong> — Turn each ID into a vector of decimals (stored as binary bits). — <code>[0.12, -0.85, 0.03, ...]</code><br />
+4. <strong>Forward pass</strong> — GPU multiplies vectors through billions of learned weights + attention. — <code>matrix math × N layers</code><br />
+5. <strong>Predict</strong> — Score every possible next token; softmax to probabilities. — <code>sleep 0.62 / run 0.11 / eat 0.05</code><br />
+6. <strong>Decode</strong> — Sample one token, convert its ID back to text. — <code>→ "sleep"</code></p>
+<p><strong>Key note (on slide):</strong> Every number is stored as binary 1s and 0s. The GPU runs arithmetic over these numbers — it does not execute your words as a program.</p>
+<p><strong>Loop:</strong> Autoregressive — append the predicted token, repeat from step 4 to produce the next one, until a stop token.</p>
+<p><strong>Caveat:</strong> Illustrative values — real vocabularies hold ~100k+ tokens and each embedding vector is thousands of numbers long.</p>
+<hr />
+<h2 id="slide-2a-why-generative-ai-happened-when-it-did-the-enablers-draft">Slide 2a — Why Generative AI Happened When It Did: The Enablers ✏️ Draft</h2>
+<p><strong>Suggested placement:</strong> right after Slide 2 (pairs with Slide 2b).<br />
+<strong>Graphic idea:</strong> Three inputs (Data · Compute · Algorithms) as arrows converging into one box: "Deep learning works — AlexNet, 2012."</p>
+<p><strong>Bullets:</strong><br />
+- The ideas were old: the perceptron (late 1950s); backpropagation — the algorithm that trains a network — popularized in 1986 (Rumelhart, Hinton, Williams).<br />
+- Through two "AI winters," neural nets underperformed. The theory was mostly there; the fuel wasn't — nets too shallow, data too small, computers too slow to train anything deep.<br />
+- ~2012, three enablers hit critical mass at once:<br />
+  - <strong>Data</strong> — internet-scale datasets. ImageNet (2009) = 14M labeled images; the web itself = a trillion-word text corpus.<br />
+  - <strong>Compute</strong> — GPUs (built for graphics) are ideal for the parallel matrix math nets need; NVIDIA CUDA (2007) made them programmable for it.<br />
+  - <strong>Algorithms</strong> — techniques that finally made <em>deep</em> networks trainable.<br />
+- Proof of concept: <strong>AlexNet (2012)</strong> — a deep net trained on GPUs crushed the ImageNet contest, roughly halving error overnight. It ended the AI winter and kicked off the deep-learning boom.<br />
+- Caveat: AlexNet is <em>discriminative</em> (it classifies images), not generative — this was the <strong>enabling</strong> tipping point, not the generative one.</p>
+<hr />
+<h2 id="slide-2b-the-generative-tipping-point-transformer-scaling-self-supervision-draft">Slide 2b — The Generative Tipping Point: Transformer + Scaling + Self-Supervision ✏️ Draft</h2>
+<p><strong>Suggested placement:</strong> right after Slide 2a.<br />
+<strong>Graphic idea:</strong> Left→right flow — "Transformer (2017)" → "Self-supervised pretraining" → "Scaling laws: GPT-1→2→3 (2018–2020)" → "RLHF + ChatGPT (2022)"; caption: "turns more compute + data into reliably better."</p>
+<p><strong>Bullets:</strong><br />
+- Three linked breakthroughs turned deep learning into <em>generative</em> AI:<br />
+  - <strong>The Transformer</strong> ("Attention Is All You Need," 2017): self-attention lets the model look at all words at once; training is <strong>fully parallel</strong> (so it can actually use all those GPUs); captures long-range context. Replaced slow, sequential RNNs/LSTMs. The key architectural unlock.<br />
+  - <strong>Self-supervised pretraining:</strong> train the model to predict the next (or a masked) word — any text is its own label, so the <strong>whole internet becomes training data</strong>. Removes the human-labeling bottleneck.<br />
+  - <strong>Scaling laws (~2020):</strong> more data + more compute → <em>predictably</em> better, with new abilities emerging at scale. GPT-1 → GPT-2 → GPT-3 (2020, 175B params) showed "just make it bigger" keeps working.<br />
+- The combination is the point: an architecture that soaks up compute + a method that soaks up data + a scaling law that makes spending on both pay off = decades of incremental research turning into an explosion.<br />
+- <strong>Public tipping point: ChatGPT (Nov 2022)</strong> — RLHF (reinforcement learning from human feedback) + instruction-tuning turned a raw next-word predictor into an instruction-following conversationalist; generative AI went from research capability to mass product.<br />
+- Three senses of "tipping point": <strong>technical</strong> = Transformer + self-supervision + scaling (2017–2020); <strong>underlying enabler</strong> = the 2012 GPU-compute + internet-data convergence; <strong>cultural/market</strong> = ChatGPT (late 2022).<br />
+- Through-line: the missing ingredient was never the <em>idea</em> of neural nets — it was enough compute and data, plus an architecture that turns "more of both" into "reliably better" without hand-labeling.</p>
+<p><strong>Sources / caveats:</strong> Established ML history (within knowledge; no live web sources needed). Key references if citing: Rumelhart–Hinton–Williams 1986 (backprop); Krizhevsky et al. 2012 (AlexNet); Vaswani et al. 2017 (Transformer); Kaplan et al. 2020 (scaling laws); Brown et al. 2020 (GPT-3); Ouyang et al. 2022 (InstructGPT/RLHF).</p>
+<hr />
+<h2 id="slide-7-why-a-models-knowledge-lags-its-release-date-draft">Slide 7 — Why a Model's Knowledge Lags Its Release Date ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two-point gap timeline — "Pretraining data cutoff (~May 2025)" ──gap──▶ "Release (May 2026)", with the intervening steps labeled along the gap.</p>
+<p><strong>Bullets:</strong><br />
+- Training cutoff ≠ release date. Pretraining freezes a snapshot of data; the model ships months later.<br />
+- After the cutoff: post-training (fine-tuning, RLHF), evaluations, red-teaming, safety review, staged rollout — typically several months.<br />
+- Point releases stretch the gap: "4.x" versions are refined mostly via post-training on a base model whose pretraining cutoff is older and shared across the family — so a May-2026 model can still "know" only to ~May 2025.<br />
+- The stated cutoff is conservative: it's the date past which the model is unreliable, often set earlier than the actual last data ingested.</p>
+<p><strong>Example:</strong> Claude Opus 4.8 — reliable knowledge cutoff end of May 2025, released May 28, 2026 (~12-month gap).</p>
+<p><strong>Sources / caveats:</strong> Anthropic "Introducing Claude Opus 4.8"; Claude Platform Docs (models overview); Claude Help Center (training-data recency). Exact internal pretraining cutoff vs. the conservative "reliable" cutoff isn't publicly detailed.</p>
+<hr />
+<h2 id="slide-8-what-are-llms-written-in-draft">Slide 8 — What Are LLMs Written In? ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two-layer stack — top band "What people write: Python" over bottom band "What the GPU runs: C++ / CUDA"; a small side note lists the framework/serving tools.</p>
+<p><strong>Bullets:</strong><br />
+- The code humans write to define and train LLMs is overwhelmingly Python.<br />
+- Python is glue: it drives frameworks — PyTorch (dominant), JAX (Google/DeepMind), formerly TensorFlow.<br />
+- Those frameworks are themselves C++ with CUDA (NVIDIA's GPU language) — where the heavy matrix math actually runs.<br />
+- Custom GPU kernels are increasingly written in Triton (a Python-like language) instead of raw CUDA.<br />
+- Inference/serving adds more C++ and, increasingly, Rust — e.g. llama.cpp (C/C++), Hugging Face tokenizers &amp; serving (Rust), vLLM (Python + CUDA).</p>
+<p><strong>Short version:</strong> Python for what people write, C++/CUDA for what the GPU runs.</p>
+<hr />
+<h2 id="slide-9-the-hardware-behind-llms-pc-vs-data-center-draft">Slide 9 — The Hardware Behind LLMs: PC vs Data Center ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two-column comparison — left "Personal PC (local inference)", right "Data center (inference at scale)", each listing components with a one-line role; a bottom band with the shared bottleneck.</p>
+<p><strong>Personal PC (local inference):</strong><br />
+- <strong>GPU</strong> — does the parallel matrix math; consumer NVIDIA RTX (RTX 5090 = 32 GB, top consumer) or Apple Silicon.<br />
+- <strong>VRAM</strong> — the hard limit on model size; ~0.6 GB per billion params at 4-bit (7B ≈ 5 GB, 70B ≈ 40 GB). Plus the <strong>KV cache</strong> (working memory for the current context) — e.g. an 8B model at Q4 ≈ 4.7 GB weights + ~4 GB for a 32K-token context = ~8.7 GB, which overflows an 8 GB card (the common out-of-memory cause).<br />
+- <strong>System RAM</strong> — load/staging &amp; CPU fallback; 16–32 GB; does not decide what fits on the GPU.<br />
+- <strong>CPU</strong> — orchestration, tokenization; runs layers offloaded when VRAM runs out (slow).<br />
+- <strong>NVMe SSD</strong> — stores multi-GB weights; speeds model loading.<br />
+- <strong>PSU + cooling</strong> — high-end GPUs draw ~575 W; need headroom.<br />
+- <strong>Quantization</strong> — compresses weights (Q4_K_M ≈ 90–95% quality at ~25–30% VRAM) to fit bigger models.</p>
+<p><strong>Data center (inference at scale):</strong><br />
+- <strong>Accelerators</strong> — NVIDIA Blackwell B200 (192 GB HBM3e, 8 TB/s) / B300 Ultra (288 GB HBM3e, H1 2026); ~30× LLM inference vs H100. Alt: AMD MI300X, Google TPU, AWS Inferentia/Trainium, Groq, Cerebras.<br />
+- <strong>HBM</strong> — on-package high-bandwidth memory; inference is bandwidth-bound (stream weights per token); capacity sets model-per-chip.<br />
+- <strong>NVLink</strong> — ultra-fast GPU↔GPU (1.8 TB/s) so many GPUs act as one (GB200 NVL72 = 72 GPUs pooled).<br />
+- <strong>InfiniBand / Ethernet</strong> — 400–800 Gb/s scale-out across nodes and racks.<br />
+- <strong>Host CPU</strong> — NVIDIA Grace CPU, fused with GPU as a "superchip" (Grace + Blackwell) to feed/orchestrate.<br />
+- <strong>Storage</strong> — parallel NVMe file systems for weights and datasets.<br />
+- <strong>Power &amp; liquid cooling</strong> — racks at tens of kW; liquid-cooled (NVL72) — "AI factories".</p>
+<p><strong>Through-line (bottom band):</strong> A PC pools nothing (one GPU, VRAM-limited, quantized, one user); a data center pools many accelerators via NVLink + InfiniBand to hold full-size models in HBM and serve many users with batching. Both are gated by <strong>memory bandwidth</strong> — moving weights, not just multiplying them.</p>
+<p><strong>Sources / caveats:</strong> NVIDIA Blackwell specs (slyd/NVIDIA); local-LLM guides (promptquorum, quantizelab) as of July 2026. Consumer GPU prices volatile (GDDR7 shortage).</p>
+<hr />
+<h2 id="slide-10-who-makes-the-memory-hbm-as-the-ai-bottleneck-draft">Slide 10 — Who Makes the Memory? HBM as the AI Bottleneck ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> A single horizontal stacked share bar for HBM (SK Hynix ~62% | Micron | Samsung) + a small row of scarcity stat callouts below. Optional inset: a mini stack diagram (8–12 DRAM dies + TSVs) to show why it's hard.</p>
+<p><strong>Bullets:</strong><br />
+- Ordinary DRAM/GDDR is a commodity; <strong>HBM is not</strong> — only three companies on Earth make it.<br />
+- Market: <strong>SK Hynix ~62%</strong> (Nvidia's primary supplier) · <strong>Micron #2</strong> (overtook Samsung in 2026) · <strong>Samsung #3</strong> (pushing HBM4 to regain share).<br />
+- Why it's hard: 8–12+ DRAM dies stacked vertically and wired with thousands of through-silicon vias (TSVs); high yield needed; eats far more wafer capacity per bit than standard DRAM and competes for the same fab lines.<br />
+- Second bottleneck downstream: attaching HBM to the GPU needs advanced packaging (TSMC CoWoS), itself capacity-limited.<br />
+- The inversion: memory used to be the cheap, swappable part; now it gates the whole AI buildout. SK Hynix / Micron / Samsung are as strategic as Nvidia and TSMC.</p>
+<p><strong>Scarcity signals (2026) — stat callouts:</strong><br />
+- <strong>36–52 wks</strong> — data-center GPU lead times (HBM-driven); ~3.6M-unit backlog (Apr 2026)<br />
+- <strong>+30%</strong> — HBM price rise in Q4 2025 alone<br />
+- <strong>~$450–470B</strong> — hyperscaler AI capex that booked most HBM through 2027 (effectively sold out ahead)<br />
+- <strong>−30–40%</strong> — Nvidia's cut to RTX 50-series consumer GPU output to redirect memory capacity</p>
+<p><strong>Sources / caveats:</strong> Astute Group, Value Add VC, EnkiAI, SK Hynix 2026 outlook — as of July 2026. Shares/prices move fast; exact Micron vs Samsung split approximate; HBM4 ramping.</p>
+<hr />
+<h2 id="slide-11-why-hbm-supply-cant-just-scale-up-draft">Slide 11 — Why HBM Supply Can't Just Scale Up ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two columns — left "Why no fourth maker (barriers to entry)", right "Why the three can't make more (scaling limits)". Optional inset: a series-bottleneck strip (DRAM wafers → HBM stacking → TSMC CoWoS packaging) to show two chokepoints in a row.</p>
+<p><strong>Why no fourth maker (barriers to entry):</strong><br />
+- Must already run a leading-edge DRAM fab — only SK Hynix, Samsung, Micron do. DRAM is off Moore's law (6F² cell since 2004; 50:1 capacitor aspect ratios), so catching up takes years and tens of $B.<br />
+- Punishing stacking process: thin 12–16 dies to 30–50 µm, wire with thousands of TSVs, stack to &lt;~775 µm with near-perfect alignment, bond, and test each die before and after (one bad die kills the stack). Yield loss compounds per layer.<br />
+- HBM4 raises the wall: the base/logic die can no longer be made on a DRAM process — it needs an advanced logic foundry (TSMC 3nm-class), tying memory makers to TSMC and favoring the largest incumbents.<br />
+- China's CXMT is trying but sits generations behind and is limited by export controls on tools.</p>
+<p><strong>Why the three can't make more (scaling limits):</strong><br />
+- Wafer trade-off (core): HBM uses far more wafer area per usable bit; every wafer moved to HBM is pulled from commodity DDR5/GDDR — the direct cause of the broader 2026 DRAM shortage and price spikes.<br />
+- Capacity takes years: new cleanrooms are 2–3-year builds; specialized gear (TSV etch, thin-wafer bonders, stack testers) has long lead times.<br />
+- Second chokepoint in series: finished HBM must be co-packaged onto the GPU via TSMC CoWoS, which is also capacity-limited.</p>
+<p><strong>Takeaway:</strong> A structural triopoly, not a temporary shortage a new supplier will relieve.</p>
+<p><strong>Sources / caveats:</strong> Vik's Newsletter (HBM manufacturing), Tom's Hardware &amp; DigiTimes (HBM4 base die / TSMC), The Economy (wafer bottleneck), SemiAnalysis (CXMT) — as of July 2026.</p>
+<hr />
+<h2 id="slide-12-weights-written-in-training-read-only-at-inference-draft">Slide 12 — Weights: Written in Training, Read-Only at Inference ✏️ Draft</h2>
+<p><strong>Suggested placement:</strong> conceptually belongs right after Slide 6 (LLM pipeline); final order decided at build.<br />
+<strong>Graphic idea:</strong> Two panels. Left "Training" with a loop (forward → compare to correct answer → backpropagation → update weights) labeled <strong>weights change</strong>. Right "Inference" with a one-way flow (input → read weights → output) labeled <strong>weights fixed</strong>. Small legend distinguishing weights vs activations/KV cache.</p>
+<p><strong>Bullets:</strong><br />
+- Weights = the billions of learned numbers. Set during training, frozen afterward.<br />
+- <strong>Training:</strong> weights are read <strong>and written</strong> — backpropagation computes the error and updates every weight. This is where they change.<br />
+- <strong>Inference:</strong> weights are <strong>read-only</strong> — loaded and multiplied against your input to predict the next token; the values never change.<br />
+- What <em>does</em> change at inference: <strong>activations</strong> and the <strong>KV cache</strong> — transient numbers computed fresh for your prompt, then discarded.<br />
+- "Streaming" or "moving" weights at inference means <em>reading</em> them, not editing them — which is why it's a memory-<strong>bandwidth (read)</strong> problem, not a writing one. A 70B model = ~40 GB of weights read for <em>every</em> token.<br />
+- Analogy: training writes the cookbook; inference reads the recipe. Cooking 1,000 meals reads the recipe 1,000 times but never rewrites it.</p>
+<hr />
+<h2 id="application-reliability-cluster-slides-1316">— Application &amp; Reliability cluster (Slides 13–16) —</h2>
+<h2 id="slide-13-building-reliably-with-an-unreliable-model-llm-steers-deterministic-code-executes-draft">Slide 13 — Building Reliably with an Unreliable Model: LLM Steers, Deterministic Code Executes ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Flow — "Natural-language request" → [LLM: understand intent + choose action] → "structured call (function / JSON / SQL)" → [Deterministic system executes] → "result" → [LLM phrases the answer].</p>
+<p><strong>Bullets:</strong><br />
+- Principle: let the LLM do only what it's uniquely good at (understanding messy natural language); hand everything that must be exact to deterministic code.<br />
+- Never make the LLM <em>be</em> the calculator, database, or rules engine — make it decide <em>which</em> to call and <em>with what inputs</em>.<br />
+- Mechanisms: <strong>tool use / function calling</strong>; <strong>structured/constrained output</strong> (valid JSON, schema-checked); <strong>retrieval (RAG)</strong> to ground facts; <strong>neurosymbolic</strong> (neural language + symbolic logic/solver).<br />
+- The LLM becomes a <strong>translator + orchestrator</strong>: NL in → structured intent → deterministic execution → NL out.<br />
+- Removes whole error classes — arithmetic, lookup, sorting, formatting — anything expressible as code.</p>
+<hr />
+<h2 id="slide-14-the-catch-you-move-the-error-you-dont-delete-it-draft">Slide 14 — The Catch: You Move the Error, You Don't Delete It ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Text-to-SQL example — "How many active customers in Q2?" → LLM writes SQL (probabilistic) → DB runs it (deterministic) → precise but possibly wrong number. Callout: <strong>deterministic execution ≠ correct decision</strong>.</p>
+<p><strong>Bullets:</strong><br />
+- The boundary itself is probabilistic: the LLM still picks which tool and what arguments — that NL→structured-call step <em>is</em> the 90% part.<br />
+- The deterministic backend faithfully executes the <strong>wrong</strong> call if the LLM chose wrong. The error is relocated, not removed.<br />
+- Example: text-to-SQL — the database is deterministic, but wrong SQL from your question yields a confident, precise, wrong answer.<br />
+- What it still buys: shrinks the fuzzy surface to "understand intent + choose action"; makes errors <strong>catchable</strong> (schema checks, validators, business-rule vetoes, a second model to verify); enables <strong>safe failure</strong> (confidence thresholds, abstention, human-in-the-loop).<br />
+- Honest limit: the NL→action step can't be made provably 100% reliable. Shrink the LLM's role, wrap the rest in checkable code, design for graceful failure. A well-built AI product is mostly ordinary deterministic software the model <em>steers</em>.</p>
+<hr />
+<h2 id="slide-15-vague-prompts-the-clarification-gap-draft">Slide 15 — Vague Prompts &amp; the Clarification Gap ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two contrasting bars — "Recognizes ambiguity when asked: 60–80%" vs "Actually asks a clarifying question: 0–5%".</p>
+<p><strong>Bullets:</strong><br />
+- Much of the error is the model <strong>guessing</strong> among valid interpretations instead of asking.<br />
+- 2026 finding ("Knowing but Not Showing"): models judge ambiguity correctly <strong>60–80%</strong> when asked, but ask clarifying questions only <strong>0–5%</strong> of the time in normal use (Claude highest, ~5%). Capability present, behavior absent.<br />
+- Counterintuitive: giving context (RAG) <strong>suppresses</strong> clarification further — "I have documents" reads as "answerable."<br />
+- Root cause: RLHF rewarded confident, complete answers over "it depends," so models learned guessing looks more helpful. An <strong>alignment/behavior gap, not a knowledge gap</strong> — so it's trainable.</p>
+<hr />
+<h2 id="slide-16-closing-the-gap-making-llms-ask-well-draft">Slide 16 — Closing the Gap: Making LLMs Ask Well ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> CLAM-style pipeline — classify ambiguity → ask if needed → incorporate answer → respond; side note "reward asking only when it improves the final answer."</p>
+<p><strong>Bullets:</strong><br />
+- <strong>Train to ask — and only when it pays off:</strong> SFT on clarification dialogues (CAMBIGNQ, 5,653 queries); RL/self-play (STaR-GATE, ~72% human preference); "double-turn preference" (reward clarifications that lead to a correct next answer). Over-asking is penalized.<br />
+- <strong>Detect when to ask:</strong> use the model's own uncertainty (APA). Caveat: "Uncertainty Quantification Fails under Ambiguity" (Nov 2025) — confidence is least reliable exactly when the query is ambiguous.<br />
+- <strong>Reason first:</strong> chain-of-thought, self-ask, Tree-of-Clarifications; reasoning models (2025–26) surface the fork before committing.<br />
+- <strong>System-level (most reliable today):</strong> wrapper pipelines (CLAM: classify→ask→incorporate); a small model to disambiguate the prompt before the big LLM; product patterns (slot-filling, "did you mean…", confirmation before high-stakes actions).<br />
+- <strong>Benchmarks reframe it as a tradeoff:</strong> "One More Turn, Less Regret" (Jul 2026) scores clarification <em>policies</em> by regret — cost of asking unnecessarily vs. guessing wrong.<br />
+- It's a <strong>tradeoff, not a bug</strong>: ask too much = annoying; too little = wrong. Trajectory = better-<em>calibrated</em> asking, not perfect intent-reading. Complement: have the system <strong>state its assumption</strong> ("interpreting 'active' as logged-in ≤30 days…") so a wrong guess is visible and cheap to correct.</p>
+<p><strong>Sources / caveats:</strong> Knowing but Not Showing (2026); "Teaching AI to Clarify" synthesis (May 2025); One More Turn, Less Regret (Jul 2026); UQ Fails under Ambiguity (Nov 2025); Modeling Future Conversation Turns (OpenReview). As of July 2026; default asking rates still low.</p>
+<hr />
+<h2 id="customization-fine-tuning-cluster-slides-1720">— Customization &amp; Fine-Tuning cluster (Slides 17–20) —</h2>
+<h2 id="slide-17-customizing-an-llm-the-ladder-draft">Slide 17 — Customizing an LLM: The Ladder ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> A 4-rung ascending-steps graphic — Prompting → RAG → Tool use → Fine-tuning ("cheapest/fastest" at bottom → "heaviest" at top). Side callout box: RAG vs Fine-tuning.</p>
+<p><strong>Bullets:</strong><br />
+- Customization is a ladder — try the cheapest rung first:<br />
+  1. <strong>Prompting / system prompt</strong> — free, instant; often enough.<br />
+  2. <strong>RAG (retrieval)</strong> — give the model your documents at query time (open-book).<br />
+  3. <strong>Tool use</strong> — connect it to your systems.<br />
+  4. <strong>Fine-tuning</strong> — actually change the model's weights; the heaviest lever, reach for it last.<br />
+- Key distinction:<br />
+  - <strong>RAG = new <em>knowledge</em></strong> it should know (facts, policies, docs — especially things that change). Open-book.<br />
+  - <strong>Fine-tuning = new <em>behavior/skill</em></strong> — how it should act: house format, tone, domain reasoning, following a schema, a specialized task. Changes its instincts.<br />
+- Rule of thumb: <strong>RAG for what it should know, fine-tuning for how it should behave.</strong><br />
+- Common mistake: fine-tuning to "add facts" — the model blurs them and they go stale; use RAG for knowledge.<br />
+- If prompting + RAG gets you there, don't fine-tune — cheaper and easier to update.</p>
+<hr />
+<h2 id="slide-18-what-fine-tuning-is-and-the-methods-draft">Slide 18 — What Fine-Tuning Is, and the Methods ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> A frozen base model with small highlighted "adapter" blocks (LoRA); a legend listing the methods ordered by cost.</p>
+<p><strong>Bullets:</strong><br />
+- <strong>What it is:</strong> continue training a pretrained model on curated input→output example pairs so its weights shift toward your desired behavior. You're not teaching it English — you're teaching <em>your way of doing a specific job</em> by showing hundreds–thousands of ideal examples.<br />
+- <strong>Methods, cheapest → heaviest:</strong><br />
+  - <strong>LoRA</strong> (default) — freeze the big model, train tiny low-rank adapter matrices (~0.1–1% of params). Cheap, fast, swappable.<br />
+  - <strong>QLoRA</strong> — LoRA on a 4-bit quantized base → fine-tune a large model on a single GPU. Democratized fine-tuning.<br />
+  - <strong>Full fine-tuning</strong> — update all weights. Powerful but expensive; risks catastrophic forgetting. Rare for most teams.<br />
+  - <strong>Preference / RL tuning</strong> — <strong>DPO</strong> (learn from preferred-vs-rejected answer pairs to shape style/judgment); <strong>GRPO / reinforcement fine-tuning</strong> (reward-based; great when answers are checkable, e.g. reasoning). Used <em>after</em> basic supervised fine-tuning to refine.<br />
+  - <strong>Managed APIs</strong> — OpenAI/Anthropic/Google run training from an uploaded example file (easiest); open-weights + LoRA for control/privacy.<br />
+- <strong>Supervised fine-tuning (SFT)</strong> on instruction→response pairs is the workhorse base step.</p>
+<hr />
+<h2 id="slide-19-fine-tuning-step-by-step-a-worked-example-draft">Slide 19 — Fine-Tuning Step by Step: A Worked Example ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> An 8-step numbered flow with an example banner: "Law firm — contract → house-style risk memo."<br />
+<strong>Goal:</strong> an LLM that reads a contract and drafts a risk-review memo in the firm's house format, flagging problematic clauses.</p>
+<ol>
+<li><strong>Define the task + decide RAG vs FT.</strong> Narrow to one job: contract → risk memo. Firm precedents/playbook = <strong>RAG</strong> (updating knowledge); house style + memo structure + risk-flagging behavior = <strong>fine-tuning</strong> (a skill).</li>
+<li><strong>Collect &amp; curate data — 80% of the work.</strong> ~500–2,000 pairs of <em>(contract excerpt → ideal senior-associate memo)</em> from past matters; clean, de-identify, ensure genuinely exemplary. Quality &gt; quantity.</li>
+<li><strong>Format into instruction pairs.</strong> <code>{system: "You are the firm's contract reviewer…", user: &lt;contract text&gt;, assistant: &lt;ideal memo&gt;}</code>. Hold back a <strong>test set</strong> the model never sees.</li>
+<li><strong>Pick base model + method.</strong> Open model (Llama/Qwen/Mistral-class) for control/privacy, or a provider fine-tuning API. Use <strong>QLoRA</strong> to train adapters cheaply.</li>
+<li><strong>Train.</strong> A few epochs; with QLoRA, hours on one/few GPUs, often tens–low-hundreds of dollars for a small model. Watch for overfitting.</li>
+<li><strong>Evaluate against baselines.</strong> On held-out contracts: format match, catches risky clauses, no invented terms. Rubric + human review (+ optional LLM-judge). Compare vs <em>base model</em> and <em>RAG-only</em> — if it doesn't beat those, don't ship.</li>
+<li><strong>Iterate.</strong> Patch data gaps, add hard/edge cases, retrain. Optionally <strong>DPO</strong> on better-vs-worse memos to sharpen style/judgment.</li>
+<li><strong>Deploy with the full stack.</strong> Fine-tuned model (house style) + <strong>RAG</strong> (precedents) + <strong>tool use</strong> (clause database) + <strong>human-in-the-loop</strong> (legal — never fully autonomous). Monitor; feed lawyers' corrections into the next round (a flywheel).</li>
+</ol>
+<hr />
+<h2 id="slide-20-fine-tuning-pitfalls-when-not-to-draft">Slide 20 — Fine-Tuning: Pitfalls &amp; When (Not) To ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two-column do/don't, or a set of warning callouts.</p>
+<p><strong>Pitfalls:</strong><br />
+- <strong>Don't fine-tune for changing facts</strong> — that's RAG's job; fine-tuned facts go stale and blur.<br />
+- <strong>Catastrophic forgetting</strong> — over-training erodes general ability; LoRA + modest, high-quality data mitigates it.<br />
+- <strong>Garbage in, confident garbage out</strong> — the model faithfully learns whatever the examples teach, flaws included.<br />
+- <strong>Try the cheaper rungs first</strong> — many "we need to fine-tune" problems are solved by a better prompt + RAG.<br />
+- <strong>Cost reality:</strong> LoRA/QLoRA made it accessible — a 7–13B fine-tune can be tens–hundreds of dollars, not millions.</p>
+<p><strong>When to actually fine-tune:</strong> consistent format/tone/style; a narrow, repeated task; latency/cost (a small fine-tuned model replacing a big general one); or behavior that prompting can't reliably enforce.</p>
+<p><strong>Sources / caveats:</strong> Future AGI (LoRA/QLoRA/DPO/GRPO, 2026); BigData Boutique (RAG vs fine-tuning, 2026); Umesh Malik (RAG vs fine-tuning, 2026). Methods stable as of July 2026; tooling names churn.</p>
+<hr />
+<h2 id="on-prem-open-models-cluster-slides-2123">— On-Prem &amp; Open Models cluster (Slides 21–23) —</h2>
+<h2 id="slide-21-a-model-is-just-a-file-download-vs-run-draft">Slide 21 — A Model Is Just a File: Download vs. Run ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two panels — "On disk (download)" vs "In GPU memory (run)"; a size-math strip; Kimi K3 numbers as the extreme case.</p>
+<p><strong>Bullets:</strong><br />
+- A trained model = its <strong>weights</strong> = a file of numbers. Downloading a model = downloading that file. "Open weights" = the company published the file (e.g., on Hugging Face).<br />
+- Size math: <strong>file ≈ params × bytes/param.</strong> FP16 = 2 bytes (7B ≈ 14 GB, 70B ≈ 140 GB); 4-bit ≈ 0.5 byte (7B ≈ 4 GB, 70B ≈ 35–40 GB).<br />
+- Small models (1–8B) are small files — download <strong>and</strong> run on a laptop. No contradiction.<br />
+- <strong>Kimi K3 (Jul 2026)</strong> shows the other extreme: <strong>2.8T</strong> params, <strong>MXFP4</strong> 4-bit → <strong>~1.4 TB download</strong> (vs ~5.6 TB at FP16); <strong>MoE</strong> routes only <strong>~50B active/token</strong> (16 of 896 experts).<br />
+- <strong>Download ≠ run:</strong> the 1.4 TB file is public and downloadable, but loading it needs ~1.4 TB of <strong>GPU memory</strong> — in practice an 8-node cluster of 8×80 GB (~5.12 TB). "Open" = access to the file, not that it fits your machine.<br />
+- MoE cuts <em>running</em> cost (computes like a ~50B model) but not <em>storage</em> (must hold all 2.8T in memory).</p>
+<hr />
+<h2 id="slide-22-running-a-model-on-premises-right-size-quantize-serve-draft">Slide 22 — Running a Model On-Premises: Right-Size, Quantize, Serve ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Hardware-tier ladder (7B → 70B → frontier) with GPU counts + $; a "serving" box (vLLM / NIM) feeding an internal API.</p>
+<p><strong>Bullets:</strong><br />
+- "Too big" usually points at the wrong thing: <strong>disk footprint is trivial</strong>; the real constraint is <strong>GPU memory</strong> to hold + run. Inference is far lighter than training — no training supercomputer needed.<br />
+- Two levers: <strong>right-size the model</strong> + <strong>quantize</strong>.<br />
+- Tiers (2026): <strong>7–8B</strong> → one 24 GB GPU (RTX 4090), ~$15K server; <strong>13–34B</strong> → one 48–80 GB card; <strong>70B</strong> → 2–4× H100 or one H200 (or ~35–40 GB at 4-bit on a 48 GB card); <strong>frontier</strong> (Kimi K3 / 405B-class) → multi-node cluster (8–16 nodes of 8× H100/B200).<br />
+- Serving: <strong>vLLM</strong> (free; PagedAttention; ~4× throughput; OpenAI-compatible API) or <strong>NVIDIA NIM</strong> (~$4,500/GPU/yr; support + SLA). Apps point at an internal endpoint.<br />
+- Why on-prem: <strong>data sovereignty/compliance</strong> (GDPR, healthcare, finance, defense); <strong>cost at scale</strong>; <strong>control</strong> (weights + logs stay inside); air-gap; free fine-tuning.</p>
+<hr />
+<h2 id="slide-23-on-prem-economics-why-many-still-dont-draft">Slide 23 — On-Prem Economics &amp; Why Many Still Don't ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> A break-even curve (cost vs. utilization) showing on-prem wins only past a high sustained-load threshold; plus a "does on-prem fit us?" checklist.</p>
+<p><strong>Cost reality (corrected):</strong><br />
+- ~<strong>$712K–948K over 3 years ≈ one 8-GPU (8×H100) server</strong> — runs up to a ~70B model comfortably. <strong>Not</strong> enough for frontier: Kimi K3 (2.8T) needs 8–16 nodes = <strong>many millions</strong>.<br />
+- The "~3.7-month payback vs cloud" holds <strong>only at high sustained utilization</strong> (billions of tokens/month, GPUs busy). At modest or spiky usage the GPUs sit idle and on-prem is <strong>more</strong> expensive than pay-per-token cloud. On-prem is cheaper <em>only at scale</em>.</p>
+<p><strong>Concrete reasons NOT to run on-prem (beyond cost):</strong><br />
+- <strong>Capability gap:</strong> the best models (Claude/GPT/Gemini top tier) are <strong>closed, cloud-only</strong>; open weights typically trail the closed frontier ~6–18 months. On-prem = sovereignty over cutting-edge capability.<br />
+- <strong>Operational/talent burden:</strong> GPU ops, serving tuning, quantization, model upgrades, monitoring, security patching, driver/CUDA, hardware failures — a whole MLOps function most companies lack. Cloud APIs need ~none of it.<br />
+- <strong>Obsolescence + procurement:</strong> GPUs depreciate fast, and a new efficient model may need more VRAM than you bought. Plus GPU lead times are <strong>36–52 weeks</strong> in 2026 — you can't buy a cluster next month; cloud holds priority allocation.<br />
+- <strong>No elasticity:</strong> on-prem is a fixed ceiling — can't absorb a 10× spike; you size for peak (wasteful) or get throttled. Cloud scales to zero and to peak.<br />
+- <strong>Facilities:</strong> a cluster draws tens of kW; needs power/cooling (often liquid), rack space, physical security — many offices can't host it; colo adds cost/complexity.<br />
+- <strong>Time-to-value &amp; breadth:</strong> cloud API integrates in an afternoon and offers many models (text/image/video/speech) via one endpoint; on-prem is weeks–months to first token, each model a separate deployment.<br />
+- <strong>Security is double-edged:</strong> keeps data in, but you now own securing the whole stack — a big cloud provider may have a <em>stronger</em> posture than a small self-run cluster.</p>
+<p><strong>Who on-prem actually fits:</strong> regulated + privacy-critical + high, predictable sustained volume + OK with slightly-behind-frontier open models. A real and growing <strong>segment — not a universal direction</strong>.</p>
+<p><strong>Sources / caveats:</strong> iternal.ai on-prem guide (2026); GPU/HBM lead times 36–52 wks (Slides 10–11 sources). As of July 2026; hardware prices/lead times volatile.</p>
+<hr />
+<h2 id="slide-24-the-deployment-spectrum-its-not-on-prem-vs-public-api-draft">Slide 24 — The Deployment Spectrum (It's Not On-Prem vs Public API) ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> A left→right spectrum with an axis: "data leaves ← → data stays in your boundary." Four stops, each with a one-line note on capability/effort tradeoff.</p>
+<p><strong>Bullets:</strong><br />
+- The choice is not binary — there's a spectrum, and enterprises live in the middle:<br />
+  1. <strong>Public API</strong> — data goes to the vendor endpoint (contractual zero-retention).<br />
+  2. <strong>In-your-own-cloud</strong> — Claude via <strong>Amazon Bedrock</strong> / <strong>Google Vertex</strong>, GPT via <strong>Azure OpenAI</strong>: the model runs inside the customer's own cloud tenancy/region, <strong>no training on your data</strong>.<br />
+  3. <strong>Dedicated / managed</strong> — provisioned capacity or vendor-run secure infra (e.g. "Claude Managed Agent").<br />
+  4. <strong>On-prem open-weights</strong> — self-host. The far end.<br />
+- Key point: by tier 2–3 a company already has <strong>data control that satisfies regulators and model-risk teams</strong> — data stays in its boundary, contractually untrained-on — <strong>without owning GPUs or accepting a weaker open model</strong>.<br />
+- That combination is exactly why OpenAI/Anthropic can win the most regulated, security-conscious clients — it removes the main reason to go on-prem.</p>
+<hr />
+<h2 id="slide-25-why-even-fortune-500-banks-buy-frontier-instead-of-self-hosting-open-source-draft">Slide 25 — Why Even Fortune 500 Banks Buy Frontier Instead of Self-Hosting Open Source ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> A "money + talent removes these barriers ✔ / but not these ✘" two-column, with the bank evidence as a footer strip.</p>
+<p><strong>Real-world evidence (2026):</strong><br />
+- JPMorgan's internal <strong>"LLM Suite"</strong> is a bank-built portal tapping <strong>OpenAI + Anthropic</strong> models, refreshed ~every <strong>8 weeks</strong>.<br />
+- Claude in production at <strong>JPMorgan, Goldman Sachs, Citi, AIG, Visa</strong>; Jamie Dimon described using Claude Code to build an analysis dashboard in ~20 min.<br />
+- The richest, best-staffed institutions chose to <strong>rent frontier, not self-host open</strong> — for flagship work.</p>
+<p><strong>Why money + talent don't tip them to on-prem open source:</strong><br />
+- <strong>Capability gap is unbuyable:</strong> the frontier is closed; open weights trail ~6–18 months. Spending can't turn an open model into frontier quality, and finance is high-stakes.<br />
+- <strong>Private deployments already solve data control:</strong> in-cloud/VPC + no-retention/no-training contracts + compliance certs ≈ sovereignty, without GPUs or open weights.<br />
+- <strong>Inference infra isn't the bank's edge:</strong> self-hosting is undifferentiated heavy lifting; the real bottleneck is <em>integration/adoption</em> — JPMorgan's Derek Waldron's "value gap." Scarce engineers belong on the last mile.<br />
+- <strong>Pace:</strong> frontier moves every ~8 weeks; buy-as-a-service = always-latest with no re-capitalization; self-host freezes you at your deployed model.<br />
+- <strong>Risk transfer &amp; safety:</strong> banks want SLAs, IP indemnity, safety/jailbreak tuning, attestations, and model docs for model-risk governance (SR 11-7). Self-hosted open = the bank owns all model risk with no backstop.<br />
+- <strong>Reliability/support</strong> for mission-critical: vendor-managed infra, uptime, solutions teams, early access — key for "organizational absorption" at scale.</p>
+<p><strong>Honest nuance — they do BOTH:</strong> banks self-host open models selectively (internal doc search, code on proprietary repos, PII-heavy batch) where "good enough + cheap + fully internal" wins, and route the hardest work to frontier providers. JPMorgan built the <strong>portal/integration</strong> (their differentiation) and <strong>rented the models</strong> (not their differentiation).</p>
+<p><strong>Takeaway:</strong> money/talent remove the <em>cost + ops</em> objections to on-prem, but not the three that decide it — (1) can't buy frontier quality in open weights, (2) private deployments already give data control, (3) inference infra isn't where a bank creates value.</p>
+<p><strong>Sources / caveats:</strong> Inside JPMorgan's LLM Suite (CEFPro, 2026); Anthropic's Wall Street push / Jamie Dimon (Fortune, May 5 2026); enterprise deployment comparisons (2026). As of July 2026.</p>
+<hr />
+<h2 id="pricing-cost-usage-cluster-slides-2629">— Pricing, Cost &amp; Usage cluster (Slides 26–29) —</h2>
+<h2 id="slide-26-how-ai-is-priced-subscription-vs-metered-api-draft">Slide 26 — How AI Is Priced: Subscription vs Metered API ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two columns — "Consumer subscription (flat)" vs "API / enterprise (metered per token)"; buffet vs à-la-carte analogy.</p>
+<p><strong>Bullets:</strong><br />
+- Two pricing models collide:<br />
+  - <strong>Consumer subscription</strong> (Claude Pro $20, Max $100 / $200): flat monthly fee for access + a usage allowance, throttled by <strong>message rate limits</strong> — <em>not</em> billed per token. "Paying for compute capacity, not per token."<br />
+    - Max 5x ($100) ≈ <strong>225 messages / rolling 5-hour window</strong>; Max 20x ($200) ≈ 900 / 5-hour. Plus weekly caps.<br />
+  - <strong>API / usage-based</strong> (developers, enterprises building apps): billed <strong>per token</strong> — input and output priced separately, per model tier (Opus &gt; Sonnet &gt; Haiku). Itemized per request.<br />
+- Why the flat plan shows no per-token cost:<br />
+  - Tokens aren't the billing unit — the <strong>month</strong> is; there's no line item to show.<br />
+  - Predictability + no bill shock; removes the "meter running" friction; encourages use.<br />
+  - Smooths wildly variable per-message cost (500 tokens vs 200,000). Anthropic bets on <strong>average</strong> usage; light users subsidize heavy ones.<br />
+- Your real cost/answer on the subscription ≈ <strong>$0 marginal</strong> until you hit the limit; effective cost = $100 ÷ answers used → the more you use it, the cheaper each answer. The per-token figure is <strong>undefined by design</strong>.<br />
+- Estimate trick: count tokens × public API per-token rate = "what it would cost on the API" (not what you actually pay).</p>
+<hr />
+<h2 id="slide-27-enterprise-cost-attribution-per-user-tokencost-draft">Slide 27 — Enterprise Cost Attribution: Per-User Token:Cost ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> A per-user usage-table mockup — columns: User · tokens · USD · commits/PRs.</p>
+<p><strong>Bullets:</strong><br />
+- Enterprises get the itemized visibility consumers don't — three layers:<br />
+  1. <strong>API usage billing</strong> — every call priced per input/output token per model; itemized per request.<br />
+  2. <strong>Admin Usage &amp; Cost API</strong> (2025) — tokens grouped by workspace, API key, model, service tier.<br />
+  3. <strong>Enterprise Analytics API</strong> (2026) — <strong>per-user cost + usage</strong> across every Claude surface (chat, Claude Code, Cowork, Office agents).<br />
+- The 2026 Enterprise Analytics API delivers exactly the "Employee A" scenario:<br />
+  - Per named user (email): individual <strong>token usage + USD spend</strong>, broken down by product, model tier, context size.<br />
+  - Plus <strong>engagement</strong>: conversation counts, Claude Code sessions, commits, pull requests, lines of code changed, Cowork actions, connector usage.<br />
+  - = <em>"Employee A completed Y processes (Z commits/PRs), used Z tokens, at a cost of $___."</em><br />
+- Caveats: Enterprise-plan only (Primary Owner); cost data in <strong>beta</strong>, refreshes ~every 4h with up to 24h delay; aggregates by user/time, <strong>not per-request</strong>; Bedrock-routed usage excluded.<br />
+- Why the asymmetry: consumers want <strong>simplicity/predictability</strong> (flat); enterprises want <strong>accountability</strong> for chargebacks, ROI, governance (metered + analytics). Same token economics, different bills.</p>
+<p><strong>Sources / caveats:</strong> Finout — Enterprise Analytics API (2026); IntuitionLabs — Max plan &amp; pricing (2026); CloudZero — Claude API pricing (2026).</p>
+<hr />
+<h2 id="slide-28-what-drives-your-ai-usage-the-cost-levers-draft">Slide 28 — What Drives Your AI Usage: The Cost Levers ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> A ranked ladder/bars, cheapest → most expensive, of the consumption drivers.</p>
+<p><strong>Bullets:</strong><br />
+- On a flat plan there's <strong>no monthly token pool and no exact % meter</strong>: limits are rolling <strong>5-hour session caps + weekly caps</strong>, measured <em>opaquely</em> (a blend of prompt length, file size, conversation length, model, feature, capacity). Your signal = the "approaching your limit" warning.<br />
+- What burns allowance, <strong>cheapest → most expensive</strong>:<br />
+  1. <strong>Model choice</strong> (biggest lever): Opus ≫ Sonnet ≫ Haiku.<br />
+  2. <strong>Output length</strong> — generating lots of text/code.<br />
+  3. <strong>Context / conversation length</strong> — every turn re-sends the <em>whole</em> history; long chats get progressively costlier even when new questions are short.<br />
+  4. <strong>File uploads / attachments</strong> — big sheets/PDFs/images add input context on each reference.<br />
+  5. <strong>Extended thinking / reasoning</strong> — extra tokens before the answer.<br />
+  6. <strong>Tool use / agentic loops</strong> (the sleeper): Claude Code, Claude for Excel, Cowork make <strong>many hidden model calls per action</strong> (read→reason→act→observe→repeat) — 10–50× a single chat turn.<br />
+- Worst combos <strong>stack</strong> these: Opus + big file + long session + many iterations.<br />
+- Defenses: use <strong>Sonnet</strong> for routine work; <strong>start fresh chats</strong> to shed context; avoid dumping huge files; watch the limit warnings.</p>
+<hr />
+<h2 id="slide-29-practical-website-build-claude-for-excel-vs-desktop-draft">Slide 29 — Practical: Website Build &amp; Claude for Excel vs Desktop ✏️ Draft</h2>
+<p><strong>Graphic idea:</strong> Two worked mini-cases, each with a "how much does it cost me?" verdict.</p>
+<p><strong>Bullets:</strong><br />
+- Reframe: limits are per <strong>5-hour session + weekly</strong>, not a monthly pool — so the real question is "will this blow my current window," not "% of my month."<br />
+- <strong>Case 1 — build a 5-page HTML site:</strong> a one-shot build ≈ tens of thousands of output tokens = a <strong>small slice of one 5-hour session</strong> (low single digits), <strong>not 50% of your month</strong>. What inflates it: Opus, ~20 rounds of revisions (each re-sends the growing codebase as context), large reference files/images. Tip: build in Sonnet; start a fresh chat per page.<br />
+- <strong>Case 2 — Claude for Excel vs desktop chat:</strong> Excel is meaningfully <strong>more</strong> token-intensive — the agentic add-in reads the <strong>whole workbook</strong>, tracks cross-tab dependencies, and runs multiple tool calls to make + verify changes (the most expensive mode). Some users "maxed out Pro in <strong>5 minutes</strong>" after a few Excel tasks.<br />
+  - One pivot table on a small tidy sheet = <strong>modest</strong> (not 20% of your month). A pivot on a large multi-tab workbook, iterated, in Opus = <strong>burns fast</strong> (whole workbook is context every loop).<br />
+  - Guidance: if you know how and the sheet is simple, <strong>DIY is cheaper</strong> (your instinct is right); if using the agent, pick <strong>Sonnet not Opus</strong>; reserve the agent for cross-tab reasoning that saves real time, not one-liners.<br />
+- Bottom line: a single website or single pivot table won't blow your month; <strong>long Opus sessions, giant files, and agentic tools on big inputs</strong> are what do.</p>
+<p><strong>Sources / caveats:</strong> TokenMix — Claude limits 2026; AIToolsReview — Claude for Excel (2026); IntuitionLabs — Max plan; Zenken — usage limits (2026). Subscription limits are opaque/estimated, not published token budgets.</p>
+<hr />
+<h2 id="backlog-ideas-not-yet-drafted">Backlog / ideas (not yet drafted)</h2>
+<ul>
+<li>Inside a single neuron: weighted sum → activation (deeper zoom of Slide 5).</li>
+<li>From neural network to transformer/LLM: attention, scale.</li>
+<li>Title slide + section dividers if slides are combined into one deck.</li>
+</ul>
+</div>
+</body>
+</html>

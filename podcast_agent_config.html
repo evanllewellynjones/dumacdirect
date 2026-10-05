@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podcast Intelligence Agent — Config Builder</title>
+<style>
+  :root {
+    --bg: #0e0d12;
+    --panel: #18171e;
+    --panel-2: #201f28;
+    --border: #2e2d38;
+    --border-2: #3d3c4a;
+    --text: #e9e8ef;
+    --text-dim: #9b99a8;
+    --text-faint: #6a6877;
+    --accent: #c9a86a;
+    --accent-dim: #8a7548;
+    --green: #6fbf8f;
+    --red: #d97a7a;
+    --mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 0;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+  header { margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 38px; height: 38px; border-radius: 9px;
+    background: var(--accent); color: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; flex-shrink: 0;
+  }
+  h1 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .subtitle { font-size: 13px; color: var(--text-dim); }
+
+  .tabs { display: flex; gap: 2px; margin-bottom: 1.5rem; background: var(--panel); border-radius: 10px; padding: 4px; }
+  .tab {
+    flex: 1; padding: 9px 8px; font-size: 13px; font-family: var(--sans);
+    background: transparent; border: none; color: var(--text-dim);
+    cursor: pointer; border-radius: 7px; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--panel-2); color: var(--accent); font-weight: 500; }
+  .tab .count {
+    background: var(--accent-dim); color: var(--bg); font-size: 11px;
+    border-radius: 9px; padding: 1px 6px; min-width: 17px; text-align: center; font-weight: 600;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fade 0.2s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 11px; padding: 1.25rem; margin-bottom: 1rem;
+  }
+  .card-title { font-size: 13px; font-weight: 600; margin-bottom: 1rem; color: var(--text); }
+
+  label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
+  input[type=text], input[type=url], textarea, select {
+    width: 100%; background: var(--bg); border: 1px solid var(--border-2);
+    border-radius: 7px; padding: 9px 11px; color: var(--text);
+    font-size: 13px; font-family: var(--sans); transition: border 0.15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 70px; }
+
+  .field-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 12px; }
+  .field-row:last-child { margin-bottom: 0; }
+  .field-row > div { flex: 1; }
+
+  button.btn {
+    background: var(--accent); color: var(--bg); border: none;
+    border-radius: 7px; padding: 9px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: var(--sans); transition: opacity 0.15s;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  button.btn:hover { opacity: 0.88; }
+  button.btn-ghost {
+    background: transparent; color: var(--text-dim);
+    border: 1px solid var(--border-2);
+  }
+  button.btn-ghost:hover { color: var(--text); background: var(--panel-2); }
+  button.btn-danger { background: transparent; color: var(--red); border: 1px solid #4a2e2e; padding: 7px 9px; }
+  button.btn-danger:hover { background: #2a1c1c; }
+
+  .hint { font-size: 11px; color: var(--text-faint); margin-top: 7px; }
+
+  .list-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 11px 0; border-bottom: 1px solid var(--border);
+  }
+  .list-item:last-child { border-bottom: none; }
+  .item-icon {
+    width: 34px; height: 34px; border-radius: 7px; background: var(--panel-2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 15px;
+  }
+  .item-body { flex: 1; min-width: 0; }
+  .item-name { font-size: 13px; font-weight: 500; }
+  .item-sub { font-size: 11px; color: var(--text-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--panel-2); border: 1px solid var(--border-2);
+    border-radius: 20px; padding: 5px 12px; font-size: 12px; margin: 3px;
+  }
+  .tag button { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; }
+  .tag button:hover { color: var(--red); }
+
+  .empty { text-align: center; padding: 1.75rem 1rem; color: var(--text-faint); font-size: 13px; }
+
+  .day-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+  .day-chip {
+    padding: 7px 13px; border-radius: 7px; font-size: 12px; cursor: pointer;
+    background: var(--bg); border: 1px solid var(--border-2); color: var(--text-dim);
+    user-select: none; transition: all 0.15s;
+  }
+  .day-chip.on { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+
+  pre.yaml {
+    background: var(--bg); border: 1px solid var(--border-2); border-radius: 8px;
+    padding: 14px; font-family: var(--mono); font-size: 11.5px; line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word; color: var(--text);
+    max-height: 380px; overflow-y: auto;
+  }
+  .step {
+    display: flex; gap: 12px; padding: 12px; background: var(--panel-2);
+    border-radius: 8px; margin-bottom: 8px;
+  }
+  .step-num {
+    width: 23px; height: 23px; border-radius: 50%; background: var(--accent);
+    color: var(--bg); display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .step-text { font-size: 12.5px; color: var(--text); line-height: 1.55; }
+  .step-text strong { color: var(--accent); font-weight: 600; }
+  .step-text code { font-family: var(--mono); font-size: 11px; background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+
+  .toast {
+    background: #1d3326; border: 1px solid #2f5640; color: var(--green);
+    padding: 9px 13px; border-radius: 8px; font-size: 12.5px; margin-top: 10px;
+    display: none; align-items: center; gap: 7px;
+  }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 540px) { .field-grid, .field-row { grid-template-columns: 1fr; flex-direction: column; align-items: stretch; } }
+  .var-table { width: 100%; font-family: var(--mono); font-size: 11.5px; line-height: 2; color: var(--text); }
+  .var-table td:first-child { color: var(--accent); padding-right: 14px; white-space: nowrap; }
+  footer { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-faint); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">P</div>
+      <div>
+        <h1>Podcast Intelligence Agent</h1>
+        <div class="subtitle">Config builder — generate your config.yaml, paste it into GitHub</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="podcasts">Podcasts <span class="count" id="c-pod">0</span></button>
+    <button class="tab" data-tab="topics">Topics <span class="count" id="c-top">0</span></button>
+    <button class="tab" data-tab="settings">Settings</button>
+    <button class="tab" data-tab="deploy">Deploy</button>
+  </div>
+
+  <!-- PODCASTS -->
+  <div class="section active" id="s-podcasts">
+    <div class="card">
+      <div class="card-title">Add a podcast</div>
+      <div class="field-row">
+        <div>
+          <label>RSS feed URL</label>
+          <input type="url" id="pod-url" placeholder="https://feeds.example.com/show.rss">
+        </div>
+      </div>
+      <div class="field-row">
+        <div>
+          <label>Display name</label>
+          <input type="text" id="pod-name" placeholder="e.g. NPR News Now">
+        </div>
+        <button class="btn" id="add-pod">+ Add</button>
+      </div>
+      <div class="hint">Find RSS feed URLs on the show's website or at podchaser.com</div>
+    </div>
+    <div class="card" id="pod-list">
+      <div class="empty">No podcasts added yet.</div>
+    </div>
+  </div>
+
+  <!-- TOPICS -->
+  <div class="section" id="s-topics">
+    <div class="card">
+      <div class="card-title">Add a topic to monitor</div>
+      <div class="field-row">
+        <div>
+          <label>Topic or issue</label>
+          <input type="text" id="topic-input" placeholder="e.g. Federal Reserve rate decisions 2026">
+        </div>
+        <button class="btn" id="add-topic">+ Add</button>
+      </div>
+      <div class="hint">Be specific — precise topics produce sharper quote extraction.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Active topics</div>
+      <div id="topic-list"><div class="empty">No topics yet.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Extraction instructions (optional)</div>
+      <textarea id="extract-inst" placeholder="e.g. Focus on guest statements, not the host. Prioritise data-backed claims and forward-looking predictions."></textarea>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="section" id="s-settings">
+    <div class="card">
+      <div class="card-title">Digest schedule</div>
+      <label>Which days to send the digest email</label>
+      <div class="day-grid" id="day-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Agent behaviour</div>
+      <div class="field-grid">
+        <div>
+          <label>Poll interval (hours)</label>
+          <select id="poll-interval">
+            <option value="1">Every 1 hour</option>
+            <option value="6">Every 6 hours</option>
+            <option value="24" selected>Every 24 hours</option>
+          </select>
+        </div>
+        <div>
+          <label>Max episodes per run</label>
+          <select id="max-eps">
+            <option value="1">1</option>
+            <option value="3" selected>3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row" style="margin-top:12px;">
+        <div>
+          <label>Ignore episodes older than (days)</label>
+          <select id="max-age">
+            <option value="7">7 days</option>
+            <option value="14" selected>14 days</option>
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEPLOY -->
+  <div class="section" id="s-deploy">
+    <div class="card">
+      <div class="card-title">How to update your agent</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Click <strong>Copy config.yaml</strong> below.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Go to your GitHub repo → open <code>config.yaml</code> → click the pencil icon → select all → paste → <strong>Commit changes</strong>. If no <code>config.yaml</code> exists, use <strong>Add file → Create new file</strong> and name it exactly <code>config.yaml</code>.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Railway detects the commit and <strong>redeploys automatically</strong> within about a minute.</div></div>
+      <div style="display:flex;gap:9px;margin-top:14px;flex-wrap:wrap;">
+        <button class="btn" id="copy-yaml">Copy config.yaml</button>
+        <button class="btn btn-ghost" id="download-yaml">Download as file</button>
+      </div>
+      <div class="toast" id="toast">✓ Copied — now paste it into GitHub and commit.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">config.yaml preview</div>
+      <pre class="yaml" id="yaml-out"></pre>
+    </div>
+    <div class="card">
+      <div class="card-title">Reminder — Railway variables (set these once, separately)</div>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:11px;">API keys never go in config.yaml. They live in Railway → your project → Variables:</p>
+      <table class="var-table">
+        <tr><td>ANTHROPIC_API_KEY</td><td style="color:var(--text-faint)">sk-ant-...</td></tr>
+        <tr><td>ASSEMBLYAI_API_KEY</td><td style="color:var(--text-faint)">your AssemblyAI key</td></tr>
+        <tr><td>GMAIL_ADDRESS</td><td style="color:var(--text-faint)">you@gmail.com</td></tr>
+        <tr><td>GMAIL_APP_PASSWORD</td><td style="color:var(--text-faint)">16-char app password</td></tr>
+        <tr><td>DIGEST_RECIPIENT</td><td style="color:var(--text-faint)">where digests are sent</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    Everything you enter is stored only in this browser. Nothing is uploaded.<br>
+    Open this file any time to update your config.
+  </footer>
+
+</div>
+
+<script>
+  var podcasts = [], topics = [];
+  var DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var dayState = [true,true,true,true,true,true,true];
+
+  function load() {
+    try { podcasts = JSON.parse(localStorage.getItem('pia_html_pods') || '[]'); } catch(e) { podcasts = []; }
+    try { topics = JSON.parse(localStorage.getItem('pia_html_topics') || '[]'); } catch(e) { topics = []; }
+    try {
+      var d = JSON.parse(localStorage.getItem('pia_html_days') || 'null');
+      if (Array.isArray(d) && d.length === 7) dayState = d;
+    } catch(e) {}
+    var inst = localStorage.getItem('pia_html_inst') || '';
+    if (inst) document.getElementById('extract-inst').value = inst;
+    var poll = localStorage.getItem('pia_html_poll'); if (poll) document.getElementById('poll-interval').value = poll;
+    var me = localStorage.getItem('pia_html_maxeps'); if (me) document.getElementById('max-eps').value = me;
+    var ma = localStorage.getItem('pia_html_maxage'); if (ma) document.getElementById('max-age').value = ma;
+  }
+
+  function save() {
+    localStorage.setItem('pia_html_pods', JSON.stringify(podcasts));
+    localStorage.setItem('pia_html_topics', JSON.stringify(topics));
+    localStorage.setItem('pia_html_days', JSON.stringify(dayState));
+    localStorage.setItem('pia_html_inst', document.getElementById('extract-inst').value);
+    localStorage.setItem('pia_html_poll', document.getElementById('poll-interval').value);
+    localStorage.setItem('pia_html_maxeps', document.getElementById('max-eps').value);
+    localStorage.setItem('pia_html_maxage', document.getElementById('max-age').value);
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Tabs
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].addEventListener('click', function() {
+      var name = this.getAttribute('data-tab');
+      for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
+      this.classList.add('active');
+      var secs = document.querySelectorAll('.section');
+      for (var k = 0; k < secs.length; k++) secs[k].classList.remove('active');
+      document.getElementById('s-' + name).classList.add('active');
+      if (name === 'deploy') renderYaml();
+    });
+  }
+
+  // Podcasts
+  document.getElementById('add-pod').addEventListener('click', function() {
+    var url = document.getElementById('pod-url').value.trim();
+    var name = document.getElementById('pod-name').value.trim() || url;
+    if (!url) { alert('Enter an RSS feed URL.'); return; }
+    for (var i = 0; i < podcasts.length; i++) {
+      if (podcasts[i].rss_url === url) { alert('Already added.'); return; }
+    }
+    podcasts.push({ name: name, rss_url: url });
+    document.getElementById('pod-url').value = '';
+    document.getElementById('pod-name').value = '';
+    save(); renderPodcasts();
+  });
+
+  function renderPodcasts() {
+    document.getElementById('c-pod').textContent = podcasts.length;
+    var el = document.getElementById('pod-list');
+    if (!podcasts.length) { el.innerHTML = '<div class="empty">No podcasts added yet.</div>'; return; }
+    var html = '';
+    for (var i = 0; i < podcasts.length; i++) {
+      html += '<div class="list-item">' +
+        '<div class="item-icon">🎙️</div>' +
+        '<div class="item-body"><div class="item-name">' + esc(podcasts[i].name) + '</div>' +
+        '<div class="item-sub">' + esc(podcasts[i].rss_url) + '</div></div>' +
+        '<button class="btn btn-danger" data-i="' + i + '">✕</button></div>';
+    }
+    el.innerHTML = html;
+    var btns = el.querySelectorAll('.btn-danger');
+    for (var b = 0; b < btns.length; b++) {
+      btns[b].addEventListener('click', function() {
+        podcasts.splice(parseInt(this.getAttribute('data-i')), 1);
+        save(); renderPodcasts();
+      });
+    }
+  }
+
+  // Topics
+  document.getElementById('add-topic').addEventListener('click', addTopic);
+  document.getElementById('topic-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') addTopic();
+  });
+  function addTopic() {
+    var v = document.getElementById('topic-input').value.trim();
+    if (!v) return;
+    if (topics.indexOf(v) !== -1) { alert('Already added.'); return; }
+    topics.push(v);
+    document.getElementById('topic-input').value = '';
+    save(); renderTopics();
+  }
+
+  function renderTopics() {
+    document.getElementById('c-top').textContent = topics.length;
+    var el = document.getElementById('topic-list');
+    if (!topics.length) { el.innerHTML = '<div class="empty">No topics yet.</div>'; return; }
+    var html = '';
+    for (var i = 0; i < topics.length; i++) {
+      html += '<span class="tag">' + esc(topics[i]) + '<button data-i="' + i + '">×</button></span>';
+    }
+    el.innerHTML = html;
+    var btns = el.querySelectorAll('.tag button');
+    for (var b = 0; b < btns.length; b++) {
+      btns[b].addEventListener('click', function() {
+        topics.splice(parseInt(this.getAttribute('data-i')), 1);
+        save(); renderTopics();
+      });
+    }
+  }
+
+  // Day grid
+  function renderDays() {
+    var el = document.getElementById('day-grid');
+    el.innerHTML = '';
+    for (var i = 0; i < 7; i++) {
+      (function(idx) {
+        var chip = document.createElement('div');
+        chip.className = 'day-chip' + (dayState[idx] ? ' on' : '');
+        chip.textContent = DAYS[idx];
+        chip.addEventListener('click', function() {
+          dayState[idx] = !dayState[idx];
+          chip.classList.toggle('on');
+          save();
+        });
+        el.appendChild(chip);
+      })(i);
+    }
+  }
+
+  // Settings change listeners
+  document.getElementById('extract-inst').addEventListener('input', save);
+  document.getElementById('poll-interval').addEventListener('change', save);
+  document.getElementById('max-eps').addEventListener('change', save);
+  document.getElementById('max-age').addEventListener('change', save);
+
+  // YAML
+  function buildYaml() {
+    var days = [];
+    for (var i = 0; i < 7; i++) if (dayState[i]) days.push(i);
+    var poll = document.getElementById('poll-interval').value;
+    var maxEps = document.getElementById('max-eps').value;
+    var maxAge = document.getElementById('max-age').value;
+    var inst = document.getElementById('extract-inst').value.trim();
+    var y = '# Podcast Intelligence Agent — config\n';
+    y += '# Generated by the config builder. Do NOT put API keys here.\n\n';
+    y += 'digest_days: [' + days.join(', ') + ']\n';
+    y += 'poll_interval_hours: ' + poll + '\n';
+    y += 'max_episodes_per_run: ' + maxEps + '\n';
+    y += 'max_episode_age_days: ' + maxAge + '\n';
+    if (inst) {
+      y += '\nextraction_instructions: |\n  ' + inst.replace(/\r/g,'').replace(/\n/g,'\n  ') + '\n';
+    }
+    y += '\npodcasts:\n';
+    if (podcasts.length) {
+      for (var p = 0; p < podcasts.length; p++) {
+        y += '  - name: "' + podcasts[p].name.replace(/"/g,'\\"') + '"\n';
+        y += '    rss_url: "' + podcasts[p].rss_url + '"\n';
+      }
+    } else {
+      y += '  []  # add podcasts in the builder\n';
+    }
+    y += '\ntopics:\n';
+    if (topics.length) {
+      for (var t = 0; t < topics.length; t++) {
+        y += '  - "' + topics[t].replace(/"/g,'\\"') + '"\n';
+      }
+    } else {
+      y += '  []  # add topics in the builder\n';
+    }
+    return y;
+  }
+
+  function renderYaml() {
+    document.getElementById('yaml-out').textContent = buildYaml();
+  }
+
+  document.getElementById('copy-yaml').addEventListener('click', function() {
+    var yaml = buildYaml();
+    var btn = this;
+    function done() {
+      document.getElementById('toast').style.display = 'flex';
+      btn.textContent = 'Copied ✓';
+      setTimeout(function() {
+        document.getElementById('toast').style.display = 'none';
+        btn.textContent = 'Copy config.yaml';
+      }, 4000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(yaml).then(done, function() { fallbackCopy(yaml, done); });
+    } else {
+      fallbackCopy(yaml, done);
+    }
+  });
+
+  function fallbackCopy(text, cb) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); cb(); } catch(e) { alert('Copy failed — select the text in the preview box manually.'); }
+    document.body.removeChild(ta);
+  }
+
+  document.getElementById('download-yaml').addEventListener('click', function() {
+    var blob = new Blob([buildYaml()], { type: 'text/yaml' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'config.yaml';
+    a.click();
+  });
+
+  // Init
+  load();
+  renderPodcasts();
+  renderTopics();
+  renderDays();
+  renderYaml();
+</script>
+</body>
+</html>

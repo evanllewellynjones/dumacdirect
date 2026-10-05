@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defense &amp; National Security — Names by Theme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1815;
+    --paper: #f4f1ea;
+    --paper-raised: #faf8f2;
+    --rule: #cdc6b5;
+    --rule-soft: #e2dccc;
+    --muted: #6b6457;
+    --tail: #2f5d3f;
+    --tail-soft: #e8efe6;
+    --head: #8a3324;
+    --head-soft: #f1e4df;
+    --gold: #9a7d31;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { background: var(--paper); }
+
+  body {
+    font-family: 'Newsreader', Georgia, serif;
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.012) 2px, rgba(0,0,0,0.012) 3px);
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 36px 90px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    padding: 40px 0 22px;
+    border-bottom: 3px double var(--ink);
+  }
+  .crumb {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .crumb .here { color: var(--ink); font-weight: 600; }
+
+  .home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 12px 6px 9px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--paper-raised);
+    transition: border-color 0.14s ease, color 0.14s ease;
+    margin-bottom: 18px;
+  }
+  .home-link:hover { border-color: var(--ink); color: var(--ink); }
+  .home-link .arrow { font-size: 13px; line-height: 1; }
+  .category-name {
+    font-size: clamp(48px, 8vw, 92px);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 0.96;
+    margin: 18px 0 6px;
+  }
+  .category-sub {
+    font-size: 19px;
+    font-style: italic;
+    color: var(--muted);
+    max-width: 640px;
+  }
+  .meta-strip {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .meta-cell {
+    padding: 9px 20px 9px 0;
+    margin-right: 20px;
+    border-right: 1px solid var(--rule-soft);
+    color: var(--muted);
+  }
+  .meta-cell:last-child { border-right: none; }
+  .meta-cell b {
+    display: block;
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0;
+  }
+
+  /* ---------- Column headers ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin-top: 4px;
+  }
+  .col {
+    padding-top: 32px;
+  }
+  .col.survivors { padding-right: 38px; border-right: 1px solid var(--rule); }
+  .col.disruption { padding-left: 38px; }
+
+  .col-flag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+  .col-flag.tail { background: var(--tail-soft); color: var(--tail); }
+  .col-flag.head { background: var(--head-soft); color: var(--head); }
+  .col-flag .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor;
+  }
+  .col-title {
+    font-size: 38px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 14px 0 4px;
+    line-height: 1.02;
+  }
+  .col-desc {
+    font-size: 15.5px;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 6px;
+    min-height: 70px;
+  }
+  .col-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .col-count b { color: var(--ink); font-size: 14px; }
+
+  /* ---------- Sub-theme groups ---------- */
+  .group { margin-top: 26px; }
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 5px;
+    margin-bottom: 4px;
+  }
+  .group-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .group-name .lvl {
+    color: var(--gold);
+    font-size: 10px;
+    margin-right: 6px;
+  }
+  .group-tally {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ---------- Name rows ---------- */
+  ul.names { list-style: none; }
+  ul.names li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 7px 4px 7px 2px;
+    border-bottom: 1px dotted var(--rule-soft);
+    transition: background 0.12s ease;
+  }
+  ul.names li:hover { background: var(--paper-raised); }
+  .tkr {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    flex: 0 0 56px;
+  }
+  .tkr.survivor { color: var(--tail); }
+  .tkr.disruptor { color: var(--head); }
+  .nm {
+    flex: 1;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+  }
+  .tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .tag.flag {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(154,125,49,0.07);
+  }
+  .strength {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .strength.core { background: var(--head); color: var(--paper); }
+  .strength.significant { background: var(--head-soft); color: var(--head); border: 1px solid var(--head); }
+  .strength.peripheral { background: transparent; color: var(--head); border: 1px solid var(--rule); }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    margin-top: 56px;
+    padding-top: 18px;
+    border-top: 3px double var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .footer .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-bottom: 14px;
+  }
+  .footer .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+  .footer .disc {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 780px;
+  }
+
+  @media (max-width: 760px) {
+    .wrap { padding: 0 20px 70px; }
+    .board { grid-template-columns: 1fr; }
+    .col.survivors { padding-right: 0; border-right: none; padding-bottom: 30px; }
+    .col.disruption { padding-left: 0; border-top: 1px solid var(--rule); }
+    .category-name { font-size: 52px; }
+    .tags { display: none; }
+  }
+
+  /* ---- additions for multi-theme category pages (Tailwind rosters) ---- */
+  .board { display:block; }
+  .theme-block { margin-top: 44px; }
+  .theme-block:first-of-type { margin-top: 30px; }
+  .theme-flag {
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.18em;
+    text-transform:uppercase; display:inline-flex; align-items:center; gap:8px;
+    padding:4px 10px; border-radius:2px; background:var(--tail-soft); color:var(--tail);
+  }
+  .theme-flag .dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .groups-grid { columns: 2; column-gap: 46px; margin-top: 6px; }
+  .groups-grid .group { break-inside: avoid; margin-top: 22px; }
+  .groups-grid .group:first-child { margin-top: 4px; }
+  ul.names.flow { columns: 2; column-gap: 46px; }
+  ul.names.flow li { break-inside: avoid; }
+  .tkr { flex: 0 0 80px; }
+  .nm.pending { color: var(--rule); font-style: italic; }
+  /* tailwind-toned strength chips (template's are headwind-red) */
+  .strength.core.tail { background: var(--tail); color: var(--paper); border:1px solid var(--tail); }
+  .strength.significant.tail { background: var(--tail-soft); color: var(--tail); border:1px solid var(--tail); }
+  .strength.peripheral.tail { background: transparent; color: var(--tail); border:1px solid var(--rule); }
+  @media (max-width: 760px) {
+    .groups-grid, ul.names.flow { columns: 1; }
+    .tkr { flex: 0 0 72px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <a class="home-link" href="index.html"><span class="arrow">&larr;</span>&nbsp;Home &middot; Category Index</a>
+    <div class="crumb">
+      <span>Thematic Research &nbsp;/&nbsp; Names Index &nbsp;/&nbsp; <span class="here">Defense &amp; National Security</span></span>
+      <span>Snapshot &middot; 26 Jun 2026</span>
+    </div>
+    <h1 class="category-name">Defense &amp; National Security</h1>
+    <p class="category-sub">Unmanned systems and the critical-minerals / strategic-materials base behind supply-chain security and reshoring.</p>
+    <div class="meta-strip">
+      <div class="meta-cell">Category<b>Defense &amp; National Security</b></div>
+      <div class="meta-cell">Themes covered<b>2 L1</b></div>
+      <div class="meta-cell">Total names<b>48</b></div>
+      <div class="meta-cell">Source<b>Neo4j Aura graph</b></div>
+      <div class="meta-cell">Edge as of<b>26 Jun 2026</b></div>
+    </div>
+  </header>
+
+  <div class="board">
+    <section class="theme-block">
+      <span class="theme-flag"><span class="dot"></span>Tailwind</span>
+      <h2 class="col-title">National Security</h2>
+      <p class="col-desc">Critical-minerals, domestic-fuel, and strategic-materials names tied to supply-chain security, reshoring, and stockpiling.</p>
+      <div class="col-count"><b>38</b> names &nbsp;&middot;&nbsp; single L1 theme &middot; all Peripheral</div>
+      <div class="group">
+        <ul class="names flow">
+          <li><span class="tkr survivor">ABAT</span><span class="nm">American Battery Technology</span></li>
+          <li><span class="tkr survivor">ALB</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">AMPX</span><span class="nm">Amprius Technologies</span></li>
+          <li><span class="tkr survivor">ASPI</span><span class="nm">ASP Isotopes</span></li>
+          <li><span class="tkr survivor">BLDP</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">BWXT</span><span class="nm">BWX Technologies</span></li>
+          <li><span class="tkr survivor">CCJ</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">CRML</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">CRS</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">EOSE</span><span class="nm">Eos Energy Enterprises</span></li>
+          <li><span class="tkr survivor">EU</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">FCX</span><span class="nm">Freeport-McMoRan</span></li>
+          <li><span class="tkr survivor">FM CT</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">IDR</span><span class="nm">Idaho Strategic Resources</span></li>
+          <li><span class="tkr survivor">IE</span><span class="nm">Ivanhoe Electric</span></li>
+          <li><span class="tkr survivor">IVN CT</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">LAC</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">LAR</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">LEU</span><span class="nm">Centrus Energy</span></li>
+          <li><span class="tkr survivor">LTBR</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">METC</span><span class="nm">Ramaco Resources</span></li>
+          <li><span class="tkr survivor">MIR</span><span class="nm">Mirion Technologies</span></li>
+          <li><span class="tkr survivor">MP</span><span class="nm">MP Materials</span></li>
+          <li><span class="tkr survivor">MVST</span><span class="nm">Microvast Holdings</span></li>
+          <li><span class="tkr survivor">NB</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">NNE</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">NXE</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">OKLO</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">SEI</span><span class="nm">Solaris Energy Infrastructure</span></li>
+          <li><span class="tkr survivor">SGML</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">SLI</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">TSLA</span><span class="nm">Tesla</span></li>
+          <li><span class="tkr survivor">UAMY</span><span class="nm">United States Antimony</span></li>
+          <li><span class="tkr survivor">UEC</span><span class="nm">Uranium Energy</span></li>
+          <li><span class="tkr survivor">UROY</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">USAR</span><span class="nm">USA Rare Earth</span></li>
+          <li><span class="tkr survivor">UUUU</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">WPM</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+        </ul>
+      </div>
+    </section>
+    <section class="theme-block">
+      <span class="theme-flag"><span class="dot"></span>Tailwind</span>
+      <h2 class="col-title">Drones</h2>
+      <p class="col-desc">Unmanned aerial systems and counter-UAS — platforms, autonomy, and sensing levered to defense drone demand.</p>
+      <div class="col-count"><b>10</b> names &nbsp;&middot;&nbsp; single L1 theme &middot; all Significant</div>
+      <div class="group">
+        <ul class="names flow">
+          <li><span class="tkr survivor">AVAV</span><span class="nm">AeroVironment</span></li>
+          <li><span class="tkr survivor">DPRO</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">HAWK</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">KTOS</span><span class="nm">Kratos Defense &amp; Security</span></li>
+          <li><span class="tkr survivor">ONDS</span><span class="nm">Ondas Holdings</span></li>
+          <li><span class="tkr survivor">OUST</span><span class="nm">Ouster</span></li>
+          <li><span class="tkr survivor">RCAT</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">TRMB</span><span class="nm">Trimble</span></li>
+          <li><span class="tkr survivor">UAVS</span><span class="nm pending">&mdash;</span><span class="tags"><span class="tag flag">name pending</span></span></li>
+          <li><span class="tkr survivor">UMAC</span><span class="nm">Unusual Machines</span></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--tail);"></span>Tailwind — beneficiary</span>
+      <span><span class="swatch" style="background:rgba(154,125,49,0.4);border:1px solid var(--gold);"></span>Name pending — Evan-added, awaiting graph shortName</span>
+    </div>
+    <p>NEO4J AURA &mdash; THEMATIC INVESTMENT GRAPH &nbsp;|&nbsp; CATEGORY: DEFENSE &amp; NATIONAL SECURITY &nbsp;|&nbsp; SNAPSHOT GENERATED 26 JUNE 2026</p>
+    <p>Tickers shown in short form; canonical Bloomberg format in the graph (e.g. SHOP CN Equity). Strength chips (Core / Significant / Peripheral) reflect how central each name is to the thesis.</p>
+    <p class="disc" style="margin-top:10px;">
+      Static snapshot of the Neo4j graph and will drift — the graph is the canonical source. &ldquo;Name pending&rdquo; rows are companies present in the graph whose display name has not yet been populated (shortName backfill outstanding). Framework-driven analysis of structural exposure, not investment advice.
+    </p>
+  </footer>
+</div>
+</body>
+</html>
