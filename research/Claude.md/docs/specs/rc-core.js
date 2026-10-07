@@ -1020,7 +1020,13 @@ function validateRun(run){
 
 /* ---------- reading the corpus ------------------------------------------ */
 /* Flat shared tree:  NOTES/YYYY/MM/<note_id>/note.md
-   note_id carries contributor initials so two people cannot collide. */
+   note_id carries contributor initials so two people cannot collide.
+
+   Any path segment starting with "_" is not a record. NOTES/_positions/ (the
+   Arcana snapshots, v1.6 §18.4) is already excluded by the YYYY / MM name
+   tests; the note-folder check covers a "_" folder dropped one level deeper,
+   which would otherwise be read as a note if it held a note.md. */
+const isPrivateSeg = s => String(s).charAt(0)==="_";
 async function notesRoot(create){
   return RC.dir.getDirectoryHandle("NOTES",{create:!!create});
 }
@@ -1034,7 +1040,7 @@ async function walkNotes(force){
     for await (const [mn,mh] of yh.entries()){
       if(mh.kind!=="directory"||!/^\d{2}$/.test(mn)) continue;
       for await (const [nn,nh] of mh.entries()){
-        if(nh.kind!=="directory") continue;
+        if(nh.kind!=="directory"||isPrivateSeg(nn)) continue;
         try{
           const fm=parseFM(await readTextFile(nh,"note.md"));
           if(fm){ fm._path=[yn,mn,nn]; out.push(fm); }
@@ -1116,6 +1122,182 @@ function bumpRevision(text){
   return setFMLine(text,"revision",String(next));
 }
 
+/* ==========================================================================
+   PRICE CHART (v1.6 §18)
+   Pure functions only — rc-chart.js draws, this decides what is drawn. All
+   dates are YYYY-MM-DD strings compared as strings; day arithmetic is done in
+   UTC so a browser in any timezone gets the same answer as the Node tests.
+   ========================================================================== */
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const hasVal = v => v!==null && v!==undefined && String(v).trim()!=="";
+function isoAddDays(d, n){
+  return new Date(Date.parse(String(d).slice(0,10)+"T00:00:00Z")+n*86400000)
+    .toISOString().slice(0,10);
+}
+/* Clamped to month end: six months before Aug 30 is Feb 29, not Mar 1 —
+   setUTCMonth() alone rolls Feb 30 over into March. */
+function isoAddMonths(d, n){
+  const t=new Date(String(d).slice(0,10)+"T00:00:00Z"), dd=t.getUTCDate();
+  t.setUTCDate(1); t.setUTCMonth(t.getUTCMonth()+n);
+  const last=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()+1,0)).getUTCDate();
+  t.setUTCDate(Math.min(dd,last));
+  return t.toISOString().slice(0,10);
+}
+
+/* FMP's unadjusted EOD series. Verified 2026-10-07 against a live call: the
+   path below answers, and the close field is named `adjClose` even on this
+   endpoint — NVDA reads 1208.90 on 2024-06-07 and 121.79 on 2024-06-10, so
+   the values really are the prices of their day, across the 10:1 split.
+   Non-split-adjusted because targets are typed in the prices of their day
+   (§18.2 decision 3). Tickers are stored as FMP symbols already — the Admin
+   ticker list is FMP-keyed — so no suffix conversion happens here. */
+function fmpHistoryUrl(ticker, from, to, key){
+  return "https://financialmodelingprep.com/stable/historical-price-eod/non-split-adjusted"
+    + "?symbol="+encodeURIComponent(String(ticker||"").trim().toUpperCase())
+    + (from ? "&from="+encodeURIComponent(from) : "")
+    + (to   ? "&to="+encodeURIComponent(to)     : "")
+    + "&apikey="+encodeURIComponent(key||"");
+}
+/* [{date, close}] ascending, one row per date. An error object, an empty
+   array or a row with no usable close all degrade to fewer rows, never a
+   throw — the chart draws targets without a price line. `close` is accepted
+   as well as `adjClose` in case FMP renames the field to match the endpoint. */
+function parseFmpHistory(json){
+  const rows = Array.isArray(json) ? json
+             : (json && Array.isArray(json.historical) ? json.historical : []);
+  const by = new Map();
+  for(const r of rows){
+    if(!r || !ISO_DATE.test(String(r.date||"").slice(0,10))) continue;
+    const c = typeof r.adjClose==="number" ? r.adjClose
+            : typeof r.close==="number" ? r.close : NaN;
+    if(!isFinite(c)) continue;
+    by.set(String(r.date).slice(0,10), c);
+  }
+  return [...by.entries()].sort((a,b)=>a[0].localeCompare(b[0]))
+           .map(([date,close])=>({date,close}));
+}
+/* sessionStorage key. asOf (today) is in it so yesterday's cached series is
+   never served as today's. */
+function chartCacheKey(ticker, from, to, asOf){
+  return "rc_hist_"+[String(ticker||"").toUpperCase(),from||"",to||"",asOf||""].join("|");
+}
+
+/* Target history as step lines (§18.3). Each record that states a buy or a
+   sell opens a step on its date and closes that contributor's previous step
+   on the same side the day before. Blank is "not stated", never "removed":
+   it leaves the open step running. Two records by one contributor on one date
+   — the later (by last_updated) wins and the earlier collapses to nothing.
+   contributors: array of names, or empty/null for everyone.
+   range: {from, to}; steps are clipped to it, and dropped if wholly outside. */
+function buildTargetSteps(records, contributors, range){
+  const want = Array.isArray(contributors)&&contributors.length ? new Set(contributors) : null;
+  const rFrom = range&&range.from || null, rTo = range&&range.to || null;
+  const recs = (records||[]).filter(r => r && r.record_type!=="Trade"
+      && ISO_DATE.test(String(r.date||"").slice(0,10))
+      && (hasVal(r.price_target_buy)||hasVal(r.price_target_sell))
+      && (!want || want.has(r.contributor||"")))
+    .sort((a,b)=> String(a.date).localeCompare(String(b.date))
+               || String(a.last_updated||"").localeCompare(String(b.last_updated||""))
+               || String(a.note_id||"").localeCompare(String(b.note_id||"")));
+  const open = new Map(), steps = [];
+  for(const r of recs){
+    const d = String(r.date).slice(0,10);
+    for(const side of ["buy","sell"]){
+      const raw = r["price_target_"+side];
+      if(!hasVal(raw)) continue;
+      const value = Number(raw);
+      if(!isFinite(value)) continue;
+      const who = r.contributor||"", key = who+"|"+side;
+      const prev = open.get(key);
+      if(prev) prev.to = isoAddDays(d,-1);
+      const s = { contributor:who, side, value, from:d, to:null,
+                  note_id:r.note_id||null, why:r.why||"", subject:r.subject||"" };
+      steps.push(s); open.set(key,s);
+    }
+  }
+  const out = [];
+  for(const s of steps){
+    if(s.to===null) s.to = rTo;                   // still current: runs to range end
+    if(s.to!==null && s.to < s.from) continue;    // superseded the same day
+    if(rTo   && s.from > rTo)   continue;
+    if(rFrom && s.to!==null && s.to < rFrom) continue;
+    if(rFrom && s.from < rFrom) s.from = rFrom;
+    out.push(s);
+  }
+  return out;
+}
+
+/* Last series point on or before `date` — a Saturday trade sits on Friday's
+   close (§18.2 decision 6a). null when the date precedes the series. series
+   must be ascending, as parseFmpHistory returns it. */
+function snapToPriorClose(date, series){
+  const d = String(date||"").slice(0,10);
+  let lo=0, hi=(series||[]).length-1, hit=null;
+  while(lo<=hi){
+    const mid=(lo+hi)>>1;
+    if(series[mid].date<=d){ hit=series[mid]; lo=mid+1; } else hi=mid-1;
+  }
+  return hit;
+}
+
+/* Trade records as ▲ / ▼ markers. Only the four position actions draw; a Trade
+   record carrying pass / observation is a reaction, not a position change.
+   strategies: array to keep, empty/null = all (blank strategy only shows
+   under "all"). With no price series the marker keeps its own date and a
+   null close, so trades still draw when the price fetch failed. range is an
+   optional {from,to} filter on the trade date — without it a trade after the
+   series end would snap onto the last close. */
+const TRADE_DIR = { initiate:"up", add:"up", trim:"down", exit:"down" };
+function tradesToMarkers(records, series, strategies, range){
+  const want = Array.isArray(strategies)&&strategies.length ? new Set(strategies) : null;
+  const s = series||[], out = [];
+  for(const r of (records||[])){
+    if(!r || r.record_type!=="Trade") continue;
+    const dir = TRADE_DIR[r.action];
+    if(!dir) continue;
+    if(want && !want.has(r.strategy||"")) continue;
+    const td = String(r.date||"").slice(0,10);
+    if(!ISO_DATE.test(td)) continue;
+    if(range && range.from && td < range.from) continue;
+    if(range && range.to   && td > range.to)   continue;
+    let date=td, close=null;
+    if(s.length){
+      const p = snapToPriorClose(td, s);
+      if(!p) continue;                            // before the price history
+      date=p.date; close=p.close;
+    }
+    out.push({ date, tradeDate:td, close, dir, action:r.action,
+               strategy:r.strategy||"", why:r.why||"", note_id:r.note_id||null });
+  }
+  return out.sort((a,b)=>a.date.localeCompare(b.date)
+                      || String(a.note_id).localeCompare(String(b.note_id)));
+}
+
+/* Default chart window (§18.2 decision 4): 30 days before the contributor's
+   earliest target on the name, to today. A viewer with no targets of their
+   own falls back to the earliest target by anyone; a name with no targets at
+   all gets a year. records = the ticker's records, any type. */
+function defaultRange(records, contributor, today){
+  const t = String(today).slice(0,10);
+  const tgt = (records||[]).filter(r => r && r.record_type!=="Trade"
+    && ISO_DATE.test(String(r.date||"").slice(0,10))
+    && (hasVal(r.price_target_buy)||hasVal(r.price_target_sell)));
+  let mine = contributor ? tgt.filter(r=>r.contributor===contributor) : tgt;
+  if(!mine.length) mine = tgt;
+  if(!mine.length) return { from:isoAddMonths(t,-12), to:t };
+  const first = mine.map(r=>String(r.date).slice(0,10)).sort()[0];
+  return { from:isoAddDays(first,-30), to:t };
+}
+/* The four presets. "first" is defaultRange under its button name. */
+const CHART_PRESETS = ["6M","1Y","3Y","first"];
+function presetRange(preset, records, contributor, today){
+  const t = String(today).slice(0,10);
+  if(preset==="6M") return { from:isoAddMonths(t,-6),  to:t };
+  if(preset==="1Y") return { from:isoAddMonths(t,-12), to:t };
+  if(preset==="3Y") return { from:isoAddMonths(t,-36), to:t };
+  return defaultRange(records, contributor, t);
+}
+
 /* ---------- shared UI bits ---------------------------------------------- */
 /* Where notes are being read from, in words. admin.html and reports.html both
    call this in their "found nothing" message, which is the one moment it
@@ -1175,6 +1357,10 @@ if (typeof module === "object" && module.exports) {
     runId, screenPath, parseRunId, validateScreen, buildScreen,
     buildRunSidecar, validateRun,
     companyFor, splitDelimited, parseTickerCSV, diffTickers, notesLocation, deleteNote, readAttachment,
-    fmtDate, ageDays, ageLabel
+    fmtDate, ageDays, ageLabel,
+    walkNotes, isPrivateSeg,
+    isoAddDays, isoAddMonths, fmpHistoryUrl, parseFmpHistory, chartCacheKey,
+    buildTargetSteps, snapToPriorClose, TRADE_DIR, tradesToMarkers,
+    defaultRange, CHART_PRESETS, presetRange
   };
 }

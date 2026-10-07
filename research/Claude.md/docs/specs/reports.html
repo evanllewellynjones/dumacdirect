@@ -373,6 +373,7 @@ table.grid.pttbl td.chg.up{color:var(--ok)} table.grid.pttbl td.chg.dn{color:#94
 </div>
 
 <script src="rc-core.js"></script>
+<script src="rc-chart.js"></script>
 <script>
 let VIEW="company";
 function banner(t,ok){ const b=$("#banner"); b.textContent=t||"";
@@ -1037,6 +1038,7 @@ async function renderCompany(force){
   const px=el("span","cpg-px", noPrice ? "" : "\u2014");
   if(noPrice) px.appendChild(el("span","asof","private \u2014 no price data"));
   top.appendChild(px);
+  top.appendChild(chartBtn(tk));
   if(themeMap.size){
     const th=el("span","cpg-themes");
     for(const [theme,recs] of themeMap){
@@ -1128,6 +1130,42 @@ async function renderCompany(force){
       td.textContent=fresh.textContent; td.className=fresh.className;
     }
   }
+}
+
+/* ---------- PRICE CHART (v1.6 §18) ----------
+   The button is the only thing drawn up front; the chart, and its FMP call,
+   happen on click (§18.2 decision 1). Records handed over are the ticker's
+   Company records (targets) and Trade records (markers) — rc-chart.js filters
+   by contributor and strategy itself.
+
+   Who is viewing comes from entry.html's remembered contributor
+   (localStorage rc_contributor). Reports only reads it; Entry stays the one
+   place it is set. Blank means "unknown" and the chart shows everyone. */
+function viewerName(){
+  try{ return localStorage.getItem("rc_contributor")||""; }catch(e){ return ""; }
+}
+function chartBtn(tk){
+  const b=el("button","btn","Chart");
+  b.style.cssText="padding:2px 10px;font-size:12px";
+  b.title="Price chart with price targets and trades";
+  b.onclick=e=>{ e.stopPropagation(); openChart(tk); };
+  return b;
+}
+async function openChart(tk){
+  const ns=await walkNotes();
+  const own=companies(ns).filter(n=>normTk(n.ticker)===tk);
+  const trd=trades(ns).filter(n=>normTk(n.ticker)===tk);
+  const last=own.length ? [...own].sort((a,b)=>String(a.date).localeCompare(String(b.date))).pop() : null;
+  const listed=last ? last.listed : null;
+  RCChart.open({
+    ticker:tk,
+    name:(own.find(n=>n.entity)||{}).entity||companyFor(tk,ns)||"",
+    records:own.concat(trd),
+    cfg:RC.cfg||SEED,
+    viewer:viewerName(),
+    noPrice:tk.startsWith("P.")||listed===false||listed==="false",
+    onOpenRecord:n=>openReader(n)
+  });
 }
 
 /* ---------- THEME VIEW ---------- */
@@ -1509,6 +1547,7 @@ async function renderTargets(){
     const nm=(recs.find(n=>n.entity)||{}).entity||companyFor(ticker,ns)||"";
     if(nm&&nm!==ticker) hd.appendChild(el("span","nm",nm));
     hd.appendChild(el("span","tiny",recs.length+" target note(s)"));
+    hd.appendChild(chartBtn(ticker));
     c.appendChild(hd);
     const tbl=el("table","grid pttbl");
     tbl.innerHTML="<thead><tr><th style='width:96px'>Date</th><th style='width:150px'>Contributor</th>"

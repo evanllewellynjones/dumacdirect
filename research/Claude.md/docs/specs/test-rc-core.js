@@ -68,7 +68,10 @@ t("subject hit sorts first", C.matchTags("Semis rolling over", "retail data soft
 const base = { date:"2026-09-07", subject:"S", entity:"E", origin:"app", why:"w" };
 const V = o => C.validateRecord(Object.assign({}, base, o), cfg);
 
-t("missing action errors", !C.validateRecord(base, cfg).ok);
+/* action is required only where the type makes a decision (TYPE_RULES). */
+t("missing action errors on a Trade",
+  !V({record_type:"Trade", ticker:"WOLF", strategy:"Direct US"}).ok);
+t("missing action fine on an untyped record", C.validateRecord(base, cfg).ok);
 t("bad action errors", !V({action:"buy"}).ok);
 t("pass ok", V({action:"pass"}).ok);
 t("observation ok", V({action:"observation"}).ok);
@@ -80,8 +83,11 @@ t("position action w/ ticker: no ticker warning",
 
 /* ================= v1.4: why ============================================ */
 
-t("why required for observation",
-  !C.validateRecord({date:"2026-09-07",subject:"S",entity:"E",origin:"app",action:"observation"}, cfg).ok);
+t("why required on a Trade",
+  !C.validateRecord({date:"2026-09-07",subject:"S",entity:"E",origin:"app",record_type:"Trade",
+                     ticker:"WOLF",strategy:"Direct US",action:"trim"}, cfg).ok);
+const nw = C.validateRecord({date:"2026-09-07",subject:"S",entity:"E",origin:"app",action:"observation"}, cfg);
+t("observation with no why warns, does not block", nw.ok && nw.warnings.length > 0);
 t("why exempt for reference",
   C.validateRecord({date:"2026-09-07",subject:"S",entity:"E",origin:"ingest",action:"reference"}, cfg).ok);
 const lw = V({action:"pass", why:"x".repeat(250)});
@@ -117,7 +123,7 @@ t("review_status without review_date warns, does not block",
   orphan.ok && orphan.warnings.length > 0);
 
 t("conviction Med ok", V({action:"pass", conviction:"Med"}).ok);
-t("bad conviction errors", !V({action:"pass", conviction:"Vhigh"}).ok);
+t("pre-v1.6 conviction is left alone, not validated", V({action:"pass", conviction:"Vhigh"}).ok);
 t("decimal price target errors", !V({action:"pass", price_target_buy:"62.5"}).ok);
 t("whole price target ok", V({action:"pass", price_target_buy:"62"}).ok);
 t("zero price target ok", V({action:"pass", price_target_buy:0}).ok);
@@ -143,7 +149,7 @@ const rec = {
   source:"SemiAnalysis \u2014 SiC capacity buildout",
   outcome_check_date:null,
   tags:["Semiconductors","United States"], attachments:[],
-  price_target_buy:0, price_target_sell:null, conviction:"Med",
+  price_target_buy:0, price_target_sell:null, bias:"+",
   review_date:null, review_status:null, priority:null, revision:1
 };
 const md = C.buildFM(rec, "Spoke with two accounts.");
@@ -211,12 +217,13 @@ const V2 = o => C.validateRecord(Object.assign(
   {date:"2026-09-07", subject:"S", origin:"app", action:"observation", why:"w"}, o), cfg);
 t("Note type valid", V2({record_type:"Note"}).ok);
 t("Note needs no entity", V2({record_type:"Note"}).ok);
-t("Company still needs entity", !V2({record_type:"Company", ticker:"NKE", entity:""}).ok);
+t("Company entity optional — resolves from the ticker",
+  V2({record_type:"Company", ticker:"NKE", entity:""}).ok);
 t("Theme still needs entity", !V2({record_type:"Theme", entity:""}).ok);
 t("bad record_type errors", !V2({record_type:"Quick"}).ok);
 const nt = V2({record_type:"Note", entity:"Brazil", ticker:"BRZ"});
 t("Note with ticker warns not blocks", nt.ok && nt.warnings.length > 0);
-eq("RECORD_TYPES", C.RECORD_TYPES, ["Company","Theme","Note"]);
+eq("RECORD_TYPES", C.RECORD_TYPES, ["Company","Theme","Note","Trade"]);
 }
 
 /* ================= v1.5: write-once why ================================= */
@@ -409,5 +416,152 @@ eq("STRATEGY email key",
    "Direct US");
 }
 
-console.log("\n" + pass + " passed, " + fail + " failed");
-process.exit(fail ? 1 : 0);
+/* ================= v1.6 §18: price chart ================================ */
+{
+/* FMP URL — the endpoint path was checked against a live call, see rc-core. */
+eq("fmpHistoryUrl shape",
+   C.fmpHistoryUrl(" nvda ","2024-06-04","2024-06-14","K&Y"),
+   "https://financialmodelingprep.com/stable/historical-price-eod/non-split-adjusted"
+   + "?symbol=NVDA&from=2024-06-04&to=2024-06-14&apikey=K%26Y");
+t("fmpHistoryUrl keeps an FMP suffix", C.fmpHistoryUrl("7203.T","","","k").indexOf("symbol=7203.T&")>0);
+
+/* parseFmpHistory over a saved real response (NVDA around the 2024 10:1 split) */
+const fx = JSON.parse(require("fs").readFileSync(__dirname+"/fixtures/fmp-nvda-non-split-2024-06.json","utf8"));
+const S = C.parseFmpHistory(fx);
+eq("fixture rows", S.length, 9);
+eq("ascending", [S[0].date, S[S.length-1].date], ["2024-06-04","2024-06-14"]);
+eq("pre-split close is the price of its day", S.find(p=>p.date==="2024-06-07").close, 1208.9);
+eq("post-split close", S.find(p=>p.date==="2024-06-10").close, 121.79);
+eq("rows with no close dropped",
+   C.parseFmpHistory([{date:"2024-01-02",adjClose:null},{date:"junk",adjClose:1},
+                      {date:"2024-01-03",adjClose:5},{date:"2024-01-04"}]),
+   [{date:"2024-01-03",close:5}]);
+eq("error object -> empty", C.parseFmpHistory({"Error Message":"Invalid API KEY."}), []);
+eq("duplicate dates collapse",
+   C.parseFmpHistory([{date:"2024-01-03",adjClose:5},{date:"2024-01-03",adjClose:6}]).length, 1);
+eq("close accepted if adjClose is renamed",
+   C.parseFmpHistory([{date:"2024-01-03",close:7}]), [{date:"2024-01-03",close:7}]);
+t("cache key carries as-of date",
+  C.chartCacheKey("NVDA","a","b","2026-10-07")!==C.chartCacheKey("NVDA","a","b","2026-10-08"));
+
+/* buildTargetSteps */
+const R = (id,who,date,buy,sell,extra) => Object.assign({ note_id:id, contributor:who,
+  date, record_type:"Company", ticker:"NVDA", price_target_buy:buy, price_target_sell:sell,
+  why:"why "+id, subject:"subj "+id, last_updated:date+"T09:00:00Z" }, extra||{});
+const recs = [
+  R("a","Evan Jones","2026-01-10","50","80"),
+  R("b","Evan Jones","2026-03-01","55",null),          // sell blank: not stated
+  R("c","Evan Jones","2026-05-01","","90"),            // buy blank: not stated
+  R("d","Ana Anderson","2026-02-01","40",null),
+  R("x","Evan Jones","2026-01-05",null,null),          // no target at all
+  R("t","Evan Jones","2026-04-01","99","99",{record_type:"Trade",action:"add"})
+];
+const full = {from:"2025-12-01", to:"2026-06-30"};
+const pick = (steps,side) => steps.filter(s=>s.side===side)
+  .map(s=>[s.value,s.from,s.to,s.note_id]);
+const ej = C.buildTargetSteps(recs,["Evan Jones"],full);
+eq("buy steps", pick(ej,"buy"),
+   [[50,"2026-01-10","2026-02-28","a"],[55,"2026-03-01","2026-06-30","b"]]);
+eq("blank sell leaves the step running (blank-means-unchanged)", pick(ej,"sell"),
+   [[80,"2026-01-10","2026-04-30","a"],[90,"2026-05-01","2026-06-30","c"]]);
+eq("why carried for the tooltip", ej[0].why, "why a");
+t("Trade record targets ignored", ej.every(s=>s.note_id!=="t"));
+t("other contributor excluded", ej.every(s=>s.contributor==="Evan Jones"));
+eq("everyone when contributors empty", C.buildTargetSteps(recs,[],full).length, 5);
+eq("one other contributor", pick(C.buildTargetSteps(recs,["Ana Anderson"],full),"buy"),
+   [[40,"2026-02-01","2026-06-30","d"]]);
+eq("step straddling range start is clipped, not dropped",
+   pick(C.buildTargetSteps(recs,["Evan Jones"],{from:"2026-02-15",to:"2026-06-30"}),"buy")[0],
+   [50,"2026-02-15","2026-02-28","a"]);
+t("step wholly before range dropped",
+  C.buildTargetSteps(recs,["Evan Jones"],{from:"2026-03-15",to:"2026-06-30"})
+   .every(s=>s.note_id!=="a" || s.side!=="buy"));
+const early = C.buildTargetSteps(recs,["Evan Jones"],{from:"2025-12-01",to:"2026-04-15"});
+t("step starting after range end dropped", early.every(s=>s.note_id!=="c"));
+eq("open step ends at range end", pick(early,"buy")[1], [55,"2026-03-01","2026-04-15","b"]);
+const same = recs.concat([R("b2","Evan Jones","2026-03-01","57",null,
+                            {last_updated:"2026-03-01T15:00:00Z"})]);
+eq("same-day revision: the later record wins",
+   pick(C.buildTargetSteps(same,["Evan Jones"],full),"buy").map(s=>s[3]), ["a","b2"]);
+eq("zero is a value, not blank",
+   C.buildTargetSteps([R("z","Evan Jones","2026-01-10","0",null)],[],full)[0].value, 0);
+
+/* snapToPriorClose */
+eq("Saturday snaps to Friday", C.snapToPriorClose("2024-06-08",S), {date:"2024-06-07",close:1208.9});
+eq("Sunday snaps to Friday", C.snapToPriorClose("2024-06-09",S).date, "2024-06-07");
+eq("trading day is itself", C.snapToPriorClose("2024-06-10",S).date, "2024-06-10");
+eq("before the series -> null", C.snapToPriorClose("2024-06-01",S), null);
+eq("after the series -> last close", C.snapToPriorClose("2024-06-20",S).date, "2024-06-14");
+eq("empty series -> null", C.snapToPriorClose("2024-06-10",[]), null);
+
+/* tradesToMarkers */
+const T = (id,date,action,strategy) => ({ note_id:id, record_type:"Trade", ticker:"NVDA",
+  date, action, strategy, why:"why "+id });
+const trs = [ T("i","2024-06-04","initiate","Direct US"), T("ad","2024-06-05","add","Direct US"),
+  T("tr","2024-06-08","trim","Direct Global Ideas"), T("ex","2024-06-11","exit","Direct US"),
+  T("ps","2024-06-12","pass","Direct US"), T("pre","2024-05-01","add","Direct US"),
+  Object.assign(T("co","2024-06-06","initiate","Direct US"),{record_type:"Company"}) ];
+const M = C.tradesToMarkers(trs,S,[]);
+eq("direction per action", M.map(m=>m.action+":"+m.dir),
+   ["initiate:up","add:up","trim:down","exit:down"]);
+t("pass draws nothing", M.every(m=>m.action!=="pass"));
+t("Company record with an action is not a trade", M.every(m=>m.note_id!=="co"));
+t("trade before the series dropped", M.every(m=>m.note_id!=="pre"));
+const wk = M.find(m=>m.note_id==="tr");
+eq("weekend trade snaps, keeps its true date", [wk.date,wk.tradeDate,wk.close],
+   ["2024-06-07","2024-06-08",1208.9]);
+eq("strategy filter", C.tradesToMarkers(trs,S,["Direct Global Ideas"]).map(m=>m.note_id), ["tr"]);
+const np = C.tradesToMarkers(trs,[],[]);
+t("no price series: markers still drawn, own date, no close",
+  np.length===5 && np.every(m=>m.close===null && m.date===m.tradeDate));
+eq("range filter on trade date",
+   C.tradesToMarkers(trs,S,[],{from:"2024-06-05",to:"2024-06-08"}).map(m=>m.note_id), ["ad","tr"]);
+
+/* defaultRange / presets */
+eq("default: 30 days before my first target",
+   C.defaultRange(recs,"Evan Jones","2026-10-07"), {from:"2025-12-11",to:"2026-10-07"});
+eq("default: other contributor's own first target",
+   C.defaultRange(recs,"Ana Anderson","2026-10-07").from, "2026-01-02");
+eq("default: viewer with no targets falls back to anyone's first",
+   C.defaultRange(recs,"Ian Jennings","2026-10-07").from, "2025-12-11");
+eq("default: no targets at all -> one year",
+   C.defaultRange([],"Evan Jones","2026-10-07"), {from:"2025-10-07",to:"2026-10-07"});
+eq("preset 6M", C.presetRange("6M",recs,"Evan Jones","2026-10-07").from, "2026-04-07");
+eq("preset 3Y", C.presetRange("3Y",recs,"Evan Jones","2026-10-07").from, "2023-10-07");
+eq("month arithmetic clamps to month end", C.isoAddMonths("2024-08-30",-6), "2024-02-29");
+eq("month arithmetic across a year", C.isoAddMonths("2026-01-31",1), "2026-02-28");
+eq("month arithmetic plain", C.isoAddMonths("2026-10-07",-36), "2023-10-07");
+eq("preset first = default", C.presetRange("first",recs,"Evan Jones","2026-10-07").from, "2025-12-11");
+}
+
+/* ================= v1.6 §18.4: walkNotes skips "_" segments ============= */
+/* A fake FileSystemDirectoryHandle tree. NOTES/_positions/ holds snapshot
+   JSON and must never come back as a record; nor may a "_" folder inside a
+   month. Only the one real note should. */
+async function walkTest(){
+  const file = text => ({ kind:"file", async getFile(){ return { async text(){ return text; } }; } });
+  const dir = kids => ({ kind:"directory",
+    async *entries(){ for(const k of Object.keys(kids)) yield [k,kids[k]]; },
+    async getDirectoryHandle(n){ const h=kids[n];
+      if(!h||h.kind!=="directory") throw new Error("NotFound"); return h; },
+    async getFileHandle(n){ const h=kids[n];
+      if(!h||h.kind!=="file") throw new Error("NotFound"); return h; } });
+  const note = id => dir({ "note.md": file("---\nnote_id: "+id+"\ndate: 2026-10-01\n---\n\nb") });
+  C.RC.dir = dir({ NOTES: dir({
+    "2026": dir({ "10": dir({ "2026-10-01_ej_real": note("2026-10-01_ej_real"),
+                              "_scratch": note("should-not-load") }) }),
+    "_positions": dir({ "direct-global-ideas": dir({ "latest.json": file("{}") }),
+                        "10": dir({ "x": note("also-not") }) })
+  }) });
+  C.RC.notes = null;
+  const got = await C.walkNotes(true);
+  eq("walkNotes returns only the real note", got.map(n=>n.note_id), ["2026-10-01_ej_real"]);
+  t("isPrivateSeg", C.isPrivateSeg("_positions") && !C.isPrivateSeg("2026"));
+  C.RC.dir = null; C.RC.notes = null;
+}
+
+walkTest().catch(e => { fail++; console.log("FAIL: walkNotes threw " + e.message); })
+  .then(() => {
+    console.log("\n" + pass + " passed, " + fail + " failed");
+    process.exit(fail ? 1 : 0);
+  });
