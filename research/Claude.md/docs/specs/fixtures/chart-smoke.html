@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chart smoke fixture</title>
+<link rel="stylesheet" href="../rc-style.css">
+</head>
+<body>
+<!-- Fixture page for test-chart-smoke.js. Loads the real rc-core.js and
+     rc-chart.js against hand-made records, with fetch stubbed to serve a saved
+     FMP response (window.__FMP, injected by the test). Opened by hand with no
+     test runner it still renders — just without a price line. The reader here
+     is a stand-in: reports.html's openReader needs a granted folder. -->
+<div class="wrap wide"><div class="card">Chart smoke fixture
+  <button class="btn" id="open">Open chart</button></div></div>
+
+<div class="modal" id="reader"><div class="box">
+  <div class="hd"><h3 id="rd_title"></h3><button class="btn" id="rd_close">Close</button></div>
+  <div class="bd"><pre id="rd_body"></pre></div>
+</div></div>
+
+<script src="../rc-core.js"></script>
+<script src="../rc-chart.js"></script>
+<script>
+window.fetch = async () => window.__FMP
+  ? { ok:true, json: async () => window.__FMP }
+  : { ok:false, json: async () => ({}) };
+
+const C = (id,who,date,buy,sell,why) => ({ note_id:id, record_type:"Company", ticker:"NVDA",
+  contributor:who, date, last_updated:date+"T09:00:00Z", subject:"Target note "+id,
+  price_target_buy:buy, price_target_sell:sell, why, _body:"Body of "+id });
+const T = (id,date,action,strategy,why) => ({ note_id:id, record_type:"Trade", ticker:"NVDA",
+  contributor:"Evan Jones", date, subject:"Trade "+id, action, strategy, why, _body:"Body of "+id });
+
+const RECORDS = [
+  C("t1","Evan Jones","2024-03-20","800","1000","AI capex cycle has two more years"),
+  C("t2","Evan Jones","2024-05-10","900",null,"Data-centre guide raised again"),
+  C("t3","Evan Jones","2024-06-20","110","150","Post-split prices; thesis unchanged"),
+  C("t4","Ana Anderson","2024-04-15",null,"1100","Valuation stretched above 1100"),
+  T("x1","2024-03-22","initiate","Direct US","Starter position after GTC"),
+  T("x2","2024-06-08","add","Direct Global Ideas","Added on the split weekend"),
+  T("x3","2024-07-17","trim","Direct US","")
+];
+window.__opened = null;
+function openReader(n){
+  window.__opened = n.note_id;
+  document.getElementById("rd_title").textContent = n.subject;
+  document.getElementById("rd_body").textContent = n._body;
+  document.getElementById("reader").classList.add("show");
+}
+document.getElementById("rd_close").onclick = () =>
+  document.getElementById("reader").classList.remove("show");
+
+function openIt(){
+  RCChart.open({ ticker:"NVDA", name:"NVIDIA Corp", records:RECORDS,
+    cfg:{ strategies:["Direct Global Ideas","Direct US"], fmp_api_key:"TEST" },
+    viewer:"Evan Jones", noPrice:false, onOpenRecord:openReader, today:"2024-08-30" });
+}
+document.getElementById("open").onclick = openIt;
+openIt();
+</script>
+</body>
+</html>

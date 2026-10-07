@@ -1,0 +1,12 @@
+{
+  "name": "research-capture",
+  "private": true,
+  "description": "DUMAC Research Capture — test runners only. The app itself has no build step and no runtime dependencies.",
+  "scripts": {
+    "test": "node test-rc-core.js && node test-reader-edit.js",
+    "test:smoke": "node test-chart-smoke.js"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.0.0"
+  }
+}
