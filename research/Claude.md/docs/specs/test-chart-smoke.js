@@ -120,6 +120,21 @@ const ok = (c, m) => { c ? pass++ : (fail++, console.log("FAIL: " + m)); };
       /* headless Chrome removes its downloads on close, so keep a copy */
       fs.writeFileSync(path.join(out, "chart-export.png"), b);
     }
+    /* 7. a name with no targets: price only, one-year window */
+    await page.evaluate(() => { RCChart.close(); RCChart.open({ ticker:"NVDA", name:"NVIDIA Corp",
+      records:[], cfg:{ strategies:["Direct US"], fmp_api_key:"TEST" }, viewer:"Evan Jones",
+      onOpenRecord:()=>{}, today:"2024-08-30" }); });
+    await page.waitForFunction(() => RCChart.state() && !RCChart.state().loading);
+    const bare = await page.evaluate(() => { const s=RCChart.state();
+      return { range:s.range, series:s.drawn.series.length, steps:s.drawn.steps.length,
+               markers:s.drawn.markers.length,
+               who:document.getElementById("ch_who").textContent }; });
+    ok(bare.series > 100 && bare.steps === 0 && bare.markers === 0,
+       "no targets: price line only, got " + JSON.stringify(bare));
+    ok(bare.range.from === "2023-08-30", "no targets: one-year default range");
+    ok(/No price targets entered/.test(bare.who), "no targets: says so in the chip row");
+    await page.screenshot({ path:path.join(out, "chart-no-targets.png") });
+
     ok(errs.length === 0, "no page errors: " + errs.join(" | "));
   } finally { await browser.close(); }
 
