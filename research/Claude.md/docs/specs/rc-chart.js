@@ -359,6 +359,7 @@ const RCChart = (()=>{
     const gSt = svg("g"), gHit = svg("g");
     const prevBy = new Map();
     const lastBy = new Map();
+    const placed = [];
     steps.forEach((s,i)=>{
       const col = s.side==="buy" ? "var(--chart-buy)" : "var(--chart-sell)";
       const xa = X(s.from), xb = s.to>=r.to ? X(r.to) : X(isoAddDays(s.to,1)), y = Y(s.value);
@@ -370,7 +371,12 @@ const RCChart = (()=>{
           Object.assign({},st,{"stroke-width":"1.25",opacity:"0.55"})));
       prevBy.set(k,s); lastBy.set(k,s);
       gSt.appendChild(svg("line",{x1:xa,x2:Math.max(xb,xa+1),y1:y,y2:y},st));
-      if(xb-xa > 30){                                     // value at the step start
+      /* value at the step start, unless the step is too short or the label
+         would sit on one already placed (buy and sell set the same day at
+         close values). The right-margin label and the tooltip still carry it. */
+      const clash = placed.some(p=>Math.abs(p.x-xa)<46 && Math.abs(p.y-y)<12);
+      if(xb-xa > 30 && !clash){
+        placed.push({x:xa,y});
         const t = svg("text",{x:xa+3,y:y-4},
           {fill:"var(--ink,#12181f)","font-size":"10.5px",opacity:"0.85"});
         t.textContent = (s.side==="buy"?"B ":"S ")+fmtN(s.value);
